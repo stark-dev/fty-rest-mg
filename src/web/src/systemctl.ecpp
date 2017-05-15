@@ -20,6 +20,7 @@
 /*!
  * \file systemctl.ecpp
  * \author Karol Hrdina <KarolHrdina@Eaton.com>
+ * \author Jim Klimov <EvgenyKlimov@Eaton.com>
  * \brief  Provide Users ability to manipulate with some specified services
  */
  #><%pre>
@@ -65,7 +66,7 @@ is_POST_operation (const std::string& operation)
 bool
 systemctl_service_status (const std::string& service_name, std::string& load, std::string& active, std::string& unit_file, std::string& sub)
 {
-    MlmSubprocess::Argv proc_cmd {"sudo", "/bin/systemctl", "show", service_name,
+    MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "show", service_name,
                            "-p", "LoadState", "-p", "ActiveState", "-p", "UnitFileState", "-p", "SubState"};
     std::string proc_out, proc_err;
 
@@ -73,7 +74,7 @@ systemctl_service_status (const std::string& service_name, std::string& load, st
 
     if (rv != 0) {
         std::string message;
-        message = "`sudo /bin/systemctl show " + service_name + " -p LoadState -p ActiveState "
+        message = "`sudo systemctl show " + service_name + " -p LoadState -p ActiveState "
                   "-p UnitFileState -p SubState` failed. Return value = '" + std::to_string (rv) + "', stderr = '" + proc_err + "'.";
         log_error ("%s", message.c_str ());
         return false;
@@ -266,14 +267,16 @@ UserInfo user;
     }
 
     {
-        MlmSubprocess::Argv proc_cmd {"sudo", "/bin/systemctl", checked_operation, checked_service_name};
+        MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", checked_operation, checked_service_name};
         std::string proc_out, proc_err;
 
         int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
 
         if (rv != 0) {
             std::string message;
-            message = "`sudo /bin/systemctl " + checked_operation + " " + checked_service_name  + "'.";
+            // Use our wrapper from PATH of the web-server,
+            // so allowing management of only our services
+            message = "`sudo systemctl " + checked_operation + " " + checked_service_name  + "'.";
             log_error ("%s", message.c_str ());
             std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
             http_die ("internal-error", err.c_str ());
