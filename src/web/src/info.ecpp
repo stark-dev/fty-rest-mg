@@ -68,6 +68,7 @@ get_rc_info (std::string &output)
         log_critical ("info: client->recv (timeout = '5') returned NULL");
         return -3;
     }
+    char *command = zmsg_popstr (resp);
     char *srv_name  = zmsg_popstr (resp);
     char *srv_type  = zmsg_popstr (resp);
     char *srv_stype = zmsg_popstr (resp);
@@ -82,7 +83,6 @@ get_rc_info (std::string &output)
     output += utils::json::jsonify("sub_type", srv_stype)+ ",\n";
     output += utils::json::jsonify("port", srv_port);
     output += "\n},";
-    
     output += "\"attributes\": {\n";
     char *value = (char *) zhash_first (infos);   // first value
     while ( value != NULL )
@@ -95,6 +95,7 @@ get_rc_info (std::string &output)
     }
     output += "\n}";
     output += "\n}";
+    zstr_free (&command);
     zstr_free(&srv_name);
     zstr_free(&srv_type);
     zstr_free(&srv_stype);
