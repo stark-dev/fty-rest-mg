@@ -34,6 +34,8 @@ struct Item
 
 struct Topology
 {
+    typedef bool (compare_fn) (const Item&, const Item&);
+
     std::vector <Item> rooms;
     std::vector <Item> rows;
     std::vector <Item> racks;
@@ -70,6 +72,14 @@ struct Topology
                 groups.push_back (it);
         }
     }
+
+    void sort (compare_fn compare) {
+        std::sort (rooms.begin (), rooms.end (), compare);
+        std::sort (rows.begin (), rows.end (), compare);
+        std::sort (racks.begin (), racks.end (), compare);
+        std::sort (devices.begin (), devices.end (), compare);
+        std::sort (groups.begin (), groups.end (), compare);
+    }
 };
 
     Item () {}
@@ -83,7 +93,8 @@ struct Topology
         name {name},
         subtype {subtype},
         type {type},
-        contains {}
+        contains {},
+        asset_order {}
         {}
 
     std::string id;
@@ -91,6 +102,7 @@ struct Topology
     std::string subtype;
     std::string type;
     Topology contains;
+    std::string asset_order;
     friend void operator<<= (cxxtools::SerializationInfo &si, const Item &asset);
 };
 //
@@ -195,7 +207,11 @@ topology2_from_json_recursive (
     const std::vector <Item> &groups
     );
 
+// returns TRUE if asset_name is power device
+// returns FALSE if otherwise
+bool
+    is_power_device (tntdb::Connection &conn, std::string &asset_name);
+
 };  // namespace persist
 
 #endif //SRC_INCLUDE_TOPOLOGY2
-
