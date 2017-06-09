@@ -94,7 +94,7 @@ std::map <std::string, std::string> systemctl_service_names = {
     { "ifplug-dhcp-autoconf", "" },
     { "ipc-meta-setup", "" },
     { "fty-sensor-env", "" },
-    { "fty-nut-configuator", "" },
+    { "fty-nut-configurator", "" },
     { "fty-metric-compute", "" },
     { "fty-metric-cache", "" },
     { "fty-alert-flexible", "" },
