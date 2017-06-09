@@ -75,6 +75,7 @@ std::map <std::string, std::string> systemctl_service_names = {
     { "fty-metric-composite-configurator", "" },
     { "fty-metric-tpower", "" },
     { "bios-agent-inventory", "" },
+    { "fty-discovery", "" },
     { "fty-info", "" },
     { "fty-mdns-sd", "" },
     { "fty-metric-snmp", "" },
