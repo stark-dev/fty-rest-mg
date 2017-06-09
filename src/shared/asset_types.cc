@@ -130,6 +130,9 @@ a_elmnt_stp_id_t
     else if (st == "patch panel") {
         return asset_subtype::PATCHPANEL;
     }
+    else if (st == "patchpanel") {
+        return asset_subtype::PATCHPANEL;
+    }
     else if (st == "other") {
         return asset_subtype::OTHER;
     }
@@ -177,7 +180,7 @@ std::string
         case asset_subtype::CHASSIS:
             return "chassis";
         case asset_subtype::PATCHPANEL:
-            return "patch panel";
+            return "patchpanel";
         case asset_subtype::OTHER:
             return "other";
         case asset_subtype::VIRTUAL:
