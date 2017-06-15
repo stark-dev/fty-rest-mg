@@ -156,6 +156,7 @@ src/web/src/email_test.cpp
 src/web/src/email_vote.cpp
 src/web/src/input_power_chain.cpp
 src/web/src/info.cpp
+src/web/src/scan_run.cpp
 
 tntnet.xml.example
 !src/web/tntnet.xml

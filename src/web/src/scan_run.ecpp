@@ -1,0 +1,127 @@
+<#
+ #
+ # Copyright (C) 2016-2017 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file    scan_run.ecpp
+ * \author  Jana Rapava <JanaRapava@Eaton.com>
+ * \brief   This call runs autodiscovery scan.
+ */
+ #><%pre>
+#include <string>
+#include "tntmlm.h"
+#include "helpers.h"
+#include "utils_web.h"
+
+// scan request
+static zmsg_t *
+req_scan (zuuid_t *uuid, char *config, char *range)
+{
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "RUNSCAN");
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zmsg_addstr (msg, config);
+    zmsg_addstr (msg, range);
+    return msg;
+}
+
+int
+runscan (char *config, char *range)
+{
+    // connect to mlm client
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        log_critical ("scan_run: mlm_pool.get () failed.");
+        return -1;
+    }
+
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *request = req_scan (uuid, config, range);
+    int rv = client->sendto ("fty-discovery", "scan", 1000, &request);
+
+    if (rv == -1)
+    {
+        log_critical ("scan_run: client->sendto (address = '%s') failed.", "fty-discovery");
+        return -2;
+    }
+
+    zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    if (!resp)
+    {
+        log_critical ("scan_run: client->recv (timeout = '5') returned NULL");
+        return -3;
+    }
+    char *result = zmsg_popstr (resp);
+    if (result) {
+        if (streq (result, "OK")) {
+                zstr_free (&result);
+                return 0;
+            }
+        else if (streq (result, "ERROR")) {
+            zstr_free (&result);
+            return -4;
+        }
+        else {
+            zstr_free (&result);
+            return -5;
+        }
+    }
+    else
+        return -5;
+    zstr_free (&result);
+    zmsg_destroy(&resp);
+    return 0;
+}
+</%pre>
+<%request scope="global">
+UserInfo user;
+</%request>
+<%cpp>
+    // permission check
+    static const std::map <BiosProfile, std::string> PERMISSIONS = {
+            {BiosProfile::Anonymous, "R"},
+            {BiosProfile::Dashboard, "R"},
+            {BiosProfile::Admin,     "R"}
+            };
+    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+    std::string config = request.getArg ("config");
+    std::string range = request.getArg ("range");
+
+    //TODO: verify that range is valid IPv4 range
+    char *checked_config = strdup (config.c_str ());
+    char *checked_range = strdup (range.c_str ());
+
+    int rv = runscan (checked_config, checked_range);
+    if (rv == -1)
+        http_die ("internal-error", "mlmpool.get () failed.");
+    else
+    if (rv == -2)
+        http_die ("internal-error", "client->sendto () failed.");
+    else
+    if (rv == -3)
+        http_die ("internal-error", "client->recv () failed.");
+    else
+    if (rv == -4)
+        http_die ("request-param-required", "<range>");
+    else
+    if (rv == -5)
+        http_die ("internal-error", "fty-discovery returned malformed or unexpected message.");
+    else
+</%cpp>
