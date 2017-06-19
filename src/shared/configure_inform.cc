@@ -105,15 +105,11 @@ void
             throw std::runtime_error ("persist::select_asset_element_super_parent () failed.");
         }
 
-        zhash_t *ext = s_map2zhash (oneRow.first.ext);
+        // ask fty-asset to republish
+        zmsg_t *republish = zmsg_new ();
+        zmsg_addstr (republish, s_asset_name.c_str ());
+        mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
 
-        zmsg_t *msg = fty_proto_encode_asset (
-                aux,
-                oneRow.first.name.c_str(),
-                operation2str (oneRow.second).c_str(),
-                ext);
-        r = mlm_client_send (client, subject.c_str (), &msg);
-        zhash_destroy (&ext);
         zhash_destroy (&aux);
         if ( r != 0 ) {
             mlm_client_destroy (&client);
