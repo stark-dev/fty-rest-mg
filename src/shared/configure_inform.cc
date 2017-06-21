@@ -107,11 +107,10 @@ void
 
         zhash_t *ext = s_map2zhash (oneRow.first.ext);
 
-        const char *operation = operation2str (oneRow.second).c_str ();
         zmsg_t *msg = fty_proto_encode_asset (
                 aux,
                 oneRow.first.name.c_str(),
-                operation,
+                operation2str (oneRow.second).c_str (),
                 ext);
         r = mlm_client_send (client, subject.c_str (), &msg);
         if ( r != 0 ) {
@@ -122,7 +121,7 @@ void
         zhash_destroy (&aux);
 
         // ask fty-asset to republish so we would get UUID
-        if (streq (operation, FTY_PROTO_ASSET_OP_CREATE) || streq (operation, FTY_PROTO_ASSET_OP_UPDATE)) {
+        if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) || streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
             zmsg_t *republish = zmsg_new ();
             zmsg_addstr (republish, s_asset_name.c_str ());
             mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
