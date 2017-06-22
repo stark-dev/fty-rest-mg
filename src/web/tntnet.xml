@@ -419,11 +419,23 @@
         <csv>no</csv>
       </args>
     </mapping>
-    
+
     <!-- admin/config -->
     <mapping>
         <target>config@bios_web</target>
         <url>^/api/v1/admin/config.*$</url>
+    </mapping>
+
+    <!-- POST admin/scan -->
+    <mapping>
+        <target>scan_run@bios_web</target>
+        <url>^/api/v1/admin/scan.*$</url>
+    </mapping>
+
+    <!-- GET admin/scan -->
+    <mapping>
+        <target>scan_progress@bios_web</target>
+        <url>^/api/v1/admin/scan.*$</url>
     </mapping>
 
     <!-- POST admin/email/test -->
