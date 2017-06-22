@@ -61,11 +61,11 @@ enum asset_subtype {
     ROUTER,
     RACKCONTROLLER,
     SENSOR,
-    SENSORGPIO,
     APPLIANCE,
     CHASSIS,
     PATCHPANEL,
-    OTHER
+    OTHER,
+    SENSORGPIO
 };
 
 enum asset_operation
