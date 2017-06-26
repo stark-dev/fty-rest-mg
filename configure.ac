@@ -118,10 +118,11 @@ AC_DEFINE_UNQUOTED([ENABLE_DEBUG_TSAN],   [$_ENABLE_DEBUG_TSAN],
 # Google Address Sanitizer and Leak Sanitizer; see
 #   http://code.google.com/p/address-sanitizer/wiki
 # As of GCC4.9, either TSAN or ASAN+LSAN may be used, not both at once.
+# As of GCC4.8, -llsan is not yet available
 # If TSan is off, then by default ASan is (or not) enabled if Debug is (or not)
 # It can be manually enabled for "production" builds as well, just 2x slowdown
 _CFLAGS_ASAN="-fsanitize=address -fno-omit-frame-pointer"
-_LDFLAGS_ASAN="-lasan -llsan -shared"
+_LDFLAGS_ASAN="-lasan -shared"
 AS_IF([test "x$_ENABLE_DEBUG_TSAN" = x0],
         [_ENABLE_DEBUG_ASAN=$ENABLE_DEBUG_BUILD],
         [_ENABLE_DEBUG_ASAN=0])
@@ -151,18 +152,45 @@ AS_IF([test "x$_ENABLE_DEBUG_ASAN" != x0],
          LDFLAGS="$my_save_ldflags"
          CFLAGS="$my_save_cflags"]
 )
+
+# leak sanitizer is not available everywhere, so handle it separately
+_ENABLE_DEBUG_LSAN=0
+AS_IF([test "x$_ENABLE_DEBUG_ASAN" != x0],
+        [my_save_cflags="$CFLAGS"
+         my_save_ldflags="$LDFLAGS"
+         _ENABLE_DEBUG_LSAN=1
+         AC_MSG_CHECKING([whether CC supports Leak Sanitizer along with Address Sanitizer: CFLAGS='$_CFLAGS_ASAN' LDFLAGS='$_LDFLAGS_ASAN -llsan'])
+         CFLAGS="$_CFLAGS_ASAN -Werror"
+         LDFLAGS="$_LDFLAGS_ASAN -llsan -Werror"
+         AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+            [AC_MSG_RESULT([yes])],
+            [AC_MSG_RESULT([no])
+             AC_MSG_NOTICE([NOTE: Leak Sanitizer was optional and support was not detected, DISABLING])
+             _ENABLE_DEBUG_LSAN=0])
+         LDFLAGS="$my_save_ldflags"
+         CFLAGS="$my_save_cflags"]
+)
+
 # value for both Makefile conditionals as well as the AM_COND_IF macro below
 # note that in the Makefile we (should?) conditionally link against libasan;
 # at least this holds for our built SO libraries like bios_web.so
 AM_CONDITIONAL([ENABLE_DEBUG_ASAN],
 	[test "x$_ENABLE_DEBUG_ASAN" != x0])
+AM_CONDITIONAL([ENABLE_DEBUG_LSAN],
+	[test "x$_ENABLE_DEBUG_LSAN" != x0])
 AM_COND_IF([ENABLE_DEBUG_ASAN],
 	[AC_MSG_NOTICE([Enabling Address Sanitizer])
          my_LDFLAGS="$my_LDFLAGS $_LDFLAGS_ASAN"
          my_CFLAGS="$my_CFLAGS $_CFLAGS_ASAN"
          my_CPPFLAGS="$my_CPPFLAGS $_CFLAGS_ASAN"
-         my_CXXFLAGS="$my_CXXFLAGS $_CFLAGS_ASAN"],
-	[AC_MSG_NOTICE([Not enabling Address Sanitizer])])
+         my_CXXFLAGS="$my_CXXFLAGS $_CFLAGS_ASAN"
+         AM_COND_IF([ENABLE_DEBUG_LSAN],
+            [AC_MSG_NOTICE([Also enabling Leak Sanitizer])
+             my_LDFLAGS="$my_LDFLAGS -llsan"
+            ],[AC_MSG_NOTICE([Not enabling Leak Sanitizer])]
+         )
+    ],[AC_MSG_NOTICE([Not enabling Address Sanitizer])]
+)
 # a define-flag into config.h just in case some C code would need it later on?
 AC_DEFINE_UNQUOTED([ENABLE_DEBUG_ASAN],   [$_ENABLE_DEBUG_ASAN],
         [Flag mostly for Makefile: enable Address Sanitizer (0=no)?])
