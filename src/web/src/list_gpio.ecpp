@@ -41,19 +41,19 @@ req_list (zuuid_t *uuid)
 static void s_handle_response (zmsg_t *msg, std::string &json)
 {
     json.assign ("[");
-    char *partNumber = zmsg_popstr (msg);
-    while (partNumber) {
+    char *part_number = zmsg_popstr (msg);
+    while (part_number) {
         json.append ("{");
-        json.append ("\"partNumber\" : \"");
-        json.append (partNumber);
+        json.append ("\"part_number\" : \"");
+        json.append (part_number);
         json.append ("\", ");
-        zstr_free (&partNumber);
+        zstr_free (&part_number);
 
         char *manufacturer = zmsg_popstr (msg);
         json.append ("\"manufacturer\" : \"");
         json.append (manufacturer);
         json.append ("\", ");
-        zstr_free (&partNumber);
+        zstr_free (&manufacturer);
 
         char *type = zmsg_popstr (msg);
         json.append ("\"type\" : \"");
@@ -61,32 +61,32 @@ static void s_handle_response (zmsg_t *msg, std::string &json)
         json.append ("\", ");
         zstr_free (&type);
 
-        char *normalState = zmsg_popstr (msg);
-        json.append ("\"normalState\" : \"");
-        json.append (normalState);
+        char *normal_state = zmsg_popstr (msg);
+        json.append ("\"normal_state\" : \"");
+        json.append (normal_state);
         json.append ("\", ");
-        zstr_free (&normalState);
+        zstr_free (&normal_state);
 
-        char *gpxDirection = zmsg_popstr (msg);
-        json.append ("\"gpxDirection\" : \"");
-        json.append (gpxDirection);
+        char *gpx_direction = zmsg_popstr (msg);
+        json.append ("\"gpx_direction\" : \"");
+        json.append (gpx_direction);
         json.append ("\", ");
-        zstr_free (&gpxDirection);
+        zstr_free (&gpx_direction);
 
-        char *alarmSeverity = zmsg_popstr (msg);
-        json.append ("\"alarmSeverity\" : \"");
-        json.append (alarmSeverity);
+        char *alarm_severity = zmsg_popstr (msg);
+        json.append ("\"alarm_severity\" : \"");
+        json.append (alarm_severity);
         json.append ("\", ");
-        zstr_free (&alarmSeverity);
+        zstr_free (&alarm_severity);
 
-        char *alarmMessage = zmsg_popstr (msg);
-        json.append ("\"alarmMessage\" : \"");
-        json.append (alarmMessage);
+        char *alarm_message = zmsg_popstr (msg);
+        json.append ("\"alarm_message\" : \"");
+        json.append (alarm_message);
         json.append ("\" ");
-        zstr_free (&alarmMessage);
+        zstr_free (&alarm_message);
 
         json.append ("},");
-        partNumber = zmsg_popstr (msg);
+        part_number = zmsg_popstr (msg);
     }
     //remove trailing comma
     json.pop_back ();
