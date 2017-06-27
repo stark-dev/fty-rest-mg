@@ -158,6 +158,7 @@ src/web/src/input_power_chain.cpp
 src/web/src/info.cpp
 src/web/src/scan_run.cpp
 src/web/src/scan_progress.cpp
+src/web/src/list_gpio.cpp
 
 tntnet.xml.example
 !src/web/tntnet.xml
