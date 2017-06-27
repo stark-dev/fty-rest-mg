@@ -860,7 +860,7 @@ web-test-deps-inst: install-ci_helperSCRIPTS
 
 ### Execute the test web-server for $BIOS REST API
 # LD_PRELOAD=/path/to/libasan.so is needed for fair play with external libs,
-# otherwise "new mlm_stuff; throw(exception)" breaks in ASA as a function
+# otherwise "new mlm_stuff; throw(exception)" breaks in ASAN as a function
 # without a proper return code-path (un-instrumented delete/free involved).
 # Note that the execution chain below is backslash-concatenated so that we
 # can both set, export and use the LD_PRELOAD value (independent lines are
