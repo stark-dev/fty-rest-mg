@@ -22,7 +22,7 @@
  * \file bios-csv.cc
  * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
  * \author Alena Chernikava <AlenaChernikava@Eaton.com>
- * \brief Not yet documented file
+ * \brief Not yet documented file; used in "diagnostic-information" in production
  */
 #include <cstdlib>
 #include <cstring>
@@ -38,7 +38,7 @@
 static void
 s_usage()
 {
-    std::cerr << "Usage: bios-cli [export|compare]" << std::endl;
+    std::cerr << "Usage: bios-csv [export|compare]" << std::endl;
     std::cerr << "       export     export csv file from current DB" << std::endl;
     std::cerr << "       compare    sourcefile_1 exportedfile_2  return exportedfile_2 corresponds with sourcefile_1" << std::endl;
     std::cerr << "Enviromental variables:" << std::endl;

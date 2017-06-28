@@ -762,7 +762,8 @@ BUILT_SOURCES_bios_web_la = \
 	              src/web/src/email_vote.cpp \
 		      src/web/src/info.cpp \
 			  src/web/src/scan_run.cpp \
-			  src/web/src/scan_progress.cpp
+			  src/web/src/scan_progress.cpp \
+			  src/web/src/list_gpio.cpp
 
 # Track real-git and nodist (generated) sources SEPARATELY
 nodist_bios_web_la_SOURCES = $(BUILT_SOURCES_bios_web_la)
