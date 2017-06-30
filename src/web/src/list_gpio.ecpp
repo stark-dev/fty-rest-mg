@@ -38,7 +38,7 @@ req_list (zuuid_t *uuid)
     return msg;
 }
 
-static void s_handle_response (zmsg_t *msg, std::string &json)
+static int s_handle_response (zmsg_t *msg, std::string &json)
 {
     json.assign ("[");
     char *part_number = zmsg_popstr (msg);
@@ -50,36 +50,49 @@ static void s_handle_response (zmsg_t *msg, std::string &json)
         zstr_free (&part_number);
 
         char *manufacturer = zmsg_popstr (msg);
+        if (!manufacturer) return -5;
         json.append ("\"manufacturer\" : \"");
         json.append (manufacturer);
         json.append ("\", ");
         zstr_free (&manufacturer);
 
         char *type = zmsg_popstr (msg);
+        if (!type) return -5;
         json.append ("\"type\" : \"");
         json.append (type);
         json.append ("\", ");
         zstr_free (&type);
 
         char *normal_state = zmsg_popstr (msg);
+        if (!normal_state) return -5;
         json.append ("\"normal_state\" : \"");
         json.append (normal_state);
         json.append ("\", ");
         zstr_free (&normal_state);
 
         char *gpx_direction = zmsg_popstr (msg);
+        if (!gpx_direction) return -5;
         json.append ("\"gpx_direction\" : \"");
         json.append (gpx_direction);
         json.append ("\", ");
         zstr_free (&gpx_direction);
 
+        char *gpx_power_source = zmsg_popstr (msg);
+        if (!gpx_power_source) return -5;
+        json.append ("\"gpx_power_source\" : \"");
+        json.append (gpx_power_source);
+        json.append ("\", ");
+        zstr_free (&gpx_power_source);
+
         char *alarm_severity = zmsg_popstr (msg);
+        if (!alarm_severity) return -5;
         json.append ("\"alarm_severity\" : \"");
         json.append (alarm_severity);
         json.append ("\", ");
         zstr_free (&alarm_severity);
 
         char *alarm_message = zmsg_popstr (msg);
+        if (!alarm_message) return -5;
         json.append ("\"alarm_message\" : \"");
         json.append (alarm_message);
         json.append ("\" ");
@@ -91,6 +104,7 @@ static void s_handle_response (zmsg_t *msg, std::string &json)
     //remove trailing comma
     json.pop_back ();
     json.append ("]");
+    return 0;
 }
 
 int
@@ -125,8 +139,10 @@ get_list (std::string &output)
     char *result = zmsg_popstr (resp);
     if (result) {
         if (streq (result, "OK")) {
-            s_handle_response (resp, output);
+            int rv = s_handle_response (resp, output);
             zstr_free (&result);
+            zmsg_destroy(&resp);
+            return rv;
         }
         else {
             zstr_free (&result);
@@ -138,9 +154,6 @@ get_list (std::string &output)
         zmsg_destroy(&resp);
         return -5;
     }
-
-    zmsg_destroy(&resp);
-    return 0;
 }
 </%pre>
 <%request scope="global">
