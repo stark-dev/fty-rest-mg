@@ -1,0 +1,169 @@
+<#
+ #
+ # Copyright (C) 2016-2017 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file    add_gpio.ecpp
+ * \author  Jana Rapava <JanaRapava@Eaton.com>
+ * \brief   This call runs autodiscovery scan.
+ */
+ #><%pre>
+#include <string>
+#include "tntmlm.h"
+#include "helpers.h"
+#include "utils_web.h"
+#include <cxxtools/jsondeserializer.h>
+
+struct gpio_params_t {
+    std::string part_number;
+    std::string manufacturer;
+    std::string type;
+    std::string normal_state;
+    std::string gpx_direction;
+    std::string gpx_power_source;
+    std::string alarm_severity;
+    std::string alarm_message;
+};
+
+void operator>>= (cxxtools::SerializationInfo& si, gpio_params_t params)
+{
+    si.getMember ("part_number") >>= params.part_number;
+    si.getMember ("manufacturer") >>= params.manufacturer;
+    si.getMember("type") >>= params.type;
+    si.getMember("normal_state") >>= params.normal_state;
+    si.getMember("gpx_direction") >>= params.gpx_direction;
+    si.getMember("gpx_power_source") >>= params.gpx_power_source;
+    si.getMember ("alarm_severity") >>= params.alarm_severity;
+    si.getMember ("alarm_message") >>= params.alarm_message;
+}
+
+
+// scan request
+static zmsg_t *
+req_add (zuuid_t *uuid, gpio_params_t *params)
+{
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zmsg_addstr (msg, strdup (params->part_number.c_str ()));
+    zmsg_addstr (msg, strdup (params->manufacturer.c_str ()));
+    zmsg_addstr (msg, strdup (params->type.c_str ()));
+    zmsg_addstr (msg, strdup (params->normal_state.c_str ()));
+    zmsg_addstr (msg, strdup (params->gpx_direction.c_str ()));
+    zmsg_addstr (msg, strdup (params->gpx_power_source.c_str ()));
+    zmsg_addstr (msg, strdup (params->alarm_severity.c_str ()));
+    zmsg_addstr (msg, strdup (params->alarm_message.c_str ()));
+    return msg;
+}
+
+int
+add_gpio (std::string json)
+{
+    // connect to mlm client
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        log_critical ("add_gpio: mlm_pool.get () failed.");
+        return -1;
+    }
+
+    struct gpio_params_t params;
+    try {
+        cxxtools::SerializationInfo si;
+        std::stringstream input (json);
+        cxxtools::JsonDeserializer deserializer (input);
+        deserializer.deserialize (si);
+    }
+    catch (const std::exception& e) {
+        return -4;
+    }
+
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *request = req_add (uuid, &params);
+    int rv = client->sendto ("fty-sensor-gpio", "GPIO_TEMPLATE_ADD", 1000, &request);
+
+    if (rv == -1)
+    {
+        log_critical ("add_gpio: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
+        return -2;
+    }
+
+    zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    if (!resp)
+    {
+        log_critical ("add_gpio: client->recv (timeout = '5') returned NULL");
+        return -3;
+    }
+    char *result = zmsg_popstr (resp);
+    if (result) {
+        if (streq (result, "OK")) {
+                zstr_free (&result);
+                return 0;
+            }
+        else if (streq (result, "ERROR")) {
+            zstr_free (&result);
+            return -4;
+        }
+        else {
+            zstr_free (&result);
+            return -5;
+        }
+    }
+    else
+        return -5;
+    zstr_free (&result);
+    zmsg_destroy(&resp);
+    return 0;
+}
+</%pre>
+<%request scope="global">
+UserInfo user;
+</%request>
+<%cpp>
+    // permission check
+    static const std::map <BiosProfile, std::string> PERMISSIONS = {
+            {BiosProfile::Admin,     "C"}
+            };
+    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+    if (request.getMethod() != "POST") {
+        http_die("method-not-allowed", request.getMethod().c_str() );
+    }
+
+    std::string json = request.getBody ();
+
+    if (json.empty ()) {
+        http_die ("request-param-required", "<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+    }
+
+    int rv = add_gpio (json);
+    if (rv == -1)
+        http_die ("internal-error", "mlmpool.get () failed.");
+    else
+    if (rv == -2)
+        http_die ("internal-error", "client->sendto () failed.");
+    else
+    if (rv == -3)
+        http_die ("internal-error", "client->recv () failed.");
+    else
+    if (rv == -4)
+        http_die ("request-param-required", "<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+    else
+    if (rv == -5)
+        http_die ("internal-error", "fty-discovery returned malformed or unexpected message.");
+    else
+</%cpp>
