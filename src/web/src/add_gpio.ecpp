@@ -20,7 +20,7 @@
 /*!
  * \file    add_gpio.ecpp
  * \author  Jana Rapava <JanaRapava@Eaton.com>
- * \brief   This call runs autodiscovery scan.
+ * \brief   This call adds new GPIO template.
  */
  #><%pre>
 #include <string>
