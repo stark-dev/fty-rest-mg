@@ -82,7 +82,7 @@ UserInfo user;
         }
 
         std::transform (filter.begin(), filter.end(), filter.begin(), ::tolower);
-        if (!filter.empty ())
+        if (!filter.empty ()) {
             if (filter == "rooms"   ||
                 filter == "rows"    ||
                 filter == "racks"   ||
@@ -91,6 +91,7 @@ UserInfo user;
                 checked_filter = filter;
             else
                 http_die("request-param-bad","filter", filter.c_str(), "'rooms'/'rows'/'racks'/'groups'/'devices'");
+        }
 
         if (!feed_by.empty ())
         {

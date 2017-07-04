@@ -65,7 +65,8 @@ id_to_name_ext_name (uint32_t asset_id)
     }
     catch (const std::exception &e)
     {
-        log_error ("exception caught %s - %" PRIu32, e.what (), asset_id);
+        if (asset_id != 0)
+            log_error ("exception caught %s - %" PRIu32, e.what (), asset_id);
         name = "";
         ext_name = "";
     }
