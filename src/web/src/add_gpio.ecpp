@@ -40,7 +40,7 @@ struct gpio_params_t {
     std::string alarm_message;
 };
 
-void operator>>= (cxxtools::SerializationInfo& si, gpio_params_t params)
+void operator>>= (const cxxtools::SerializationInfo& si, gpio_params_t &params)
 {
     si.getMember ("part_number") >>= params.part_number;
     si.getMember ("manufacturer") >>= params.manufacturer;
@@ -59,13 +59,21 @@ req_add (zuuid_t *uuid, gpio_params_t *params)
 {
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zsys_debug ("part_number = %s", params->part_number.c_str ());
     zmsg_addstr (msg, strdup (params->part_number.c_str ()));
+    zsys_debug ("manufacturer = %s", params->manufacturer.c_str ());
     zmsg_addstr (msg, strdup (params->manufacturer.c_str ()));
+    zsys_debug ("type = %s", params->type.c_str ());
     zmsg_addstr (msg, strdup (params->type.c_str ()));
+    zsys_debug ("normal_state = %s", params->normal_state.c_str ());
     zmsg_addstr (msg, strdup (params->normal_state.c_str ()));
+    zsys_debug ("gpx_direction = %s", params->gpx_direction.c_str ());
     zmsg_addstr (msg, strdup (params->gpx_direction.c_str ()));
+    zsys_debug ("gpx_power_source = %s", params->gpx_power_source.c_str ());
     zmsg_addstr (msg, strdup (params->gpx_power_source.c_str ()));
+    zsys_debug ("alarm_severity = %s", params->alarm_severity.c_str ());
     zmsg_addstr (msg, strdup (params->alarm_severity.c_str ()));
+    zsys_debug ("alarm_message = %s", params->alarm_message.c_str ());
     zmsg_addstr (msg, strdup (params->alarm_message.c_str ()));
     return msg;
 }
@@ -81,12 +89,11 @@ add_gpio (std::string json)
         return -1;
     }
 
-    struct gpio_params_t params;
+    gpio_params_t params;
     try {
-        cxxtools::SerializationInfo si;
         std::stringstream input (json);
         cxxtools::JsonDeserializer deserializer (input);
-        deserializer.deserialize (si);
+        deserializer.deserialize (params);
     }
     catch (const std::exception& e) {
         return -4;
