@@ -426,15 +426,11 @@
         <url>^/api/v1/admin/config.*$</url>
     </mapping>
 
-    <!-- POST admin/scan -->
+        <!-- POST admin/scan -->
     <mapping>
       <target>scan_run@bios_web</target>
       <url>^/api/v1/admin/scan.*$</url>
       <method>POST</method>
-      <args>
-        <config>$2</config>
-        <range>$1</range>
-      </args>
     </mapping>
 
     <!-- GET admin/scan -->
@@ -443,7 +439,14 @@
       <url>^/api/v1/admin/scan.*$</url>
       <method>GET</method>
     </mapping>
-
+    
+    <!-- DELETE admin/scan -->
+    <mapping>
+        <target>scan_run@bios_web</target>
+        <url>^/api/v1/admin/scan.*$</url>
+        <method>DELETE</method>
+    </mapping>
+    
     <!-- GET admin/gpio -->
     <mapping>
         <method>GET</method>
