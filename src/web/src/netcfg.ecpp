@@ -163,13 +163,31 @@ if(request.getMethod() == "PUT") {
             if(it.category() != cxxtools::SerializationInfo::Category::Array) {
                 http_die ("bad-request-document", "Wrong value for DNS setting - array expected");
             }
-            augeas->run_cmd("rm /files/etc/resolv.conf/nameserver");
+            // get all interface from /etc/network/interfaces
+            std::vector<std::string> interfaces;
+            std::string in = augeas->get_cmd_out_raw ("match /files/etc/network/interfaces/iface[*]");
+            cxxtools::split ("\n", in, std::back_inserter (interfaces));
+
+            std::string ns_list = "";
+            // Build the list of nameservers
             for(auto i : it) {
                 i.getValue(val);
                 if(!CIDRAddress(val).valid()) {
                     http_die ("bad-request-document", "Wrong value for DNS setting - array of IPs expected" );
                 }
-                augeas->run_cmd("set /files/etc/resolv.conf/nameserver[0] " + val);
+                ns_list += std::string(" ") + val.c_str ();
+            }
+            log_debug("Nameservers list = %s", ns_list.c_str());
+            // Now set nameservers for each interfaces
+            int j = 1; // Augeas indexes start at 1, not 0
+            for (auto iface : interfaces) {
+                log_debug("Processing interface %s", iface.c_str ());
+                if (iface != "lo") {
+                    char *path = zsys_sprintf ("set /files/etc/network/interfaces/iface[%s]/dns-nameserver '%s'",
+                                j, ns_list.c_str ());
+                    augeas->run_cmd (std::string (path));
+                }
+                j++;
             }
             handled = true;
         }
