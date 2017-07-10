@@ -64,7 +64,8 @@ enum asset_subtype {
     APPLIANCE,
     CHASSIS,
     PATCHPANEL,
-    OTHER
+    OTHER,
+    SENSORGPIO
 };
 
 enum asset_operation

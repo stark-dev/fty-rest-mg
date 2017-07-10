@@ -120,12 +120,20 @@ UserInfo user;
             if ( shared::call(proc_cmd_ntp2) != 0 ) {
                 http_die ("internal-error", "Cannot disable ntp service");
             }
+            shared::Argv proc_cmd_ntp3 {"sudo", "systemctl", "mask", "ntp"};
+            if ( shared::call(proc_cmd_ntp3) != 0 ) {
+                http_die ("internal-error", "Cannot mask away ntp service");
+            }
         }
 
         if(!checked_ntp.empty()) {
 
             augeas->run_cmd("set /files/etc/ntp.conf/server[1] " + checked_ntp);
             augeas->save();
+            shared::Argv proc_cmd_ntp0 {"sudo", "systemctl", "unmask", "ntp"};
+            if ( shared::call(proc_cmd_ntp0) != 0 ) {
+                log_debug ("Cannot unmask ntp service, maybe it was never masked away yet?");
+            }
             shared::Argv proc_cmd_ntp1 {"sudo", "systemctl", "enable", "ntp"};
             if ( shared::call(proc_cmd_ntp1) != 0 ) {
                 http_die ("internal-error", "Cannot enable ntp service");

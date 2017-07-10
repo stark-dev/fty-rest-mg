@@ -240,7 +240,7 @@ UserInfo user;
 </%cpp>
 {
       "id": "<$$ tmp.item.basic.name $>"
-    , "power_devices_in_uri": "/api/v1/assets?in=<$$ tmp.item.basic.name $>&sub_type=epdu,pdu,feed,genset,ups,sts"
+    , "power_devices_in_uri": "/api/v1/assets?in=<$$ tmp.item.basic.name $>&sub_type=epdu,pdu,feed,genset,ups,sts,rackcontroller"
     , "name": "<$$ utils::json::escape (asset_ext_name) $>"
     , "status": "<$$ tmp.item.basic.status $>"
     , "priority": "P<$$ tmp.item.basic.priority $>"

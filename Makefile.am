@@ -700,7 +700,7 @@ RULE_TEMPLATES = \
 			src/agents/autoconfig/rule_templates/voltage.input_3phase@__device_ups__.rule \
             src/agents/autoconfig/rule_templates/sts-frequency@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-preferred-source@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule	
+            src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule
 
 template_rule_DATA =	$(RULE_TEMPLATES)
 EXTRA_DIST +=		$(RULE_TEMPLATES)
@@ -760,7 +760,11 @@ BUILT_SOURCES_bios_web_la = \
 		      src/web/src/input_power_chain.cpp	\
 		      src/web/src/email_feedback.cpp \
 	              src/web/src/email_vote.cpp \
-		      src/web/src/info.cpp
+		      src/web/src/info.cpp \
+			  src/web/src/scan_run.cpp \
+			  src/web/src/scan_progress.cpp \
+			  src/web/src/list_gpio.cpp \
+			  src/web/src/add_gpio.cpp
 
 # Track real-git and nodist (generated) sources SEPARATELY
 nodist_bios_web_la_SOURCES = $(BUILT_SOURCES_bios_web_la)
@@ -858,7 +862,7 @@ web-test-deps-inst: install-ci_helperSCRIPTS
 
 ### Execute the test web-server for $BIOS REST API
 # LD_PRELOAD=/path/to/libasan.so is needed for fair play with external libs,
-# otherwise "new mlm_stuff; throw(exception)" breaks in ASA as a function
+# otherwise "new mlm_stuff; throw(exception)" breaks in ASAN as a function
 # without a proper return code-path (un-instrumented delete/free involved).
 # Note that the execution chain below is backslash-concatenated so that we
 # can both set, export and use the LD_PRELOAD value (independent lines are

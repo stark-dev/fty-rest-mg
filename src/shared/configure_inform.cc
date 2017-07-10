@@ -110,14 +110,21 @@ void
         zmsg_t *msg = fty_proto_encode_asset (
                 aux,
                 oneRow.first.name.c_str(),
-                operation2str (oneRow.second).c_str(),
+                operation2str (oneRow.second).c_str (),
                 ext);
         r = mlm_client_send (client, subject.c_str (), &msg);
-        zhash_destroy (&ext);
-        zhash_destroy (&aux);
         if ( r != 0 ) {
             mlm_client_destroy (&client);
             throw std::runtime_error("mlm_client_send () failed.");
+        }
+        zhash_destroy (&ext);
+        zhash_destroy (&aux);
+
+        // ask fty-asset to republish so we would get UUID
+        if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) || streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
+            zmsg_t *republish = zmsg_new ();
+            zmsg_addstr (republish, s_asset_name.c_str ());
+            mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
         }
 
         //data for uptime
