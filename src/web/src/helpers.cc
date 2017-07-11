@@ -173,7 +173,10 @@ iname_to_dbid (const std::string& url, const std::string& asset_name)
     }
     catch (const std::exception &e)
     {
-        log_error ("exception caught %s", e.what ());
+        if (!asset_name.empty())
+            log_error ("%s not found. exception caught %s", asset_name.c_str(), e.what ());
+        else
+            log_error ("asset_name empty. exception caught %s", e.what ());
         return -1;
     }
 }

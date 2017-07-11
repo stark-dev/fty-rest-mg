@@ -183,7 +183,7 @@ if(request.getMethod() == "PUT") {
             for (auto iface : interfaces) {
                 log_debug("Processing interface %s", iface.c_str ());
                 if (iface != "lo") {
-                    char *path = zsys_sprintf ("set /files/etc/network/interfaces/iface[%s]/dns-nameserver '%s'",
+                    char *path = zsys_sprintf ("set /files/etc/network/interfaces/iface[%d]/dns-nameserver '%s'",
                                 j, ns_list.c_str ());
                     augeas->run_cmd (std::string (path));
                 }
