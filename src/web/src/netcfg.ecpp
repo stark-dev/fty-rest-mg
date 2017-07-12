@@ -191,7 +191,7 @@ if(request.getMethod() == "PUT") {
                         && iface.find("*")==std::string::npos 
                         && iface.find("]")!=std::string::npos) {
                     std::size_t found = iface.find("]");
-                    std::string sub_iface=iface.substr(0,found+1)
+                    std::string sub_iface=iface.substr(0,found+1);
                     log_debug("set %s/dns-nameservers '%s'",
                                 sub_iface.c_str(), ns_list.c_str ());
                     char *path = zsys_sprintf ("set %s/dns-nameservers '%s'",
