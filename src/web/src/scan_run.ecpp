@@ -27,6 +27,7 @@
 #include "tntmlm.h"
 #include "helpers.h"
 #include "utils_web.h"
+#include <cxxtools/jsondeserializer.h>
 
 // stop request
 static zmsg_t *
@@ -57,6 +58,49 @@ req_localscan (zuuid_t *uuid)
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, "LOCALSCAN");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    return msg;
+}
+
+static zmsg_t *
+req_multiscan (zuuid_t *uuid, std::string json)
+{
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "MULTISCAN");
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    //parsing json file
+    try {
+        
+        std::stringstream input (json);
+        cxxtools::JsonDeserializer deserializer (input);
+        cxxtools::SerializationInfo request_doc;
+        deserializer.deserialize (request_doc);
+        int val =0;
+        for (auto it = request_doc.begin(); it != request_doc.end(); ++it) {
+            val++;
+        }
+        
+        zmsg_addstrf(msg, "%" PRIi32, val);
+        
+        log_debug ("run_multiscan: %i different scans", val);
+
+        std::string value_sn;
+        for (auto it = request_doc.begin(); it != request_doc.end(); ++it) {
+            if(it->getMember("subnet", value_sn) && value_sn != "")
+                zmsg_addstr(msg, value_sn.c_str());
+            else if(it->getMember("from_to", value_sn) && value_sn != "")
+                zmsg_addstr(msg, value_sn.c_str());
+            else { //ERROR not valid format
+                zmsg_destroy(&msg);
+                log_critical ("run_multiscan: error during parse. No \"subnet\" nor \"from_to\"");
+                return NULL;
+            }  
+       }
+        
+    }
+    catch (const std::exception& e) {
+        return NULL;
+    }
+    
     return msg;
 }
 
@@ -128,14 +172,14 @@ run_localscan ()
     
     if (rv == -1)
     {
-        log_critical ("scan_run: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_critical ("run_localscan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
     if (!resp)
     {
-        log_critical ("scan_run: client->recv (timeout = '5') returned NULL");
+        log_critical ("run_localscan: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);
@@ -166,6 +210,67 @@ run_localscan ()
     zstr_free (&result);
     zmsg_destroy(&resp);
     return 0;
+}
+
+int
+run_multiscan(std::string json)
+{
+     // connect to mlm client
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        log_critical ("run_multiscan: mlm_pool.get () failed.");
+        return -1;
+    }
+
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *request = req_multiscan (uuid, json);   
+    if(request == NULL) {
+        return -8;
+    }
+    
+    int rv = client->sendto ("fty-discovery", "multiscan", 1000, &request);
+    
+    if (rv == -1)
+    {
+        log_critical ("run_multiscan: client->sendto (address = '%s') failed.", "fty-discovery");
+        return -2;
+    }
+
+    zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    if (!resp)
+    {
+        log_critical ("run_multiscan: client->recv (timeout = '5') returned NULL");
+        return -3;
+    }
+    char *result = zmsg_popstr (resp);
+    if (result) {
+        if (streq (result, "OK")) {
+                zstr_free (&result);
+                return 0;
+            }
+        else if (streq (result, "ERROR")) {
+            zstr_free (&result);
+            return -8;
+        }
+        else if (streq (result, "STOPPING")) {
+            zstr_free (&result);
+            return -6;
+        }
+        else if (streq (result, "RUNNING")) {
+            zstr_free (&result);
+            return -7;
+        }
+        else {
+            zstr_free (&result);
+            return -5;
+        }
+    }
+    else
+        return -5;
+    zstr_free (&result);
+    zmsg_destroy(&resp);
+    return 0;    
 }
 
 int
@@ -246,13 +351,13 @@ UserInfo user;
     }
     else if (request.getMethod() == "POST") {
         if(range.empty()) {
-            rv  = run_localscan ();
+            std::string json = request.getBody ();
+            if( json.empty() )
+                rv  = run_localscan ();
+            else
+                rv = run_multiscan(json);
         }
         else {
-            log_critical("regular scan");
-            //TODO: verify that range is valid IPv4 range
-            //char *checked_config = strdup (config.c_str ());
-
             rv = runscan (checked_range);
         }
     }
@@ -282,5 +387,8 @@ UserInfo user;
     else
     if (rv == -7)
         http_die ("internal-error", "fty-discovery already have a scan running.");    
+    else
+    if (rv == -8)
+        http_die("bad-request-document", "Please check RFC-11 for valid json schema description.");
     else
 </%cpp>
