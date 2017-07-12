@@ -22,6 +22,7 @@
  * \author Michal Hrusecky <MichalHrusecky@Eaton.com>
  * \author Tomas Halman <TomasHalman@Eaton.com>
  * \author Karol Hrdina <KarolHrdina@Eaton.com>
+ * \author Gerald Guillaume <GeraldGuillaume@Eaton.com>
  * \brief  Returns information about network configuration
  */
  #><%pre>
@@ -175,19 +176,28 @@ if(request.getMethod() == "PUT") {
                 if(!CIDRAddress(val).valid()) {
                     http_die ("bad-request-document", "Wrong value for DNS setting - array of IPs expected" );
                 }
-                ns_list += std::string(" ") + val.c_str ();
+                if(ns_list.length()>0){
+                    ns_list += " " + val;
+                }else{
+                    ns_list = val;
+                }
             }
             log_debug("Nameservers list = %s", ns_list.c_str());
             // Now set nameservers for each interfaces
-            int j = 1; // Augeas indexes start at 1, not 0
             for (auto iface : interfaces) {
                 log_debug("Processing interface %s", iface.c_str ());
-                if (iface != "lo") {
-                    char *path = zsys_sprintf ("set /files/etc/network/interfaces/iface[%d]/dns-nameserver '%s'",
-                                j, ns_list.c_str ());
+                //avoid lo interface and some augtool cli weird iface
+                if (iface.find("lo")==std::string::npos 
+                        && iface.find("*")==std::string::npos 
+                        && iface.find("]")!=std::string::npos) {
+                    std::size_t found = iface.find("]");
+                    std::string sub_iface=iface.substr(0,found+1)
+                    log_debug("set %s/dns-nameservers '%s'",
+                                sub_iface.c_str(), ns_list.c_str ());
+                    char *path = zsys_sprintf ("set %s/dns-nameservers '%s'",
+                                sub_iface.c_str(), ns_list.c_str ());
                     augeas->run_cmd (std::string (path));
                 }
-                j++;
             }
             handled = true;
         }
