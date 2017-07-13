@@ -182,7 +182,7 @@ if(request.getMethod() == "PUT") {
                     ns_list = val;
                 }
             }
-            log_debug("Nameservers list = %s", ns_list.c_str());
+            log_debug("Nameservers list = '%s'", ns_list.c_str());
             // Now set nameservers for each interfaces
             for (auto iface : interfaces) {
                 log_debug("Processing interface %s", iface.c_str ());
@@ -192,11 +192,18 @@ if(request.getMethod() == "PUT") {
                         && iface.find("]")!=std::string::npos) {
                     std::size_t found = iface.find("]");
                     std::string sub_iface=iface.substr(0,found+1);
-                    log_debug("set %s/dns-nameservers '%s'",
+                    char *path;
+                    if (ns_list.empty()){
+                        log_debug("rm %s/dns-nameservers",sub_iface.c_str());
+                        path = zsys_sprintf ("rm %s/dns-nameservers",
+                                sub_iface.c_str());
+                    }else{
+                        log_debug("set %s/dns-nameservers '%s'",
                                 sub_iface.c_str(), ns_list.c_str ());
-                    char *path = zsys_sprintf ("set %s/dns-nameservers '%s'",
+                        path = zsys_sprintf ("set %s/dns-nameservers '%s'",
                                 sub_iface.c_str(), ns_list.c_str ());
-                    augeas->run_cmd (std::string (path));
+                   }
+                   augeas->run_cmd (std::string (path));
                 }
             }
             handled = true;
