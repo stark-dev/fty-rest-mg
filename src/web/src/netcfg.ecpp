@@ -151,12 +151,25 @@ if(request.getMethod() == "PUT") {
         AUG_GET("method",  method);
         AUG_SET("address", (CIDRAddress(val).valid()     && method == "static"));
         AUG_SET("netmask", (CIDRAddress(val).isNetmask() && method == "static"));
-        AUG_SET("gateway", (CIDRAddress(val).valid()     && method == "static"));
 
         if(method != "static") {
             augeas->run_cmd("rm " + address + "/address");
             augeas->run_cmd("rm " + address + "/netmask");
-            augeas->run_cmd("rm " + address + "/gateway");;
+            augeas->run_cmd("rm " + address + "/gateway");
+        }
+
+        //gateway could be unset, handle it differently
+        if(it.name() == "gateway" && method == "static") {
+            it.getValue(val);
+            if(val.empty()){
+                augeas->run_cmd("rm " + address + "/gateway");
+            }else{
+                if(! CIDRAddress(val).valid() ) {
+                    http_die ("parameter-conflict", std::string ("Wrong value for 'gateway' setting or setting not expected for method ").append (method).append (".").c_str ());
+                }
+                augeas->run_cmd("set " + address + "/gateway " + val);
+            }
+            handled = true;
         }
 
         //DNS is array, handle differently
