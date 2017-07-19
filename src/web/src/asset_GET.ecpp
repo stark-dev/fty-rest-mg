@@ -356,7 +356,7 @@ else {
 , "ext" : [
 % bool isExtCommaNeeded = false;
 % if ( !tmp.item.basic.asset_tag.empty() ) {
-{"asset_tag": "<$$ tmp.item.basic.asset_tag $>", "read_only": true }
+{"asset_tag": "<$$ tmp.item.basic.asset_tag $>", "read_only": false }
 % isExtCommaNeeded = true;
 %}
 <%cpp>
