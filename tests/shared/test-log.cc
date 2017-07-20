@@ -109,7 +109,7 @@ TEST_CASE("log-do_log", "[log][do_log]") {
     rewind(tempf);
     char *fmt;
     int ln = asprintf(&fmt, "[%d.%u] [CRITICAL]: test-log:42 (test_do_log) testing C-formatted string",getpid(),(unsigned int)pthread_self());
-    CHECK(ln!=-1 && ln<1024);
+    CHECK(ln!=-1);
 
     char buf[1024];
     size_t r = fread((void*) buf, 1, ln, tempf);
