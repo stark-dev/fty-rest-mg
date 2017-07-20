@@ -29,8 +29,10 @@
 
 #include <string>
 
+#define PASSWD_FILE  "/etc/default/bios-db-rw"
 //! Global string with url to the database
 extern std::string url;
 void dbpath ();
+bool dbreadcredentials();
 
 #endif //TOOLS_DBPATH_H

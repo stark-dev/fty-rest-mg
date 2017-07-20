@@ -129,7 +129,7 @@ static int do_logv(
             return -1;
     };
 
-    r = asprintf(&fmt, "[%s]: %s:%d (%s) %s", prefix, file, line, func, format);
+    r = asprintf(&fmt, "[%d.%u] [%s]: %s:%d (%s) %s",getpid(),(unsigned int)pthread_self(), prefix, file, line, func, format);
     if (r == -1) {
         fprintf(log_file, "[ERROR]: %s:%d (%s) can't allocate enough memory for format string: %m", __FILE__, __LINE__, __func__);
         return r;
