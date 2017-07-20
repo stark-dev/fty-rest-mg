@@ -430,10 +430,6 @@ x_headers (zhash_t *headers)
         (void*) (s_getenv ("HARDWARE_SPEC_REVISION", "unknown")));
     zhash_insert (headers, "X-Eaton-IPC-hardware-serial-number",
         (void*) (s_getenv ("HARDWARE_SERIAL_NUMBER", "unknown")));
-
-    std::string machine_id = s_read_all ("/etc/machine-id");
-    if (!machine_id.empty ())
-        zhash_insert (headers, "X-Eaton-IPC-machine-id", (void*) machine_id.c_str ());
 }
 } // namespace utils::email
 
