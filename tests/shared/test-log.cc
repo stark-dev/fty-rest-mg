@@ -107,13 +107,17 @@ TEST_CASE("log-do_log", "[log][do_log]") {
         exit(1);
     }
     rewind(tempf);
+    char *fmt;
+    int ln = asprintf(&fmt, "[%d.%u] [CRITICAL]: test-log:42 (test_do_log) testing C-formatted string",getpid(),(unsigned int)pthread_self());
+    CHECK(ln!=-1 && ln<1024);
 
     char buf[1024];
-    size_t r = fread((void*) buf, 1, 64, tempf);
+    size_t r = fread((void*) buf, 1, ln, tempf);
 
-    CHECK(r == 64);
-    buf[64] = 0;
-    CHECK(streq(buf, "[CRITICAL]: test-log:42 (test_do_log) testing C-formatted string"));
+    CHECK(r == ln);
+    buf[ln] = 0;
+    
+    CHECK(streq(buf, fmt));
 
     fclose(tempf);
     unlink(temp_name);
