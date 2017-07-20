@@ -33,6 +33,6 @@
 //! Global string with url to the database
 extern std::string url;
 void dbpath ();
-bool dbreadcredentails();
+bool dbreadcredentials();
 
 #endif //TOOLS_DBPATH_H

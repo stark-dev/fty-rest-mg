@@ -61,7 +61,7 @@ s_dropdq (char* buffer) {
 
 // read /etc/default/bios-db-rw and update url global variable
 // @return 0 if OK, -1 if KO
-bool dbreadcredentails(){
+bool dbreadcredentials(){
     if(!shared::is_file (PASSWD_FILE))return false;
     // and setup db username/password
     log_debug("Reading %s ..",PASSWD_FILE);

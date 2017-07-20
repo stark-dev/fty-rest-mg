@@ -108,11 +108,11 @@ UserInfo user;
             http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
 
         // once done, check environment files for accessing the database
-        if (!dbreadcredentails())
+        if (!dbreadcredentials())
             http_die ("internal-error", "Database password file is missing");
     }else{
         //enforce reload credential
-        if (!dbreadcredentails())
+        if (!dbreadcredentials())
             http_die ("internal-error", "Database password file is missing");  
     }
 </%cpp>
