@@ -430,6 +430,8 @@ x_headers (zhash_t *headers)
         (void*) (s_getenv ("HARDWARE_SPEC_REVISION", "unknown")));
     zhash_insert (headers, "X-Eaton-IPC-hardware-serial-number",
         (void*) (s_getenv ("HARDWARE_SERIAL_NUMBER", "unknown")));
+    zhash_insert (headers, "X-Eaton-IPC-hardware-uuid",
+        (void*) (s_getenv ("HARDWARE_UUID", "unknown")));
 }
 } // namespace utils::email
 
