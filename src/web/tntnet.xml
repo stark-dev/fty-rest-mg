@@ -10,7 +10,18 @@
     <mapping>
       <target>ssl-redirect@bios_web</target>
     </mapping>
-
+    <!-- Set reply default and security HTTP header -->
+    <mapping>
+      <target>security_headers@bios_web</target>
+      <args>
+          <!-- default headers -->
+          <Cache-Control>no-store</Cache-Control>
+          <Pragma>no-cache</Pragma>
+          <!-- security headers -->
+          <X-XSS-Protection>1</X-XSS-Protection>
+          <X-Content-Type-Options>nosniff</X-Content-Type-Options>
+      </args>
+    </mapping>
     <!-- Serve static files -->
     <mapping>
       <target>static@tntnet</target>
@@ -54,6 +65,7 @@
     <mapping>
       <target>auth-verify@bios_web</target>
     </mapping>
+
 
     <!-- Here starts the real API -->
 
