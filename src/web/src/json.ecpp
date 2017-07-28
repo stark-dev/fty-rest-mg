@@ -33,6 +33,7 @@
 <%cpp>
 	// NOTE: json.ecpp is not limited by CHECK_USER_PERMISSIONS_OR_DIE
 	//       this file do some basic setup of response
+        // CAUTION : All reply HTTP headers are now set by security_headers.ecpp
 
 	// Get rid of locales
 	setenv("LANG", "C", 1);
@@ -75,9 +76,6 @@
 			reply.setContentType("application/json;charset=UTF-8");
 	} else
 		reply.setContentType("application/json;charset=UTF-8");
-
-	reply.setHeader(tnt::httpheader::cacheControl, "no-store");
-	reply.setHeader(tnt::httpheader::pragma, "no-cache");
 
 	return DECLINED;
 </%cpp>
