@@ -52,11 +52,11 @@ s_smtp_GET_message (
     zstr_free (&subject);
 
     std::string message = "Hi,\nthis product is ";
-    if (vote == 0)
+    if (vote == 1)
         message += "ugly";
     else
-    if (vote == 1)
-        message += "medicore";
+    if (vote == 2)
+        message += "mediocre";
     else
         message += "amazing";
     message += "\n\nSincerelly your customer";
