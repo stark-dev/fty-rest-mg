@@ -59,7 +59,7 @@ s_smtp_GET_message (
         message += "mediocre";
     else
         message += "amazing";
-    message += "\n\nSincerelly your customer";
+    message += "\n\nSincerely, your customer";
     zmsg_addstr(msg, message.c_str ());
 
     zhash_t *headers = zhash_new ();
