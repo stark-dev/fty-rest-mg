@@ -31,6 +31,8 @@
 #include <cxxtools/split.h>
 #include <malamute.h>
 #include <fty_proto.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <math.h>
 #include "data.h"

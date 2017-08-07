@@ -29,6 +29,7 @@
 #include <czmq.h> // for streq macro
 
 #include <cstdio>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <utils.h>
@@ -116,7 +117,7 @@ TEST_CASE("log-do_log", "[log][do_log]") {
 
     CHECK(r == ln);
     buf[ln] = 0;
-    
+
     CHECK(streq(buf, fmt));
 
     fclose(tempf);

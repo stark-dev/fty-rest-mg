@@ -22,6 +22,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdlib.h>
 #include <errno.h>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 #include "log.h"
 #include "utils.h"
 
