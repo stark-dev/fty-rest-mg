@@ -29,6 +29,8 @@
 #include <fstream>
 #include <sys/syscall.h>
 #include <cstring>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "log.h"
 #include "db/inout.h"

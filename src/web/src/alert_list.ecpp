@@ -29,6 +29,7 @@
 #include <functional>
 #include <malamute.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 #include <tntdb/connection.h>
 #include <tntdb/error.h>

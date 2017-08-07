@@ -28,6 +28,7 @@
  #><%pre>
 #include <cxxtools/regex.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 
 #include <fty_proto.h>

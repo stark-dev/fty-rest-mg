@@ -25,6 +25,8 @@
  */
  #><%pre>
 #include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <cxxtools/jsondeserializer.h>
 #include "configure_inform.h"

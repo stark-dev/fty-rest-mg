@@ -29,6 +29,7 @@
 #include <string>
 #include <malamute.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 #include "log.h"
 #include "utils_web.h"
