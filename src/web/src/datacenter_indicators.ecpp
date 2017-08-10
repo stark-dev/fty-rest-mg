@@ -31,6 +31,8 @@
 #include <cxxtools/split.h>
 #include <malamute.h>
 #include <fty_proto.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <math.h>
 #include "data.h"
@@ -284,6 +286,9 @@ bool database_ready;
         if (dbid == -1) {
             http_die ("element-not-found", item.c_str ());
         }
+        if (dbid == -2) {
+                http_die ("internal-error", "Connecting to database failed.");
+        }
         auto it = allDcsShort.item.find ((uint32_t) dbid);
         if (it == allDcsShort.item.end()) {
             http_die ("element-not-found", item.c_str ());
@@ -408,17 +413,20 @@ bool database_ready;
             mlm_client_destroy (&client);
 
     // So we finally have all values in "dataDc"
-    // no http_die is expected
     // lets just  print them
     std::string json;
     json += "{\"datacenter_indicators\": [";
     for( size_t D = 0 ; D < DCs.size(); D++ ) {
+        std::pair<std::string,std::string> dc_names = persist::id_to_name_ext_name (DCIDs[D]);
+        if (dc_names.first.empty () && dc_names.second.empty ())
+            http_die ("internal-error", "Database failure");
+
         json += "{";
         json += "\"id\": \"";
         json += DCNames[D];
         json += "\",";
         json += "\"name\": \"";
-        json += persist::id_to_name_ext_name (DCIDs[D]).second;
+        json += dc_names.second;
         json += "\",";
         for ( const auto &row : dataDc.at(DCNames[D]) ) {
             // data contains topics and it aliases, but we need to print only aliases

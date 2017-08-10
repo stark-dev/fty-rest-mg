@@ -93,7 +93,10 @@ bool database_ready;
         }
 
         for ( auto &oneAsset : allAssetsShort.item ) {
-            ext_name = persist::id_to_name_ext_name (oneAsset.first).second;
+            std::pair<std::string, std::string> asset_names =  persist::id_to_name_ext_name (oneAsset.first);
+            if (asset_names.first.empty () && asset_names.second.empty ())
+                http_die ("internal-error", "Database failure");
+            ext_name = asset_names.second;
             json += "{";
             json += utils::json::jsonify ("id", oneAsset.second);
             json += ",";

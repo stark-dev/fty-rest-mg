@@ -25,6 +25,8 @@
  */
  #><%pre>
 #include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <cxxtools/jsondeserializer.h>
 #include "configure_inform.h"
@@ -125,8 +127,12 @@ bool database_ready;
         }
         // no unexpected errors was detected
         // process results
+        std::pair<std::string, std::string> asset_names = persist::id_to_name_ext_name (row.first.id);
+        if (asset_names.first.empty () && asset_names.second.empty ())
+            http_die ("internal-error", "Database failure");
+
 </%cpp>
-{<$$ utils::json::jsonify ("id", persist::id_to_name_ext_name (row.first.id).first) $>}
+{<$$ utils::json::jsonify ("id", asset_names.first) $>}
 <%cpp>
         return HTTP_OK;
     }

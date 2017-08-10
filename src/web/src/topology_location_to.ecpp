@@ -98,6 +98,12 @@ bool database_ready;
     }
     // Sanity check end
     int64_t checked_to_num = persist::name_to_asset_id (checked_to);
+    if (checked_to_num == -1) {
+            http_die ("request-param-bad", "to", checked_to.c_str (), "existing asset name");
+    }
+    if (checked_to_num == -2) {
+            http_die ("internal-error", "Connecting to database failed.");
+    }
     // ##################################################
     // BLOCK 2
     // Call persistence layer
@@ -235,7 +241,10 @@ bool database_ready;
                 // <checked_to_num, type, contains, name, type_name>
                 std::tuple<int, int, std::string, std::string, std::string> row = stack.top();
                 stack.pop();
-                ext_name = persist::id_to_name_ext_name (std::get<0>(row)).second;
+                std::pair <std::string,std::string> asset_names = persist::id_to_name_ext_name (std::get<0>(row));
+                if (asset_names.first.empty () && asset_names.second.empty ())
+                    http_die ("internal-error", "Database failure");
+                ext_name = asset_names.second;
 
                 indent++;
                 if (!std::get<2>(row).empty()) {

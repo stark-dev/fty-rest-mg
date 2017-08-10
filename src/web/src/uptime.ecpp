@@ -25,6 +25,7 @@
  #><%pre>
 #include <malamute.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include <sys/syscall.h>
 #include <cxxtools/split.h>
 #include <tntdb/error.h>

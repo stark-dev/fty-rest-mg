@@ -24,6 +24,8 @@
  */
  #><%pre>
 #include <sys/syscall.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "data.h"
 #include "configure_inform.h"
@@ -69,6 +71,9 @@ bool database_ready;
     int64_t dbid = persist::name_to_asset_id (checked_id);
     if (dbid == -1) {
         http_die ("element-not-found", checked_id.c_str ());
+    }
+    if (dbid == -2) {
+        http_die ("internal-error", "Connecting to database failed.");
     }
 
     // delete it

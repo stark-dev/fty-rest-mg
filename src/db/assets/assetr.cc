@@ -94,10 +94,14 @@ name_to_asset_id (std::string asset_name)
         row [0].get(id);
         return id;
     }
+    catch (const tntdb::NotFound &e) {
+        log_error ("element %s not found", asset_name.c_str ());
+        return -1;
+    }
     catch (const std::exception &e)
     {
         log_error ("exception caught %s for element %s", e.what (), asset_name.c_str ());
-        return -1;
+        return -2;
     }
 }
 

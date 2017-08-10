@@ -86,7 +86,7 @@ void operator<<= (cxxtools::SerializationInfo& si, const Array_power_chain& arra
 }
 
 
-void
+int
 fill_array_devices (const std::map <std::string,
                           std::pair <std::string,
                                      std::string>> map_devices,
@@ -97,15 +97,19 @@ fill_array_devices (const std::map <std::string,
     for (const auto& device : _map_devices)
     {
         array_devices.id = device.second.first;
-        array_devices.name = persist::id_to_name_ext_name (atoi (device.first.c_str())).second;
+        std::pair<std::string, std::string> device_names = persist::id_to_name_ext_name (atoi (device.first.c_str()));
+        if (device_names.first.empty () && device_names.second.empty ())
+            return 1;
+        array_devices.name = device_names.second;
+
         array_devices.sub_type = device.second.second;
 
         devices_vector.push_back (array_devices);
     }
-
+    return 0;
 }
 
-void
+int
 fill_array_powerchains (std::vector <std::tuple
                                          <std::string,
                                           std::string,
@@ -123,8 +127,19 @@ fill_array_powerchains (std::vector <std::tuple
             array_powerchains.src_id = persist::id_to_name_ext_name (atoi (std::get <2> (chain).c_str())).first;
             array_powerchains.dst_id = persist::id_to_name_ext_name (atoi (std::get <0> (chain).c_str ())).first;
 
+            std::pair<std::string, std::string> src_names = persist::id_to_name_ext_name (atoi (std::get <2> (chain).c_str()));
+            if (src_names.first.empty () && src_names.second.empty ())
+                return 1;
+            array_powerchains.src_id = src_names.first;
+
+            std::pair<std::string, std::string> dst_names = persist::id_to_name_ext_name (atoi (std::get <0> (chain).c_str ()));
+            if (dst_names.first.empty () && dst_names.second.empty ())
+                return 1;
+            array_powerchains.dst_id = dst_names.first;
+
             powerchains_vector.push_back (array_powerchains);
         }
+        return 0;
 }
 </%pre>
 <%request scope="global">
@@ -168,7 +183,9 @@ fill_array_powerchains (std::vector <std::tuple
 
     if ( dbid == -1 )
         http_die ("element-not-found", "dc_id ", dc_id.c_str ());
-
+    if (dbid == -2) {
+            http_die ("internal-error", "Connecting to database failed.");
+    }
     rv = input_power_group_response (url, (uint32_t) dbid, devices_data, powerchains_data);
 
 
@@ -183,8 +200,12 @@ fill_array_powerchains (std::vector <std::tuple
     if (powerchains_data.size () == 0)
         log_debug ("powerchains_data.size () == 0");
 
-    fill_array_devices (devices_data, devices_vector);
-    fill_array_powerchains (powerchains_data, powerchains_vector);
+    rv = fill_array_devices (devices_data, devices_vector);
+    if (rv != 0)
+        http_die ("internal-error", "Database failure");
+    rv = fill_array_powerchains (powerchains_data, powerchains_vector);
+    if (rv != 0)
+        http_die ("internal-error", "Database failure");
 
     topo.devices = std::move (devices_vector);
     topo.powerchains = std::move (powerchains_vector);
