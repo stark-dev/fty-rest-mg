@@ -65,6 +65,9 @@ UserInfo user;
     if (dbid == -1) {
         http_die ("element-not-found", checked_id.c_str ());
     }
+    if (dbid == -2) {
+        http_die ("internal-error", "Connecting to database failed.");
+    }
 
     // delete it
     db_a_elmnt_t row;

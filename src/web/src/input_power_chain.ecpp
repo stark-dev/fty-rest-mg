@@ -177,7 +177,9 @@ fill_array_powerchains (std::vector <std::tuple
 
     if ( dbid == -1 )
         http_die ("element-not-found", "dc_id ", dc_id.c_str ());
-
+    if (dbid == -2) {
+            http_die ("internal-error", "Connecting to database failed.");
+    }
     rv = input_power_group_response (url, (uint32_t) dbid, devices_data, powerchains_data);
 
 

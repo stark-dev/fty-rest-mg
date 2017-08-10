@@ -229,6 +229,9 @@ std::string checked_arg2;
         if (dbid == -1) {
             http_die ("element-not-found", item.c_str ());
         }
+        if (dbid == -2) {
+                http_die ("internal-error", "Connecting to database failed.");
+        }
         auto it = allRacksShort.item.find(dbid);
         if (it == allRacksShort.item.end()) {
             http_die ("element-not-found", item.c_str ());

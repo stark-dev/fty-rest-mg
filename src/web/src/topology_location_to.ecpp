@@ -91,6 +91,12 @@ UserInfo user;
     }
     // Sanity check end
     int64_t checked_to_num = persist::name_to_asset_id (checked_to);
+    if (checked_to_num == -1) {
+            http_die ("request-param-bad", "to", checked_to.c_str (), "existing asset name");
+    }
+    if (checked_to_num == -2) {
+            http_die ("internal-error", "Connecting to database failed.");
+    }
     // ##################################################
     // BLOCK 2
     // Call persistence layer
