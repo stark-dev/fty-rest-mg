@@ -215,7 +215,11 @@ UserInfo user;
                     } else {
                         first = false;
                     }
-                    json.append("{ \"name\" : \"").append(persist::id_to_name_ext_name (asset_msg_element_id (item)).second).append("\",");
+                    std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (asset_msg_element_id (item));
+                    if (asset_names.first.empty () && asset_names.second.empty ())
+                        http_die ("internal-error", "Database failure");
+
+                    json.append("{ \"name\" : \"").append(asset_names.second).append("\",");
                     json.append("\"id\" : \"").append(asset_msg_name (item)).append("\",");
                     json.append("\"sub_type\" : \"").append(utils::strip (asset_msg_type_name (item))).append("\"}");
 
@@ -247,11 +251,19 @@ UserInfo user;
                     while (getline(f, tmp, ':')) {
                         tokens.push_back(tmp);
                     }
-                    json.append("\"src-id\" : \"").append(persist::id_to_name_ext_name (std::stoi (tokens[1])).first).append("\",");
+                    std::pair<std::string,std::string> src_names = persist::id_to_name_ext_name (std::stoi (tokens[1]));
+                    if (src_names.first.empty () && src_names.second.empty ())
+                        http_die ("internal-error", "Database failure");
+                    json.append("\"src-id\" : \"").append(src_names.first).append("\",");
+
                     if (!tokens[0].empty() && tokens[0] != "999") {
                         json.append("\"src-socket\" : \"").append(tokens[0]).append("\",");
                     }
-                    json.append("\"dst-id\" : \"").append(persist::id_to_name_ext_name (std::stoi (tokens[3])).first).append("\"");
+                    std::pair<std::string,std::string> dst_names = persist::id_to_name_ext_name (std::stoi (tokens[3]));
+                    if (dst_names.first.empty () && dst_names.second.empty ())
+                        http_die ("internal-error", "Database failure");
+                    json.append("\"dst-id\" : \"").append(dst_names.first).append("\"");
+
                     if (!tokens[2].empty() && tokens[2] != "999") {
                         json.append(",\"dst-socket\" : \"").append(tokens[2]).append("\"");
                     }

@@ -42,9 +42,12 @@ int asset_location_r(asset_msg_t** asset_msg, std::string& json) {
     std::string name = asset_msg_name(*asset_msg);
     std::string type_name = asset_msg_type_name(*asset_msg);
 
+    std::pair<std::string,std::string> elem_names = persist::id_to_name_ext_name (element_id);
+    if (elem_names.first.empty () && elem_names.second.empty ())
+        return HTTP_INTERNAL_SERVER_ERROR;
 
     json += "{";
-    json += "\"name\" : \"" + utils::json::escape (persist::id_to_name_ext_name (element_id).second) + "\", ";
+    json += "\"name\" : \"" + utils::json::escape (elem_names.second) + "\", ";
     json += "\"id\" : \"" + utils::json::escape (name) + "\",";
     json += "\"type\" : \"" + persist::typeid_to_type(type_id) + "\",";
     if ( (type_id == persist::asset_type::DEVICE ) ||

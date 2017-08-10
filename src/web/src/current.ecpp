@@ -299,12 +299,16 @@ std::vector<uint32_t> asset_ids;
             http_die("internal-error");
         }
 
+        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (asset_id);
+        if (asset_names.first.empty () && asset_names.second.empty ())
+            http_die ("internal-error", "Database failure");
+
         // we are here -> everything is ok, need just to form
         // this is a small JSON for just ONE asset
         std::string json = "{";
         json += utils::json::jsonify ("id", asset.item.name);
         json += ",";
-        json += utils::json::jsonify ("name", persist::id_to_name_ext_name (asset_id).second);
+        json += utils::json::jsonify ("name", asset_names.second);
         json += ",";
         std::map <std::string, OutletProperties> outlet_properties;
 
