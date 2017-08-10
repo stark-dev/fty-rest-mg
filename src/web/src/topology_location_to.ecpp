@@ -228,7 +228,10 @@ UserInfo user;
                 // <checked_to_num, type, contains, name, type_name>
                 std::tuple<int, int, std::string, std::string, std::string> row = stack.top();
                 stack.pop();
-                ext_name = persist::id_to_name_ext_name (std::get<0>(row)).second;
+                std::pair <std::string,std::string> asset_names = persist::id_to_name_ext_name (std::get<0>(row));
+                if (asset_names.first.empty () && asset_names.second.empty ())
+                    http_die ("internal-error", "Database failure");
+                ext_name = asset_names.second;
 
                 indent++;
                 if (!std::get<2>(row).empty()) {

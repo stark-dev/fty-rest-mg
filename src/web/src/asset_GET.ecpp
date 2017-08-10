@@ -232,10 +232,16 @@ UserInfo user;
         http_die ("internal-error", "mlm_client_connect() failed.");
     }
     // end connect to malamute
+    std::pair<std::string,std::string> parent_names = persist::id_to_name_ext_name (tmp.item.basic.parent_id);
+    if (parent_names.first.empty () && parent_names.second.empty ())
+        http_die ("internal-error", "Database failure");
+    std::string parent_name = parent_names.first;
+    std::string ext_parent_name = parent_names.second;
 
-    std::string parent_name = persist::id_to_name_ext_name (tmp.item.basic.parent_id).first;
-    std::string ext_parent_name = persist::id_to_name_ext_name (tmp.item.basic.parent_id).second;
-    std::string asset_ext_name = persist::id_to_name_ext_name (tmp.item.basic.id).second;
+    std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (tmp.item.basic.id);
+    if (asset_names.first.empty () && asset_names.second.empty ())
+        http_die ("internal-error", "Database failure");
+    std::string asset_ext_name = asset_names.second;
 
 // Prepare the reply
 </%cpp>
@@ -271,7 +277,11 @@ if ( !tmp.item.groups.empty() )
     std::string ext_name = "";
     for ( auto &oneGroup : tmp.item.groups )
     {
-        ext_name = persist::id_to_name_ext_name (oneGroup.first).second;
+       std::pair<std::string,std::string> group_names = persist::id_to_name_ext_name (oneGroup.first);
+       if (group_names.first.empty () && group_names.second.empty ())
+               http_die ("internal-error", "Database failure");
+       ext_name = group_names.second;
+
 </%cpp>
 {
     "id"  : "<$$ oneGroup.second $>",
@@ -297,8 +307,12 @@ if ( tmp.item.basic.type_id == persist::asset_type::DEVICE )
         uint32_t i = 1;
         for ( auto &oneLink : tmp.item.powers )
         {
+            std::pair<std::string,std::string> link_names = persist::id_to_name_ext_name (oneLink.src_id);
+            if (link_names.first.empty () && link_names.second.empty ())
+                http_die ("internal-error", "Database failure");
+
 </%cpp>
-{"src_name":"<$$ utils::json::escape (persist::id_to_name_ext_name (oneLink.src_id).second) $>",
+{"src_name":"<$$ utils::json::escape (link_names.second) $>",
  "src_id":"<$$ utils::json::escape (oneLink.src_name) $>"
 <%cpp>
             if ( !oneLink.src_socket.empty() )
@@ -341,7 +355,11 @@ else {
 %std::string ext_name = "";
 %for (const auto& it: tmp.item.parents) {
 %   char comma = i != tmp.item.parents.size () ? ',' : ' ';
-%   ext_name = persist::id_to_name_ext_name (std::get<0> (it)).second   ;
+%   std::pair<std::string,std::string> it_names = persist::id_to_name_ext_name (std::get<0> (it));
+%   if (it_names.first.empty () && it_names.second.empty ())
+%       http_die ("internal-error", "Database failure");
+%   ext_name = it_names.second   ;
+
     {
         "id" : "<$$ std::get<1> (it) $>",
         "name" : "<$$ utils::json::escape (ext_name) $>",

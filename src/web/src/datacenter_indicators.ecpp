@@ -403,17 +403,20 @@ UserInfo user;
             mlm_client_destroy (&client);
 
     // So we finally have all values in "dataDc"
-    // no http_die is expected
     // lets just  print them
     std::string json;
     json += "{\"datacenter_indicators\": [";
     for( size_t D = 0 ; D < DCs.size(); D++ ) {
+        std::pair<std::string,std::string> dc_names = persist::id_to_name_ext_name (DCIDs[D]);
+        if (dc_names.first.empty () && dc_names.second.empty ())
+            http_die ("internal-error", "Database failure");
+
         json += "{";
         json += "\"id\": \"";
         json += DCNames[D];
         json += "\",";
         json += "\"name\": \"";
-        json += persist::id_to_name_ext_name (DCIDs[D]).second;
+        json += dc_names.second;
         json += "\",";
         for ( const auto &row : dataDc.at(DCNames[D]) ) {
             // data contains topics and it aliases, but we need to print only aliases

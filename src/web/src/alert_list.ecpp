@@ -366,6 +366,7 @@ if (streq (part, "LIST")) {
 %       continue;
 %   }
 %   log_debug ("persist::select_asset_element_web_byName ('%s')", fty_proto_name (decoded));
+%
 %   auto asset_element = persist::select_asset_element_web_byName (connection, fty_proto_name (decoded));
 %   if (asset_element.status != 1) {
 %       log_error ("%s", asset_element.msg.c_str ());
@@ -374,12 +375,16 @@ if (streq (part, "LIST")) {
 %       continue;
 %   }
 %
+%   std::pair<std::string,std::string> asset_element_names = persist::id_to_name_ext_name (asset_element.item.id);
+%   if (asset_element_names.first.empty () && asset_element_names.second.empty ())
+%       http_die ("internal-error", "Database error");
+%
 %   if (first) {
     {
         <$$ utils::json::jsonify ("timestamp", buff) $>,
         <$$ utils::json::jsonify ("rule_name", fty_proto_rule (decoded)) $>,
         <$$ utils::json::jsonify ("element_id",  fty_proto_name (decoded)) $>,
-        <$$ utils::json::jsonify ("element_name", persist::id_to_name_ext_name (asset_element.item.id).second) $>,
+        <$$ utils::json::jsonify ("element_name", asset_element_names.second) $>,
         <$$ utils::json::jsonify ("element_type", asset_element.item.type_name) $>,
         <$$ utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) $>,
         <$$ utils::json::jsonify ("state", fty_proto_state (decoded)) $>,
@@ -393,7 +398,7 @@ if (streq (part, "LIST")) {
         <$$ utils::json::jsonify ("timestamp", buff) $>,
         <$$ utils::json::jsonify ("rule_name", fty_proto_rule (decoded)) $>,
         <$$ utils::json::jsonify ("element_id", fty_proto_name (decoded)) $>,
-        <$$ utils::json::jsonify ("element_name", persist::id_to_name_ext_name (asset_element.item.id).second) $>,
+        <$$ utils::json::jsonify ("element_name", asset_element_names.second) $>,
         <$$ utils::json::jsonify ("element_type", asset_element.item.type_name) $>,
         <$$ utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) $>,
         <$$ utils::json::jsonify ("state", fty_proto_state (decoded)) $>,
