@@ -279,6 +279,9 @@ UserInfo user;
         if (dbid == -1) {
             http_die ("element-not-found", item.c_str ());
         }
+        if (dbid == -2) {
+                http_die ("internal-error", "Connecting to database failed.");
+        }
         auto it = allDcsShort.item.find ((uint32_t) dbid);
         if (it == allDcsShort.item.end()) {
             http_die ("element-not-found", item.c_str ());

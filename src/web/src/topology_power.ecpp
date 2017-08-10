@@ -116,6 +116,9 @@ UserInfo user;
         checked_id = persist::name_to_asset_id (asset_id);
         if (checked_id == -1)
             http_die ("request-param-bad", "id", asset_id.c_str (), "existing asset name");
+        if (checked_id == -2) {
+            http_die ("internal-error", "Connecting to database failed.");
+    }
     }
     // Sanity check end
 
