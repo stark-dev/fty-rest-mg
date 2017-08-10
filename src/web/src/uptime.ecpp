@@ -41,6 +41,7 @@ asset_manager asset_mgr;
 </%thread>
 <%request scope="global">
 UserInfo user;
+bool database_ready;
 </%request>
 <%cpp>
     // check user permissions
