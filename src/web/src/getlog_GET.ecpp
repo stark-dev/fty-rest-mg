@@ -30,7 +30,6 @@
 #include <stdexcept>
 #include <sys/utsname.h>
 #include <time.h>
-#include <tntdb/connect.h>
 #include <tnt/mimedb.h>
 #include "helpers.h"
 #include "subprocess.h"
@@ -292,7 +291,6 @@ class _clonedcode_Compressor
 UserInfo user;
 </%request>
 <%cpp>
-
     // permission check
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Admin,     "R"}
