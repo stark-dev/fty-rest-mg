@@ -94,6 +94,8 @@ generate_measurement
 warranty-metric
 bios-csv
 
+tests/junit
+
 var/
 
 build/
