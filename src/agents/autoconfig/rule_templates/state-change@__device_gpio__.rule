@@ -1,0 +1,22 @@
+{
+    "name"          : "state-change@__name__",
+    "description"   : "GPIO status changed",
+    "metrics"       : ["status.GPI1"],
+    "assets"	    : [__name__],
+    "types" 	    : ["sensorgpio"],
+    "results"       :  {
+        "high_critical"  : { "action" : ["EMAIL","SMS"] },
+        "high_warning"   : { "action" : ["EMAIL"] }
+    },
+    "variables"	    : {
+      "normal_state" : "closed"
+    },
+    "evaluation"    : "
+         function main(current_state)
+	     if current_state == normal_state then
+	         return OK, '' .. name .. 'is ' .. current_state  ..'.'
+ 	     end
+	         return WARNING, ' ' .. name .. 'status changed to ' .. current_state ..'.'
+         end
+    "
+}
