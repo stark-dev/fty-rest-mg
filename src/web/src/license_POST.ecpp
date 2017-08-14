@@ -43,6 +43,7 @@
 </%pre>
 <%request scope="global">
 UserInfo user;
+bool database_ready;
 </%request>
 <%cpp>
 {
@@ -90,7 +91,7 @@ UserInfo user;
     free (license_file); license_file = NULL;
 
     // once done, read and setup environment files for accessing the database
-    if (!shared::is_file (PASSWD_FILE)) {
+    if (!shared::is_file (PASSWD_FILE) || !database_ready) {
 
         // call fty-db-init to start mysql and initialize the database
         // and more importantly - wait for initialization to complete
@@ -120,5 +121,6 @@ UserInfo user;
 </%cpp>
 { "success" : "License version <$ clv $> accepted." }
 <%cpp>
+    database_ready = true;
 }
 </%cpp>
