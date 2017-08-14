@@ -568,7 +568,9 @@ if ( !tmp.item.ext.empty() )
     "realpower.nominal" : <$ realpower_nominal != NAN ? std::to_string(realpower_nominal) : "null" $>,
     "outlet.available" : {
 %           std::map<std::string, int> res;
-%           rack_outlets_available(tmp.item.basic.id, res);
+%           int rv = rack_outlets_available(tmp.item.basic.id, res);
+%           if (rv != 0)
+%               http_die ("internal-error", "Database failure");
 %           size_t i=1;
 %           for (const auto &it : res) {
 %               std::string val = it.second >= 0 ? std::to_string(it.second) : "null";
