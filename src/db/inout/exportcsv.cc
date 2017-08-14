@@ -56,7 +56,7 @@ s_update_keytags(
             std::string keytag;
             r["keytag"].get(keytag);
             if (std::find(aek.cbegin(), aek.cend(), keytag) != aek.end())
-                return;
+                return 0;
             if (std::find(s.cbegin(), s.cend(), keytag) == s.end())
                 s.push_back(keytag);
         };
