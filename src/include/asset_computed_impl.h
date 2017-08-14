@@ -31,7 +31,7 @@
 
 int free_u_size( uint32_t elementId);
 
-void
+int
 rack_outlets_available(
         uint32_t elementId,
         std::map<std::string, int> &res);
