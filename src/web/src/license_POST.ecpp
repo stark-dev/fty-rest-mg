@@ -127,8 +127,31 @@ bool database_ready;
 </%cpp>
 { "success" : "License version <$ clv $> accepted." }
 <%cpp>
-    database_ready = true;
     log_info("license was accepted, db services were started, db credentials were refreshed");
     log_debug("Current DB URL is: %s", url.c_str());
+
+    log_info("Making sure webserver can already connect to database...");
+
+    try {
+        tntdb::Connection conn;
+        REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+
+        tntdb::Statement st = conn.prepareCached(
+            " SELECT * from t_empty"
+//            " SHOW databases"
+        );
+
+        tntdb::Result result = st.select();
+        for ( auto &row: result )
+        {
+            std::string ret;
+            row[0].get(ret);
+        }
+        database_ready = true;
+    } catch (std::exception &e) {
+        log_error("Database connection test failed: %s", e.what());
+        database_ready = false;
+        http_die ("internal-error", "Database connection test failed");
+    }
 }
 </%cpp>
