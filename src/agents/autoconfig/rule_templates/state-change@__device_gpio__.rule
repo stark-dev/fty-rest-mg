@@ -14,9 +14,9 @@
     "evaluation"    : "
          function main(current_state)
 	     if current_state == normal_state then
-	         return OK, ..NAME.. 'is ' ..current_state..'.'
+	         return OK, '' .. name .. 'is ' .. current_state  ..'.'
  	     end
-	         return WARNING,  ..NAME.. 'status changed to ' ..current_state..'.'
+	         return WARNING, ' ' .. name .. 'status changed to ' .. current_state ..'.'
          end
     "
 }
