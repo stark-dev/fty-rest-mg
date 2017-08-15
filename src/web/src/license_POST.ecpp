@@ -31,6 +31,7 @@
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
+#include <tntdb.h>
 
 #include "utils.h"
 #include "cleanup.h"
@@ -107,20 +108,51 @@ bool database_ready;
         std::string proc_out, proc_err;
 
         int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
-        if (rv != 0)
+        if (rv != 0) {
+            log_error("Starting of start-db-services have failed. Consult system logs");
+            log_debug("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                "/usr/libexec/fty/start-db-services", rv, proc_out.c_str(), proc_err.c_str());
             http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
+        }
 
         // once done, check environment files for accessing the database
+        log_info("db services were started, re-reading password ...");
         if (!dbreadcredentials())
             http_die ("internal-error", "Database password file is missing");
     }else{
         //enforce reload credential
+        log_info("db services were already started and set up, re-reading password just in case ...");
         if (!dbreadcredentials())
-            http_die ("internal-error", "Database password file is missing");  
+            http_die ("internal-error", "Database password file is missing");
     }
 </%cpp>
 { "success" : "License version <$ clv $> accepted." }
 <%cpp>
-    database_ready = true;
+    log_info("license was accepted, db services were started, db credentials were refreshed");
+    log_debug("Current DB URL is: %s", url.c_str());
+
+    log_info("Making sure webserver can already connect to database...");
+
+    try {
+        tntdb::Connection conn;
+        conn = tntdb::connectCached(url);
+
+        tntdb::Statement st = conn.prepareCached(
+            " SELECT * from t_empty"
+//            " SHOW databases"
+        );
+
+        tntdb::Result result = st.select();
+        for ( auto &row: result )
+        {
+            std::string ret;
+            row[0].get(ret);
+        }
+        database_ready = true;
+    } catch (std::exception &e) {
+        log_error("Database connection test failed: %s", e.what());
+        database_ready = false;
+        http_die ("internal-error", "Database connection test failed");
+    }
 }
 </%cpp>
