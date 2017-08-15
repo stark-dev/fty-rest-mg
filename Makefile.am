@@ -701,7 +701,7 @@ RULE_TEMPLATES = \
             src/agents/autoconfig/rule_templates/sts-frequency@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-preferred-source@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/state-change@__device_gpio__.rule
+            src/agents/autoconfig/rule_templates/state-change@__device_sensorgpio__.rule
 
 template_rule_DATA =	$(RULE_TEMPLATES)
 EXTRA_DIST +=		$(RULE_TEMPLATES)
