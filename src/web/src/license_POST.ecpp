@@ -31,6 +31,7 @@
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
+#include <tntdb.h>
 
 #include "utils.h"
 #include "cleanup.h"
@@ -134,7 +135,7 @@ bool database_ready;
 
     try {
         tntdb::Connection conn;
-        REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+        conn = tntdb::connectCached(url);
 
         tntdb::Statement st = conn.prepareCached(
             " SELECT * from t_empty"
