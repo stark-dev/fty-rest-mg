@@ -72,7 +72,7 @@ bool database_ready;
         http_die ("element-not-found", checked_id.c_str ());
     }
     if (dbid == -2) {
-        http_die ("internal-error", "Connecting to database failed.");
+        http_die ("internal-error", "Database failure");
     }
 
     // delete it
