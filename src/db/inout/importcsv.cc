@@ -798,7 +798,7 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
         bios_throw("internal-error", msg.c_str());
 
     std::set<a_elmnt_id_t> ids{};
-    auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, false);
+    auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, true);
     LOG_END;
     return ret;
 }
