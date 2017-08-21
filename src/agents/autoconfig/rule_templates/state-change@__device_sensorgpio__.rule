@@ -4,20 +4,20 @@
     "description"   : "GPIO status changed",
     "metrics"       : ["status.__port__"],
     "assets"	    : ["__name__"],
-    "types" 	    : ["sensorgpio","rackcontroller"],
+    "types" 	    : ["sensorgpio", "rackcontroller"],
     "results"       :  {
         "high_critical"  : { "action" : ["EMAIL","SMS"] },
         "high_warning"   : { "action" : ["EMAIL"] }
     },
     "variables"	    : {
-      "normal_state" : "closed"
+      "normal_state" : "__normalstate__"
     },
     "evaluation"    : "
          function main(current_state)
 	     if current_state == normal_state then
-	         return OK, '' .. name .. 'is ' .. current_state  ..'.'
+	         return OK, '' .. NAME .. 'is ok .'
  	     end
-	         return WARNING, ' ' .. name .. 'status changed to ' .. current_state ..'.'
+	         return __severity__ , ' Door ' __logicalasset__ ' is ' .. current_state ..'.'
          end
     "
   }
