@@ -269,3 +269,4 @@ UserInfo user;
         http_die("bad-request-document", "Please check RFC-11 for valid json schema description.");
     else
 </%cpp>
+<$$ output $>
