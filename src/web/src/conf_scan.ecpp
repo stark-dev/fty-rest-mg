@@ -33,7 +33,7 @@ static zmsg_t *
 req_setconf (zuuid_t *uuid, std::string json)
 {
     zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "SETCONF");
+    zmsg_addstr (msg, "SETCONFIG");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     //parsing json file
     try {
@@ -158,7 +158,7 @@ static zmsg_t *
 req_getconfscan (zuuid_t *uuid)
 {
     zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "GETCONF");
+    zmsg_addstr (msg, "GETCONFIG");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     return msg;
 }
