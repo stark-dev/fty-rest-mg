@@ -4,6 +4,7 @@
     "description"   : "GPIO status changed",
     "metrics"       : ["status.__port__"],
     "assets"	    : ["__name__"],
+    "models"	    : ["DCS001"],
     "types" 	    : ["sensorgpio", "rackcontroller"],
     "results"       :  {
         "high_critical"  : { "action" : ["EMAIL","SMS"] },
@@ -11,10 +12,10 @@
     },
     "evaluation"    : "
         function main(current_state)
-            if current_state == __normal_state__ then
-                return OK, '' .. NAME .. 'is ok .'
+            if current_state == '__normalstate__' then
+                return OK, 'Door to __logicalasset__ is OK.'
             end
-                return __severity__ , ' Door ' __logicalasset__ ' is ' .. current_state ..'.'
+                return __severity__, 'Door to __logicalasset__ is ' .. current_state ..'. Reported '
         end
     "
   }
