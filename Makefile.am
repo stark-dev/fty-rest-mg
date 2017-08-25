@@ -701,7 +701,8 @@ RULE_TEMPLATES = \
             src/agents/autoconfig/rule_templates/sts-frequency@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-preferred-source@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/state-change@__device_sensorgpio__.rule
+            src/agents/autoconfig/rule_templates/state-change@__device_sensorgpio__.rule \
+            src/agents/autoconfig/rule_templates/vibration-sensor.state-change@__device_sensorgpio__.rule
 
 template_rule_DATA =	$(RULE_TEMPLATES)
 EXTRA_DIST +=		$(RULE_TEMPLATES)
@@ -767,7 +768,8 @@ BUILT_SOURCES_bios_web_la = \
 		      src/web/src/scan_progress.cpp \
 		      src/web/src/list_gpio.cpp \
 		      src/web/src/add_gpio.cpp \
-		      src/web/src/security_headers.cpp
+		      src/web/src/security_headers.cpp \
+		      src/web/src/conf_scan.cpp
 
 # Track real-git and nodist (generated) sources SEPARATELY
 nodist_bios_web_la_SOURCES = $(BUILT_SOURCES_bios_web_la)
