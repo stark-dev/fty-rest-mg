@@ -242,7 +242,9 @@ bool
     assert (aux);
 
     std::map<std::string, std::vector <std::string>> dc_upses;
-    get_dc_upses(dc_upses, asset_name);
+    bool rv = get_dc_upses(dc_upses, asset_name);
+    if (!rv)
+        return false;
 
     for (auto& item : dc_upses)
     {

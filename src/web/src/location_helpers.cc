@@ -43,7 +43,7 @@ int asset_location_r(asset_msg_t** asset_msg, std::string& json) {
     std::string type_name = asset_msg_type_name(*asset_msg);
 
     std::pair<std::string,std::string> elem_names = persist::id_to_name_ext_name (element_id);
-    if (elem_names.first.empty () && elem_names.second.empty ())
+    if (element_id != 0 && elem_names.first.empty () && elem_names.second.empty ())
         return HTTP_INTERNAL_SERVER_ERROR;
 
     json += "{";

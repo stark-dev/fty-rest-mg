@@ -33,18 +33,18 @@ static zmsg_t *
 req_setconf (zuuid_t *uuid, std::string json)
 {
     zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "SETCONF");
+    zmsg_addstr (msg, "SETCONFIG");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     //parsing json file
     try {
-        
+
         std::stringstream input (json);
         cxxtools::JsonDeserializer deserializer (input);
         cxxtools::SerializationInfo request_doc;
         deserializer.deserialize (request_doc);
         
         std::string scanType;
-        if(!request_doc.getMember("scan_type", &scanType)) {
+        if(!request_doc.getMember("scan_type", scanType)) {
             //ERROR
             zmsg_destroy(&msg);
             return NULL;
@@ -52,6 +52,51 @@ req_setconf (zuuid_t *uuid, std::string json)
         
         zmsg_addstr(msg, scanType.c_str());;
         
+        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember("rangescan");
+        if(si_rangescan == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+        
+        cxxtools::SerializationInfo *list_subnet = si_rangescan->findMember("subnet");
+        if(list_subnet == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+         
+        cxxtools::SerializationInfo *list_fromto = si_rangescan->findMember("from_to");
+        if(list_fromto == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+        
+        int val =0;
+        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
+            val++;
+        }
+        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
+            val++;
+        }
+        
+        zmsg_addstrf(msg, "%" PRIi32, val);
+        
+        log_debug ("set_confscan: %i different scans", val);
+        
+        std::string value_sn;
+        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());
+        }
+        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());            
+        }
+        
+        
+        /*
         cxxtools::SerializationInfo *list_scan = request_doc.findMember("scans");
         if(list_scan == NULL) {
             //ERROR
@@ -60,7 +105,7 @@ req_setconf (zuuid_t *uuid, std::string json)
         }
         
         int val =0;
-        for (auto it = list_scan.begin(); it != list_scan.end(); ++it) {
+        for (auto it = list_scan->begin(); it != list_scan->end(); ++it) {
             val++;
         }
         
@@ -69,7 +114,7 @@ req_setconf (zuuid_t *uuid, std::string json)
         log_debug ("set_confscan: %i different scans", val);
 
         std::string value_sn;
-        for (auto it = list_scan.begin(); it != list_scan.end(); ++it) {
+        for (auto it = list_scan->begin(); it != list_scan->end(); ++it) {
             if(it->getMember("subnet", value_sn) && value_sn != "")
                 zmsg_addstr(msg, value_sn.c_str());
             else if(it->getMember("from_to", value_sn) && value_sn != "")
@@ -79,7 +124,7 @@ req_setconf (zuuid_t *uuid, std::string json)
                 log_critical ("set_confscan: error during parse. No \"subnet\" nor \"from_to\"");
                 return NULL;
             }  
-       }
+       } */
         
     }
     catch (const std::exception& e) {
@@ -153,7 +198,7 @@ static zmsg_t *
 req_getconfscan (zuuid_t *uuid)
 {
     zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, "GETCONF");
+    zmsg_addstr (msg, "GETCONFIG");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     return msg;
 }
@@ -226,22 +271,22 @@ UserInfo user;
             };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
         
-    int rv;
+    int rv = 0;
     std::string output;
     if(request.getMethod() == "GET") {
-        rv = get_conf();
+        rv = get_confscan(output);
     }
     else if (request.getMethod() == "POST") {
         std::string json = request.getBody ();
         if(!json.empty())
-            rv = applyconf(json);
+            rv = set_confscan(json);
     }
     else
         http_die("method-not-allowed", request.getMethod().c_str() );
 
-
     
-
+    
+    
     if (rv == -1)
         http_die ("internal-error", "mlmpool.get () failed.");
     else
@@ -267,3 +312,4 @@ UserInfo user;
         http_die("bad-request-document", "Please check RFC-11 for valid json schema description.");
     else
 </%cpp>
+<$$ output $>

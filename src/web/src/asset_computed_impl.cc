@@ -124,7 +124,7 @@ s_select_outlet_count(
     return string_to_uint32(foo.c_str());
 }
 
-void
+int
 rack_outlets_available(
         uint32_t elementId,
         std::map<std::string, int> &res)
@@ -161,17 +161,18 @@ rack_outlets_available(
             res[std::to_string(device_asset_id)] = outlet_count;
         };
 
+    int rv;
     try {
         conn = tntdb::connectCached(url);
-        persist::select_assets_by_container(
+        rv = persist::select_assets_by_container(
                 conn, elementId, cb);
 
     } catch (std::exception &e) {
         log_error("%s", e.what());
-        return;
+        return -1;
     }
 
     if (!tainted)
         res["sum"] = sum +1;   //sum is initialized to -1
-    return;
+    return rv;
 }

@@ -8,7 +8,7 @@
   <mappings>
     <!-- Global variables setup regarding server status -->
     <mapping>
-      <target>server_status@tntnet</target>
+      <target>server_status@bios_web</target>
     </mapping>
 
     <!-- Everything SSL only -->
@@ -456,7 +456,7 @@
       <url>^/api/v1/admin/scan.*$</url>
       <method>GET</method>
     </mapping>
-    
+
     <!-- DELETE admin/scan -->
     <mapping>
         <target>scan_run@bios_web</target>
@@ -503,14 +503,14 @@
     <mapping>
         <target>email_feedback@bios_web</target>
         <url>^/api/v1/admin/email/feedback.*$</url>
-	<method>POST</method>
+        <method>POST</method>
     </mapping>
 
     <!-- POST admin/email/cpre -->
     <mapping>
         <target>email_vote@bios_web</target>
         <url>^/api/v1/admin/email/vote.*$</url>
-	<method>POST</method>
+        <method>POST</method>
     </mapping>
 
     <!-- not found error  -->
@@ -520,7 +520,7 @@
     </mapping>
 
 
- </mappings>
+  </mappings>
 
   <!-- listen to a port (empty string means any local interface) -->
   <listeners>

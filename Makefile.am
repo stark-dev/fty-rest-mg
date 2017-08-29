@@ -93,12 +93,12 @@ $(RUN_TNTNET_ENVFILE): $(abs_top_builddir)/Makefile
 	     echo 'export DATADIR="$$DATADIR_BASE/fty"'; \
 	} > $@
 
-RUN_TNTNET = cat "$(RUN_TNTNET_ENVFILE)" || exit; \
+RUN_TNTNET = ( cat "$(RUN_TNTNET_ENVFILE)" || exit; \
 	     . "$(RUN_TNTNET_ENVFILE)" || exit; \
 	     [ "x${KEEP_LICENSE}" = "xyes" ] || rm -rf "$$DATADIR_BASE"; id; \
 	     mkdir -p "$$DATADIR" && ls -la "$$DATADIR" && \
 	     [ -d "$$DATADIR" ] && [ -w "$$DATADIR" ] && \
-	     ${TNTNET} $(abs_top_builddir)/tntnet.xml
+	     ${TNTNET} $(abs_top_builddir)/tntnet.xml )
 
 # ----------------------------------------------------------------------
 # List of header files. The purpose of this list is not dependency
@@ -700,7 +700,12 @@ RULE_TEMPLATES = \
 			src/agents/autoconfig/rule_templates/voltage.input_3phase@__device_ups__.rule \
             src/agents/autoconfig/rule_templates/sts-frequency@__device_sts__.rule \
             src/agents/autoconfig/rule_templates/sts-preferred-source@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule
+            src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule \
+            src/agents/autoconfig/rule_templates/state-change@__device_sensorgpio__.rule \
+            src/agents/autoconfig/rule_templates/vibration-sensor.state-change@__device_sensorgpio__.rule \
+            src/agents/autoconfig/rule_templates/water-leak-detector.state-change@__device_sensorgpio__.rule \
+            src/agents/autoconfig/rule_templates/smoke-detector.state-change@__device_sensorgpio__.rule \
+            src/agents/autoconfig/rule_templates/pir-motion-detector.state-change@__device_sensorgpio__.rule
 
 template_rule_DATA =	$(RULE_TEMPLATES)
 EXTRA_DIST +=		$(RULE_TEMPLATES)
@@ -762,11 +767,12 @@ BUILT_SOURCES_bios_web_la = \
 		      src/web/src/email_feedback.cpp \
 	              src/web/src/email_vote.cpp \
 		      src/web/src/info.cpp \
+		      src/web/src/conf_scan.cpp \
 		      src/web/src/scan_run.cpp \
 		      src/web/src/scan_progress.cpp \
 		      src/web/src/list_gpio.cpp \
 		      src/web/src/add_gpio.cpp \
-		      src/web/src/security_headers.cpp 
+		      src/web/src/security_headers.cpp
 
 # Track real-git and nodist (generated) sources SEPARATELY
 nodist_bios_web_la_SOURCES = $(BUILT_SOURCES_bios_web_la)

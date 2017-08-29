@@ -38,11 +38,8 @@
     bool database_ready;
 </%request>
 <%cpp>
-    // verify server is ready
-    if (!database_ready) {
-        log_debug ("Database is not ready yet.");
-        http_die ("internal-error", "Database is not ready yet, please try again after a while.");
-    }
+    // Do not verify database because it is expected that in early
+    // wizard we try and fail to read/write user preferences
 
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Dashboard, "RU"},
@@ -76,12 +73,16 @@
         }
         catch (const std::exception &e)
         {
-            log_debug ("my_profile: exception caugth %s", e.what ());
+            log_debug ("my_profile: exception caught %s", e.what ());
         }
 
         if (preferences.empty()) {
-            // before licence POST = first login
+            // before licence POST = first login... or a DB error...
             preferences = DEFAULT_PREFERENCES;
+
+            if (database_ready) {
+                log_debug ("my_profile: database is ready but got empty preferences - using default set.");
+            }
         }
 </%cpp>
 {
@@ -114,6 +115,9 @@
 
                 if ( rv != 0 ) {
                     log_debug ("my_profile: Cannot save changes (default)");
+                    if (database_ready) {
+                        log_debug ("my_profile: database is ready though...");
+                    }
                 }
             } else {
                 std::stringstream s;
@@ -124,11 +128,17 @@
                 int rv = persist::save_agent_info (uid, preferences);
                 if ( rv != 0 ) {
                     log_debug ("my_profile: Cannot save changes");
+                    if (database_ready) {
+                        log_debug ("my_profile: database is ready though...");
+                    }
                 }
             }
         } catch (const std::exception& e) {
             LOG_END_ABNORMAL(e);
             log_debug ("my_profile: Exception caught %s", e.what());
+            if (database_ready) {
+                log_debug ("my_profile: database is ready though...");
+            }
         }
 </%cpp>
 {

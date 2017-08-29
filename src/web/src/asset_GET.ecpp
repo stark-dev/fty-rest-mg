@@ -29,7 +29,6 @@
 #include <cxxtools/regex.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <sys/syscall.h>
 
 #include <fty_proto.h>
 #include <malamute.h>
@@ -228,7 +227,7 @@ bool database_ready;
     }
 
     std::string client_name ("web.asset_get.");
-    client_name.append (std::to_string (getpid ())).append (".").append (std::to_string (syscall (SYS_gettid)));
+    client_name.append (std::to_string (getpid ())).append (".").append (std::to_string (get_current_thread_id()));
     log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
     int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
@@ -569,7 +568,9 @@ if ( !tmp.item.ext.empty() )
     "realpower.nominal" : <$ realpower_nominal != NAN ? std::to_string(realpower_nominal) : "null" $>,
     "outlet.available" : {
 %           std::map<std::string, int> res;
-%           rack_outlets_available(tmp.item.basic.id, res);
+%           int rv = rack_outlets_available(tmp.item.basic.id, res);
+%           if (rv != 0)
+%               http_die ("internal-error", "Database failure");
 %           size_t i=1;
 %           for (const auto &it : res) {
 %               std::string val = it.second >= 0 ? std::to_string(it.second) : "null";
