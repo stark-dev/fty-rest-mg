@@ -52,7 +52,7 @@ req_setconf (zuuid_t *uuid, std::string json)
         
         zmsg_addstr(msg, scanType.c_str());;
         
-        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember("rangescan");
+        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember("multiscan");
         if(si_rangescan == NULL) {
             //ERROR
             zmsg_destroy(&msg);
@@ -93,6 +93,27 @@ req_setconf (zuuid_t *uuid, std::string json)
         for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
             it->getValue(value_sn);
             zmsg_addstr(msg, value_sn.c_str());            
+        }
+        
+        cxxtools::SerializationInfo *listIp = request_doc.findMember("ips");
+        if(listIp == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+        
+        val = 0;
+        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
+            val++;
+        }
+        
+        zmsg_addstrf(msg, "%" PRIi32, val);
+        
+        log_debug ("set_confscan: %i different IPs", val);
+        
+        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());
         }
         
         

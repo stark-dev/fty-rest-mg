@@ -73,6 +73,20 @@ get_scan_progress (std::string &output)
         if (streq (result, "OK")) {
             zstr_free (&result);
             output.append ("{");
+            
+            char *status = zmsg_popstr (resp);
+            if(!status) return -5;
+            output.append ("\"status\" : \"");
+            output.append(status);
+            if(streq(status, "-1")) {                
+                zstr_free (&status);
+                output.append("\"}");
+                zmsg_destroy(&resp);
+                return 0;
+            }
+            output.append("\",");    
+            zstr_free (&status);
+            
             char *progress = zmsg_popstr (resp);
             if (!progress) return -5;
             output.append ("\"progress\" : \"");
