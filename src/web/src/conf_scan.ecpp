@@ -116,37 +116,6 @@ req_setconf (zuuid_t *uuid, std::string json)
             zmsg_addstr(msg, value_sn.c_str());
         }
         
-        
-        /*
-        cxxtools::SerializationInfo *list_scan = request_doc.findMember("scans");
-        if(list_scan == NULL) {
-            //ERROR
-            zmsg_destroy(&msg);
-            return NULL;
-        }
-        
-        int val =0;
-        for (auto it = list_scan->begin(); it != list_scan->end(); ++it) {
-            val++;
-        }
-        
-        zmsg_addstrf(msg, "%" PRIi32, val);
-        
-        log_debug ("set_confscan: %i different scans", val);
-
-        std::string value_sn;
-        for (auto it = list_scan->begin(); it != list_scan->end(); ++it) {
-            if(it->getMember("subnet", value_sn) && value_sn != "")
-                zmsg_addstr(msg, value_sn.c_str());
-            else if(it->getMember("from_to", value_sn) && value_sn != "")
-                zmsg_addstr(msg, value_sn.c_str());
-            else { //ERROR not valid format
-                zmsg_destroy(&msg);
-                log_critical ("set_confscan: error during parse. No \"subnet\" nor \"from_to\"");
-                return NULL;
-            }  
-       } */
-        
     }
     catch (const std::exception& e) {
         return NULL;
