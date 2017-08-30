@@ -463,7 +463,7 @@
         <url>^/api/v1/admin/scan.*$</url>
         <method>DELETE</method>
     </mapping>
-
+    
     <!-- POST admin/confscan -->
     <mapping>
       <target>conf_scan@bios_web</target>
@@ -477,7 +477,7 @@
       <url>^/api/v1/admin/confscan.*$</url>
       <method>GET</method>
     </mapping>   
-
+    
     <!-- GET admin/gpio -->
     <mapping>
         <method>GET</method>

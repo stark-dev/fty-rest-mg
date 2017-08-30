@@ -42,55 +42,85 @@ req_setconf (zuuid_t *uuid, std::string json)
         cxxtools::JsonDeserializer deserializer (input);
         cxxtools::SerializationInfo request_doc;
         deserializer.deserialize (request_doc);
-
+        
         std::string scanType;
-        request_doc.getMember("scan_type") >>= scanType;
-        if(scanType == "") {
+        if(!request_doc.getMember("scan_type", scanType)) {
             //ERROR
             zmsg_destroy(&msg);
             return NULL;
         }
-
+        
         zmsg_addstr(msg, scanType.c_str());;
-
-        //cxxtools::SerializationInfo *list_scan = request_doc.findMember("scans");
-        cxxtools::SerializationInfo list_scan;
-        if (request_doc.findMember("scans")) {
-            request_doc.getMember("scans") >>= list_scan;
-        }
-        else {
+        
+        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember("multiscan");
+        if(si_rangescan == NULL) {
             //ERROR
             zmsg_destroy(&msg);
             return NULL;
         }
-
+        
+        cxxtools::SerializationInfo *list_subnet = si_rangescan->findMember("subnet");
+        if(list_subnet == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+         
+        cxxtools::SerializationInfo *list_fromto = si_rangescan->findMember("from_to");
+        if(list_fromto == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+        
         int val =0;
-        for (auto it : list_scan) {
+        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
             val++;
         }
-
+        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
+            val++;
+        }
+        
         zmsg_addstrf(msg, "%" PRIi32, val);
         
         log_debug ("set_confscan: %i different scans", val);
-
+        
         std::string value_sn;
-        for (auto it = list_scan.begin(); it != list_scan.end(); ++it) {
-            if(it->getMember("subnet", value_sn) && value_sn != "")
-                zmsg_addstr(msg, value_sn.c_str());
-            else if(it->getMember("from_to", value_sn) && value_sn != "")
-                zmsg_addstr(msg, value_sn.c_str());
-            else { //ERROR not valid format
-                zmsg_destroy(&msg);
-                log_critical ("set_confscan: error during parse. No \"subnet\" nor \"from_to\"");
-                return NULL;
-            }  
-       }
+        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());
+        }
+        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());            
+        }
+        
+        cxxtools::SerializationInfo *listIp = request_doc.findMember("ips");
+        if(listIp == NULL) {
+            //ERROR
+            zmsg_destroy(&msg);
+            return NULL;
+        }
+        
+        val = 0;
+        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
+            val++;
+        }
+        
+        zmsg_addstrf(msg, "%" PRIi32, val);
+        
+        log_debug ("set_confscan: %i different IPs", val);
+        
+        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
+            it->getValue(value_sn);
+            zmsg_addstr(msg, value_sn.c_str());
+        }
         
     }
     catch (const std::exception& e) {
         return NULL;
     }
-
+    
     return msg;
 }
 
@@ -244,6 +274,9 @@ UserInfo user;
     else
         http_die("method-not-allowed", request.getMethod().c_str() );
 
+    
+    
+    
     if (rv == -1)
         http_die ("internal-error", "mlmpool.get () failed.");
     else
