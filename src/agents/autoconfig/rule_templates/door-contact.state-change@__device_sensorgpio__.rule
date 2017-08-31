@@ -1,6 +1,6 @@
 { "flexible" :
   {
-    "name"          : "state-change@__name__",
+    "name"          : "door-contact.state-change@__name__",
     "description"   : "GPIO status changed",
     "metrics"       : ["status.__port__"],
     "assets"	    : ["__name__"],
@@ -13,7 +13,7 @@
     "evaluation"    : "
         function main(current_state)
             if current_state == '__normalstate__' then
-                return OK, 'Door to __logicalasset__ is OK.'
+                return OK, 'Door to __logicalasset__ is ' .. current_state .. '. Reported '
             end
                 return __severity__, 'Door to __logicalasset__ is ' .. current_state ..'. Reported '
         end

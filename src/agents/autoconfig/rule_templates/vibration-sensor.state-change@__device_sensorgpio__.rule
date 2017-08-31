@@ -13,9 +13,9 @@
     "evaluation"    : "
         function main(current_state)
             if current_state == '__normalstate__' then
-                return OK, 'Vibration in __logicalasset__ is ok .'
+                return OK, 'Vibration in __logicalasset__ is OK. Reported '
             end
-                return __severity__ , ' Vibration detected in  __logicalasset__ . Reported'
+                return __severity__ , 'Vibration detected in  __logicalasset__. Reported '
         end
     "
   }

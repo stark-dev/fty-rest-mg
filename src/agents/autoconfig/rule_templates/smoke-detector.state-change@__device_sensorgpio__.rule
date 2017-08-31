@@ -13,9 +13,9 @@
     "evaluation"    : "
         function main(current_state)
             if current_state == '__normalstate__' then
-                return OK, '__logicalasset__ is ok .'
+                return OK, 'Smoke in __logicalasset__ is OK. Reported '
             end
-                return __severity__ , ' Smoke detected in  __logicalasset__ . Reported '
+                return __severity__ , 'Smoke detected in  __logicalasset__. Reported '
         end
     "
   }
