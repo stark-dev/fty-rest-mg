@@ -13,7 +13,7 @@
     "evaluation"    : "
         function main(current_state)
             if current_state == '__normalstate__' then
-                return OK, '__logicalasset__ is ok .'
+                return OK, 'Water leak in __logicalasset__ is OK. Reported '
             end
                 return __severity__ , 'Water leak detected in  __logicalasset__ . Reported '
         end

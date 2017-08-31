@@ -13,7 +13,7 @@
     "evaluation"    : "
         function main(current_state)
             if current_state == '__normalstate__' then
-                return OK, '__logicalasset__ is OK.'
+                return OK, 'Motion __logicalasset__ is OK. Reported '
             end
                 return __severity__ , 'Motion detected in __logicalasset__. Reported '
         end
