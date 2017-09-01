@@ -221,6 +221,10 @@ get_mapping (const std::string& key)
         {"BIOS_METRIC_STORE_AGE_24h",   "store/24h"},
         {"BIOS_METRIC_STORE_AGE_7d",    "store/7d"},
         {"BIOS_METRIC_STORE_AGE_30d",   "store/30d"}
+        //fty-discovery
+        {"FTY_DISCOVERY_TYPE",     "discovery/type"},
+        {"FTY_DISCOVERY_SCANS",    "discovery/scans"},
+        {"FTY_DISCOVERY_IPS",      "discovery/ips"}
     };
     if (config_mapping.find (key) == config_mapping.end ())
         return key.c_str ();
@@ -244,6 +248,12 @@ get_path (const std::string& key)
     {
         return "/etc/fty-nut/fty-nut.cfg";
     }
+    else
+    if (key.find ("FTY_DISCOVERY_") == 0)
+    {
+        return "/etc/fty-discovery/fty-discovery.cfg";
+    }    
+
     // general config file
     return "/etc/default/fty.cfg";
 }
