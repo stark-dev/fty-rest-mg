@@ -220,7 +220,7 @@ get_mapping (const std::string& key)
         {"BIOS_METRIC_STORE_AGE_8h",    "store/8h"},
         {"BIOS_METRIC_STORE_AGE_24h",   "store/24h"},
         {"BIOS_METRIC_STORE_AGE_7d",    "store/7d"},
-        {"BIOS_METRIC_STORE_AGE_30d",   "store/30d"}
+        {"BIOS_METRIC_STORE_AGE_30d",   "store/30d"},
         //fty-discovery
         {"FTY_DISCOVERY_TYPE",     "discovery/type"},
         {"FTY_DISCOVERY_SCANS",    "discovery/scans"},
