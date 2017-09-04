@@ -109,7 +109,8 @@ TEST_CASE("log-do_log", "[log][do_log]") {
     }
     rewind(tempf);
     char *fmt;
-    int ln = asprintf(&fmt, "[%d.%u] [CRITICAL]: test-log:42 (test_do_log) testing C-formatted string",getpid(),(unsigned int)pthread_self());
+    int ln = asprintf(&fmt, "[%jd.%" PRIu64 "] [CRITICAL]: test-log:42 (test_do_log) testing C-formatted string",
+        (intmax_t)getpid(), get_current_thread_id());
     CHECK(ln!=-1);
 
     char buf[1024];
