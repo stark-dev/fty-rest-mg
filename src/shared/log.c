@@ -17,13 +17,21 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #include <assert.h>
-#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/syscall.h>
+
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+# include <stdio.h>
+# undef _GNU_SOURCE
+#else
+# include <stdio.h>
+#endif
 
 #include "log.h"
 #include "utils.h"
