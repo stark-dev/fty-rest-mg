@@ -138,7 +138,11 @@ bool database_ready;
             // parameters are empty here!
             // possible compinations:
             //      ( relative != "" ) XOR ( start_ts != "" AND end_ts != "" )
-            http_die ("request-param-required", "start_ts or relative");
+            if (csv != "yes") { // for non-csv we parse "relative", for csv by BIOS-3225 we do not yet
+                http_die ("request-param-required", "start_ts or relative");
+            } else {
+                http_die ("request-param-required", "start_ts");
+            }
         }
         st = datetime_to_calendar (checked_start_ts.c_str ());
         if (st == -1) {

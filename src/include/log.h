@@ -112,6 +112,9 @@ int do_log(
         const char* format,
         ...) __attribute__ ((format (printf, 5, 6)));
 
+/*! \brief Portable way to get current thread ID */
+unsigned long get_current_thread_id(void);
+
 #define log_macro(level, ...) \
     do { \
         do_log((level), __FILE__, __LINE__, __func__, __VA_ARGS__); \
