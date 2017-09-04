@@ -278,7 +278,7 @@ s_zconfig_put (zconfig_t *config, const std::string& key, const char* c_value)
     }
 
     if (c_value)
-        zconfig_set_value (cfg, c_value);
+        zconfig_set_value (cfg, "%s", c_value);
 
     return cfg;
 }
