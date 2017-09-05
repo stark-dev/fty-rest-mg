@@ -86,7 +86,7 @@ void
 
         std::function<void(const tntdb::Row&)> cb = \
             [aux, &dc_name](const tntdb::Row &row) {
-                for (const auto& name: {"parent_name1", "parent_name2", "parent_name3", "parent_name4", "parent_name5"}) {
+                for (const auto& name: {"parent_name1", "parent_name2", "parent_name3", "parent_name4", "parent_name5", "parent_name6"}) {
                     std::string foo;
                     row [name].get (foo);
                     std::string hash_name = name;
