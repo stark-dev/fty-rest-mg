@@ -583,7 +583,7 @@ reply_t
         // Find last parent
         tntdb::Statement st = conn.prepareCached(
             " SELECT"
-            "   v.id_parent5, v.id_parent4, v.id_parent3, v.id_parent2, v.id_parent1"
+            "   v.id_parent6, v.id_parent5, v.id_parent4, v.id_parent3, v.id_parent2, v.id_parent1"
             " FROM"
             "   v_bios_asset_element_super_parent v"
             " WHERE v.id_asset_element = :id"
@@ -1045,7 +1045,7 @@ int
             " FROM "
             "   v_bios_asset_element_super_parent v "
             " WHERE "
-            "   :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, v.id_parent4, v.id_parent5)";
+            "   :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, v.id_parent4, v.id_parent5, v.id_parent6)";
         if (!subtypes.empty()) {
             std::string list;
             for( auto &id: subtypes) list += std::to_string(id) + ",";
@@ -1162,21 +1162,25 @@ int
             "   v.id_parent3 as id_parent3, "
             "   v.id_parent4 as id_parent4, "
             "   v.id_parent5 as id_parent5, "
+            "   v.id_parent6 as id_parent6, "
             "   v.name_parent1 as parent_name1, "
             "   v.name_parent2 as parent_name2, "
             "   v.name_parent3 as parent_name3, "
             "   v.name_parent4 as parent_name4, "
             "   v.name_parent5 as parent_name5, "
+            "   v.name_parent6 as parent_name6, "
             "   v.id_type_parent1 as id_type_parent1, "
             "   v.id_type_parent2 as id_type_parent2, "
             "   v.id_type_parent3 as id_type_parent3, "
             "   v.id_type_parent4 as id_type_parent4, "
             "   v.id_type_parent5 as id_type_parent5, "
+            "   v.id_type_parent6 as id_type_parent6, "
             "   v.id_subtype_parent1 as id_subtype_parent1, "
             "   v.id_subtype_parent2 as id_subtype_parent2, "
             "   v.id_subtype_parent3 as id_subtype_parent3, "
             "   v.id_subtype_parent4 as id_subtype_parent4, "
             "   v.id_subtype_parent5 as id_subtype_parent5, "
+            "   v.id_subtype_parent6 as id_subtype_parent6, "
             "   v.name as name, "
             "   v.type_name as type_name, "
             "   v.id_asset_device_type as device_type, "
