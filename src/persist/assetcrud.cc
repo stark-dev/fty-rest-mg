@@ -404,9 +404,13 @@ db_reply <std::set <std::pair<a_elmnt_id_t ,a_elmnt_id_t>>>
             "   v.id_asset_element_src = v1.id_asset_element AND"
             "   ("
             "       ( :containerid IN (v2.id_parent1, v2.id_parent2 ,v2.id_parent3,"
-            "               v2.id_parent4, v2.id_parent5, v2.id_parent6) ) OR"
+            "                          v2.id_parent4, v2.id_parent5, v2.id_parent6,"
+            "                          v2.id_parent7, v2.id_parent8, v2.id_parent9,"
+            "                          v2.id_parent10) ) OR"
             "       ( :containerid IN (v1.id_parent1, v1.id_parent2 ,v1.id_parent3,"
-            "               v1.id_parent4, v1.id_parent5, v1.id_parent6) )"
+            "                          v1.id_parent4, v1.id_parent5, v1.id_parent6,"
+            "                          v1.id_parent7, v1.id_parent7, v1.id_parent9,"
+            "                          v1.id_parent10) )"
             "   )"
         );
 
