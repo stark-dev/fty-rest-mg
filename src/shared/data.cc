@@ -58,6 +58,10 @@ s_get_parents (tntdb::Connection &conn, a_elmnt_id_t id)
                 std::make_tuple ("id_parent4", "parent_name4", "id_type_parent4", "id_subtype_parent4"),
                 std::make_tuple ("id_parent5", "parent_name5", "id_type_parent5", "id_subtype_parent5"),
                 std::make_tuple ("id_parent6", "parent_name6", "id_type_parent6", "id_subtype_parent6"),
+                std::make_tuple ("id_parent7", "parent_name7", "id_type_parent7", "id_subtype_parent7"),
+                std::make_tuple ("id_parent8", "parent_name8", "id_type_parent8", "id_subtype_parent8"),
+                std::make_tuple ("id_parent9", "parent_name9", "id_type_parent9", "id_subtype_parent9"),
+                std::make_tuple ("id_parent10", "parent_name10", "id_type_parent10", "id_subtype_parent10"),
             };
 
             for (const auto& it: NAMES) {
