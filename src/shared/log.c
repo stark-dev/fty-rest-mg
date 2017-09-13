@@ -187,10 +187,10 @@ int do_log(
 
 // Return a thread ID number for different platforms
 // https://issues.apache.org/jira/browse/HADOOP-11638
-unsigned long
+uint64_t
 get_current_thread_id(void)
 {
-  unsigned long thread_id = 0;
+  uint64_t thread_id = 0;
 #if defined(__linux__)
   thread_id = (unsigned long)syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
