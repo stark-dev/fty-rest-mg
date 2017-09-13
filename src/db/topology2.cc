@@ -43,6 +43,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
  *  3. ... pass the tests ...
  *
  */
+#define PARENT_LEVEL_COUNT 10
 
 namespace persist {
 
@@ -606,7 +607,7 @@ topology2_from_json_recursive (
     NodeMap nm {};
     // build the topology using NodeMap put data to map string->Item
     for (const auto& row: res) {
-        for (int i = 1; i != 6; i++) {
+        for (int i = 1; i != PARENT_LEVEL_COUNT; i++) {
             std::string name = s_get (row, "ID" + std::to_string (i));
             std::string kid = s_get (row, "ID" + std::to_string (i+1));
 
@@ -629,7 +630,7 @@ topology2_from_json_recursive (
     Item it2;
     for (const auto& row: res) {
 
-        for (int i = 1; i != 7; i++) {
+        for (int i = 1; i != PARENT_LEVEL_COUNT+1; i++) {
 
             std::string idx = std::to_string (i);
             std::string ID {"ID"}; ID.append (idx);
