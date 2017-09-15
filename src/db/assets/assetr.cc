@@ -1013,6 +1013,55 @@ int
 }
 
 
+int 
+    select_assets_without_container
+        (tntdb::Connection &conn,
+         std::vector<a_elmnt_tp_id_t> types,
+         std::vector<a_elmnt_stp_id_t> subtypes,
+         std::function<void(const tntdb::Row&)> cb
+        )
+{
+    LOG_START;
+
+    try {
+        std::string select =
+            " SELECT "
+            "   t.name, "
+            "   t.id_asset_element as asset_id, "
+            "   t.id_type as type_id, "
+            "   t.id_subtype as subtype_id "
+            " FROM "
+            "   t_bios_asset_element AS t "
+            " WHERE "
+            "   t.id_parent is NULL";
+        if (!subtypes.empty()) {
+            std::string list;
+            for( auto &id: subtypes) list += std::to_string(id) + ",";
+            select += " and t.id_subtype in (" + list.substr(0,list.size()-1) + ")";
+        }
+        if (!types.empty()) {
+            std::string list;
+            for( auto &id: types) list += std::to_string(id) + ",";
+            select += " and t.id_type in (" + list.substr(0,list.size()-1) + ")";
+        }
+        // Can return more than one row.
+        tntdb::Statement st = conn.prepareCached (select);
+
+        tntdb::Result result = st.select();
+        log_debug("[t_bios_asset_element]: were selected %" PRIu32 " rows",
+                                                            result.size());
+        for ( auto &row: result ) {
+            cb(row);
+        }
+        LOG_END;
+        return 0;
+    }
+    catch (const std::exception& e) {
+        LOG_END_ABNORMAL(e);
+        return -1;
+    }
+}
+
 int
     select_assets_by_container
         (tntdb::Connection &conn,
