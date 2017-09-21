@@ -203,6 +203,8 @@ static int do_logv(
     free(fmt);   // we don't need it in any case
     if (r == -1) {
         fprintf(log_file, "[ERROR]: %s:%d (%s) can't allocate enough memory for message string: %m", __FILE__, __LINE__, __func__);
+        if (buffer)
+            free(buffer);
         return r;
     }
 
@@ -213,7 +215,6 @@ static int do_logv(
     free(buffer);
 
     return 0;
-
 }
 
 int do_log(
