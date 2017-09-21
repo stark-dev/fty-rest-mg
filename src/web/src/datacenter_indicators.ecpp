@@ -300,17 +300,15 @@ bool database_ready;
 
     // create mlm client
     mlm_client_t *client = mlm_client_new ();
-    std::string agent_name("web.dc_indicators.");
-    agent_name.append (std::to_string ( static_cast<int> (getpid ()) ))
-              .append (".")
-              .append (std::to_string ( get_current_thread_id() ));
+    std::string client_name = utils::generate_mlm_client_id("web.dc_indicators");
+    int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str());
 
-    int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, agent_name.c_str());
     if ( rv != 0 ) {
-        log_error ("%s: Cannot connect to malamute", agent_name.c_str());
+        log_error ("%s: Cannot connect to malamute", client_name.c_str());
         mlm_client_destroy (&client);
         http_die ("internal-error", "Cannot connect to malamute");
     }
+
     // get current data for all DCs
     for ( const auto &aDc : DCNames ) {
         // fill the request message according the protocol

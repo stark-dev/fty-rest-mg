@@ -101,8 +101,8 @@ bool database_ready;
         if (!client)
             throw std::runtime_error ("Can't allocate malamute client");
 
-        std::string name = "web.uptime." + std::to_string (::getpid ()) + "." + std::to_string (::get_current_thread_id());
-        mlm_client_connect (client, "ipc://@/malamute", 1000, name.c_str());
+        std::string client_name = utils::generate_mlm_client_id("web.uptime");
+        mlm_client_connect (client, "ipc://@/malamute", 1000, client_name.c_str());
 
         json << "{\n\t\"outage\": [\n";
 
