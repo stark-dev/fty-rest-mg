@@ -29,6 +29,7 @@
 #include <cxxtools/split.h>
 #include <tntdb/error.h>
 #include "data.h"
+#include "str_defs.h"
 #include "dbpath.h"
 #include "utils_web.h"
 #include "log.h"
@@ -102,7 +103,7 @@ bool database_ready;
             throw std::runtime_error ("Can't allocate malamute client");
 
         std::string client_name = utils::generate_mlm_client_id("web.uptime");
-        mlm_client_connect (client, "ipc://@/malamute", 1000, client_name.c_str());
+        mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str());
 
         json << "{\n\t\"outage\": [\n";
 
