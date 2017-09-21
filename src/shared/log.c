@@ -187,9 +187,13 @@ static int do_logv(
             return -1;
     };
 
-    r = asprintf(&fmt, "[%jd.%" PRIu64 "] [%s]: %s:%d (%s) %s",
-        (intmax_t)getpid(), get_current_thread_id(),
-        prefix, file, line, func, format);
+    char *pidstr = asprintf_thread_id();
+    r = asprintf(&fmt, "[%s] [%s]: %s:%d (%s) %s",
+        pidstr ? pidstr : "", prefix, file, line, func, format);
+    if (pidstr) {
+        free(pidstr);
+        pidstr = NULL;
+    }
     if (r == -1) {
         fprintf(log_file, "[ERROR]: %s:%d (%s) can't allocate enough memory for format string: %m", __FILE__, __LINE__, __func__);
         return r;
