@@ -20,7 +20,15 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
+
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+# include <string.h>
+# undef _GNU_SOURCE
+#else
+# include <string.h>
+#endif
+
 #include <errno.h>
 #include <iconv.h>
 #include <ctype.h>
