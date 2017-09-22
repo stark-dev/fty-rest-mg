@@ -17,20 +17,25 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 */
 
 #include <assert.h>
-#include <string.h>
-#include <stdlib.h>
 #include <errno.h>
 
 #include <sys/types.h>
-#include <unistd.h>
-#include <sys/syscall.h>
+#include <pthread.h>
 
 #ifndef _GNU_SOURCE
-# define _GNU_SOURCE
+# define _GNU_SOURCE 1
+# include <stdlib.h>
 # include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/syscall.h>
 # undef _GNU_SOURCE
 #else
+# include <stdlib.h>
 # include <stdio.h>
+# include <string.h>
+# include <unistd.h>
+# include <sys/syscall.h>
 #endif
 
 #include "log.h"
@@ -105,6 +110,48 @@ void log_open() {
     }
 }
 
+/* Print "PID.PTHREADID" or "PID.PTHREADID.LWPID" on systems
+ * where PTHREADID != LWPID into a char* buffer string. This
+ * buffer is allocated by asprintf() and freed by caller.
+ * Returns pointer to an empty string on errors.
+ */
+char *
+asprintf_thread_id(void) {
+    uintmax_t process_id = (uintmax_t)getpid();
+    uintmax_t pthread_id = get_current_pthread_id();
+    uintmax_t thread_id = get_current_thread_id();
+    char *buf = NULL;
+    char *buf2 = NULL;
+
+    if (pthread_id != thread_id) {
+        if ( 0 > asprintf(&buf, ".%ju", thread_id) ) {
+            if (buf2) {
+                free (buf2);
+                buf2 = NULL;
+            }
+        }
+    }
+
+    if ( 0 > asprintf(&buf, "%ju.%ju%s",
+        process_id, pthread_id, buf2 ? buf2 : ""
+    ) ) {
+        if (buf) {
+            free (buf);
+            buf = NULL;
+        }
+    }
+
+    if (buf2) {
+        free (buf2);
+        buf2 = NULL;
+    }
+
+    if (buf == NULL)
+        buf = strdup("");
+
+    return buf;
+}
+
 static int do_logv(
         int level,
         const char* file,
@@ -140,9 +187,13 @@ static int do_logv(
             return -1;
     };
 
-    r = asprintf(&fmt, "[%jd.%" PRIu64 "] [%s]: %s:%d (%s) %s",
-        (intmax_t)getpid(), get_current_thread_id(),
-        prefix, file, line, func, format);
+    char *pidstr = asprintf_thread_id();
+    r = asprintf(&fmt, "[%s] [%s]: %s:%d (%s) %s",
+        pidstr ? pidstr : "", prefix, file, line, func, format);
+    if (pidstr) {
+        free(pidstr);
+        pidstr = NULL;
+    }
     if (r == -1) {
         fprintf(log_file, "[ERROR]: %s:%d (%s) can't allocate enough memory for format string: %m", __FILE__, __LINE__, __func__);
         return r;
@@ -152,6 +203,8 @@ static int do_logv(
     free(fmt);   // we don't need it in any case
     if (r == -1) {
         fprintf(log_file, "[ERROR]: %s:%d (%s) can't allocate enough memory for message string: %m", __FILE__, __LINE__, __func__);
+        if (buffer)
+            free(buffer);
         return r;
     }
 
@@ -162,7 +215,6 @@ static int do_logv(
     free(buffer);
 
     return 0;
-
 }
 
 int do_log(
@@ -185,22 +237,62 @@ int do_log(
     return r;
 }
 
-// Return a thread ID number for different platforms
-// https://issues.apache.org/jira/browse/HADOOP-11638
-uint64_t
+// Return a thread ID number for different platforms. Inspired by:
+//   https://issues.apache.org/jira/browse/HADOOP-11638
+//   https://github.com/llvm-mirror/llvm/blob/master/lib/Support/Unix/Threading.inc
+// Note that the POSIX pthread_t is a generic type which
+// may be a structure etc. and is not necessarily same as
+// the numeric ID of kernel LWP (which may be the backing
+// implementation detail).
+// See also:
+// https://stackoverflow.com/questions/1759794/how-to-print-pthread-t
+// https://stackoverflow.com/questions/14085515/obtain-lwp-id-from-a-pthread-t-on-solaris-to-use-with-processor-bind
+// https://stackoverflow.com/questions/34370172/the-thread-id-returned-by-pthread-self-is-not-the-same-thing-as-the-kernel-thr
+
+// This routine returns a pthread_self() casted into a
+// numeric value.
+uintmax_t
+get_current_pthread_id(void)
+{
+    int sp = sizeof(pthread_t), si = sizeof(uintmax_t);
+    uintmax_t thread_id = (uintmax_t)pthread_self();
+
+    if ( sp < si ) {
+        // Zero-out extra bits that an uintmax_t value could
+        // have populated above the smaller pthread_t value
+        int shift_bits = (si - sp) << 3; // * 8
+        thread_id = ( (thread_id << shift_bits ) >> shift_bits );
+    }
+
+    return thread_id;
+}
+
+// This routine aims to return LWP number wherever we
+// know how to get its ID.
+uintmax_t
 get_current_thread_id(void)
 {
-  uint64_t thread_id = 0;
+    // Note: implementations below all assume that the routines
+    // return a numeric value castable to uintmax_t, and should
+    // fail during compilation otherwise so we can then fix it.
+    uintmax_t thread_id = 0;
 #if defined(__linux__)
-  thread_id = (unsigned long)syscall(SYS_gettid);
+    // returned actual type: long
+    thread_id = syscall(SYS_gettid);
 #elif defined(__FreeBSD__)
-  thread_id = (unsigned long)pthread_getthreadid_np();
+    // returned actual type: int
+    thread_id = pthread_getthreadid_np();
 #elif defined(__sun)
-  thread_id = (unsigned long)pthread_self();
+// TODO: find a way to extract the LWP ID in current PID
+// It is known ways exist for Solaris 8-11...
+    // returned actual type: pthread_t (which is uint_t in Sol11 at least)
+    thread_id = pthread_self();
 #elif defined(__APPLE__ )
-  (void)pthread_threadid_np(pthread_self(), &thread_id);
+    pthread_t temp_thread_id;
+    (void)pthread_threadid_np(pthread_self(), &temp_thread_id);
+    thread_id = temp_thread_id;
 #else
 #error "Platform not supported: get_current_thread_id() implementation missing"
 #endif
-  return thread_id;
+    return thread_id;
 }

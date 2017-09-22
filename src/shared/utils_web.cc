@@ -27,8 +27,10 @@
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/split.h>
 #include "subprocess.h"
+#include <stdlib.h> // for random()
 
 #include "utils_web.h"
+#include "log.h"
 
 namespace utils {
 
@@ -47,7 +49,24 @@ string_to_element_id (const std::string& string) {
     return element_id;
 }
 
-namespace json {    
+std::string generate_mlm_client_id(std::string client_name) {
+/* TODO: Would a global semaphored incrementable value make
+ * sense here as part of the unique name of an MQ client? */
+    char *pidstr = asprintf_thread_id();
+    if (pidstr) {
+        client_name.append (".")
+                   .append (pidstr);
+        free(pidstr);
+        pidstr = NULL;
+    } else {
+        long r = random();
+        client_name.append (".")
+                   .append (std::to_string (r));
+    }
+    return client_name;
+}
+
+namespace json {
 
 std::string escape (const char *string) {
     if (!string)
@@ -70,7 +89,7 @@ std::string escape (const char *string) {
         \n
         \r
         \t
-        \u four-hex-digits 
+        \u four-hex-digits
     ------------------------------
 */
 
@@ -107,7 +126,6 @@ std::string escape (const char *string) {
 std::string escape (const std::string& before) {
     return escape (before.c_str ());
 }
-
 
 // Note: At the time of re-writing from defect cxxtools::JsonFormatter I decided
 // to go with the simplest solution for create_error_json functions (after all,
@@ -228,13 +246,13 @@ get_mapping (const std::string& key)
     };
     if (config_mapping.find (key) == config_mapping.end ())
         return key.c_str ();
-    return config_mapping.at (key).c_str (); 
+    return config_mapping.at (key).c_str ();
 }
 
 const char *
 get_path (const std::string& key)
 {
-    if (key.find ("BIOS_SMTP_") == 0) 
+    if (key.find ("BIOS_SMTP_") == 0)
     {
         return "/etc/fty-email/fty-email.cfg";
     }
@@ -252,7 +270,7 @@ get_path (const std::string& key)
     if (key.find ("FTY_DISCOVERY_") == 0)
     {
         return "/etc/fty-discovery/fty-discovery.cfg";
-    }    
+    }
 
     // general config file
     return "/etc/default/fty.cfg";

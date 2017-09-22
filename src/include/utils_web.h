@@ -374,6 +374,12 @@ namespace utils {
 */
 uint32_t string_to_element_id (const std::string& string);
 
+/*!
+ \brief  Return an identifier for the MLM client, based on PID/pThreadID/LWP-id
+ \return Provided prefix plus ID from definition above, or plus a random number.
+*/
+std::string generate_mlm_client_id(std::string client_name);
+
 
 namespace json {
 
@@ -382,7 +388,6 @@ namespace json {
  \return Escaped json on success, "(null_ptr)" string on null argument
 */
 std::string escape (const char *string);
-
 
 /*!
  \brief Convenient wrapper for escape"("const char *string")"
