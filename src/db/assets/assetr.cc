@@ -1014,36 +1014,75 @@ int
 
 
 int 
-    select_assets_without_container
+    select_assets_all_container
         (tntdb::Connection &conn,
          std::vector<a_elmnt_tp_id_t> types,
          std::vector<a_elmnt_stp_id_t> subtypes,
+         std::string without,
+         std::string status,
          std::function<void(const tntdb::Row&)> cb
         )
 {
     LOG_START;
 
     try {
-        std::string select =
+        std::string select = 
             " SELECT "
             "   t.name, "
             "   t.id_asset_element as asset_id, "
             "   t.id_type as type_id, "
             "   t.id_subtype as subtype_id "
             " FROM "
-            "   t_bios_asset_element AS t "
-            " WHERE "
-            "   t.id_parent is NULL";
+            "  ( SELECT "
+            "      name,"
+            "      id_type, "
+            "      id_subtype, "
+            "      id_asset_element "
+            "    FROM "
+            "      t_bios_asset_element"
+            "    WHERE ";   
+
+
         if (!subtypes.empty()) {
             std::string list;
             for( auto &id: subtypes) list += std::to_string(id) + ",";
-            select += " and t.id_subtype in (" + list.substr(0,list.size()-1) + ")";
+            select += " id_subtype in (" + list.substr(0,list.size()-1) + ")";
         }
         if (!types.empty()) {
             std::string list;
             for( auto &id: types) list += std::to_string(id) + ",";
-            select += " and t.id_type in (" + list.substr(0,list.size()-1) + ")";
+            select += " id_type in (" + list.substr(0,list.size()-1) + ")";
         }
+        if (status != "") {
+            select += " and status = \"" + status + "\"";
+        }
+        
+        std::string end_select = 
+           " ) as t " ;       
+        if (without != "") {
+            if(without == "location") {
+                select += "and id_parent is NULL";
+            } else if (without == "powerchain") {
+                end_select += " WHERE NOT EXISTS "
+                        " (SELECT id_asset_device_dest "
+                        "  FROM t_bios_asset_link_type as l JOIN t_bios_asset_link as a"
+                        "  ON a.id_asset_link_type=l.id_asset_link_type "
+                        "  WHERE "
+                        "     name=\"power chain\" "
+                        "     AND t.id_asset_element=a.id_asset_device_dest)";
+            } else {
+                end_select += " WHERE NOT EXISTS "
+                        " (SELECT a.id_asset_element "
+                        "  FROM "
+                        "     t_bios_asset_ext_attributes as a "
+                        "  WHERE "
+                        "     a.keytag=\"" + without + "\""
+                        "     AND t.id_asset_element = a.id_asset_element)";
+            }
+        }
+        
+        select += end_select;
+        
         // Can return more than one row.
         tntdb::Statement st = conn.prepareCached (select);
 
@@ -1069,7 +1108,7 @@ int
          std::function<void(const tntdb::Row&)> cb
          )
 {
-    return select_assets_by_container(conn, element_id, {}, {}, cb);
+    return select_assets_by_container(conn, element_id, {}, {},"","", cb);
 }
 
 int
@@ -1078,6 +1117,8 @@ int
          a_elmnt_id_t element_id,
          std::vector<a_elmnt_tp_id_t> types,
          std::vector<a_elmnt_stp_id_t> subtypes,
+         std::string without,
+         std::string status,
          std::function<void(const tntdb::Row&)> cb
          )
 {
@@ -1087,18 +1128,25 @@ int
     try {
         std::string select =
             " SELECT "
-            "   v.name, "
-            "   v.id_asset_element as asset_id, "
-            "   v.id_asset_device_type as subtype_id, "
-            "   v.type_name as subtype_name, "
-            "   v.id_type as type_id "
+            "   r.name, "
+            "   r.id_asset_element as asset_id, "
+            "   r.id_asset_device_type as subtype_id, "
+            "   r.type_name as subtype_name, "
+            "   r.id_type as type_id "
             " FROM "
-            "   v_bios_asset_element_super_parent AS v "
-            " WHERE "
-            "   :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, "
-            "                    v.id_parent4, v.id_parent5, v.id_parent6, "
-            "                    v.id_parent7, v.id_parent8, v.id_parent9, "
-            "                    v.id_parent10)";
+            "  ( SELECT "
+            "      name,"
+            "      id_asset_element, "
+            "      id_asset_device_type, "
+            "      type_name, "
+            "      id_type "
+            "    FROM "
+            "      v_bios_asset_element_super_parent as v"
+            "    WHERE "  
+            "      :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, "
+            "                       v.id_parent4, v.id_parent5, v.id_parent6, "
+            "                       v.id_parent7, v.id_parent8, v.id_parent9, "
+            "                       v.id_parent10)";
         if (!subtypes.empty()) {
             std::string list;
             for( auto &id: subtypes) list += std::to_string(id) + ",";
@@ -1109,6 +1157,36 @@ int
             for( auto &id: types) list += std::to_string(id) + ",";
             select += " and v.id_type in (" + list.substr(0,list.size()-1) + ")";
         }
+        if (status != "") {
+            select += " and v.status = \"" + status + "\"";
+        }
+            
+        std::string end_select = 
+           " ) as r " ;       
+        if (without != "") {
+            if(without == "location") {
+                select += "and r.id_parent1 is NULL";
+            } else if (without == "powerchain") {
+                end_select += " WHERE NOT EXISTS "
+                        " (SELECT id_asset_device_dest "
+                        "  FROM t_bios_asset_link_type as l JOIN t_bios_asset_link as a"
+                        "  ON a.id_asset_link_type=l.id_asset_link_type "
+                        "  WHERE "
+                        "     name=\"power chain\" "
+                        "     AND r.id_asset_element=a.id_asset_device_dest)";
+            } else {
+                end_select += " WHERE NOT EXISTS "
+                        " (SELECT a.id_asset_element "
+                        "  FROM "
+                        "     t_bios_asset_ext_attributes as a "
+                        "  WHERE "
+                        "     a.keytag=\"" + without + "\""
+                        "     AND r.id_asset_element = a.id_asset_element)";
+            }
+        }
+        
+        select += end_select;
+        
         // Can return more than one row.
         tntdb::Statement st = conn.prepareCached (select);
 
