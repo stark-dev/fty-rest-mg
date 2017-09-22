@@ -1033,37 +1033,30 @@ int
             "   t.id_type as type_id, "
             "   t.id_subtype as subtype_id "
             " FROM "
-            "  ( SELECT "
-            "      name,"
-            "      id_type, "
-            "      id_subtype, "
-            "      id_asset_element "
-            "    FROM "
-            "      t_bios_asset_element"
-            "    WHERE ";   
+            "   t_bios_asset_element as t"
+            " WHERE ";   
 
 
         if (!subtypes.empty()) {
             std::string list;
             for( auto &id: subtypes) list += std::to_string(id) + ",";
-            select += " id_subtype in (" + list.substr(0,list.size()-1) + ")";
+            select += " t.id_subtype in (" + list.substr(0,list.size()-1) + ")";
         }
         if (!types.empty()) {
             std::string list;
             for( auto &id: types) list += std::to_string(id) + ",";
-            select += " id_type in (" + list.substr(0,list.size()-1) + ")";
+            select += " t.id_type in (" + list.substr(0,list.size()-1) + ")";
         }
         if (status != "") {
-            select += " and status = \"" + status + "\"";
+            select += " AND t.status = \"" + status + "\"";
         }
         
-        std::string end_select = 
-           " ) as t " ;       
+        std::string end_select = "" ;       
         if (without != "") {
             if(without == "location") {
-                select += "and id_parent is NULL";
+                select += " AND t.id_parent is NULL ";
             } else if (without == "powerchain") {
-                end_select += " WHERE NOT EXISTS "
+                end_select += " AND NOT EXISTS "
                         " (SELECT id_asset_device_dest "
                         "  FROM t_bios_asset_link_type as l JOIN t_bios_asset_link as a"
                         "  ON a.id_asset_link_type=l.id_asset_link_type "
@@ -1071,7 +1064,7 @@ int
                         "     name=\"power chain\" "
                         "     AND t.id_asset_element=a.id_asset_device_dest)";
             } else {
-                end_select += " WHERE NOT EXISTS "
+                end_select += " AND NOT EXISTS "
                         " (SELECT a.id_asset_element "
                         "  FROM "
                         "     t_bios_asset_ext_attributes as a "
@@ -1128,60 +1121,52 @@ int
     try {
         std::string select =
             " SELECT "
-            "   r.name, "
-            "   r.id_asset_element as asset_id, "
-            "   r.id_asset_device_type as subtype_id, "
-            "   r.type_name as subtype_name, "
-            "   r.id_type as type_id "
+            "   v.name, "
+            "   v.id_asset_element as asset_id, "
+            "   v.id_asset_device_type as subtype_id, "
+            "   v.type_name as subtype_name, "
+            "   v.id_type as type_id "
             " FROM "
-            "  ( SELECT "
-            "      name,"
-            "      id_asset_element, "
-            "      id_asset_device_type, "
-            "      type_name, "
-            "      id_type "
-            "    FROM "
-            "      v_bios_asset_element_super_parent as v"
-            "    WHERE "  
-            "      :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, "
-            "                       v.id_parent4, v.id_parent5, v.id_parent6, "
-            "                       v.id_parent7, v.id_parent8, v.id_parent9, "
-            "                       v.id_parent10)";
+            "   v_bios_asset_element_super_parent AS v"
+            " WHERE "  
+            "   :containerid in (v.id_parent1, v.id_parent2, v.id_parent3, "
+            "                    v.id_parent4, v.id_parent5, v.id_parent6, "
+            "                    v.id_parent7, v.id_parent8, v.id_parent9, "
+            "                    v.id_parent10)";
         if (!subtypes.empty()) {
             std::string list;
             for( auto &id: subtypes) list += std::to_string(id) + ",";
-            select += " and v.id_asset_device_type in (" + list.substr(0,list.size()-1) + ")";
+            select += " AND v.id_asset_device_type in (" + list.substr(0,list.size()-1) + ")";
         }
         if (!types.empty()) {
             std::string list;
             for( auto &id: types) list += std::to_string(id) + ",";
-            select += " and v.id_type in (" + list.substr(0,list.size()-1) + ")";
+            select += " AND v.id_type in (" + list.substr(0,list.size()-1) + ")";
         }
         if (status != "") {
-            select += " and v.status = \"" + status + "\"";
+            select += " AND v.status = \"" + status + "\"";
         }
             
-        std::string end_select = 
-           " ) as r " ;       
+        std::string end_select = "" ;       
         if (without != "") {
             if(without == "location") {
-                select += "and r.id_parent1 is NULL";
+                select += " AND r.id_parent1 is NULL ";
             } else if (without == "powerchain") {
-                end_select += " WHERE NOT EXISTS "
+                end_select += " AND NOT EXISTS "
                         " (SELECT id_asset_device_dest "
                         "  FROM t_bios_asset_link_type as l JOIN t_bios_asset_link as a"
                         "  ON a.id_asset_link_type=l.id_asset_link_type "
                         "  WHERE "
                         "     name=\"power chain\" "
-                        "     AND r.id_asset_element=a.id_asset_device_dest)";
+                        "     AND v.id_asset_element=a.id_asset_device_dest)";
             } else {
-                end_select += " WHERE NOT EXISTS "
+                end_select += " AND NOT EXISTS "
                         " (SELECT a.id_asset_element "
                         "  FROM "
                         "     t_bios_asset_ext_attributes as a "
                         "  WHERE "
                         "     a.keytag=\"" + without + "\""
-                        "     AND r.id_asset_element = a.id_asset_element)";
+                        "     AND v.id_asset_element = a.id_asset_element)";
             }
         }
         
