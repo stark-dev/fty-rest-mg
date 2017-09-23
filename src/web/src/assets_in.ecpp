@@ -37,10 +37,12 @@
 #include "helpers.h"
 
 static std::string
-    assets_without_container(
+    assets_all_container(
         tntdb::Connection &connection,
         const std::vector<a_elmnt_tp_id_t> &types,
-        const std::vector<a_elmnt_stp_id_t> &subtypes
+        const std::vector<a_elmnt_stp_id_t> &subtypes,
+        const std::string &without,
+        const std::string &status
     )
 {
     std::string result;
@@ -52,9 +54,10 @@ static std::string
             "\"sub_type\":\"" + utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() )) + "\"\n"
             "},";
     };
-    int rv = persist::select_assets_without_container(connection, types, subtypes, func);
+    int rv = persist::select_assets_all_container(connection, types, subtypes, without, status, func);
     if (rv != 0) {
         result.clear ();
+        result = "error";
         return result;
     }
     return result.substr(0, result.size() - 1); // need to get ri of the last ','
@@ -66,7 +69,9 @@ static std::string
         tntdb::Connection &connection,
         a_elmnt_id_t container,
         const std::vector<a_elmnt_tp_id_t> &types,
-        const std::vector<a_elmnt_stp_id_t> &subtypes
+        const std::vector<a_elmnt_stp_id_t> &subtypes,
+        const std::string &without,
+        const std::string &status
     )
 {
     std::string result;
@@ -78,9 +83,10 @@ static std::string
             "\"sub_type\":\"" + utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() )) + "\"\n"
             "},";
     };
-    int rv = persist::select_assets_by_container(connection, container, types, subtypes, func);
+    int rv = persist::select_assets_by_container(connection, container, types, subtypes, without, status, func);
     if (rv != 0) {
         result.clear ();
+        result = "error";
         return result;
     }
     return result.substr(0, result.size() - 1); // need to get ri of the last ','
@@ -115,6 +121,8 @@ bool database_ready;
     std::vector<a_elmnt_stp_id_t> checked_subtypes;
     std::vector<a_elmnt_tp_id_t> checked_types;
     a_elmnt_id_t checked_id = 0;
+    std::string without = "";
+    std::string status = "";
     bool in_parameter_present = true;
 
     // ##################################################
@@ -127,6 +135,8 @@ bool database_ready;
         std::string in = qparam.param("in");
         std::string type = qparam.param("type");
         std::string sub_type = qparam.param("sub_type");
+        without = qparam.param("without");
+        status = qparam.param("status");
 
         // check if mandatory parameters are present
         if ( in.empty() ) {
@@ -184,11 +194,11 @@ bool database_ready;
     // do the stuff
     std::string output;
     if(in_parameter_present) {
-        output = assets_in_container(connection, checked_id, checked_types, checked_subtypes);
+        output = assets_in_container(connection, checked_id, checked_types, checked_subtypes, without, status);
     } else {
-        output = assets_without_container(connection, checked_types, checked_subtypes);
+        output = assets_all_container(connection, checked_types, checked_subtypes, without, status);
     }
-    if (output.empty ())
+    if (output == "error")
         http_die ("internal-error", "Database failure");
 </%cpp>
 [<$$ output $>]
