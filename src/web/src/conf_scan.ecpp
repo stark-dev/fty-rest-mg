@@ -138,17 +138,20 @@ set_confscan(std::string json)
     zuuid_t *uuid = zuuid_new ();
     zmsg_t *request = req_setconf (uuid, json);   
     if(request == NULL) {
+        zuuid_destroy (&uuid);
         return -8;
     }
     
     int rv = client->sendto ("fty-discovery", "setconf", 1000, &request);
     
     if (rv == -1) {
+        zuuid_destroy (&uuid);
         log_critical ("set_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
     if (!resp) {
         log_critical ("set_confscan: client->recv (timeout = '5') returned NULL");
         return -3;
@@ -212,11 +215,13 @@ get_confscan (std::string &output)
 
     if (rv == -1)
     {
+        zuuid_destroy (&uuid);
         log_critical ("get_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
     if (!resp)
     {
         log_critical ("info: client->recv (timeout = '5') returned NULL");

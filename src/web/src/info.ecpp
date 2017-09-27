@@ -58,11 +58,13 @@ get_rc_info (std::string &output)
 
     if (rv == -1)
     {
+        zuuid_destroy (&uuid);
         log_critical ("info: client->sendto (address = '%s') failed.", "fty-info");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
     if (!resp)
     {
         log_critical ("info: client->recv (timeout = '5') returned NULL");

@@ -157,6 +157,7 @@ UserInfo user;
 
     if (rv == -1)
     {
+        zuuid_destroy (&uuid);
         log_critical (
                     "Error: client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
                         FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL");

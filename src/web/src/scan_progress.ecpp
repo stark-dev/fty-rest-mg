@@ -57,11 +57,13 @@ get_scan_progress (std::string &output)
 
     if (rv == -1)
     {
+        zuuid_destroy (&uuid);
         log_critical ("scan_progress: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
     if (!resp)
     {
         log_critical ("info: client->recv (timeout = '5') returned NULL");
