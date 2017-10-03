@@ -104,7 +104,7 @@ try{
 
     auto touch_fn = [&request]() {
         request.touch ();};
-    persist::load_asset_csv(inp, okRows, failRows, touch_fn);
+    persist::load_asset_csv(inp, okRows, failRows, touch_fn, user.login());
 
     inp.close();
     ::unlink(path_p.c_str());

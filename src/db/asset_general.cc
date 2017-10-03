@@ -45,7 +45,8 @@ int
          a_elmnt_pr_t     priority,
          std::set <a_elmnt_id_t> const &groups,
          const std::string &asset_tag,
-         std::string     &errmsg)
+         std::string     &errmsg,
+         zhash_t         *extattributesRO)
 {
     LOG_START;
 
@@ -81,6 +82,17 @@ int
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
         return 3;
+    }
+    
+    if(extattributesRO != NULL) {
+        auto ret31 = insert_into_asset_ext_attributes
+        (conn, element_id, extattributes, false, errmsg);
+        if ( ret31 != 0 )
+        {
+            trans.rollback();
+            log_error ("end: %s", errmsg.c_str());
+            return 31;
+        }
     }
 
     auto ret4 = delete_asset_element_from_asset_groups
@@ -123,7 +135,8 @@ int
          std::set <a_elmnt_id_t> const &groups,
          std::vector <link_t> &links,
          const std::string &asset_tag,
-         std::string     &errmsg)
+         std::string     &errmsg,
+         zhash_t      *extattributesRO)
 {
     LOG_START;
 
@@ -159,6 +172,17 @@ int
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
         return 3;
+    }
+    
+    if(extattributesRO != NULL) {
+        auto ret31 = insert_into_asset_ext_attributes
+        (conn, element_id, extattributesRO, true, errmsg);
+        if ( ret31 != 0 )
+        {
+            trans.rollback();
+            log_error ("end: %s", errmsg.c_str());
+            return 31;
+        }
     }
 
     auto ret4 = delete_asset_element_from_asset_groups
@@ -223,7 +247,8 @@ db_reply_t
      const char      *status,
      a_elmnt_pr_t     priority,
      std::set <a_elmnt_id_t> const &groups,
-     const std::string &asset_tag)
+     const std::string &asset_tag,
+     zhash_t         *extattributesRO)
 {
     LOG_START;
     if (extname_to_asset_id(element_name) != -1) {
@@ -267,6 +292,26 @@ db_reply_t
         ret.rowid      = -reply_insert2;
         ret.msg        = err;
         return ret;
+    }
+    
+    if(extattributesRO != NULL) {
+        err = "";
+
+        int reply_insert21 = insert_into_asset_ext_attributes
+            (conn, element_id, extattributesRO, true, err);
+        if ( reply_insert21 != 0 )
+        {
+            trans.rollback();
+            log_error ("end: device was not inserted (fail in ext_attributes)");
+            db_reply_t ret;
+            ret.status     = 0;
+            ret.errtype    = DB_ERR;
+            ret.errsubtype = DB_ERROR_BADINPUT;
+            // too complicated, to transform from one format to onother
+            ret.rowid      = -reply_insert21;
+            ret.msg        = err;
+            return ret;
+        }
     }
 
     auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
@@ -316,7 +361,8 @@ db_reply_t
         const char    *asset_device_type_name,
         const char    *status,
         a_elmnt_pr_t   priority,
-        const std::string &asset_tag)
+        const std::string &asset_tag,
+        zhash_t       *extattributesRO)
 {
     LOG_START;
     if (extname_to_asset_id(element_name) != -1) {
@@ -360,6 +406,25 @@ db_reply_t
         ret.rowid      = -reply_insert2;
         ret.msg        = err;
         return ret;
+    }
+    
+    if(extattributesRO != NULL) {
+        err = "";
+        int reply_insert21 = insert_into_asset_ext_attributes
+            (conn, element_id, extattributesRO, true, err);
+        if ( reply_insert21 != 0 )
+        {
+            trans.rollback();
+            log_error ("end: device was not inserted (fail in ext_attributes)");
+            db_reply_t ret;
+            ret.status     = 0;
+            ret.errtype    = DB_ERR;
+            ret.errsubtype = DB_ERROR_BADINPUT;
+            // too complicated, to transform from one format to onother
+            ret.rowid      = -reply_insert21;
+            ret.msg        = err;
+            return ret;
+        }
     }
 
     auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
