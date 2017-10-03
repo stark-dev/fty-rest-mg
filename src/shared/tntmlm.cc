@@ -20,10 +20,11 @@
 
 #include "log.h"
 #include "tntmlm.h"
+#include "str_defs.h"
 
 MlmClientPool mlm_pool {10};
 
-const std::string MlmClient::ENDPOINT = "ipc://@/malamute";
+const std::string MlmClient::ENDPOINT = MLM_ENDPOINT;
 
 MlmClient::MlmClient ()
 {

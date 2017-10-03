@@ -29,6 +29,7 @@
 #include <tntdb.h>
 
 #include "log.h"
+#include "str_defs.h"
 #include "dbpath.h"
 #include "db/assets.h"
 
@@ -62,7 +63,7 @@ int main()
 
             std::string date;
             row["date"].get(date);
-            
+
             int day_diff;
             {
                 struct tm tm_ewd;
@@ -102,7 +103,7 @@ int main()
             mlm_client_send (client, subject.c_str (), &msg);
         };
 
-    int r = mlm_client_connect (client, "ipc://@/malamute", 1000, "warranty-metric");
+    int r = mlm_client_connect (client, MLM_ENDPOINT, 1000, "warranty-metric");
     if (r == -1) {
         log_error ("Can't connect to malamute");
         exit (EXIT_FAILURE);
