@@ -78,6 +78,12 @@ bool database_ready;
     shared::CsvMap cm;
     try{
         cm = shared::CsvMap_from_serialization_info(si);
+        cm.setUpdateUser(user.login());
+        std::time_t timestamp = std::time(NULL);
+        char mbstr[100];
+        if (std::strftime(mbstr, sizeof (mbstr), "%FT%T%z", std::localtime(&timestamp))) {
+            cm.setUpdateTs(std::string(mbstr));
+        }
     }
     catch (const std::invalid_argument &e) {
         log_error ("%s", e.what());

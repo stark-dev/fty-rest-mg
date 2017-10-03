@@ -634,13 +634,19 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     if ( !id_str.empty() )
     {
+        _scoped_zhash_t *extattributesRO = zhash_new();
+        zhash_autofree(extattributesRO);
+        if(cm.getUpdateTs() != "")
+            zhash_insert(extattributesRO, "update_ts", (void*) cm.getUpdateTs().c_str());
+        if(cm.getUpdateUser() != "")
+            zhash_insert(extattributesRO, "update_user", (void*) cm.getUpdateUser().c_str());
         m.id = id;
         std::string errmsg = "";
         if (type != "device" )
         {
             auto ret = update_dc_room_row_rack_group
                 (conn, m.id, iname.c_str(), type_id, parent_id,
-                 extattributes, status.c_str(), priority, groups, asset_tag, errmsg);
+                 extattributes, status.c_str(), priority, groups, asset_tag, errmsg, extattributesRO);
             if ( ( ret ) || ( !errmsg.empty() ) ) {
                 throw std::invalid_argument(errmsg);
             }
@@ -649,7 +655,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         {
             auto ret = update_device
                 (conn, m.id, iname.c_str(), type_id, parent_id,
-                 extattributes, status.c_str(), priority, groups, links, asset_tag, errmsg);
+                 extattributes, status.c_str(), priority, groups, links, asset_tag, errmsg, extattributesRO);
             if ( ( ret ) || ( !errmsg.empty() ) ) {
                 throw std::invalid_argument(errmsg);
             }
@@ -657,12 +663,18 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
     else
     {
+            _scoped_zhash_t *extattributesRO = zhash_new();
+            zhash_autofree(extattributesRO);
+            if(cm.getCreateMode() != 0)
+                zhash_insert(extattributesRO, "create_mode", (void*) std::to_string(cm.getCreateMode()).c_str());
+            if(cm.getCreateUser() != "")
+                zhash_insert(extattributesRO, "create_user", (void*) cm.getCreateUser().c_str());
         if ( type != "device" )
         {
             // this is a transaction
             auto ret = insert_dc_room_row_rack_group
                 (conn, ename.c_str(), type_id, parent_id,
-                 extattributes, status.c_str(), priority, groups, asset_tag);
+                 extattributes, status.c_str(), priority, groups, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
                 throw BiosError(ret.rowid, ret.msg);
             }
@@ -673,7 +685,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             // this is a transaction
             auto ret = insert_device (conn, links, groups, ename.c_str(),
                     parent_id, extattributes, subtype_id, subtype.c_str(), status.c_str(),
-                    priority, asset_tag);
+                    priority, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
                 throw BiosError(ret.rowid, ret.msg);
             }
@@ -732,7 +744,8 @@ void
         (std::istream& input,
          std::vector <std::pair<db_a_elmnt_t,persist::asset_operation>> &okRows,
          std::map <int, std::string> &failRows,
-         touch_cb_t touch_fn
+         touch_cb_t touch_fn,
+         std::string user
          )
 {
     LOG_START;
@@ -759,6 +772,14 @@ void
     CsvMap cm{data};
     cm.deserialize();
 
+    cm.setCreateMode(CREATE_MODE_CSV);
+    cm.setCreateUser(user);
+    cm.setUpdateUser(user);
+    std::time_t timestamp = std::time(NULL);
+    char mbstr[100];
+    if (std::strftime(mbstr, sizeof (mbstr), "%FT%T%z", std::localtime(&timestamp))) {
+        cm.setUpdateTs(std::string(mbstr));
+    }
     return load_asset_csv(cm, okRows, failRows, touch_fn);
 }
 

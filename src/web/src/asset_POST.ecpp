@@ -68,6 +68,8 @@ bool database_ready;
     shared::CsvMap cm;
     try{
         cm = shared::CsvMap_from_serialization_info(si);
+        cm.setCreateUser(user.login());
+        cm.setCreateMode(CREATE_MODE_ONE_ASSET);
     }
     catch (const std::invalid_argument &e) {
         log_error ("%s", e.what());

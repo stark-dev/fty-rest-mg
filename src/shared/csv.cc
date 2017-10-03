@@ -127,6 +127,32 @@ std::set<std::string> CsvMap::getTitles() const {
     return ret;
 }
 
+std::string CsvMap::getCreateUser() const {
+    return _create_user;
+}
+std::string CsvMap::getUpdateUser() const {
+    return _update_user;
+}
+std::string CsvMap::getUpdateTs() const {
+    return _update_ts;
+}
+uint32_t CsvMap::getCreateMode() const {
+    return _create_mode;
+}
+
+void CsvMap::setCreateUser(std::string user) {
+    _create_user = user;
+}
+void CsvMap::setUpdateUser(std::string user) {
+    _update_user = user;
+}
+void CsvMap::setUpdateTs(std::string timestamp) {
+    _update_ts = timestamp;
+}
+void CsvMap::setCreateMode(uint32_t mode) {
+    _create_mode = mode;
+}
+
 //TODO: does not belongs to csv, move somewhere else
 void skip_utf8_BOM (std::istream& i) {
     int c1, c2, c3;
