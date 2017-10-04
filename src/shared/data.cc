@@ -278,6 +278,8 @@ db_reply_t
         // disable deleting RC0
         if (RC0_INAME == element_info.name) {
             zsys_debug("Prevented deleting RC-0");
+            ret.status = 1;
+            ret.affected_rows = 0;
             LOG_END;
             return ret;
         }
