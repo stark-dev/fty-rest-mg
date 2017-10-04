@@ -104,7 +104,7 @@ try{
 
     auto touch_fn = [&request]() {
         request.touch ();};
-    persist::load_asset_csv(inp, okRows, failRows, touch_fn);
+    persist::load_asset_csv(inp, okRows, failRows, touch_fn, user.login());
 
     inp.close();
     ::unlink(path_p.c_str());
@@ -119,10 +119,7 @@ try{
     // in theory
     // this code can be executed in multiple threads -> agent's name should
     // be unique at the every moment
-    std::string agent_name("web.asset_import.");
-    agent_name.append (std::to_string ( static_cast<int> (getpid ()) ))
-              .append (".")
-              .append (std::to_string ( get_current_thread_id() ));
+    std::string agent_name = utils::generate_mlm_client_id("web.asset_import");
     send_configure (okRows, agent_name);
 </%cpp>
 {

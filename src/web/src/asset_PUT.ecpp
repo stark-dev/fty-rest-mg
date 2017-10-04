@@ -78,6 +78,12 @@ bool database_ready;
     shared::CsvMap cm;
     try{
         cm = shared::CsvMap_from_serialization_info(si);
+        cm.setUpdateUser(user.login());
+        std::time_t timestamp = std::time(NULL);
+        char mbstr[100];
+        if (std::strftime(mbstr, sizeof (mbstr), "%FT%T%z", std::localtime(&timestamp))) {
+            cm.setUpdateTs(std::string(mbstr));
+        }
     }
     catch (const std::invalid_argument &e) {
         log_error ("%s", e.what());
@@ -112,10 +118,7 @@ bool database_ready;
 
         // this code can be executed in multiple threads -> agent's name should
         // be unique at the every moment
-        std::string agent_name("web.asset_put.");
-        agent_name.append (std::to_string ( static_cast<int> (getpid ()) ))
-                  .append (".")
-                  .append (std::to_string ( get_current_thread_id() ));
+        std::string agent_name = utils::generate_mlm_client_id("web.asset_put");
         try{
             send_configure (row.first, row.second, agent_name);
         }

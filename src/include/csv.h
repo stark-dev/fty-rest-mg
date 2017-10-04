@@ -135,9 +135,21 @@ namespace shared {
              */
             std::set<std::string> getTitles() const;
 
+            std::string getCreateUser() const;
+            std::string getUpdateUser() const;
+            std::string getUpdateTs() const;
+            uint32_t getCreateMode() const;
+
+            void setCreateUser(std::string user);
+            void setUpdateUser(std::string user);
+            void setUpdateTs(std::string timestamp);
+            void setCreateMode(uint32_t mode);
+
         private:
             Data _data;
             std::map<std::string, size_t> _title_to_index;
+            std::string _create_user, _update_user, _update_ts;
+            uint32_t _create_mode;
     };
 
 //TODO: does not belongs to csv, move somewhere else

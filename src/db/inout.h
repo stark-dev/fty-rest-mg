@@ -34,6 +34,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "csv.h"
 
 #include "dbhelpers.h"
+
+#define CREATE_MODE_ONE_ASSET   1
+#define CREATE_MODE_CSV         2
+
 namespace persist {
 
 typedef std::function<void(void)> touch_cb_t;
@@ -83,7 +87,7 @@ void
         (std::istream& input,
          std::vector <std::pair<db_a_elmnt_t,persist::asset_operation>> &okRows,
          std::map <int, std::string> &failRows,
-         touch_cb_t touch_fn);
+         touch_cb_t touch_fn, std::string user = "");
 
 /*
  * \brief Processes a csv map

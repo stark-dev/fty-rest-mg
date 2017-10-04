@@ -30,7 +30,7 @@
     for (std::map<std::string, std::string>::iterator it=my_args.begin(); it!=my_args.end(); ++it){
         std::string key=it->first+":";
         std::string value=it->second;
-        log_debug("set HTTP Reply header %s %s",key.c_str(),value.c_str());
+        //log_debug("set HTTP Reply header %s %s",key.c_str(),value.c_str());
         reply.setHeader( key, value);
     }
 

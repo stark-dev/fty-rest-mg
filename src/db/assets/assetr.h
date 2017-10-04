@@ -287,6 +287,32 @@ int
         a_elmnt_id_t       asset_element_id,
         m_dvc_id_t        &monitor_element_id);
 
+ /**
+ * \brief select all assets in all (or without) containers
+ *
+ * \param[in] conn       - db connection
+ * \param[in] types      - vector of types we are interested in, empty vector
+ *                          means all types.
+ * \param[in] subtype    - vector of subtypes we are interested in, empty vector
+ *                          means all subtypes.
+ * \param[in] without    - select assets who don't have the field  given by without (or field null)
+ *                          can be location,  powerchain or any extended attributes
+ * \param[in] status     - select assets with status status (active or nonactive)
+ * \param[in] cb         - callback to be called with every selected row.
+ *
+ *  Every selected row has the following columns:
+ *      name, asset_id, type_id, subtype_id
+ *
+ * \return 0 on success (even if nothing was found)
+ */
+int
+    select_assets_all_container
+        (tntdb::Connection &conn,
+         std::vector<a_elmnt_tp_id_t> types,
+         std::vector<a_elmnt_stp_id_t> subtypes,
+         std::string without,
+         std::string status,
+         std::function<void(const tntdb::Row&)> cb);
 
 /**
  * \brief select all assets inside the asset-container (all 4 level down)
@@ -315,6 +341,9 @@ int
  *                          means all types.
  * \param[in] subtype    - vector of subtypes we are interested in, empty vector
  *                          means all subtypes.
+ * \param[in] without    - select assets who don't have the field  given by without (or field null)
+ *                          can be location,  powerchain or any extended attributes
+ * \param[in] status     - select assets with status status (active or nonactive)
  * \param[in] cb         - callback to be called with every selected row.
  *
  *  Every selected row has the following columns:
@@ -328,6 +357,8 @@ int
          a_elmnt_id_t element_id,
          std::vector<a_elmnt_tp_id_t> types,
          std::vector<a_elmnt_stp_id_t> subtypes,
+         std::string without,
+         std::string status,
          std::function<void(const tntdb::Row&)> cb);
 
 
