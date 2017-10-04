@@ -29,6 +29,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "dbhelpers.h"
 #include "asset_types.h"
 
+#define RC0_INAME "rackcontroller-0"
+
 namespace persist {
 
 int

@@ -38,7 +38,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id_src == 0 )
+    if ( asset_element_id_src <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -47,7 +47,7 @@ db_reply_t
         log_error ("end: %s, %s", "ignore delete", ret.msg.c_str());
         return ret;
     }
-    if ( asset_element_id_src == 0 )
+    if ( asset_element_id_src <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -99,7 +99,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -150,7 +150,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_device_id == 0 )
+    if ( asset_device_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -199,7 +199,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_device_id == 0 )
+    if ( asset_device_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -248,7 +248,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_group_id == 0 )
+    if ( asset_group_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -306,7 +306,7 @@ db_reply_t
         log_error ("end: %s, %s", "ignore delete", ret.msg.c_str());
         return ret;
     }
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -370,7 +370,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -421,7 +421,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -470,7 +470,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -531,7 +531,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -582,7 +582,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( asset_element_id == 0 )
+    if ( asset_element_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -591,7 +591,7 @@ db_reply_t
         log_error ("end: %s, %s", "ignore delete", ret.msg.c_str());
         return ret;
     }
-    if ( asset_group_id == 0 )
+    if ( asset_group_id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -653,7 +653,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( id == 0 )
+    if ( id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -701,7 +701,7 @@ db_reply_t
     db_reply_t ret = db_reply_new();
 
     // input parameters control
-    if ( id == 0 )
+    if ( id <= 0 )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;

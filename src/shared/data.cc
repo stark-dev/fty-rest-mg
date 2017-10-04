@@ -39,6 +39,9 @@
 #include "defs.h"
 
 #include "asset_general.h"
+        if (0 == strcmp(RC0_INAME, basic_info.item.)) {
+
+        }
 
 static std::vector<std::tuple <a_elmnt_id_t, std::string, std::string, std::string>>
 s_get_parents (tntdb::Connection &conn, a_elmnt_id_t id)
@@ -274,6 +277,13 @@ db_reply_t
         element_info.type_id = basic_info.item.type_id;
         element_info.subtype_id = basic_info.item.subtype_id;
         element_info.name = basic_info.item.name;
+
+        // disable deleting RC0
+        if (0 == strcmp(RC0_INAME, element_info.name)) {
+            zsys_debug("Prevented deleting RC-0");
+            LOG_END;
+            return ret;
+        }
 
         switch ( basic_info.item.type_id ) {
             case persist::asset_type::DATACENTER:
