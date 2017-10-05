@@ -275,6 +275,15 @@ db_reply_t
         element_info.subtype_id = basic_info.item.subtype_id;
         element_info.name = basic_info.item.name;
 
+        // disable deleting RC0
+        if (RC0_INAME == element_info.name) {
+            zsys_debug("Prevented deleting RC-0");
+            ret.status = 1;
+            ret.affected_rows = 0;
+            LOG_END;
+            return ret;
+        }
+
         switch ( basic_info.item.type_id ) {
             case persist::asset_type::DATACENTER:
             case persist::asset_type::ROW:
