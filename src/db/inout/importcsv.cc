@@ -1026,9 +1026,15 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
 
     std::set<a_elmnt_id_t> ids{};
     size_t rc_0 = SIZE_MAX;
-    auto iname = cm.get(1, "id");
+    auto unused_columns = cm.getTitles();
+    if (unused_columns.empty()) {
+        bios_throw("bad-request-document", "Cannot import empty document.");
+    }
+    std::string iname = unused_columns.count("id") ? cm.get(1, "id") : "noid";
     if ("rackcontroller-0" == iname) {
         rc_0 = 1;
+    } else {
+        rc_0 = SIZE_MAX;
     }
     auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, true, rc_0);
     LOG_END;
