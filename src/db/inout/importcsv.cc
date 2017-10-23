@@ -231,6 +231,7 @@ promote_rc0(
     // get list of rackcontrollers already in database
     msg = zmsg_new ();
     zmsg_addstr (msg, "GET");
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
     zmsg_addstr (msg, "rackcontroller");
     int rv = client->sendto ("asset-agent", "ASSETS", 5000, &msg);
     touch_fn(); // renew request watchdog timer
