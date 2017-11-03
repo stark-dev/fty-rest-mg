@@ -84,7 +84,8 @@ static constexpr const _WSErrors _errors = { {
     {.key = "action-forbidden",         .http_code = HTTP_FORBIDDEN,                .err_code = 51,      .message = "%s is forbidden. %s"},
     {.key = "parameter-conflict",       .http_code = HTTP_BAD_REQUEST,              .err_code = 52,      .message = "Request cannot be processed because of conflict in parameters. %s"},
     {.key = "content-too-big",          .http_code = HTTP_REQUEST_ENTITY_TOO_LARGE, .err_code = 53,      .message = "Content size is too big, maximum size is %s" },
-    {.key = "not-found",                .http_code = HTTP_NOT_FOUND,                .err_code = 54,      .message = "%s does not exist." }
+    {.key = "not-found",                .http_code = HTTP_NOT_FOUND,                .err_code = 54,      .message = "%s does not exist." },
+    {.key = "precondition-failed",      .http_code = HTTP_PRECONDITION_FAILED,      .err_code = 55,      .message = "Precondition failed - %s" }
     } };
 #undef HTTP_TEAPOT
 
