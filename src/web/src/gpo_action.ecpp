@@ -1,0 +1,175 @@
+<#
+ #
+ # Copyright (C) 2016-2017 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file    gpo_action.ecpp
+ * \author  Jana Rapava <JanaRapava@Eaton.com>
+ * \brief   This call requests action on GPO asset.
+ */
+ #><%pre>
+#include <string>
+#include "tntmlm.h"
+#include "helpers.h"
+#include "utils_web.h"
+#include "assets.h"
+
+// request GPO interaction
+static zmsg_t *
+req_gpo_interaction (zuuid_t *uuid, std::string sensor, std::string action)
+{
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zsys_debug ("sensor = %s", sensor.c_str ());
+    zmsg_addstr (msg, strdup (sensor.c_str ()));
+    zsys_debug ("action = %s", action.c_str ());
+    zmsg_addstr (msg, strdup (action.c_str ()));
+    return msg;
+}
+
+int
+gpo_action (std::string sensor, std::string action)
+{
+    // connect to mlm client
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        log_critical ("gpo_action: mlm_pool.get () failed.");
+        return -1;
+    }
+
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *request = req_gpo_interaction (uuid, sensor, action);
+    int rv = client->sendto ("fty-sensor-gpio", "GPO_INTERACTION", 1000, &request);
+
+    if (rv == -1)
+    {
+        zuuid_destroy (&uuid);
+        log_critical ("gpo_action: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
+        return -2;
+    }
+
+    zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
+    if (!resp)
+    {
+        log_critical ("gpo_action: client->recv (timeout = '5') returned NULL");
+        return -3;
+    }
+    char *result = zmsg_popstr (resp);
+    if (result) {
+        if (streq (result, "OK")) {
+                zstr_free (&result);
+                return 0;
+            }
+        else if (streq (result, "ERROR")) {
+            zstr_free (&result);
+            char *reason = zmsg_popstr (resp);
+            if (streq (reason, "ASSET_NOT_FOUND")) {
+                zstr_free (&reason);
+                return -4;
+            }
+            else if (streq (reason, "ACTION_NOT_APPLICABLE")) {
+                zstr_free (&reason);
+                return -5;
+            }
+            else if (streq (reason, "UNKNOWN_VALUE")) {
+                zstr_free (&reason);
+                return -6;
+            }
+            else {
+                zstr_free (&reason);
+                return -7;
+            }
+        }
+        else {
+            zstr_free (&result);
+            return -7;
+        }
+    }
+    else
+        return -7;
+    zstr_free (&result);
+    zmsg_destroy(&resp);
+    return 0;
+}
+</%pre>
+<%request scope="global">
+UserInfo user;
+</%request>
+<%cpp>
+    // permission check
+    static const std::map <BiosProfile, std::string> PERMISSIONS = {
+            {BiosProfile::Admin,     "C"}
+            };
+    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+    if (request.getMethod() != "POST") {
+        http_die("method-not-allowed", request.getMethod().c_str() );
+    }
+
+    std::string checked_sensor;
+    {
+        std::string sensor = qparam.param ("sensor");
+        // check asset existence by getting iname
+        if (!sensor.empty ()) {
+            std::string iname;
+            int rv = persist::extname_to_asset_name (sensor, iname);
+            if (rv == -1)
+                http_die ("not-found", sensor.c_str ());
+            if (rv == -2)
+                http_die ("internal-error", "database failure");
+            checked_sensor = sensor;
+        }
+        else
+            http_die ("request-param-bad", "sensor", "empty asset name", "non-empty asset name");
+    }
+
+    // action will be checked in fty-sensor-gpio
+    std::string checked_action;
+    {
+        std::string action = qparam.param ("action");
+        if (!action.empty ())
+            checked_action = action;
+        else
+            http_die ("request-param-bad", "action", "empty action", "non-empty action");
+    }
+
+    int rv = gpo_action (checked_sensor, checked_action);
+    if (rv == -1)
+        http_die ("internal-error", "mlmpool.get () failed.");
+    else
+    if (rv == -2)
+        http_die ("internal-error", "client->sendto () failed.");
+    else
+    if (rv == -3)
+        http_die ("internal-error", "client->recv () failed.");
+    else
+    if (rv == -4)
+        http_die ("request-param-bad", "sensor", "not a GPO asset", "GPO asset");
+    else
+    if (rv == -5)
+        http_die ("precondition-failed", "required action is not applicable in current state.");
+    else
+    if (rv == -6)
+        http_die ("request-param-bad", "action", "invalid action", "valid action");
+    else
+    if (rv == -7)
+        http_die ("internal-error", "fty-asset-gpio returned malformed or unexpected message.");
+    else
+</%cpp>

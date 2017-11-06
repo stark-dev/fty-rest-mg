@@ -463,21 +463,21 @@
         <url>^/api/v1/admin/scan.*$</url>
         <method>DELETE</method>
     </mapping>
-    
+
     <!-- POST admin/confscan -->
     <mapping>
       <target>conf_scan@bios_web</target>
       <url>^/api/v1/admin/confscan.*$</url>
       <method>POST</method>
     </mapping>
-     
+
     <!-- GET admin/confscan -->
     <mapping>
       <target>conf_scan@bios_web</target>
       <url>^/api/v1/admin/confscan.*$</url>
       <method>GET</method>
-    </mapping>   
-    
+    </mapping>
+
     <!-- GET admin/gpio -->
     <mapping>
         <method>GET</method>
@@ -485,11 +485,22 @@
         <url>^/api/v1/admin/gpio$</url>
     </mapping>
 
-    <!-- GET admin/gpio -->
+    <!-- POST admin/gpio -->
     <mapping>
         <method>POST</method>
         <target>add_gpio@bios_web</target>
         <url>^/api/v1/admin/gpio/?$</url>
+    </mapping>
+
+    <!-- POST admin/gpo -->
+    <mapping>
+        <method>POST</method>
+        <target>gpo_action@bios_web</target>
+        <url>^/api/v1/admin/gpo</url>
+        <args>
+            <sensor>$1</sensor>
+            <action>$2</action>
+         </args>
     </mapping>
 
     <!-- POST admin/email/test -->
