@@ -332,7 +332,7 @@ promote_rc0(
 
     // ask for data about myself - asset next
     msg = zmsg_new ();
-    zmsg_addstr (msg, "ASSET_DETAIL");
+    zmsg_addstr (msg, "GET");
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     zmsg_addstr (msg, "rackcontroller-0");
     if (-1 == client->sendto ("asset-agent", "ASSET_DETAIL", 1000, &msg)) {
