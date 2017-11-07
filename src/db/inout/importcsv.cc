@@ -592,8 +592,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto id_str = unused_columns.count("id") ? cm.get(row_i, "id") : "";
     if ("rackcontroller-0" == id_str && rc_0 == -1 ) {
         // we got RC-0 but it don't match "myself", change it to something else ("")
+        zsys_debug("RC is marked as rackcontroller-0, but it's not myself");
         id_str = "";
     } else if (rc_0 == row_i && id_str != "rackcontroller-0") {
+        zsys_debug("RC is identified as rackcontroller-0");
         id_str = "rackcontroller-0";
     }
 
@@ -796,6 +798,17 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             log_debug ("end of power links processing");
             log_debug ("%s", e.what());
             break;
+        }
+
+        // prevent power source being myself
+        if (link_source == ename) {
+                zsys_debug("Ignoring power source=myself");
+                link_source = "";
+                auto link_col_name1 = "power_plug_src." + std::to_string(link_index);
+                auto link_col_name2 = "power_input." + std::to_string(link_index);
+                if (!link_col_name1.empty()) unused_columns.erase(link_col_name1);
+                if (!link_col_name2.empty()) unused_columns.erase(link_col_name2);
+                continue;
         }
 
         log_debug ("power_source_name = '%s'", link_source.c_str());
