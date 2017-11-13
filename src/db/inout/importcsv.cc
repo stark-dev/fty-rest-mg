@@ -623,7 +623,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             msg += "' found twice, aborting";
             bios_throw("bad-request-document", msg.c_str());
         }
+        /*
+         * removed ids insert here as we only want to pair good rows
         ids.insert(id);
+        */
         operation = persist::asset_operation::UPDATE;
     }
 
@@ -1139,6 +1142,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         m.ext.emplace (zhash_cursor (extattributes), (char*) it);
     }
 
+    if ( !id_str.empty() ) {
+        ids.insert(id);
+    }
+
     LOG_END;
     return std::make_pair(m, operation) ;
 }
@@ -1322,7 +1329,7 @@ void
     do {
         somethingProcessed = false;
         failRows.clear ();
-        for (size_t row_i = 1; row_i != cm.rows(); row_i++) {
+        for (size_t row_i = 1; row_i != cm.rows(); ++row_i) {
             if (processedRows.find (row_i) != processedRows.end ()) continue;
             try{
                 auto ret = process_row(conn, cm, row_i, TYPES, SUBTYPES, ids, true, rc0);
