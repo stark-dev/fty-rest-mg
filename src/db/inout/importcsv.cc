@@ -900,7 +900,6 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             } else {
                 break;
             }
-            ++i;
         }
         // remove all ipv6.X
         for (i = 1; ; ++i) {
@@ -910,7 +909,6 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             } else {
                 break;
             }
-            ++i;
         }
         // remove fqdn
         if (unused_columns.count("fqdn")) {
