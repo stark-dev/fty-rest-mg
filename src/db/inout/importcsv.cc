@@ -355,6 +355,8 @@ promote_rc0(
         } else {
             myself_db_ext = fty_proto_get_ext(myself_db);
         }
+        // workaround for having count of RC assets, as we consider only 0/1+ state
+        rcs_in_db.push_back("rackcontroller-0");
     } else {
         zsys_debug("Receieved message that is not fty_proto");
         myself_db_ext = NULL;
@@ -367,6 +369,11 @@ promote_rc0(
     }
     fty_proto_destroy (&myself_db);
     touch_fn(); // renew request watchdog timer
+
+    /*
+     * this code was disabled due to performance issues, and assuming that this code followed
+     * various updates to DB and other agents, we always have RC-0 when there is at least one
+     * RC in our DB. Should this code be reactivated again, remote the workaround above.
     // get list of rcs_in_db already in database
     msg = zmsg_new ();
     zmsg_addstr (msg, "GET");
@@ -397,6 +404,7 @@ promote_rc0(
     zmsg_destroy (&resp);
     zuuid_destroy (&uuid);
     touch_fn(); // renew request watchdog timer
+    */
 
     int retval = -1;
     do { // easier memory freeing
@@ -421,6 +429,7 @@ promote_rc0(
         // check for special case = 1 RC in DB, 1 RC in CSV, internal id not set
         if (1 == rcs_in_db.size() && 1 == rcs_in_csv.size() && 0 == unused_columns.count("id")) {
             retval = rcs_in_csv[0];
+            zsys_debug("Picked one by special condition 1RC in CSV and DB, id column not set");
             break;
         }
         // check for uuid match
@@ -1205,8 +1214,10 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
     }
     std::string iname = unused_columns.count("id") ? cm.get(1, "id") : "noid";
     if ("rackcontroller-0" == iname) {
+        zsys_debug("RC-0 detected");
         rc_0 = 1;
     } else {
+        zsys_debug("RC-0 not detected");
         rc_0 = -1;
     }
     auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, true, rc_0);
