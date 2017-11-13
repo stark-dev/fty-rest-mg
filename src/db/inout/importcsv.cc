@@ -888,6 +888,52 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             }
         }
     }
+
+    // sanity check, for RC-0 always skip HW attributes
+    if (rc_0 == row_i && id_str != "rackcontroller-0") {
+        int i;
+        // remove all ip.X
+        for (i = 1; ; ++i) {
+            std::string what = "ip." + std::to_string(i);
+            if (unused_columns.count(what)) {
+                unused_columns.erase(what); // remove from unused
+            } else {
+                break;
+            }
+            ++i;
+        }
+        // remove all ipv6.X
+        for (i = 1; ; ++i) {
+            std::string what = "ipv6." + std::to_string(i);
+            if (unused_columns.count(what)) {
+                unused_columns.erase(what); // remove from unused
+            } else {
+                break;
+            }
+            ++i;
+        }
+        // remove fqdn
+        if (unused_columns.count("fqdn")) {
+            unused_columns.erase("fqdn"); // remove from unused
+        }
+        // remove serial_no
+        if (unused_columns.count("serial_no")) {
+            unused_columns.erase("serial_no"); // remove from unused
+        }
+        // remove model
+        if (unused_columns.count("model")) {
+            unused_columns.erase("model"); // remove from unused
+        }
+        // remove manufacturer
+        if (unused_columns.count("manufacturer")) {
+            unused_columns.erase("manufacturer"); // remove from unused
+        }
+        // remove uuid
+        if (unused_columns.count("uuid")) {
+            unused_columns.erase("uuid"); // remove from unused
+        }
+    }
+
     _scoped_zhash_t *extattributes = zhash_new();
     zhash_autofree(extattributes);
     zhash_insert (extattributes, "name", (void *) ename.c_str ());
