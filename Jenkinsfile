@@ -110,7 +110,7 @@ pipeline {
                             dir("tmp/test-check") {
                                 deleteDir()
                                 unstash 'built'
-                                timeout (time: 10, unit: 'MINUTES') {
+                                timeout (time: 30, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make check'
                                 }
                                 sh 'echo "Are GitIgnores good after make check? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
@@ -121,7 +121,7 @@ pipeline {
                                 }
                             }
                           } else {
-                                timeout (time: 10, unit: 'MINUTES') {
+                                timeout (time: 30, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make check'
                                 }
                                 sh 'echo "Are GitIgnores good after make check? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
@@ -139,7 +139,7 @@ pipeline {
                               dir("tmp/test-memcheck") {
                                 deleteDir()
                                 unstash 'built'
-                                timeout (time: 10, unit: 'MINUTES') {
+                                timeout (time: 30, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make VERBOSE=1 memcheck-verbose'
                                 }
                                 sh 'echo "Are GitIgnores good after make memcheck? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
@@ -150,7 +150,7 @@ pipeline {
                                 }
                               }
                           } else {
-                                timeout (time: 10, unit: 'MINUTES') {
+                                timeout (time: 30, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make memcheck && exit 0 ; echo "Re-running failed ($?) memcheck with greater verbosity" >&2 ; make VERBOSE=1 memcheck-verbose'
                                 }
                                 sh 'echo "Are GitIgnores good after make memcheck? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
@@ -168,7 +168,7 @@ pipeline {
                               dir("tmp/test-distcheck") {
                                 deleteDir()
                                 unstash 'built'
-                                timeout (time: 20, unit: 'MINUTES') {
+                                timeout (time: 35, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make distcheck'
                                 }
                                 sh 'echo "Are GitIgnores good after make distcheck? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
@@ -179,7 +179,7 @@ pipeline {
                                 }
                               }
                             } else {
-                                timeout (time: 20, unit: 'MINUTES') {
+                                timeout (time: 35, unit: 'MINUTES') {
                                     sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make distcheck'
                                 }
                                 sh 'echo "Are GitIgnores good after make distcheck? (should have no output below)"; git status -s || if [ "${params.REQUIRE_GOOD_GITIGNORE}" = false ]; then echo "WARNING GitIgnore tests found newly changed or untracked files" >&2 ; exit 0 ; else echo "FAILED GitIgnore tests" >&2 ; exit 1; fi'
