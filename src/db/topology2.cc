@@ -77,22 +77,31 @@ class NodeMap {
             }
         }
 
-        void _feed_by (const std::string& name, std::set <std::string> &ret) {
+        void _feed_by (const std::string& name, std::set <std::string> &ret, std::set <std::string> &seen) {
 
             ret.insert (name);
 
             if (_map.count (name) == 0)
                 return;
 
-            for (const auto& kid: _map [name]) {
-                _feed_by (kid, ret);
+            auto ins = seen.insert (name);
+            if (!ins.second) {
+                std::string msg("Power source loop detected:");
+                for (auto a : seen)
+                    msg += " " + a;
+                zsys_error("%s", msg.c_str());
+                return;
             }
+            for (const auto& kid: _map [name]) {
+                _feed_by (kid, ret, seen);
+            }
+            seen.erase(ins.first);
         }
 
         // return a subtree - recursively
         std::set <std::string> feed_by (const std::string& name) {
-            std::set <std::string> ret {};
-            _feed_by (name, ret);
+            std::set <std::string> ret {}, seen {};
+            _feed_by (name, ret, seen);
             return ret;
         }
 

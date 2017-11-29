@@ -124,6 +124,9 @@ a_elmnt_stp_id_t
     else if (st == "sensorgpio") {
         return asset_subtype::SENSORGPIO;
     }
+    else if (st == "gpo") {
+        return asset_subtype::GPO;
+    }
     else if (st == "appliance") {
         return asset_subtype::APPLIANCE;
     }
@@ -180,6 +183,8 @@ std::string
             return "sensor";
         case asset_subtype::SENSORGPIO:
             return "sensorgpio";
+        case asset_subtype::GPO:
+            return "gpo";
         case asset_subtype::APPLIANCE:
             return "appliance";
         case asset_subtype::CHASSIS:

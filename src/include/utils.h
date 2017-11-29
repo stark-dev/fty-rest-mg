@@ -163,20 +163,6 @@ bool bsi32_add(int32_t value1, int8_t scale1,
            int32_t value2, int8_t scale2,
            int32_t *value, int8_t* scale);
 
-/** \brief get mac address for given name
- *
- * \param ethname name of interface
- * \param buf preallocated buffer (at minimum MAX_ADDR_LEN+1 long)
- * \param len length of buffer
- *
- * \return true if value has been read, or false if read failed or ethname was lo
- */
-bool
-get_mac(
-        const char* ethname,
-        char* buf,
-        size_t len);
-
 /*!
  \brief sanitize input date (ISO, European day.month.year, day month year, US month/day/year)
  \return NULL or freshly allocated string with ISO format

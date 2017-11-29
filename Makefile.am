@@ -668,48 +668,6 @@ bios_csv_LDADD = libpriv-utils.la
 bios_csv_LDFLAGS = \
 						 ${CXXTOOLS_LIBS} -ltntdb ${LIBCZMQ_LIBS} ${LIBMLM_LIBS} ${LIBFTYPROTO_LIBS}
 
-#XXX: $(localstatedir) did not worked
-#FIXME: installing things to /var is not a good idea according FHS or GNU standards
-# so this needs to be reconsidered later on (datadir is preffered location)
-template_ruledir = $(datadir)/$(PACKAGE)/fty-autoconfig
-RULE_TEMPLATES = \
-			src/agents/autoconfig/rule_templates/average.humidity@__datacenter__.rule \
-			src/agents/autoconfig/rule_templates/average.temperature@__datacenter__.rule \
-			src/agents/autoconfig/rule_templates/average.humidity@__rack__.rule \
-			src/agents/autoconfig/rule_templates/average.temperature@__rack__.rule \
-			src/agents/autoconfig/rule_templates/average.humidity@__row__.rule \
-			src/agents/autoconfig/rule_templates/average.temperature@__row__.rule \
-			src/agents/autoconfig/rule_templates/charge.battery@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/load.default@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/load.input_1phase@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/load.input_3phase@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/lowbattery@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/onbattery@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/onbypass@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/phase_imbalance@__datacenter__.rule \
-			src/agents/autoconfig/rule_templates/phase_imbalance@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/phase_imbalance@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/phase_imbalance@__rack__.rule \
-			src/agents/autoconfig/rule_templates/realpower.default_1phase@__rack__.rule \
-			src/agents/autoconfig/rule_templates/realpower.default@__datacenter__.rule \
-			src/agents/autoconfig/rule_templates/section_load@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/temperature.default@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/voltage.input_1phase@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/voltage.input_1phase@__device_ups__.rule \
-			src/agents/autoconfig/rule_templates/voltage.input_3phase@__device_epdu__.rule \
-			src/agents/autoconfig/rule_templates/voltage.input_3phase@__device_ups__.rule \
-            src/agents/autoconfig/rule_templates/sts-frequency@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/sts-preferred-source@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/sts-voltage@__device_sts__.rule \
-            src/agents/autoconfig/rule_templates/door-contact.state-change@__device_sensorgpio__.rule \
-            src/agents/autoconfig/rule_templates/vibration-sensor.state-change@__device_sensorgpio__.rule \
-            src/agents/autoconfig/rule_templates/water-leak-detector.state-change@__device_sensorgpio__.rule \
-            src/agents/autoconfig/rule_templates/smoke-detector.state-change@__device_sensorgpio__.rule \
-            src/agents/autoconfig/rule_templates/pir-motion-detector.state-change@__device_sensorgpio__.rule
-
-template_rule_DATA =	$(RULE_TEMPLATES)
-EXTRA_DIST +=		$(RULE_TEMPLATES)
-
 client_PROGRAMS += warranty-metric
 
 warranty_metric_SOURCES = src/warranty/warranty-metric.cc
