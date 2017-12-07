@@ -224,7 +224,7 @@ if [ "$BUILD_TYPE" == "default" ] || [ "$BUILD_TYPE" == "default-Werror" ] || [ 
         echo ""
         BASE_PWD=${PWD}
         echo "`date`: INFO: Building prerequisite 'libzmq' from Git repository..." >&2
-        $CI_TIME git clone -b release/IPM_Infra-1.3 --quiet --depth 1 https://github.com/42ity/libzmq.git libzmq
+        $CI_TIME git clone --quiet --depth 1 -b release/IPM_Infra-1.3 https://github.com/42ity/libzmq.git libzmq
         #$CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libzmq libzmq
         cd libzmq
         CCACHE_BASEDIR=${PWD}
