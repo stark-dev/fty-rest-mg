@@ -487,6 +487,7 @@ topology2_from_json (
     )
 {
     cxxtools::JsonSerializer serializer (out);
+    serializer.inputUtf8 (true);
     serializer.beautify (true);
 
     Item item_from {};
@@ -694,6 +695,7 @@ topology2_from_json_recursive (
     }
 
     cxxtools::JsonSerializer serializer (out);
+    serializer.inputUtf8 (true);
     serializer.beautify (true);
 
     Item::Topology topo {};
