@@ -74,8 +74,15 @@ class BIOSAgent {
         zpoller_t *poller = zpoller_new(pipe, NULL);
         zsock_t *which = NULL;
         
+        uint64_t last = zclock_mono ();
         while(! zsys_interrupted) {
             which = (zsock_t *)zpoller_wait(poller, _timeout);
+            uint64_t now = zclock_mono();
+            if (now - last >= static_cast<uint64_t>(_timeout)) {
+                last = now;
+                zsys_debug("Periodic polling");
+                onPoll();
+            }
             if( zsys_interrupted ) break;
             if(which) {
                 ymsg_t *message = recv( );
