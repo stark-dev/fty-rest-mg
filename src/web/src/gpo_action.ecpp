@@ -173,3 +173,4 @@ UserInfo user;
         http_die ("internal-error", "fty-asset-gpio returned malformed or unexpected message.");
     else
 </%cpp>
+{}

@@ -33,6 +33,7 @@
 #include "helpers.h"
 #include "dbpath.h"
 #include "assettopology.h"
+#include <cxxtools/utf8codec.h>
 
 // struc for "devices" array
 struct Array_devices
@@ -68,6 +69,7 @@ void operator<<= (cxxtools::SerializationInfo& si, const Topology& input_power)
 // that's how "devices" array is serialized
 void operator<<= (cxxtools::SerializationInfo& si, const Array_devices& array_devices)
 {
+
     si.addMember("name") <<= array_devices.name;
     si.addMember("id") <<= array_devices.id;
     si.addMember("sub_type") <<= utils::strip (array_devices.sub_type);
@@ -211,6 +213,7 @@ fill_array_powerchains (std::vector <std::tuple
     topo.powerchains = std::move (powerchains_vector);
 
     cxxtools::JsonSerializer serializer (reply.out ());
+    serializer.inputUtf8 (true);
     serializer.serialize(topo).finish();
 
     return HTTP_OK;

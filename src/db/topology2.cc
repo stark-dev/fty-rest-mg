@@ -487,6 +487,7 @@ topology2_from_json (
     )
 {
     cxxtools::JsonSerializer serializer (out);
+    serializer.inputUtf8 (true);
     serializer.beautify (true);
 
     Item item_from {};
@@ -535,9 +536,10 @@ topology2_from_json (
                 s_get (row, NAME),
                 persist::subtypeid_to_subtype (s_geti (row, SUBTYPE)),
                 persist::typeid_to_type (s_geti (row, TYPE))};
-            item.asset_order = s_get (row, ASSET_ORDER);
-            if (item.asset_order == "(null)") {
-                item.asset_order = "";
+            item.asset_order = s_geti (row, ASSET_ORDER);
+
+            if (item.asset_order < 0) {
+                item.asset_order = 0;
             }
             topo.push_back (item);
 
@@ -659,6 +661,7 @@ topology2_from_json_recursive (
                 it2.name = s_get (row, NAME),
                 it2.subtype =  from_subtype;
                 it2.type =  from_type;
+                it2.asset_order = 0;
             }
 
             // feed_by filtering - for devices only
@@ -679,9 +682,9 @@ topology2_from_json_recursive (
                     s_get (row, NAME),
                     persist::subtypeid_to_subtype (s_geti (row, SUBTYPE)),
                     persist::typeid_to_type (s_geti (row, TYPE))};
-            it.asset_order = s_get (row, ASSET_ORDER);
-            if (it.asset_order == "(null)")
-                it.asset_order = "";
+            it.asset_order = s_geti (row, ASSET_ORDER);
+            if (it.asset_order < 0)
+                it.asset_order = 0;
 
             if (s_geti (row, TYPE) == persist::asset_type::GROUP)
                 s_topology2_devices_in_groups (conn, it);
@@ -693,6 +696,7 @@ topology2_from_json_recursive (
     }
 
     cxxtools::JsonSerializer serializer (out);
+    serializer.inputUtf8 (true);
     serializer.beautify (true);
 
     Item::Topology topo {};
