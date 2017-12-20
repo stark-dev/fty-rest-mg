@@ -152,6 +152,8 @@ src/web/src/alert_rules_detail.cpp
 src/web/src/alert_rules.cpp
 src/web/src/alert_ack.cpp
 src/web/src/alert_list.cpp
+src/web/src/alert_sse.cpp
+src/web/src/gpo_action.cpp
 src/web/src/email_feedback.cpp
 src/web/src/email_test.cpp
 src/web/src/email_vote.cpp
