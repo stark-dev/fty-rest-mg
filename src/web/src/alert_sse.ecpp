@@ -106,11 +106,56 @@ bool database_ready;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
     // sanity checks
-    std::string checked_state = "ALL-ACTIVE";
-    std::string checked_asset = "datacenter-3";
-    std::string checked_recursive = "true";
+ std::string checked_state;
+    std::string checked_asset;
+    std::string checked_recursive;
     uint32_t element_id = 0;
 
+    {
+        std::string state = qparam.param("state");
+        std::string asset = qparam.param("asset");
+        std::string recursive = qparam.param("recursive");
+        log_debug ("Request parameters - Initial tainted values received:\n\tstate = '%s'\n\tasset = '%s'\n\trecursive = '%s'\n",
+                state.c_str (), asset.c_str (), recursive.c_str ());
+
+        // Check 'state' parameter
+        if (state.empty ()) {
+            state = "ALL-ACTIVE";
+        }
+        else
+            if (!is_requeststate (state.c_str ())) {
+                log_error ("state = '%s' is not a valid alert state.", state.c_str ());
+                http_die ("request-param-bad", "state", std::string ("value '").append (state).append ("'").c_str (),
+                        std::string ("one of the following values [ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]").c_str ());
+            }
+
+        // Check 'recursive' parameter
+        if (recursive.empty ()) {
+            recursive = "false";
+        }
+        else
+            if (recursive.compare ("true") != 0 && recursive.compare ("false") != 0) {
+                log_error ("recursive = '%s' is not a valid value.", recursive.c_str ());
+                http_die ("request-param-bad", "recursive", std::string ("value '").append (state).append ("'").c_str (),
+                        std::string ("one of the following values [ true | false ]").c_str ());
+            }
+
+        if (!asset.empty ())
+        {
+            if (!is_ok_name (asset.c_str ()))
+            {
+                http_die ("request-param-bad", asset.c_str ());
+            }
+        } 
+        
+        checked_state = state;
+        checked_asset = asset;
+        checked_recursive = recursive;
+
+        log_debug ("Request parameters - un-tainted values applied:\n"
+                "\tstate = '%s'\n\tasset = '%s'\n\trecursive = '%s'\n",
+                state.c_str (), asset.c_str (), recursive.c_str ());
+    }
     {
         int64_t dbid =  persist::name_to_asset_id (checked_asset);
         if (!checked_asset.empty() && dbid == -1) {
