@@ -176,6 +176,16 @@ reply.setHeader(tnt::httpheader::cacheControl, "no-cache");
 reply.setDirectMode();
 reply.out().flush();
 
+int64_t start = zclock_mono();
+int64_t diff = 0;
+int64_t now = 0;
+// Every 9 minutes we close the connection to avoid a connection timeout (10 min) which would kill tntnet.
+// The client will reconnect itself.
+while (diff < 540000) {
+    //wait 10 seconds
+    sleep(10);
+
+
 // connect to malamute
 _scoped_mlm_client_t *client = mlm_client_new ();
 if (!client) {
@@ -368,20 +378,20 @@ if (streq (part, "LIST")) {
 
 json += "]\n\n";
 
-int64_t start = zclock_mono();
-int64_t diff = 0;
-int64_t now = 0;
-// Every 10 minutes we close the connection to avoid a connection timeout which would kill tntnet.
-// The client will reconnect itself.
-while (diff < 600000) {
-    //wait 10 seconds
-    sleep(10);
 
 reply.out()<<json;
-reply.out().flush();
+
+
+if (reply.out().flush().fail())
+{
+    log_debug ("Error during flush");
+    mlm_client_destroy (&client);
+    break;
+}
 
 now = zclock_mono();
 diff = now - start; 
+
 log_debug ("end of while");
 
 }
