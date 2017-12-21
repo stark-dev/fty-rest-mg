@@ -106,56 +106,10 @@ bool database_ready;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
     // sanity checks
-    std::string checked_state;
-    std::string checked_asset;
-    std::string checked_recursive;
+    std::string checked_state = "ALL-ACTIVE";
+    std::string checked_asset = "datacenter-3";
+    std::string checked_recursive = "true";
     uint32_t element_id = 0;
-
-    {
-        std::string state = qparam.param("state");
-        std::string asset = qparam.param("asset");
-        std::string recursive = qparam.param("recursive");
-        log_debug ("Request parameters - Initial tainted values received:\n\tstate = '%s'\n\tasset = '%s'\n\trecursive = '%s'\n",
-                state.c_str (), asset.c_str (), recursive.c_str ());
-
-        // Check 'state' parameter
-        if (state.empty ()) {
-            state = "ALL-ACTIVE";
-        }
-        else
-            if (!is_requeststate (state.c_str ())) {
-                log_error ("state = '%s' is not a valid alert state.", state.c_str ());
-                http_die ("request-param-bad", "state", std::string ("value '").append (state).append ("'").c_str (),
-                        std::string ("one of the following values [ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]").c_str ());
-            }
-
-        // Check 'recursive' parameter
-        if (recursive.empty ()) {
-            recursive = "false";
-        }
-        else
-            if (recursive.compare ("true") != 0 && recursive.compare ("false") != 0) {
-                log_error ("recursive = '%s' is not a valid value.", recursive.c_str ());
-                http_die ("request-param-bad", "recursive", std::string ("value '").append (state).append ("'").c_str (),
-                        std::string ("one of the following values [ true | false ]").c_str ());
-            }
-
-        if (!asset.empty ())
-        {
-            if (!is_ok_name (asset.c_str ()))
-            {
-                http_die ("request-param-bad", asset.c_str ());
-            }
-        }
-
-        checked_state = state;
-        checked_asset = asset;
-        checked_recursive = recursive;
-
-        log_debug ("Request parameters - un-tainted values applied:\n"
-                "\tstate = '%s'\n\tasset = '%s'\n\trecursive = '%s'\n",
-                state.c_str (), asset.c_str (), recursive.c_str ());
-    }
 
     {
         int64_t dbid =  persist::name_to_asset_id (checked_asset);
@@ -217,6 +171,11 @@ for (auto const& item : desired_elements) {
 }
 log_debug ("=== end ===");
 
+reply.setContentType("text/event-stream");
+reply.setHeader(tnt::httpheader::cacheControl, "no-cache");
+reply.setDirectMode();
+reply.out().flush();
+
 // connect to malamute
 _scoped_mlm_client_t *client = mlm_client_new ();
 if (!client) {
@@ -276,12 +235,9 @@ while (true) {
     if (!recv_msg) {
         if (zpoller_expired (poller) || zpoller_terminated (poller)) {
             log_error ("zpoller_wait(timeout = 5000) timed out waiting for message.");
-            zpoller_destroy (&poller);
-            mlm_client_destroy (&client);
-            http_die ("internal-error", "Timed out waiting for message.");
+            break;
         }
         log_error ("mlm_client_recv() failed.");
-        zpoller_destroy (&poller);
         mlm_client_destroy (&client);
         http_die ("internal-error", "mlm_client_recv() failed.");
     }
@@ -290,7 +246,6 @@ while (true) {
     zmsg_destroy (&recv_msg);
 }
 zpoller_destroy (&poller);
-
 
 // Got it
 // Check subject
@@ -322,133 +277,115 @@ if (streq (part, "LIST")) {
         log_debug ("First `zframe_t *frame = zmsg_pop (recv_msg)` returned NULL.");
     }
     bool first = true;
-</%cpp>
-[
-<%cpp>
+    std::string json = "";
+    json += "data:[";
+
  while (frame) {
 #if CZMQ_VERSION_MAJOR == 3
    zmsg_t *decoded_zmsg = zmsg_decode (zframe_data (frame), zframe_size (frame));
 #else
     zmsg_t *decoded_zmsg = zmsg_decode (frame);
 #endif
-</%cpp>
-%   zframe_destroy (&frame);
-%   if (!decoded_zmsg) {
-%       log_error ("Bad frame, skipping");
-%       zmsg_destroy (&recv_msg);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   fty_proto_t *decoded = fty_proto_decode (&decoded_zmsg);
-%   if (!decoded) {
-%       log_error ("Can't decode fty_proto");
-%       zmsg_destroy (&recv_msg);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if (!fty_proto_id (decoded) == FTY_PROTO_ALERT) {
-%       log_error ("message id is not FTY_PROTO_ALERT");
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if ((!checked_asset.empty () && desired_elements.find (fty_proto_name (decoded)) == desired_elements.end ())) {
-%       log_debug ("skipping due to element_src '%s' not being in the list", fty_proto_name (decoded));
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if (!is_state_included (checked_state.c_str (), fty_proto_state (decoded))) {
-%       log_debug ("skipping due to state '%s' not being requested", fty_proto_state (decoded));
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   char buff[64];
-%   rv = calendar_to_datetime (fty_proto_time (decoded), buff, 64);
-%   if (rv == -1) {
-%       log_error ("can't convert %" PRIu64 "to calendar time, skipping element '%s'", fty_proto_time (decoded), fty_proto_rule (decoded) );
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   log_debug ("persist::select_asset_element_web_byName ('%s')", fty_proto_name (decoded));
-%
-%   auto asset_element = persist::select_asset_element_web_byName (connection, fty_proto_name (decoded));
-%   if (asset_element.status != 1) {
-%       log_error ("%s", asset_element.msg.c_str ());
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%
-%   std::pair<std::string,std::string> asset_element_names = persist::id_to_name_ext_name (asset_element.item.id);
-%   if (asset_element_names.first.empty () && asset_element_names.second.empty ())
-%       http_die ("internal-error", "Database error");
-%
-%   if (first) {
-    {
-        <$$ utils::json::jsonify ("timestamp", buff) $>,
-        <$$ utils::json::jsonify ("rule_name", fty_proto_rule (decoded)) $>,
-        <$$ utils::json::jsonify ("element_id",  fty_proto_name (decoded)) $>,
-        <$$ utils::json::jsonify ("element_name", asset_element_names.second) $>,
-        <$$ utils::json::jsonify ("element_type", asset_element.item.type_name) $>,
-        <$$ utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) $>,
-        <$$ utils::json::jsonify ("state", fty_proto_state (decoded)) $>,
-        <$$ utils::json::jsonify ("severity", fty_proto_severity (decoded)) $>,
-        <$$ utils::json::jsonify ("description", fty_proto_description (decoded)) $>
-    }
-%     first = false;
-%   }
-%   else {
-, {
-        <$$ utils::json::jsonify ("timestamp", buff) $>,
-        <$$ utils::json::jsonify ("rule_name", fty_proto_rule (decoded)) $>,
-        <$$ utils::json::jsonify ("element_id", fty_proto_name (decoded)) $>,
-        <$$ utils::json::jsonify ("element_name", asset_element_names.second) $>,
-        <$$ utils::json::jsonify ("element_type", asset_element.item.type_name) $>,
-        <$$ utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) $>,
-        <$$ utils::json::jsonify ("state", fty_proto_state (decoded)) $>,
-        <$$ utils::json::jsonify ("severity", fty_proto_severity (decoded)) $>,
-        <$$ utils::json::jsonify ("description", fty_proto_description (decoded)) $>
+
+   zframe_destroy (&frame);
+   if (!decoded_zmsg) {
+       log_error ("Bad frame, skipping");
+       zmsg_destroy (&recv_msg);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   fty_proto_t *decoded = fty_proto_decode (&decoded_zmsg);
+   if (!decoded) {
+       log_error ("Can't decode fty_proto");
+       zmsg_destroy (&recv_msg);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   if (!fty_proto_id (decoded) == FTY_PROTO_ALERT) {
+       log_error ("message id is not FTY_PROTO_ALERT");
+       fty_proto_destroy (&decoded);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   if ((!checked_asset.empty () && desired_elements.find (fty_proto_name (decoded)) == desired_elements.end ())) {
+       log_debug ("skipping due to element_src '%s' not being in the list", fty_proto_name (decoded));
+       fty_proto_destroy (&decoded);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   if (!is_state_included (checked_state.c_str (), fty_proto_state (decoded))) {
+       log_debug ("skipping due to state '%s' not being requested", fty_proto_state (decoded));
+       fty_proto_destroy (&decoded);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   char buff[64];
+   rv = calendar_to_datetime (fty_proto_time (decoded), buff, 64);
+   if (rv == -1) {
+       log_error ("can't convert %" PRIu64 "to calendar time, skipping element '%s'", fty_proto_time (decoded), fty_proto_rule (decoded) );
+       fty_proto_destroy (&decoded);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+   log_debug ("persist::select_asset_element_web_byName ('%s')", fty_proto_name (decoded));
+
+   auto asset_element = persist::select_asset_element_web_byName (connection, fty_proto_name (decoded));
+   if (asset_element.status != 1) {
+       log_error ("%s", asset_element.msg.c_str ());
+       fty_proto_destroy (&decoded);
+       frame = zmsg_pop (recv_msg);
+       continue;
+   }
+
+   log_debug ("persist::id_to_name_ext_name ('%d')", asset_element.item.id);
+   std::pair<std::string,std::string> asset_element_names = persist::id_to_name_ext_name (asset_element.item.id);
+   if (asset_element_names.first.empty () && asset_element_names.second.empty ()) {
+       log_error ("internal-error : Database error");
+       continue;
+   }
+   if (first) {
+       first = false;
+   } else {
+       json+=",";
+   }
+   
+   json+="{";
+   
+    json+= utils::json::jsonify ("timestamp", buff) + ",";
+    json+= utils::json::jsonify ("rule_name", fty_proto_rule (decoded))+ ",";
+    json+= utils::json::jsonify ("element_id",  fty_proto_name (decoded)) + ",";
+    json+= utils::json::jsonify ("element_name", asset_element_names.second) + ",";
+    json+= utils::json::jsonify ("element_type", asset_element.item.type_name) + ",";
+    json+= utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) + ",";
+    json+= utils::json::jsonify ("state", fty_proto_state (decoded)) + ",";
+    json+= utils::json::jsonify ("severity", fty_proto_severity (decoded)) + ",";
+    json+= utils::json::jsonify ("description", fty_proto_description (decoded));
+    json+="}";
+
+   fty_proto_destroy (&decoded);
+   frame = zmsg_pop (recv_msg);
+ }
+
+json += "]\n\n";
+
+int64_t start = zclock_mono();
+int64_t diff = 0;
+int64_t now = 0;
+// Every 10 minutes we close the connection to avoid a connection timeout which would kill tntnet.
+// The client will reconnect itself.
+while (diff < 600000) {
+    //wait 10 seconds
+    sleep(10);
+
+reply.out()<<json;
+reply.out().flush();
+
+now = zclock_mono();
+diff = now - start; 
+log_debug ("end of while");
+
 }
-%   }
-%   fty_proto_destroy (&decoded);
-%   frame = zmsg_pop (recv_msg);
-% }
-]
-<%cpp>
-    zmsg_destroy (&recv_msg);
-    mlm_client_destroy (&client);
-    return HTTP_OK;
-}
-if (streq (part, "ERROR")) {
-    free (part);
-    part = zmsg_popstr (recv_msg);
-    if (!part) {
-        log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
-        zmsg_destroy (&recv_msg);
-        mlm_client_destroy (&client);
-        http_die ("internal-error", "Bad message.");
-    }
-    if (streq (part, "NOT_FOUND")) {
-        free (part);
-        log_error ("State = '%s' does not exist.", checked_state.c_str ());
-        zmsg_destroy (&recv_msg);
-        mlm_client_destroy (&client);
-        http_die ("not-found", std::string ("State '").append (checked_state).append ("'").c_str ());
-    }
-    log_error ("%s", part);
-    std::string reason = part;
-    free (part); part = NULL;
-    zmsg_destroy (&recv_msg);
-    mlm_client_destroy (&client);
-    http_die ("internal-error", std::string ("Error while requesting list of alerts: ").append (reason).c_str ());
-}
-// Message does not conform to protocol
-log_error ("Unexptected reply from  '%s'. Does not conform to '%s' protocol.",
-    mlm_client_sender (client), RFC_ALERTS_LIST);
-zmsg_destroy (&recv_msg);
 mlm_client_destroy (&client);
-http_die ("internal-error", "Bad message.");
+}
+
 </%cpp>
