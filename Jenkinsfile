@@ -60,7 +60,7 @@ pipeline {
             name: 'DO_CLEANUP_AFTER_BUILD')
     }
     triggers {
-        pollSCM 'H/5 * * * *'
+        pollSCM 'H/2 * * * *'
     }
 // Note: your Jenkins setup may benefit from similar setup on side of agents:
 //        PATH="/usr/lib64/ccache:/usr/lib/ccache:/usr/bin:/bin:${PATH}"
