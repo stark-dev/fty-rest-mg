@@ -36,6 +36,7 @@
 #include <fty_proto.h>
 #include "log.h"
 #include "utils.h"
+#include "tokens.h"
 #include "utils_web.h"
 #include "utils++.h"
 #include "str_defs.h"
@@ -189,12 +190,36 @@ bool database_ready;
         http_die ("internal-error", "zpoller_new() failed.");
     }
     
+    //get the token from the request
+    std::string token = request.getCookie("eaton_token").getValue();
+    long int tme;
+    long int uid;
+    long int gid;
+    char * user_name;
     // prepare rfc-alerts-list LIST message
     
     // Every 5 minutes we close the connection to avoid a connection timeout (10 min) which would kill tntnet.
     // The client will reconnect itself.
+    std::string json;
     while (diff < 300000) {
 
+        //check if token is still valid 
+        if (BiosProfile::Anonymous == tokens::get_instance()->verify_token(token, &tme,&uid,&gid,&user_name))
+        {
+            log_debug ("sse : Token revoked or expired");
+            break;
+        }
+        // send the time before the token is expired
+        json = "data:{\"topic\":\"ttl\",\"payload\":{\"time\":" ;
+        json +=  std::to_string(tme).c_str();
+        json +=  "}}\n\n";
+        reply.out()<<json;
+        if (reply.out().flush().fail())
+        {
+            log_debug ("Error during flush");
+            break;
+        }
+        
         
         now = zclock_mono();
         diff = now - start; 
@@ -210,13 +235,12 @@ bool database_ready;
             if (zpoller_expired (poller)) {
                 log_debug ("zpoller_wait(timeout = 10000) timed out waiting for message.");
                 //Send heartbeat message
-                std::string json = "data:{\"topic\":\"heartbeat\",\"payload\":{}}\n\n";
+                json = "data:{\"topic\":\"heartbeat\",\"payload\":{}}\n\n";
                 
                 reply.out()<<json;
                 if (reply.out().flush().fail())
                 {
                     log_debug ("Error during flush");
-                    mlm_client_destroy (&client);
                     break;
                 }
                 continue;
@@ -227,7 +251,7 @@ bool database_ready;
                 break;
             }
         }
-
+        
         // Got it
         //Check if the message comes from stream
         if (streq(mlm_client_command(client), "STREAM DELIVER")) {
@@ -269,7 +293,6 @@ bool database_ready;
                 log_error ("internal-error : Database error");
                 continue;
             }
-            std::string json = "";
             json = "data:{\"topic\":\"alert\",\"payload\":";
             json+="{";
             
@@ -291,7 +314,6 @@ bool database_ready;
             if (reply.out().flush().fail())
             {
                 log_debug ("Error during flush");
-                mlm_client_destroy (&client);
                 break;
             }
             

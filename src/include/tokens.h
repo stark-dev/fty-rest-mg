@@ -103,8 +103,9 @@ public:
      * \brief Verifies whether supplied token is valid
      *
      * \return BiosProfile enum, where BiosProfile::Anonymous means verification failed
+     * \return long int expInSec, the time before token expire if not BiosProfile::Anonymous
      */
-    BiosProfile verify_token(const std::string token, long int* uid = NULL, long int* gid = NULL, char **user_name = NULL);
+    BiosProfile verify_token(const std::string token, long int* expInSec, long int* uid = NULL, long int* gid = NULL, char **user_name = NULL);
     //! Invalidates selected token
     void revoke(const std::string token);
     /**
