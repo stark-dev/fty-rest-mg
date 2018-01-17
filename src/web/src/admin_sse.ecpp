@@ -153,10 +153,6 @@ bool database_ready;
     reply.setDirectMode();
     reply.out().flush();
 
-    int64_t start = zclock_mono();
-    int64_t diff = 0;
-    int64_t now = 0;
-    
     // connect to malamute
     _scoped_mlm_client_t *client = mlm_client_new ();
     if (!client) {
@@ -189,7 +185,12 @@ bool database_ready;
         mlm_client_destroy (&client);
         http_die ("internal-error", "zpoller_new() failed.");
     }
-    
+
+    int64_t start = zclock_mono();
+    int64_t sendNextExpTime = zclock_mono();
+    int64_t diff = 0;
+    int64_t now = 0;
+
     //get the token from the request
     std::string token = request.getCookie("eaton_token").getValue();
     long int tme;
@@ -203,26 +204,33 @@ bool database_ready;
     std::string json;
     while (diff < 300000) {
 
+        now = zclock_mono();
+        diff = now - start; 
+        
         //check if token is still valid 
         if (BiosProfile::Anonymous == tokens::get_instance()->verify_token(token, &tme,&uid,&gid,&user_name))
         {
             log_debug ("sse : Token revoked or expired");
             break;
         }
-        // send the time before the token is expired
-        json = "data:{\"topic\":\"ttl\",\"payload\":{\"time\":" ;
-        json +=  std::to_string(tme).c_str();
-        json +=  "}}\n\n";
-        reply.out()<<json;
-        if (reply.out().flush().fail())
-        {
-            log_debug ("Error during flush");
-            break;
+
+        // Each minute, send the time before expiration
+        if (now - sendNextExpTime > 60000) {
+            // send the time before the token is expired
+            json = "data:{\"topic\":\"timer\",\"payload\":{\"exptime\":" ;
+            json +=  std::to_string(tme).c_str();
+            json +=  "}}\n\n";
+            reply.out()<<json;
+            if (reply.out().flush().fail())
+            {
+                log_debug ("Error during flush");
+                break;
+            }
+            sendNextExpTime = now;
+            
         }
         
         
-        now = zclock_mono();
-        diff = now - start; 
 
         // wait for the right message or time-out
         zmsg_t *recv_msg = NULL;
