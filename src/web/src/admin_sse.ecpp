@@ -181,7 +181,7 @@ bool database_ready;
     }
 
     int64_t start = zclock_mono();
-    int64_t sendNextExpTime = zclock_mono();
+    int64_t sendNextExpTime = 0;
     int64_t diff = 0;
     int64_t now = 0;
 
