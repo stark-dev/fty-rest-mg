@@ -19,8 +19,8 @@
  #><#
 /*!
  \file alert_list.ecpp
- \author Karol Hrdina <KarolHrdina@Eaton.com>
- \brief Retrieves a list of alerts known to the system according specified parameters
+ \author nicolas DAVIET <nicolasdaviet@Eaton.com>
+ \brief Open an sse connection to send any notification to UI
 */
 #><%pre>
 #include <exception>

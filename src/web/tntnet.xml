@@ -97,7 +97,7 @@
     </mapping>
 
     <mapping>
-        <target>alert_sse@bios_web</target>
+        <target>admin_sse@bios_web</target>
         <method>GET</method>
         <url>^/api/v1/sse.*$</url>
     </mapping>
