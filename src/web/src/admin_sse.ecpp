@@ -18,7 +18,7 @@
  #
  #><#
 /*!
- \file alert_list.ecpp
+ \file admin_sse.ecpp
  \author nicolas DAVIET <nicolasdaviet@Eaton.com>
  \brief Open an sse connection to send any notification to UI
 */
@@ -44,10 +44,6 @@
 #include "db/assets.h"
 #include "cleanup.h"
 #include "helpers.h"
-
-#define RFC_ALERTS_LIST "rfc-alerts-list"
-
-
 
 </%pre>
 <%request scope="global">
@@ -75,8 +71,6 @@ bool database_ready;
     std::string dc = qparam.param("datacenter");
     log_debug ("Request parameters - Initial tainted values received: datacenter = '%s'\n",
             dc.c_str ());
-
-
 
     if (!dc.empty ())
     {
@@ -197,12 +191,13 @@ bool database_ready;
     long int uid;
     long int gid;
     char * user_name;
-    // prepare rfc-alerts-list LIST message
+    unsigned tntRequestTimeout = tnt::TntConfig::it().maxRequestTime * 1000 / 2 ;
+
     
-    // Every 5 minutes we close the connection to avoid a connection timeout (10 min) which would kill tntnet.
+    // Every ( connection request time out / 2) minutes we close the connection to avoid a connection timeout which would kill tntnet.
     // The client will reconnect itself.
     std::string json;
-    while (diff < 300000) {
+    while (diff < tntRequestTimeout) {
 
         now = zclock_mono();
         diff = now - start; 
@@ -217,7 +212,7 @@ bool database_ready;
         // Each minute, send the time before expiration
         if (now - sendNextExpTime > 60000) {
             // send the time before the token is expired
-            json = "data:{\"topic\":\"timer\",\"payload\":{\"exptime\":" ;
+            json = "data:{\"topic\":\"session\",\"payload\":{\"exptime\":" ;
             json +=  std::to_string(tme).c_str();
             json +=  "}}\n\n";
             reply.out()<<json;
@@ -229,8 +224,6 @@ bool database_ready;
             sendNextExpTime = now;
             
         }
-        
-        
 
         // wait for the right message or time-out
         zmsg_t *recv_msg = NULL;
@@ -241,7 +234,6 @@ bool database_ready;
         }
         if (!recv_msg ){
             if (zpoller_expired (poller)) {
-                log_debug ("zpoller_wait(timeout = 10000) timed out waiting for message.");
                 //Send heartbeat message
                 json = "data:{\"topic\":\"heartbeat\",\"payload\":{}}\n\n";
                 
@@ -272,11 +264,13 @@ bool database_ready;
             
             if (!fty_proto_id (alert) == FTY_PROTO_ALERT) {
                 log_error ("message id is not FTY_PROTO_ALERT");
+                zmsg_destroy (&recv_msg);
                 fty_proto_destroy (&alert);
                 continue;
             }
             if ((!checked_dc.empty () && desired_elements.find (fty_proto_name (alert)) == desired_elements.end ())) {
                 log_debug ("skipping due to element_src '%s' not being in the list", fty_proto_name (alert));
+                zmsg_destroy (&recv_msg);
                 fty_proto_destroy (&alert);
                 continue;
             }
@@ -284,6 +278,7 @@ bool database_ready;
             rv = calendar_to_datetime (fty_proto_time (alert), buff, 64);
             if (rv == -1) {
                 log_error ("can't convert %" PRIu64 "to calendar time, skipping element '%s'", fty_proto_time (alert), fty_proto_rule (alert) );
+                zmsg_destroy (&recv_msg);
                 fty_proto_destroy (&alert);
                 continue;
             }
@@ -291,6 +286,7 @@ bool database_ready;
             auto asset_element = persist::select_asset_element_web_byName (connection, fty_proto_name (alert));
             if (asset_element.status != 1) {
                 log_error ("%s", asset_element.msg.c_str ());
+                zmsg_destroy (&recv_msg);
                 fty_proto_destroy (&alert);
                 continue;
             }
@@ -299,6 +295,8 @@ bool database_ready;
             std::pair<std::string,std::string> asset_element_names = persist::id_to_name_ext_name (asset_element.item.id);
             if (asset_element_names.first.empty () && asset_element_names.second.empty ()) {
                 log_error ("internal-error : Database error");
+                zmsg_destroy (&recv_msg);
+                fty_proto_destroy (&alert);
                 continue;
             }
             json = "data:{\"topic\":\"alert\",\"payload\":";
@@ -326,10 +324,9 @@ bool database_ready;
             }
             
         } else if (streq(mlm_client_command(client), "MAILBOX DELIVER")) {
-            
+            //not implemented yet
+            zmsg_destroy (&recv_msg);
         }
-        
-        log_debug ("end of while");
     }
     zpoller_destroy (&poller);
     mlm_client_destroy (&client);
