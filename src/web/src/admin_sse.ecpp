@@ -178,8 +178,6 @@ bool database_ready;
     reply.setHeader(tnt::httpheader::cacheControl, "no-store");
     reply.setDirectMode();
     reply.out().flush();
-
-
     
     int64_t start = zclock_mono();
     int64_t sendNextExpTime = 0;
