@@ -231,7 +231,7 @@ void tokens::revoke(const std::string token) {
     revoked_queue.insert(std::make_pair(tme, token));
 }
 
-BiosProfile tokens::verify_token(const std::string token, long int* uid, long int* gid, char **user_name) {
+BiosProfile tokens::verify_token(const std::string token, long int* expInSec, long int* uid, long int* gid, char **user_name) {
     char buff[MESSAGE_LEN + 1];
     long int tme = 0, l_uid = 0, l_gid = 0;
 
@@ -253,11 +253,13 @@ BiosProfile tokens::verify_token(const std::string token, long int* uid, long in
     if (gid)
         *gid = l_gid;
 
-    if (mono_time (NULL) > tme) {
+    time_t now = mono_time (NULL);
+    if (now > tme) {
         log_info ("verify_token: expired token for uid/gid %ld/%ld, authentication failed!", l_uid, l_gid);
         return BiosProfile::Anonymous;
     }
-
+    *expInSec = tme - now;
+    
     if (user_name) {
         char *foo = NULL;
         size_t foo_len;

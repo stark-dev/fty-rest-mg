@@ -79,9 +79,10 @@ std::string checked_access_token;
 /* We can get the token from header, or from GET or POST request args */
 if(!checked_access_token.empty()) {
     long int uid;
+    long int tme;
     long int gid;
     char *user_name;
-    BiosProfile profile = tokens::get_instance()->verify_token(checked_access_token, &uid, &gid, &user_name);
+    BiosProfile profile = tokens::get_instance()->verify_token(checked_access_token,&tme, &uid, &gid, &user_name);
 
     if (profile != BiosProfile::Anonymous) {
         user.profile (profile);
