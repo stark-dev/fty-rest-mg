@@ -143,7 +143,7 @@ bool database_ready;
     log_debug ("=== end ===");
 
     reply.setContentType("text/event-stream");
-    reply.setHeader(tnt::httpheader::cacheControl, "no-cache");
+    reply.setHeader(tnt::httpheader::cacheControl, "no-store");
     reply.setDirectMode();
     reply.out().flush();
 
