@@ -254,13 +254,11 @@ BiosProfile tokens::verify_token(const std::string token, long int* expInSec, lo
         *gid = l_gid;
 
     time_t now = mono_time (NULL);
-    if (mono_time (NULL) > tme) {
+    if (now > tme) {
         log_info ("verify_token: expired token for uid/gid %ld/%ld, authentication failed!", l_uid, l_gid);
         return BiosProfile::Anonymous;
     }
     *expInSec = tme - now;
-    log_debug ("verify_token: expInSec: %ld",*expInSec);
-    
     
     if (user_name) {
         char *foo = NULL;
