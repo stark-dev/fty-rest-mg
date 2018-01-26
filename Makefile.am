@@ -741,6 +741,7 @@ bios_web_la_SOURCES = \
                       src/web/src/location_helpers.cc   \
                       src/web/src/sasl.cc               \
                       src/web/src/tokens.cc             \
+                      src/web/src/sse.cc             \
                       src/shared/data.cc                \
                       src/shared/upsstatus.cc           \
                       src/web/src/asset_computed_impl.cc \
@@ -750,6 +751,7 @@ bios_web_la_SOURCES = \
 					  src/include/sasl.h \
 					  src/include/helpers.h \
 					  src/include/tokens.h \
+					  src/include/sse.h \
 					  src/persist/assetcrud.h \
 					  src/include/dbpath.h
 

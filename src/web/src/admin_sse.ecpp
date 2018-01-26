@@ -23,17 +23,10 @@
  \brief Open an sse connection to send any notification to UI
 */
 #><%pre>
-#include <exception>
-#include <string>
-#include <map>
-#include <functional>
-#include <malamute.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <tntdb/connection.h>
-#include <tntdb/error.h>
 
 #include <fty_proto.h>
+
+#include "sse.h"
 #include "log.h"
 #include "utils.h"
 #include "tokens.h"
@@ -65,9 +58,6 @@ bool database_ready;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
     // sanity checks
-    std::string checked_dc;
-    uint32_t element_id = 0;
-
     std::string dc = qparam.param("datacenter");
     log_debug ("Request parameters - Initial tainted values received: datacenter = '%s'\n",
             dc.c_str ());
@@ -90,12 +80,14 @@ bool database_ready;
     if (dbid == -2) {
             http_die ("internal-error", "Connecting to database failed.");
     }
-    element_id = (uint32_t) dbid;
-
-    std::map<std::string, int> desired_elements;
-    tntdb::Connection connection;
+    log_debug ("datacenter id = '%" PRIu32 "'.", (uint32_t) dbid);
+    
+    Sse sseManager;
+    sseManager.datacenter(dc);
+    sseManager.datacenter_id((uint32_t) dbid);
+    
     try {
-        connection = tntdb::connectCached (url);
+        sseManager.connection(tntdb::connectCached (url));
     }
     catch (const tntdb::Error& e) {
         log_error ("tntdb::connectCached (url = '%s') failed: %s.", url.c_str (), e.what ());
@@ -103,74 +95,28 @@ bool database_ready;
     }
     catch (const std::exception& e) {
         log_error ("Exception caught: '%s'.", e.what ());
-        http_die ("internal-error", e.what ()); // TODO
+        http_die ("internal-error", e.what ());
     }
-    log_debug ("Asset element id = '%" PRIu32 "'.", element_id);
 
-    auto asset_element = persist::select_asset_element_web_byId (connection, element_id);
-    if (asset_element.status != 1)
-        http_die ("internal-error", asset_element.msg.c_str ());
-    log_debug ("Asset element name = '%s'.", asset_element.item.name.c_str ());
-    desired_elements.emplace (std::make_pair (asset_element.item.name, 5));
-
+    //Get asset from the datacenter
+    const char * errorMsgAsset = sseManager.loadAssetFromDatacenter();
+    if (errorMsgAsset) {
+        http_die ("internal-error", errorMsgAsset);
+    }
     
-    //TODO : the list of asset is not refresh during the session, so when sse will
-    //manage the asset, update the list desired_elements.
-    try {
-        int rv = persist::select_assets_by_container (
-            connection,
-            element_id,
-            [&desired_elements](const tntdb::Row& row) -> void {
-                std::string name;
-                row[0].get (name);
-                desired_elements.emplace (std::make_pair (name, 5));
-            });
-        if (rv != 0) { http_die ("internal-error", "persist::select_assets_by_container () failed."); }
+    // connect to malamute and streams
+    const char * errorMsgMlm  = sseManager.connectMalamute();
+    if (errorMsgMlm) {
+        http_die ("internal-error", errorMsgMlm);
     }
-    catch (const tntdb::Error& e) {
-        http_die ("internal-error", e.what ());
-    }
-    catch (const std::exception& e) {
-        http_die ("internal-error", e.what ());
+    //Stream Alert
+    if (-1 == sseManager.consumeStream("ALERTS", ".*")) {
+        http_die ("internal-error", "Cannot consume ALERT stream");        
     }
 
-    log_debug ("=== These elements are topologically under element id: '%" PRIu32"' ===", element_id);
-    for (auto const& item : desired_elements) {
-        log_debug ("%s", item.first.c_str ());
-    }
-    log_debug ("=== end ===");
-
-    // connect to malamute
-    _scoped_mlm_client_t *client = mlm_client_new ();
-    if (!client) {
-        log_critical ("mlm_client_new() failed.");
-        http_die ("internal-error", "mlm_client_new() failed.");
-    }
-
-    std::string client_name = utils::generate_mlm_client_id("web.sse");
-    log_debug ("malamute client name = '%s'.", client_name.c_str ());
-
-    int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
-    if (rv == -1) {
-        log_critical ("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
-                        MLM_ENDPOINT, 1000, client_name.c_str ());
-        mlm_client_destroy (&client);
-        http_die ("internal-error", "mlm_client_connect() failed.");
-    }
-    mlm_client_set_consumer(client, "ALERTS", ".*");
-
-    zsock_t *pipe = mlm_client_msgpipe (client);
-    if (!pipe) {
-        log_critical ("mlm_client_msgpipe() failed.");
-        mlm_client_destroy (&client);
-        http_die ("internal-error", "mlm_client_msgpipe() failed.");
-    }
-
-    zpoller_t *poller = zpoller_new (pipe, NULL);
-    if (!poller) {
-        log_critical ("zpoller_new() failed.");
-        mlm_client_destroy (&client);
-        http_die ("internal-error", "zpoller_new() failed.");
+    //Stream Asset
+    if (-1 == sseManager.consumeStream("ASSETS", ".*")) {
+        http_die ("internal-error", "Cannot consume ASSETS stream");        
     }
 
     // Sse specification :  https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
@@ -185,11 +131,8 @@ bool database_ready;
     int64_t now = 0;
 
     //get the token from the request
-    std::string token = request.getCookie("eaton_token").getValue();
+    sseManager.token(request.getCookie("eaton_token").getValue());
     long int tme;
-    long int uid;
-    long int gid;
-    char * user_name;
     unsigned tntRequestTimeout = tnt::TntConfig::it().maxRequestTime * 1000 / 2 ;
 
     // Every ( connection request time out / 2) minutes we close the connection to avoid a connection timeout which would kill tntnet.
@@ -201,7 +144,9 @@ bool database_ready;
         diff = now - start; 
         
         //check if token is still valid 
-        if (BiosProfile::Anonymous == tokens::get_instance()->verify_token(token, &tme,&uid,&gid,&user_name))
+        //If valid return the time before the session expiration
+        tme = sseManager.checkTokenValidity();
+        if (-1 == tme)
         {
             log_info ("sse : Token revoked or expired");
             break;
@@ -225,12 +170,12 @@ bool database_ready;
         // wait for the right message or time-out
         zmsg_t *recv_msg = NULL;
 
-        zsock_t *which = (zsock_t *) zpoller_wait (poller, 10000);
-        if (which == pipe) {
-            recv_msg = mlm_client_recv (client);
+        zsock_t *which = (zsock_t *) zpoller_wait (sseManager.poller(), 10000);
+        if (which == sseManager.pipe()) {
+            recv_msg = sseManager.getMessageFromMlm();
         }
         if (!recv_msg ){
-            if (zpoller_expired (poller)) {
+            if (zpoller_expired (sseManager.poller())) {
                 //Send heartbeat message
                 json = "data:{\"topic\":\"heartbeat\",\"payload\":{}}\n\n";
                 
@@ -243,7 +188,7 @@ bool database_ready;
                 continue;
             }
             
-            if (zpoller_terminated(poller)){
+            if (zpoller_terminated(sseManager.poller())){
                 log_error ("zpoller_wait(timeout = 10000) terminated.");
                 break;
             }
@@ -251,81 +196,40 @@ bool database_ready;
         
         // Got it
         //Check if the message comes from stream
-        if (streq(mlm_client_command(client), "STREAM DELIVER")) {
-            fty_proto_t *alert = fty_proto_decode (&recv_msg);
-            if (!alert) {
+        if (sseManager.isMessageComesFrom("STREAM DELIVER")) {
+            fty_proto_t *msgProto = fty_proto_decode (&recv_msg);
+            if (!msgProto) {
                 log_error ("Can't decode fty_proto from stream");
                 zmsg_destroy (&recv_msg);
                 continue;
             }
             
-            if (!fty_proto_id (alert) == FTY_PROTO_ALERT) {
-                log_error ("message id is not FTY_PROTO_ALERT");
-                zmsg_destroy (&recv_msg);
-                fty_proto_destroy (&alert);
-                continue;
-            }
-            if (desired_elements.find (fty_proto_name (alert)) == desired_elements.end ()) {
-                log_debug ("skipping due to element_src '%s' not being in the list", fty_proto_name (alert));
-                zmsg_destroy (&recv_msg);
-                fty_proto_destroy (&alert);
-                continue;
-            }
-            char buff[64];
-            rv = calendar_to_datetime (fty_proto_time (alert), buff, 64);
-            if (rv == -1) {
-                log_error ("can't convert %" PRIu64 "to calendar time, skipping element '%s'", fty_proto_time (alert), fty_proto_rule (alert) );
-                zmsg_destroy (&recv_msg);
-                fty_proto_destroy (&alert);
+            if (fty_proto_id (msgProto) == FTY_PROTO_ALERT) {
+                log_debug ("message id is  FTY_PROTO_ALERT");
+                json = sseManager.changeFtyProtoAlert2Json(msgProto);
+            } if (fty_proto_id (msgProto) == FTY_PROTO_ASSET) {
+                log_debug ("message id is  FTY_PROTO_ASSET");
+                json = sseManager.changeFtyProtoAsset2Json(msgProto);
+            } else {
+                log_debug ("message id %d is not implemented for sse",fty_proto_id (msgProto));
                 continue;
             }
             
-            auto asset_element = persist::select_asset_element_web_byName (connection, fty_proto_name (alert));
-            if (asset_element.status != 1) {
-                log_error ("%s", asset_element.msg.c_str ());
-                zmsg_destroy (&recv_msg);
-                fty_proto_destroy (&alert);
-                continue;
-            }
-
-            log_debug ("persist::id_to_name_ext_name ('%d')", asset_element.item.id);
-            std::pair<std::string,std::string> asset_element_names = persist::id_to_name_ext_name (asset_element.item.id);
-            if (asset_element_names.first.empty () && asset_element_names.second.empty ()) {
-                log_error ("internal-error : Database error");
-                zmsg_destroy (&recv_msg);
-                fty_proto_destroy (&alert);
-                continue;
-            }
-            json = "data:{\"topic\":\"alert\",\"payload\":";
-            json+="{";
-            
-            json+= utils::json::jsonify ("timestamp", buff) + ",";
-            json+= utils::json::jsonify ("rule_name", fty_proto_rule (alert))+ ",";
-            json+= utils::json::jsonify ("element_id",  fty_proto_name (alert)) + ",";
-            json+= utils::json::jsonify ("element_name", asset_element_names.second) + ",";
-            json+= utils::json::jsonify ("element_type", asset_element.item.type_name) + ",";
-            json+= utils::json::jsonify ("element_sub_type", utils::strip (asset_element.item.subtype_name)) + ",";
-            json+= utils::json::jsonify ("state", fty_proto_state (alert)) + ",";
-            json+= utils::json::jsonify ("severity", fty_proto_severity (alert)) + ",";
-            json+= utils::json::jsonify ("description", fty_proto_description (alert));
-            json+="}}\n\n";
-
-            fty_proto_destroy (&alert);
+            fty_proto_destroy (&msgProto);
             zmsg_destroy (&recv_msg);
             
-            reply.out()<<json;
-            if (reply.out().flush().fail())
-            {
-                log_debug ("Error during flush");
-                break;
+            if (!json.empty()){
+                reply.out()<<json;
+                if (reply.out().flush().fail())
+                {
+                    log_debug ("Error during flush");
+                    break;
+                }
             }
-            
-        } else if (streq(mlm_client_command(client), "MAILBOX DELIVER")) {
+        } else if (sseManager.isMessageComesFrom("MAILBOX DELIVER")) {
             //not implemented yet
             zmsg_destroy (&recv_msg);
         }
     }
-    zpoller_destroy (&poller);
-    mlm_client_destroy (&client);
     
 </%cpp>
