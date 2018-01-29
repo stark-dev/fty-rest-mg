@@ -246,15 +246,16 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     //remove this asset from the assets list
     _assetsOfDatacenter.erase(nameElement);
   }
-  else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
+  else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+          || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
   {
-    log_debug("Sse get an update message");
+    log_debug("Sse get an update or create message");
     //Check if sender is asset-agent-stream 
-    if (!streq(mlm_client_sender(_clientMlm), ASSET_AGENT))
+    /*if (!streq(mlm_client_sender(_clientMlm), ASSET_AGENT))
     {
       log_debug("Skipping cause not an update ASSET message from asset-agent-stream");
       return json;
-    }
+    }*/
 
     //get id of this element
     int64_t elemId = persist::name_to_asset_id(nameElement);
@@ -269,15 +270,23 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     }
     log_debug("Sse-update get id Ok !!!");
 
-    std::string action = "update";
-
-    //if update
-    //Check if asset is in asset element
-    if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
+    std::string action;
+    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
     {
-      log_debug("Sse-update asset not found in the _assetsOfDatacenter list");
-      log_debug("Sse-update check aux parent name");
+      action = "update";
 
+      //if update
+      //Check if asset is in asset element
+      if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
+      {
+        log_debug("skipping due to element_src '%s' is not an element of the datacenter",
+                  nameElement.c_str());
+        return json;
+      }
+    }
+    else
+    {
+      //Check if the ne parent is the filtered datacenter
       int i = 1;
       const char * parentName = fty_proto_aux_string(asset, ("parent_name." + std::to_string(i)).c_str(), "not found");
       bool found = streq(parentName, _datacenter.c_str());
@@ -296,12 +305,10 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
                   nameElement.c_str());
         return json;
       }
-      else
-      {
-        //else update the asset list
-        action = "new";
-        _assetsOfDatacenter.emplace(std::make_pair(nameElement, 5));
-      }
+
+      action = "new";
+      //update the asset list
+      _assetsOfDatacenter.emplace(std::make_pair(nameElement, 5));
     }
     //All check Done and Ok 
     //Get informations from database
@@ -484,11 +491,11 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       isExtCommaNeeded = true;
     }
 
-    std::map<std::string, Outlet> outlets{};
-    std::vector<std::string> ips{};
-    std::vector<std::string> macs{};
-    std::vector<std::string> fqdns{};
-    std::vector<std::string> hostnames{};
+    std::map<std::string, Outlet> outlets;
+    std::vector<std::string> ips;
+    std::vector<std::string> macs;
+    std::vector<std::string> fqdns;
+    std::vector<std::string> hostnames;
     if (!tmp.item.ext.empty())
     {
       cxxtools::Regex r_outlet_label("^outlet\\.[0-9][0-9]*\\.label$");
@@ -734,6 +741,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       size_t i = 1;
       for (const auto &it : res)
       {
+
         std::string val = it.second >= 0 ? std::to_string(it.second) : "null";
         std::string comma = i == res.size() ? "" : ",";
         i++;
@@ -763,6 +771,7 @@ zmsg_t* Sse::encodeGET(const char* name)
   zuuid_destroy(&uuid);
   zmsg_addstr(msg, method);
   zmsg_addstr(msg, name);
+
   return msg;
 }
 
@@ -827,6 +836,7 @@ double Sse::getRackRealpowerNominal(
     }
   }
   zmsg_destroy(&msg);
+
   return ret;
 }
 
