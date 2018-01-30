@@ -207,7 +207,7 @@ bool database_ready;
             if (fty_proto_id (msgProto) == FTY_PROTO_ALERT) {
                 log_debug ("message id is  FTY_PROTO_ALERT");
                 json = sseManager.changeFtyProtoAlert2Json(msgProto);
-            } if (fty_proto_id (msgProto) == FTY_PROTO_ASSET) {
+            } else if (fty_proto_id (msgProto) == FTY_PROTO_ASSET) {
                 log_debug ("message id is  FTY_PROTO_ASSET");
                 json = sseManager.changeFtyProtoAsset2Json(msgProto);
             } else {

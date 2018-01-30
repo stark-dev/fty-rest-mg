@@ -257,6 +257,8 @@ libpriv_utils_la_SOURCES = 	\
 				src/include/defs.h \
 				src/include/utils_web.h \
 				src/shared/utils_web.cc \
+				src/include/utils_json.h \
+				src/shared/utils_json.cc \
 				src/shared/utils++.cc \
 				src/include/utils++.h \
 				src/include/filesystem.h \

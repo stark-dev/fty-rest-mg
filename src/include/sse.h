@@ -63,19 +63,6 @@ private:
   zsock_t *_pipe = NULL;
   zpoller_t *_poller = NULL;
   
-  struct Outlet
-  {
-    std::string label;
-    bool label_r;
-    std::string type;
-    bool type_r;
-    std::string group;
-    bool group_r;
-  };
-
-  zmsg_t* encodeGET(const char* name);
-  std::string getNumberOfOutlet(const std::string &extAttributeName);
-  double getRackRealpowerNominal(mlm_client_t *client, const std::string& name);
 
 public:
   //Constructor/destructor
