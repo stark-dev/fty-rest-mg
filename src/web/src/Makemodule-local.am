@@ -1,0 +1,86 @@
+ECPPC=ecppc
+ECPPFLAGS=
+ECPPFLAGS_CPP=
+
+ECPPFILES= \
+  add_gpio.ecpp \
+  admin_iface.ecpp \
+  admin_ifaces.ecpp \
+  admin_sse.ecpp \
+  alert_ack.ecpp \
+  alert_list.ecpp \
+  alert_rules_detail.ecpp \
+  alert_rules.ecpp \
+  alert_rules_list.ecpp \
+  asset_DELETE.ecpp \
+  asset_export.ecpp \
+  asset_GET.ecpp \
+  asset_import.ecpp \
+  asset_list.ecpp \
+  asset_POST.ecpp \
+  asset_PUT.ecpp \
+  assets_in.ecpp \
+  auth.ecpp \
+  auth-verify.ecpp \
+  average.ecpp \
+  config.ecpp \
+  conf_scan.ecpp \
+  current.ecpp \
+  datacenter_indicators.ecpp \
+  email_feedback.ecpp \
+  email_test.ecpp \
+  email_vote.ecpp \
+  getlog_GET.ecpp \
+  gpo_action.ecpp \
+  info.ecpp \
+  input_power_chain.ecpp \
+  json.ecpp \
+  license.ecpp \
+  license_POST.ecpp \
+  license_status.ecpp \
+  license_text.ecpp \
+  list_gpio.ecpp \
+  my_profile.ecpp \
+  netcfg.ecpp \
+  not_found.ecpp \
+  rack_total.ecpp \
+  scan_progress.ecpp \
+  scan_run.ecpp \
+  security_headers.ecpp \
+  server_status.ecpp \
+  ssl-redirect.ecpp \
+  sysinfo.ecpp \
+  systemctl.ecpp \
+  time.ecpp \
+  topology_location_from2.ecpp \
+  topology_location_from.ecpp \
+  topology_location_to.ecpp \
+  topology_power.ecpp \
+  uptime.ecpp
+
+TNTLIB_BASENAME=libfty_rest
+TNTLIB_DIRNAME=$(prefix)/lib/bios
+
+ECPPCCFILES = $(ECPPFILES:.ecpp=.cc)
+
+EXTRA_DIST += $(addprefix src/,$(ECPPFILES))
+
+project_libs += -ltntnet
+
+.ecpp.cc:
+	${ECPPC} ${ECPPFLAGS} ${ECPPFLAGS_CPP} -o $(top_builddir)/src/$(@F) $(top_srcdir)/src/$(<F) && \
+	    mv -f $(top_builddir)/src/$(@F).cpp $(top_builddir)/src/$(@F)
+
+clean-local:
+	for file in $(ECPPCCFILES); do \
+	    /bin/rm -f $(top_builddir)/src/$$file; \
+	done
+
+uninstall-local:
+	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
+
+install-exec-hook:
+	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
+	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
+	cd $(DESTDIR)$(TNTLIB_DIRNAME) && \
+	    ln -fs "`ls -1 $(TNTLIB_BASENAME).so.* | tail -1`" $(TNTLIB_BASENAME).so
