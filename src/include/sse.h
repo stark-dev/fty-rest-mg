@@ -130,9 +130,6 @@ public:
   //Return an empty string if error
   std::string changeFtyProtoAsset2Json(fty_proto_t *asset);
   
-  //Add the name of a new asset
-  void addNewAsset(std::string assetName);
-
 };
 
 #endif // SRC_WEB_INCLUDE_SSE_H
