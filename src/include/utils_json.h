@@ -28,27 +28,11 @@
 
 #include <malamute.h>
 
-struct Outlet
-  {
-    std::string label;
-    bool label_r;
-    std::string type;
-    bool type_r;
-    std::string group;
-    bool group_r;
-  };
+//Return an alert with a json format
+std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert);
 
-  zmsg_t* s_rt_encode_GET(const char* name);
-  
-  std::string getOutletNumber(const std::string &extAttributeName);
-  
-  double s_rack_realpower_nominal(mlm_client_t *client, const std::string& name);
-  
-  //Return an alert with a json format
-  std::string getJsonAlert(tntdb::Connection connection,fty_proto_t *alert);
+//Return an Asset with a json format
+std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId);
 
-  //Return an Asset with a json format
-  std::string getJsonAsset(mlm_client_t * clientMlm ,int64_t elemId);
-  
 
 #endif // SRC_SHARED_WEB_UTILS_H_
