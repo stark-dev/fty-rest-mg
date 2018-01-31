@@ -115,6 +115,7 @@ bool database_ready;
     }
     // end connect to malamute
     std::string jsonAsset = getJsonAsset(client,checked_id);
+    mlm_client_destroy (&client);
     if (jsonAsset.empty())  {
       http_die ("internal-error", "get json asset failed.");
     }
