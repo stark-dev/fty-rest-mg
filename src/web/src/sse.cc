@@ -134,12 +134,12 @@ const char * Sse::loadAssetFromDatacenter()
   try
   {
     int rv = persist::select_assets_by_container(_connection, _datacenter_id,
-                                                 [&elements](const tntdb::Row & row) -> void
-                                                 {
-                                                   std::string name;
-                                                   row[0].get(name);
-                                                   elements.emplace(std::make_pair(name, 5));
-                                                 });
+      [&elements](const tntdb::Row & row) -> void
+      {
+        std::string name;
+        row[0].get(name);
+        elements.emplace(std::make_pair(name, 5));
+      });
     if (rv != 0)
     {
       return "persist::select_assets_by_container () failed.";

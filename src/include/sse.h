@@ -105,7 +105,7 @@ public:
   //return Null if connection to malamute is ok, else an error message
   const char * connectMalamute();
 
-  //Add consume stream by malamute
+  //Add consumer stream to malamute client
   int consumeStream(std::string stream, std::string pattern);
 
   //Check if the token is still valid

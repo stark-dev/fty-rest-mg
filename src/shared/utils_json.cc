@@ -579,9 +579,8 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
     int freeusize = free_u_size(tmp.item.basic.id);
     double realpower_nominal = s_rack_realpower_nominal(clientMlm, tmp.item.basic.name.c_str());
 
-    json += utils::json::jsonify("freeusize", freeusize >= 0 ? std::to_string(freeusize) : "null");
-    json += "," + utils::json::jsonify("realpower.nominal",
-                                       realpower_nominal != NAN ? std::to_string(realpower_nominal) : "null");
+    json += "\"freeusize\":" + (freeusize >= 0 ? std::to_string(freeusize) : "null");
+    json += ",\"realpower.nominal\":" + (realpower_nominal != NAN ? std::to_string(realpower_nominal) : "null");
     json += ", \"outlet.available\" : {";
     std::map<std::string, int> res;
     int rv = rack_outlets_available(tmp.item.basic.id, res);
@@ -598,7 +597,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       std::string val = it.second >= 0 ? std::to_string(it.second) : "null";
       std::string comma = i == res.size() ? "" : ",";
       i++;
-      json += utils::json::jsonify(it.first, val);
+      json += "\"" + it.first + "\":" + val;
       json += (comma);
     } // for it : res
 
