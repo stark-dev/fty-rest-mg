@@ -30,8 +30,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <map>
 #include <stdexcept>
 
-#include "asset_types.h"
-#include "csv.h"
+#include "shared/asset_types.h"
+#include "shared/csv.h"
 
 #include "dbhelpers.h"
 

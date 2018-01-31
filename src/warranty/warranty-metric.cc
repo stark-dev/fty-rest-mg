@@ -28,9 +28,9 @@
 #include <fty_proto.h>
 #include <tntdb.h>
 
-#include "log.h"
-#include "str_defs.h"
-#include "dbpath.h"
+#include "shared/log.h"
+#include "shared/str_defs.h"
+#include "shared/dbpath.h"
 #include "db/assets.h"
 
 /*

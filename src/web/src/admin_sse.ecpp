@@ -34,13 +34,13 @@
 #include <tntdb/error.h>
 
 #include <fty_proto.h>
-#include "log.h"
+#include "shared/log.h"
 #include "utils.h"
 #include "tokens.h"
 #include "utils_web.h"
 #include "utils++.h"
-#include "str_defs.h"
-#include "dbpath.h"
+#include "shared/str_defs.h"
+#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "cleanup.h"
 #include "helpers.h"

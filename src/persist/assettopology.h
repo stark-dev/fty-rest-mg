@@ -25,9 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SRC_PERSIST_ASSETTOPOLOGY_H_
 #include <set>
 #include <inttypes.h>
-#include "asset_msg.h"
+#include "msg/asset_msg.h"
 #include "dbtypes.h"
-#include "dbhelpers.h"
+#include "db/dbhelpers.h"
 
 // 0 ok, -1 error
 int

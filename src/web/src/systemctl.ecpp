@@ -34,7 +34,7 @@
 #include <cstring>
 #include <algorithm>
 
-#include "subprocess.h"
+#include "shared/subprocess.h"
 #include "helpers.h"
 
 using namespace shared;

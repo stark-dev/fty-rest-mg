@@ -26,7 +26,7 @@
  #><%pre>
 #include <fstream>
 #include <cxxtools/regex.h>
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 #include "iface.h"
 </%pre>

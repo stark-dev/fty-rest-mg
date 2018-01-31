@@ -26,9 +26,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/error.h>
 #include <tntdb/transaction.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "defs.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "assetr.h"
 #include "utils_web.h"
 

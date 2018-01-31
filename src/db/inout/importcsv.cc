@@ -35,17 +35,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "db/inout.h"
 
-#include "log.h"
-#include "assetcrud.h"
-#include "dbpath.h"
+#include "shared/log.h"
+#include "persist/assetcrud.h"
+#include "shared/dbpath.h"
 #include "cleanup.h"
 #include "db/asset_general.h"
 #include "db/assets.h"
 #include "db/inout.h"
-#include "utils.h"
+#include "shared/utils.h"
 #include "utils++.h"
 #include "utils_web.h"
-#include "tntmlm.h"
+#include "shared/tntmlm.h"
 
 using namespace shared;
 
@@ -356,7 +356,7 @@ promote_rc0(
             myself_db_ext = fty_proto_get_ext(myself_db);
         }
         // workaround for having count of RC assets, as we consider only 0/1+ state
-        rcs_in_db.push_back("rackcontroller-0");
+        rcs_in_db.push_back((char*)"rackcontroller-0");
     } else {
         zsys_debug("Receieved message that is not fty_proto");
         myself_db_ext = NULL;
@@ -597,9 +597,9 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         bios_throw("bad-request-document", "Cannot import empty document.");
     }
 
-    // because id is definitely not an external attribute
+   // because id is definitely not an external attribute
     auto id_str = unused_columns.count("id") ? cm.get(row_i, "id") : "";
-    if ("rackcontroller-0" == id_str && rc_0 == -1 ) {
+    if ("rackcontroller-0" == id_str && rc_0 == std::string::npos  ) {
         // we got RC-0 but it don't match "myself", change it to something else ("")
         zsys_debug("RC is marked as rackcontroller-0, but it's not myself");
         id_str = "";

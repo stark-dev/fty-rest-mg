@@ -34,10 +34,10 @@
 #include <unistd.h>
 
 #include <math.h>
-#include "str_defs.h"
+#include "shared/str_defs.h"
 #include "data.h"
 #include "utils_web.h"
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 
 #include "utils++.h"

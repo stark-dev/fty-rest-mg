@@ -34,85 +34,85 @@
 
 namespace persist {
 
-enum asset_type {
-    TUNKNOWN     = 0,
-    GROUP       = 1,
-    DATACENTER  = 2,
-    ROOM        = 3,
-    ROW         = 4,
-    RACK        = 5,
-    DEVICE      = 6
-};
+    enum asset_type {
+        TUNKNOWN     = 0,
+        GROUP       = 1,
+        DATACENTER  = 2,
+        ROOM        = 3,
+        ROW         = 4,
+        RACK        = 5,
+        DEVICE      = 6
+    };
 
-enum asset_subtype {
-    SUNKNOWN = 0,
-    UPS = 1,
-    GENSET,
-    EPDU,
-    PDU,
-    SERVER,
-    FEED,
-    STS,
-    SWITCH,
-    STORAGE,
-    VIRTUAL,
-    N_A = 11,
-    /* ATTENTION: don't change N_A id. It is used as default value in initdb.sql for types, that don't have N_A */
-    ROUTER,
-    RACKCONTROLLER,
-    SENSOR,
-    APPLIANCE,
-    CHASSIS,
-    PATCHPANEL,
-    OTHER,
-    SENSORGPIO,
-    GPO
-};
+    enum asset_subtype {
+        SUNKNOWN = 0,
+        UPS = 1,
+        GENSET,
+        EPDU,
+        PDU,
+        SERVER,
+        FEED,
+        STS,
+        SWITCH,
+        STORAGE,
+        VIRTUAL,
+        N_A = 11,
+        /* ATTENTION: don't change N_A id. It is used as default value in initdb.sql for types, that don't have N_A */
+        ROUTER,
+        RACKCONTROLLER,
+        SENSOR,
+        APPLIANCE,
+        CHASSIS,
+        PATCHPANEL,
+        OTHER,
+        SENSORGPIO,
+        GPO
+    };
 
-enum asset_operation
-{
-    INSERT = 1,
-    DELETE,
-    UPDATE,
-    GET,
-    RETIRE,
-    INVENTORY
-};
+    enum asset_operation
+    {
+        INSERT = 1,
+        DELETE,
+        UPDATE,
+        GET,
+        RETIRE,
+        INVENTORY
+    };
 
-std::string
-    operation2str
-        (asset_operation operation);
+    std::string
+        operation2str
+            (asset_operation operation);
 
-a_elmnt_tp_id_t
-    type_to_typeid
-        (const std::string &type);
+    a_elmnt_tp_id_t
+        type_to_typeid
+            (const std::string &type);
 
-std::string
-    typeid_to_type
-        (a_elmnt_tp_id_t type_id);
+    std::string
+        typeid_to_type
+            (a_elmnt_tp_id_t type_id);
 
-a_elmnt_stp_id_t
-    subtype_to_subtypeid
-        (const std::string &subtype);
+    a_elmnt_stp_id_t
+        subtype_to_subtypeid
+            (const std::string &subtype);
 
-std::string
-    subtypeid_to_subtype
-        (a_elmnt_tp_id_t subtype_id);
+    std::string
+        subtypeid_to_subtype
+            (a_elmnt_tp_id_t subtype_id);
 
-bool
-is_epdu(int x);
+    bool
+    is_epdu(int x);
 
-bool
-is_pdu(int x);
+    bool
+    is_pdu(int x);
 
-bool
-is_rack(int x);
+    bool
+    is_rack(int x);
 
-bool
-is_dc(int x);
+    bool
+    is_dc(int x);
 
-bool
-is_ups(int x);
+    bool
+    is_ups(int x);
 
-}; //namespace persist
+} //namespace persist
 #endif //SRC_SHARED_ASSET_TYPES_H

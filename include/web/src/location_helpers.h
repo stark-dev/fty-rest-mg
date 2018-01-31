@@ -28,7 +28,7 @@
 #define SRC_WEB_INCLUDE_LOCATION_HELPERS
 
 #include <string>
-#include "asset_msg.h"
+#include "msg/asset_msg.h"
 
 int asset_location_r(asset_msg_t** asset_msg, std::string& json);
 

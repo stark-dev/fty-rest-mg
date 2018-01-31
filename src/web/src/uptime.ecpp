@@ -29,10 +29,10 @@
 #include <cxxtools/split.h>
 #include <tntdb/error.h>
 #include "data.h"
-#include "str_defs.h"
+#include "shared/str_defs.h"
 #include "dbpath.h"
 #include "utils_web.h"
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 #include "assets.h"
 </%pre>

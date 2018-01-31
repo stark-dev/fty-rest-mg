@@ -36,9 +36,9 @@
 #include "utils.h"
 #include "cleanup.h"
 #include "helpers.h"
-#include "log.h"
+#include "shared/log.h"
 #include "dbpath.h"
-#include "subprocess.h"
+#include "shared/subprocess.h"
 #include "filesystem.h"
 
 </%pre>

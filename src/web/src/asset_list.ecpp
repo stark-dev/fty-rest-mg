@@ -26,7 +26,7 @@
  #><%pre>
 #include <cxxtools/split.h>
 #include "data.h"
-#include "log.h"
+#include "shared/log.h"
 #include "assetcrud.h"
 #include "helpers.h"
 #include "assets.h"

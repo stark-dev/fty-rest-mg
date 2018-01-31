@@ -33,8 +33,8 @@
 #include "data.h"
 #include "utils_web.h"
 
-#include "log.h"
-#include "asset_types.h"
+#include "shared/log.h"
+#include "shared/asset_types.h"
 #include "dbpath.h"
 #include "defs.h"
 

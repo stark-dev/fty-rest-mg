@@ -42,7 +42,7 @@
 #include "utils.h"
 #include "utils++.h"
 #include "utils_web.h"
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 #include "tntmlm.h"
 

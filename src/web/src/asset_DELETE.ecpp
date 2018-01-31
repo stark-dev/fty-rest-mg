@@ -29,7 +29,7 @@
 #include "data.h"
 #include "configure_inform.h"
 #include "defs.h"
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 </%pre>
 <%thread scope="global">

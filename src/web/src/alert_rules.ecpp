@@ -32,9 +32,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "utils_web.h"
-#include "str_defs.h"
+#include "shared/str_defs.h"
 #include "helpers.h"
 
 </%pre>

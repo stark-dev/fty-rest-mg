@@ -33,7 +33,7 @@
 
 #include "utils.h"
 #include "helpers.h"
-#include "log.h"
+#include "shared/log.h"
 </%pre>
 <%cpp>
 {

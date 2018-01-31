@@ -26,7 +26,7 @@
  #><%pre>
 #include "helpers.h"
 #include "tntmlm.h"
-#include "subprocess.h"
+#include "shared/subprocess.h"
 #include "defs.h"
 #include <stdlib.h>
 #include <sys/types.h>

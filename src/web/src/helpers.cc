@@ -24,9 +24,9 @@
 #include <tntdb.h>
 #include "utils_web.h"
 #include "helpers.h"
-#include "str_defs.h" // EV_LICENSE_DIR, EV_DATA_DIR
+#include "shared/str_defs.h" // EV_LICENSE_DIR, EV_DATA_DIR
 
-#include "log.h"
+#include "shared/log.h"
 #include "dbpath.h"
 
 /**

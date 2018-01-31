@@ -56,7 +56,8 @@ ECPPFILES= \
   topology_location_from.ecpp \
   topology_location_to.ecpp \
   topology_power.ecpp \
-  uptime.ecpp
+  uptime.ecpp \
+  admin_passwd.ecpp
 
 TNTLIB_BASENAME=libfty_rest
 TNTLIB_DIRNAME=$(prefix)/lib/bios

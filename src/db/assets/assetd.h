@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/connect.h>
 
 #include "dbtypes.h"
-#include "dbhelpers.h"
+#include "db/dbhelpers.h"
 
 namespace persist {
 

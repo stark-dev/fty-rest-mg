@@ -26,11 +26,11 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/split.h>
-#include "subprocess.h"
+#include "shared/subprocess.h"
 #include <stdlib.h> // for random()
 
 #include "utils_web.h"
-#include "log.h"
+#include "shared/log.h"
 
 namespace utils {
 

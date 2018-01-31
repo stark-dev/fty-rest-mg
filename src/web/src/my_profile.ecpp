@@ -29,7 +29,7 @@
     #include <sstream>
     #include <cxxtools/jsondeserializer.h>
     #include <cxxtools/jsonserializer.h>
-    #include "log.h"
+    #include "shared/log.h"
     #include "agentstate.h"
     #define DEFAULT_PREFERENCES "\"preferences\":{\"email\" : \" \", \"telephone\" : \" \", \"organization\" : \" \", \"date\":\"DDMMYYYY\", \"temperature\":\"C\", \"language\":\"en-us\", \"time\":\"24h\"}"
 </%pre>

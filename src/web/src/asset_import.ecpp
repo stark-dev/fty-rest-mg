@@ -31,7 +31,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "db/inout.h"
 #include "bios-magic.h"
 #include "configure_inform.h"

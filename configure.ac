@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([fty-rest],[1.0.0],[eatonproductfeedback@eaton.com])
+AC_INIT([fty_rest],[1.0.0],[eatonproductfeedback@eaton.com])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -141,7 +141,7 @@ AS_CASE([x"${with_libzmq}"],
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
 AS_IF([test x"${search_libzmq}" = xno],
-    [AC_MSG_WARN([Required dependency on libzmq was explicitly disabled during configuration by '--with-libzmq=no'; subsequent full build of fty-rest may fail])])
+    [AC_MSG_WARN([Required dependency on libzmq was explicitly disabled during configuration by '--with-libzmq=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_libzmq}" = xyes], [
     # Archive previously detected and supplied flags
@@ -230,7 +230,7 @@ AS_CASE([x"${with_libczmq}"],
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
 AS_IF([test x"${search_libczmq}" = xno],
-    [AC_MSG_WARN([Required dependency on czmq was explicitly disabled during configuration by '--with-libczmq=no'; subsequent full build of fty-rest may fail])])
+    [AC_MSG_WARN([Required dependency on czmq was explicitly disabled during configuration by '--with-libczmq=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_libczmq}" = xyes], [
     # Archive previously detected and supplied flags
@@ -319,7 +319,7 @@ AS_CASE([x"${with_libmlm}"],
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
 AS_IF([test x"${search_libmlm}" = xno],
-    [AC_MSG_WARN([Required dependency on malamute was explicitly disabled during configuration by '--with-libmlm=no'; subsequent full build of fty-rest may fail])])
+    [AC_MSG_WARN([Required dependency on malamute was explicitly disabled during configuration by '--with-libmlm=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_libmlm}" = xyes], [
     # Archive previously detected and supplied flags
@@ -408,7 +408,7 @@ AS_CASE([x"${with_cxxtools}"],
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
 AS_IF([test x"${search_cxxtools}" = xno],
-    [AC_MSG_WARN([Required dependency on cxxtools was explicitly disabled during configuration by '--with-cxxtools=no'; subsequent full build of fty-rest may fail])])
+    [AC_MSG_WARN([Required dependency on cxxtools was explicitly disabled during configuration by '--with-cxxtools=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_cxxtools}" = xyes], [
     # Archive previously detected and supplied flags
@@ -559,7 +559,7 @@ AS_CASE([x"${with_libfty_proto}"],
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
 AS_IF([test x"${search_libfty_proto}" = xno],
-    [AC_MSG_WARN([Required dependency on fty_proto was explicitly disabled during configuration by '--with-libfty_proto=no'; subsequent full build of fty-rest may fail])])
+    [AC_MSG_WARN([Required dependency on fty_proto was explicitly disabled during configuration by '--with-libfty_proto=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_libfty_proto}" = xyes], [
     # Archive previously detected and supplied flags
@@ -665,9 +665,9 @@ else
         fi
         fty_rest_build_doc="no"
         # Tarballs built with 'make dist' ship with prebuilt documentation.
-        if ! test -f doc/fty-rest.7; then
+        if ! test -f doc/fty_rest.7; then
             fty_rest_install_man="no"
-            AC_MSG_WARN([You are building an unreleased version of FTY-REST and asciidoc or xmlto are not installed.])
+            AC_MSG_WARN([You are building an unreleased version of FTY_REST and asciidoc or xmlto are not installed.])
             AC_MSG_WARN([Documentation will not be built and manual pages will not be installed.])
         fi
     fi

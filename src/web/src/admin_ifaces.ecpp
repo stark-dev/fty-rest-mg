@@ -25,7 +25,7 @@
  * \brief Function for accessing network interfaces on Linux
  */
  #><%pre>
-#include "log.h"
+#include "shared/log.h"
 #include "helpers.h"
 #include "iface.h"
 </%pre>

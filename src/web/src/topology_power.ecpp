@@ -34,10 +34,10 @@
 
 #include "defs.h"
 #include "dbpath.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "assettopology.h"
 #include "utils_web.h"
-#include "log.h"
+#include "shared/log.h"
 #include "cleanup.h"
 #include "helpers.h"
 #include "assetr.h"

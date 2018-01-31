@@ -19,7 +19,7 @@
  */
 
 #include "dbpath.h"
-#include "log.h"
+#include "shared/log.h"
 
 #include <stdlib.h>
 #include <stdio.h>

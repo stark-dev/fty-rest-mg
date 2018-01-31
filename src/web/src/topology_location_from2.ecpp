@@ -35,7 +35,7 @@
 #include "dbpath.h"
 #include "data.h"
 #include "location_helpers.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "helpers.h"
 #include "topology2.h"
 </%pre>

@@ -28,7 +28,7 @@
 #include <string.h>
 #include <czmq.h> // streq
 #include "helpers.h"
-#include "log.h"
+#include "shared/log.h"
 </%pre>
 <%request scope="global">
 UserInfo user;

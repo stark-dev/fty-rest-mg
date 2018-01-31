@@ -37,7 +37,7 @@
 
 #include "tokens.h"
 
-#include "log.h"
+#include "shared/log.h"
 
 //! Max time key is alive
 #define MAX_LIVE 24*3600

@@ -22,7 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // 0 would be return as rowid
 
 #include "assetr.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 
 #include <exception>
 #include <assert.h>
@@ -30,8 +30,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/result.h>
 #include <tntdb/error.h>
-#include "dbpath.h"
-#include "log.h"
+#include "shared/dbpath.h"
+#include "shared/log.h"
 #include "defs.h"
 
 

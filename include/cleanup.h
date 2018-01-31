@@ -36,8 +36,8 @@
 #include "bios_agent.h"
 
 #ifdef LEGACY_PROTOCOL
-#include "asset_msg.h"
-#include "common_msg.h"
+#include "msg/asset_msg.h"
+#include "msg/common_msg.h"
 #endif
 
 #ifndef __GNUC__

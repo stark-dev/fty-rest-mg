@@ -26,7 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <string>
 #include <vector>
 
-#include "dbhelpers.h"
+#include "db/dbhelpers.h"
 #include "asset_types.h"
 
 void

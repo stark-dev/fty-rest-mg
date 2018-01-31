@@ -27,7 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "csv.h"
 #include "assetcrud.h"
 #include "dbpath.h"
-#include "log.h"
+#include "shared/log.h"
 
 namespace shared {
 

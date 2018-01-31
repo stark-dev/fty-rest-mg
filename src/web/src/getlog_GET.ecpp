@@ -32,8 +32,8 @@
 #include <time.h>
 #include <tnt/mimedb.h>
 #include "helpers.h"
-#include "subprocess.h"
-#include "log.h"
+#include "shared/subprocess.h"
+#include "shared/log.h"
 #include "utils.h"
 
 // For debugging server credentials in error-reports below

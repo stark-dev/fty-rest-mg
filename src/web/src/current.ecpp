@@ -32,12 +32,12 @@
 
 #include "upsstatus.h"
 #include "data.h"
-#include "log.h"
+#include "shared/log.h"
 #include "dbpath.h" // temporary
 #include "utils_web.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "helpers.h"
-#include "str_defs.h"
+#include "shared/str_defs.h"
 #include "tntmlm.h"
 #include "defs.h"
 

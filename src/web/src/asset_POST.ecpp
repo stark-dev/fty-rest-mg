@@ -32,7 +32,7 @@
 #include "configure_inform.h"
 #include "helpers.h"
 #include "inout.h"
-#include "log.h"
+#include "shared/log.h"
 #include "assets.h"
 </%pre>
 <%request scope="global">

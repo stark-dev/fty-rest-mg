@@ -28,7 +28,7 @@
  #><%pre>
 #include "sasl.h"
 #include "tokens.h"
-#include "log.h"
+#include "shared/log.h"
 #include "utils_web.h"
 #include "helpers.h"
 #include <string>

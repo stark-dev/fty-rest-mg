@@ -34,7 +34,7 @@
 #include <malamute.h>
 
 #include "data.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "assets.h"
 #include "defs.h"
 #include "utils_web.h"
@@ -42,7 +42,7 @@
 #include "asset_computed_impl.h"
 #include "helpers.h"
 
-#include "log.h"
+#include "shared/log.h"
 
 
 struct Outlet {

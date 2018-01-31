@@ -24,7 +24,7 @@
  * \author Jim Klimov <EvgenyKlimov@Eaton.com>
  * \brief Not yet documented file
  */
-#include "str_defs.h"
+#include "shared/str_defs.h"
 
 /* Implement variables declared in str_defs.h */
 

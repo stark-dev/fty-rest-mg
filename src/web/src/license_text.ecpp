@@ -27,7 +27,7 @@
 #include <string>
 #include <map>
 #include "helpers.h"
-#include "log.h"
+#include "shared/log.h"
 
 </%pre>
 <%request scope="global">

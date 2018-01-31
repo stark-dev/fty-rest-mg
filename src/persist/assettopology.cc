@@ -28,10 +28,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/value.h>
 #include <tntdb/result.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "assetcrud.h"
-#include "common_msg.h"
-#include "asset_types.h"
+#include "msg/common_msg.h"
+#include "shared/asset_types.h"
 
 #include "assettopology.h"
 #include "persist_error.h"

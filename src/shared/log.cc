@@ -38,7 +38,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 # include <sys/syscall.h>
 #endif
 
-#include "log.h"
+#include "shared/log.h"
 #include "utils.h"
 
 #define ASSERT_LEVEL \

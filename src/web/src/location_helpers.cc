@@ -30,7 +30,7 @@
 #include <list>
 #include <tnt/http.h>
 
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "cleanup.h"
 #include "utils++.h"
 #include "utils_web.h"

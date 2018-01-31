@@ -43,11 +43,11 @@
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
 #include "helpers.h"
-#include "subprocess.h"
-#include "log.h"
+#include "shared/subprocess.h"
+#include "shared/log.h"
 #include "dbpath.h"
 #include "assets.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "utils.h"
 #include "git_details_override.h"
 #include "tntmlm.h"

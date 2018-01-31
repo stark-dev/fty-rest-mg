@@ -66,28 +66,31 @@ struct db_reply{
 typedef db_reply<uint64_t> db_reply_t;
 
 inline db_reply_t db_reply_new() {
-    return db_reply_t {
-        .status = 1,
-        .errtype = 0,
-        .errsubtype = 0,
-        .rowid = 0,
-        .affected_rows = 0,
-        .msg = "",
-        .addinfo = NULL,
-        .item = 0};
+    db_reply_t val;
+    val.status = 1;
+    val.errtype = 0;
+    val.errsubtype = 0;
+    val.rowid = 0;
+    val.affected_rows = 0;
+    val.msg = "";
+    val.addinfo = NULL;
+    val.item = 0;
+
+    return val;
 }
 
 template <typename T>
 inline db_reply<T> db_reply_new(T& item) {
-    return db_reply<T> {
-        .status = 1,
-        .errtype = 0,
-        .errsubtype = 0,
-        .rowid = 0,
-        .affected_rows = 0,
-        .msg = "",
-        .addinfo = NULL,
-        .item = item};
+    db_reply<T> val;
+    val.status = 1;
+    val.errtype = 0;
+    val.errsubtype = 0;
+    val.rowid = 0;
+    val.affected_rows = 0;
+    val.msg = "";
+    val.addinfo = NULL;
+    val.item = item;
+    return val;
 }
 
 /**

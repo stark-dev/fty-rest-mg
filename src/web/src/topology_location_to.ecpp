@@ -30,12 +30,12 @@
 #include <stack>
 #include <czmq.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "defs.h"
 #include "dbpath.h"
 #include "data.h"
 #include "location_helpers.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 #include "assettopology.h"
 #include "utils_web.h"
 #include "cleanup.h"

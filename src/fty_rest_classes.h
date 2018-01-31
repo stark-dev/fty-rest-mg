@@ -16,7 +16,7 @@
 #include "platform.h"
 
 //  External API
-#include "../include/fty-rest.h"
+#include "../include/fty_rest.h"
 
 //  Extra headers
 #include "db/agentstate.h"
@@ -95,225 +95,225 @@ typedef struct _shared/magic_t shared/magic_t;
 typedef struct _warranty/warranty-metric_t warranty/warranty-metric_t;
 #define WARRANTY/WARRANTY-METRIC_T_DEFINED
 #endif
-#ifndef ADD_GPIO_T_DEFINED
-typedef struct _add_gpio_t add_gpio_t;
-#define ADD_GPIO_T_DEFINED
+#ifndef WEB/SRC/ADD_GPIO_T_DEFINED
+typedef struct _web/src/add_gpio_t web/src/add_gpio_t;
+#define WEB/SRC/ADD_GPIO_T_DEFINED
 #endif
-#ifndef ADMIN_IFACE_T_DEFINED
-typedef struct _admin_iface_t admin_iface_t;
-#define ADMIN_IFACE_T_DEFINED
+#ifndef WEB/SRC/ADMIN_IFACE_T_DEFINED
+typedef struct _web/src/admin_iface_t web/src/admin_iface_t;
+#define WEB/SRC/ADMIN_IFACE_T_DEFINED
 #endif
-#ifndef ADMIN_IFACES_T_DEFINED
-typedef struct _admin_ifaces_t admin_ifaces_t;
-#define ADMIN_IFACES_T_DEFINED
+#ifndef WEB/SRC/ADMIN_IFACES_T_DEFINED
+typedef struct _web/src/admin_ifaces_t web/src/admin_ifaces_t;
+#define WEB/SRC/ADMIN_IFACES_T_DEFINED
 #endif
-#ifndef ADMIN_SSE_T_DEFINED
-typedef struct _admin_sse_t admin_sse_t;
-#define ADMIN_SSE_T_DEFINED
+#ifndef WEB/SRC/ADMIN_SSE_T_DEFINED
+typedef struct _web/src/admin_sse_t web/src/admin_sse_t;
+#define WEB/SRC/ADMIN_SSE_T_DEFINED
 #endif
-#ifndef ALERT_ACK_T_DEFINED
-typedef struct _alert_ack_t alert_ack_t;
-#define ALERT_ACK_T_DEFINED
+#ifndef WEB/SRC/ALERT_ACK_T_DEFINED
+typedef struct _web/src/alert_ack_t web/src/alert_ack_t;
+#define WEB/SRC/ALERT_ACK_T_DEFINED
 #endif
-#ifndef ALERT_LIST_T_DEFINED
-typedef struct _alert_list_t alert_list_t;
-#define ALERT_LIST_T_DEFINED
+#ifndef WEB/SRC/ALERT_LIST_T_DEFINED
+typedef struct _web/src/alert_list_t web/src/alert_list_t;
+#define WEB/SRC/ALERT_LIST_T_DEFINED
 #endif
-#ifndef ALERT_RULES_DETAIL_T_DEFINED
-typedef struct _alert_rules_detail_t alert_rules_detail_t;
-#define ALERT_RULES_DETAIL_T_DEFINED
+#ifndef WEB/SRC/ALERT_RULES_DETAIL_T_DEFINED
+typedef struct _web/src/alert_rules_detail_t web/src/alert_rules_detail_t;
+#define WEB/SRC/ALERT_RULES_DETAIL_T_DEFINED
 #endif
-#ifndef ALERT_RULES_T_DEFINED
-typedef struct _alert_rules_t alert_rules_t;
-#define ALERT_RULES_T_DEFINED
+#ifndef WEB/SRC/ALERT_RULES_T_DEFINED
+typedef struct _web/src/alert_rules_t web/src/alert_rules_t;
+#define WEB/SRC/ALERT_RULES_T_DEFINED
 #endif
-#ifndef ALERT_RULES_LIST_T_DEFINED
-typedef struct _alert_rules_list_t alert_rules_list_t;
-#define ALERT_RULES_LIST_T_DEFINED
+#ifndef WEB/SRC/ALERT_RULES_LIST_T_DEFINED
+typedef struct _web/src/alert_rules_list_t web/src/alert_rules_list_t;
+#define WEB/SRC/ALERT_RULES_LIST_T_DEFINED
 #endif
-#ifndef ASSET_DELETE_T_DEFINED
-typedef struct _asset_delete_t asset_delete_t;
-#define ASSET_DELETE_T_DEFINED
+#ifndef WEB/SRC/ASSET_DELETE_T_DEFINED
+typedef struct _web/src/asset_delete_t web/src/asset_delete_t;
+#define WEB/SRC/ASSET_DELETE_T_DEFINED
 #endif
-#ifndef ASSET_EXPORT_T_DEFINED
-typedef struct _asset_export_t asset_export_t;
-#define ASSET_EXPORT_T_DEFINED
+#ifndef WEB/SRC/ASSET_EXPORT_T_DEFINED
+typedef struct _web/src/asset_export_t web/src/asset_export_t;
+#define WEB/SRC/ASSET_EXPORT_T_DEFINED
 #endif
-#ifndef ASSET_GET_T_DEFINED
-typedef struct _asset_get_t asset_get_t;
-#define ASSET_GET_T_DEFINED
+#ifndef WEB/SRC/ASSET_GET_T_DEFINED
+typedef struct _web/src/asset_get_t web/src/asset_get_t;
+#define WEB/SRC/ASSET_GET_T_DEFINED
 #endif
-#ifndef ASSET_IMPORT_T_DEFINED
-typedef struct _asset_import_t asset_import_t;
-#define ASSET_IMPORT_T_DEFINED
+#ifndef WEB/SRC/ASSET_IMPORT_T_DEFINED
+typedef struct _web/src/asset_import_t web/src/asset_import_t;
+#define WEB/SRC/ASSET_IMPORT_T_DEFINED
 #endif
-#ifndef ASSET_LIST_T_DEFINED
-typedef struct _asset_list_t asset_list_t;
-#define ASSET_LIST_T_DEFINED
+#ifndef WEB/SRC/ASSET_LIST_T_DEFINED
+typedef struct _web/src/asset_list_t web/src/asset_list_t;
+#define WEB/SRC/ASSET_LIST_T_DEFINED
 #endif
-#ifndef ASSET_POST_T_DEFINED
-typedef struct _asset_post_t asset_post_t;
-#define ASSET_POST_T_DEFINED
+#ifndef WEB/SRC/ASSET_POST_T_DEFINED
+typedef struct _web/src/asset_post_t web/src/asset_post_t;
+#define WEB/SRC/ASSET_POST_T_DEFINED
 #endif
-#ifndef ASSET_PUT_T_DEFINED
-typedef struct _asset_put_t asset_put_t;
-#define ASSET_PUT_T_DEFINED
+#ifndef WEB/SRC/ASSET_PUT_T_DEFINED
+typedef struct _web/src/asset_put_t web/src/asset_put_t;
+#define WEB/SRC/ASSET_PUT_T_DEFINED
 #endif
-#ifndef ASSETS_IN_T_DEFINED
-typedef struct _assets_in_t assets_in_t;
-#define ASSETS_IN_T_DEFINED
+#ifndef WEB/SRC/ASSETS_IN_T_DEFINED
+typedef struct _web/src/assets_in_t web/src/assets_in_t;
+#define WEB/SRC/ASSETS_IN_T_DEFINED
 #endif
-#ifndef AUTH_T_DEFINED
-typedef struct _auth_t auth_t;
-#define AUTH_T_DEFINED
+#ifndef WEB/SRC/AUTH_T_DEFINED
+typedef struct _web/src/auth_t web/src/auth_t;
+#define WEB/SRC/AUTH_T_DEFINED
 #endif
-#ifndef AUTH-VERIFY_T_DEFINED
-typedef struct _auth-verify_t auth-verify_t;
-#define AUTH-VERIFY_T_DEFINED
+#ifndef WEB/SRC/AUTH-VERIFY_T_DEFINED
+typedef struct _web/src/auth-verify_t web/src/auth-verify_t;
+#define WEB/SRC/AUTH-VERIFY_T_DEFINED
 #endif
-#ifndef AVERAGE_T_DEFINED
-typedef struct _average_t average_t;
-#define AVERAGE_T_DEFINED
+#ifndef WEB/SRC/AVERAGE_T_DEFINED
+typedef struct _web/src/average_t web/src/average_t;
+#define WEB/SRC/AVERAGE_T_DEFINED
 #endif
-#ifndef CONFIG_T_DEFINED
-typedef struct _config_t config_t;
-#define CONFIG_T_DEFINED
+#ifndef WEB/SRC/CONFIG_T_DEFINED
+typedef struct _web/src/config_t web/src/config_t;
+#define WEB/SRC/CONFIG_T_DEFINED
 #endif
-#ifndef CONF_SCAN_T_DEFINED
-typedef struct _conf_scan_t conf_scan_t;
-#define CONF_SCAN_T_DEFINED
+#ifndef WEB/SRC/CONF_SCAN_T_DEFINED
+typedef struct _web/src/conf_scan_t web/src/conf_scan_t;
+#define WEB/SRC/CONF_SCAN_T_DEFINED
 #endif
-#ifndef CURRENT_T_DEFINED
-typedef struct _current_t current_t;
-#define CURRENT_T_DEFINED
+#ifndef WEB/SRC/CURRENT_T_DEFINED
+typedef struct _web/src/current_t web/src/current_t;
+#define WEB/SRC/CURRENT_T_DEFINED
 #endif
-#ifndef DATACENTER_INDICATORS_T_DEFINED
-typedef struct _datacenter_indicators_t datacenter_indicators_t;
-#define DATACENTER_INDICATORS_T_DEFINED
+#ifndef WEB/SRC/DATACENTER_INDICATORS_T_DEFINED
+typedef struct _web/src/datacenter_indicators_t web/src/datacenter_indicators_t;
+#define WEB/SRC/DATACENTER_INDICATORS_T_DEFINED
 #endif
-#ifndef EMAIL_FEEDBACK_T_DEFINED
-typedef struct _email_feedback_t email_feedback_t;
-#define EMAIL_FEEDBACK_T_DEFINED
+#ifndef WEB/SRC/EMAIL_FEEDBACK_T_DEFINED
+typedef struct _web/src/email_feedback_t web/src/email_feedback_t;
+#define WEB/SRC/EMAIL_FEEDBACK_T_DEFINED
 #endif
-#ifndef EMAIL_TEST_T_DEFINED
-typedef struct _email_test_t email_test_t;
-#define EMAIL_TEST_T_DEFINED
+#ifndef WEB/SRC/EMAIL_TEST_T_DEFINED
+typedef struct _web/src/email_test_t web/src/email_test_t;
+#define WEB/SRC/EMAIL_TEST_T_DEFINED
 #endif
-#ifndef EMAIL_VOTE_T_DEFINED
-typedef struct _email_vote_t email_vote_t;
-#define EMAIL_VOTE_T_DEFINED
+#ifndef WEB/SRC/EMAIL_VOTE_T_DEFINED
+typedef struct _web/src/email_vote_t web/src/email_vote_t;
+#define WEB/SRC/EMAIL_VOTE_T_DEFINED
 #endif
-#ifndef GETLOG_GET_T_DEFINED
-typedef struct _getlog_get_t getlog_get_t;
-#define GETLOG_GET_T_DEFINED
+#ifndef WEB/SRC/GETLOG_GET_T_DEFINED
+typedef struct _web/src/getlog_get_t web/src/getlog_get_t;
+#define WEB/SRC/GETLOG_GET_T_DEFINED
 #endif
-#ifndef GPO_ACTION_T_DEFINED
-typedef struct _gpo_action_t gpo_action_t;
-#define GPO_ACTION_T_DEFINED
+#ifndef WEB/SRC/GPO_ACTION_T_DEFINED
+typedef struct _web/src/gpo_action_t web/src/gpo_action_t;
+#define WEB/SRC/GPO_ACTION_T_DEFINED
 #endif
-#ifndef INFO_T_DEFINED
-typedef struct _info_t info_t;
-#define INFO_T_DEFINED
+#ifndef WEB/SRC/INFO_T_DEFINED
+typedef struct _web/src/info_t web/src/info_t;
+#define WEB/SRC/INFO_T_DEFINED
 #endif
-#ifndef INPUT_POWER_CHAIN_T_DEFINED
-typedef struct _input_power_chain_t input_power_chain_t;
-#define INPUT_POWER_CHAIN_T_DEFINED
+#ifndef WEB/SRC/INPUT_POWER_CHAIN_T_DEFINED
+typedef struct _web/src/input_power_chain_t web/src/input_power_chain_t;
+#define WEB/SRC/INPUT_POWER_CHAIN_T_DEFINED
 #endif
-#ifndef JSON_T_DEFINED
-typedef struct _json_t json_t;
-#define JSON_T_DEFINED
+#ifndef WEB/SRC/JSON_T_DEFINED
+typedef struct _web/src/json_t web/src/json_t;
+#define WEB/SRC/JSON_T_DEFINED
 #endif
-#ifndef LICENSE_T_DEFINED
-typedef struct _license_t license_t;
-#define LICENSE_T_DEFINED
+#ifndef WEB/SRC/LICENSE_T_DEFINED
+typedef struct _web/src/license_t web/src/license_t;
+#define WEB/SRC/LICENSE_T_DEFINED
 #endif
-#ifndef LICENSE_POST_T_DEFINED
-typedef struct _license_post_t license_post_t;
-#define LICENSE_POST_T_DEFINED
+#ifndef WEB/SRC/LICENSE_POST_T_DEFINED
+typedef struct _web/src/license_post_t web/src/license_post_t;
+#define WEB/SRC/LICENSE_POST_T_DEFINED
 #endif
-#ifndef LICENSE_STATUS_T_DEFINED
-typedef struct _license_status_t license_status_t;
-#define LICENSE_STATUS_T_DEFINED
+#ifndef WEB/SRC/LICENSE_STATUS_T_DEFINED
+typedef struct _web/src/license_status_t web/src/license_status_t;
+#define WEB/SRC/LICENSE_STATUS_T_DEFINED
 #endif
-#ifndef LICENSE_TEXT_T_DEFINED
-typedef struct _license_text_t license_text_t;
-#define LICENSE_TEXT_T_DEFINED
+#ifndef WEB/SRC/LICENSE_TEXT_T_DEFINED
+typedef struct _web/src/license_text_t web/src/license_text_t;
+#define WEB/SRC/LICENSE_TEXT_T_DEFINED
 #endif
-#ifndef LIST_GPIO_T_DEFINED
-typedef struct _list_gpio_t list_gpio_t;
-#define LIST_GPIO_T_DEFINED
+#ifndef WEB/SRC/LIST_GPIO_T_DEFINED
+typedef struct _web/src/list_gpio_t web/src/list_gpio_t;
+#define WEB/SRC/LIST_GPIO_T_DEFINED
 #endif
-#ifndef MY_PROFILE_T_DEFINED
-typedef struct _my_profile_t my_profile_t;
-#define MY_PROFILE_T_DEFINED
+#ifndef WEB/SRC/MY_PROFILE_T_DEFINED
+typedef struct _web/src/my_profile_t web/src/my_profile_t;
+#define WEB/SRC/MY_PROFILE_T_DEFINED
 #endif
-#ifndef NETCFG_T_DEFINED
-typedef struct _netcfg_t netcfg_t;
-#define NETCFG_T_DEFINED
+#ifndef WEB/SRC/NETCFG_T_DEFINED
+typedef struct _web/src/netcfg_t web/src/netcfg_t;
+#define WEB/SRC/NETCFG_T_DEFINED
 #endif
-#ifndef NOT_FOUND_T_DEFINED
-typedef struct _not_found_t not_found_t;
-#define NOT_FOUND_T_DEFINED
+#ifndef WEB/SRC/NOT_FOUND_T_DEFINED
+typedef struct _web/src/not_found_t web/src/not_found_t;
+#define WEB/SRC/NOT_FOUND_T_DEFINED
 #endif
-#ifndef RACK_TOTAL_T_DEFINED
-typedef struct _rack_total_t rack_total_t;
-#define RACK_TOTAL_T_DEFINED
+#ifndef WEB/SRC/RACK_TOTAL_T_DEFINED
+typedef struct _web/src/rack_total_t web/src/rack_total_t;
+#define WEB/SRC/RACK_TOTAL_T_DEFINED
 #endif
-#ifndef SCAN_PROGRESS_T_DEFINED
-typedef struct _scan_progress_t scan_progress_t;
-#define SCAN_PROGRESS_T_DEFINED
+#ifndef WEB/SRC/SCAN_PROGRESS_T_DEFINED
+typedef struct _web/src/scan_progress_t web/src/scan_progress_t;
+#define WEB/SRC/SCAN_PROGRESS_T_DEFINED
 #endif
-#ifndef SCAN_RUN_T_DEFINED
-typedef struct _scan_run_t scan_run_t;
-#define SCAN_RUN_T_DEFINED
+#ifndef WEB/SRC/SCAN_RUN_T_DEFINED
+typedef struct _web/src/scan_run_t web/src/scan_run_t;
+#define WEB/SRC/SCAN_RUN_T_DEFINED
 #endif
-#ifndef SECURITY_HEADERS_T_DEFINED
-typedef struct _security_headers_t security_headers_t;
-#define SECURITY_HEADERS_T_DEFINED
+#ifndef WEB/SRC/SECURITY_HEADERS_T_DEFINED
+typedef struct _web/src/security_headers_t web/src/security_headers_t;
+#define WEB/SRC/SECURITY_HEADERS_T_DEFINED
 #endif
-#ifndef SERVER_STATUS_T_DEFINED
-typedef struct _server_status_t server_status_t;
-#define SERVER_STATUS_T_DEFINED
+#ifndef WEB/SRC/SERVER_STATUS_T_DEFINED
+typedef struct _web/src/server_status_t web/src/server_status_t;
+#define WEB/SRC/SERVER_STATUS_T_DEFINED
 #endif
-#ifndef SSL-REDIRECT_T_DEFINED
-typedef struct _ssl-redirect_t ssl-redirect_t;
-#define SSL-REDIRECT_T_DEFINED
+#ifndef WEB/SRC/SSL-REDIRECT_T_DEFINED
+typedef struct _web/src/ssl-redirect_t web/src/ssl-redirect_t;
+#define WEB/SRC/SSL-REDIRECT_T_DEFINED
 #endif
-#ifndef SYSINFO_T_DEFINED
-typedef struct _sysinfo_t sysinfo_t;
-#define SYSINFO_T_DEFINED
+#ifndef WEB/SRC/SYSINFO_T_DEFINED
+typedef struct _web/src/sysinfo_t web/src/sysinfo_t;
+#define WEB/SRC/SYSINFO_T_DEFINED
 #endif
-#ifndef SYSTEMCTL_T_DEFINED
-typedef struct _systemctl_t systemctl_t;
-#define SYSTEMCTL_T_DEFINED
+#ifndef WEB/SRC/SYSTEMCTL_T_DEFINED
+typedef struct _web/src/systemctl_t web/src/systemctl_t;
+#define WEB/SRC/SYSTEMCTL_T_DEFINED
 #endif
-#ifndef TIME_T_DEFINED
-typedef struct _time_t time_t;
-#define TIME_T_DEFINED
+#ifndef WEB/SRC/TIME_T_DEFINED
+typedef struct _web/src/time_t web/src/time_t;
+#define WEB/SRC/TIME_T_DEFINED
 #endif
-#ifndef UPTIME_T_DEFINED
-typedef struct _uptime_t uptime_t;
-#define UPTIME_T_DEFINED
+#ifndef WEB/SRC/UPTIME_T_DEFINED
+typedef struct _web/src/uptime_t web/src/uptime_t;
+#define WEB/SRC/UPTIME_T_DEFINED
 #endif
-#ifndef TOPOLOGY_LOCATION_FROM2_T_DEFINED
-typedef struct _topology_location_from2_t topology_location_from2_t;
-#define TOPOLOGY_LOCATION_FROM2_T_DEFINED
+#ifndef WEB/SRC/TOPOLOGY_LOCATION_FROM2_T_DEFINED
+typedef struct _web/src/topology_location_from2_t web/src/topology_location_from2_t;
+#define WEB/SRC/TOPOLOGY_LOCATION_FROM2_T_DEFINED
 #endif
-#ifndef TOPOLOGY_LOCATION_FROM_T_DEFINED
-typedef struct _topology_location_from_t topology_location_from_t;
-#define TOPOLOGY_LOCATION_FROM_T_DEFINED
+#ifndef WEB/SRC/TOPOLOGY_LOCATION_FROM_T_DEFINED
+typedef struct _web/src/topology_location_from_t web/src/topology_location_from_t;
+#define WEB/SRC/TOPOLOGY_LOCATION_FROM_T_DEFINED
 #endif
-#ifndef TOPOLOGY_LOCATION_TO_T_DEFINED
-typedef struct _topology_location_to_t topology_location_to_t;
-#define TOPOLOGY_LOCATION_TO_T_DEFINED
+#ifndef WEB/SRC/TOPOLOGY_LOCATION_TO_T_DEFINED
+typedef struct _web/src/topology_location_to_t web/src/topology_location_to_t;
+#define WEB/SRC/TOPOLOGY_LOCATION_TO_T_DEFINED
 #endif
-#ifndef TOPOLOGY_POWER_T_DEFINED
-typedef struct _topology_power_t topology_power_t;
-#define TOPOLOGY_POWER_T_DEFINED
+#ifndef WEB/SRC/TOPOLOGY_POWER_T_DEFINED
+typedef struct _web/src/topology_power_t web/src/topology_power_t;
+#define WEB/SRC/TOPOLOGY_POWER_T_DEFINED
 #endif
-#ifndef ADMIN_PASSWD_T_DEFINED
-typedef struct _admin_passwd_t admin_passwd_t;
-#define ADMIN_PASSWD_T_DEFINED
+#ifndef WEB/SRC/ADMIN_PASSWD_T_DEFINED
+typedef struct _web/src/admin_passwd_t web/src/admin_passwd_t;
+#define WEB/SRC/ADMIN_PASSWD_T_DEFINED
 #endif
 
 //  Internal API
@@ -335,61 +335,61 @@ typedef struct _admin_passwd_t admin_passwd_t;
 #include "persist/persist_error.h"
 #include "shared/magic.h"
 #include "warranty/warranty-metric.h"
-#include "add_gpio.h"
-#include "admin_iface.h"
-#include "admin_ifaces.h"
-#include "admin_sse.h"
-#include "alert_ack.h"
-#include "alert_list.h"
-#include "alert_rules_detail.h"
-#include "alert_rules.h"
-#include "alert_rules_list.h"
-#include "asset_DELETE.h"
-#include "asset_export.h"
-#include "asset_GET.h"
-#include "asset_import.h"
-#include "asset_list.h"
-#include "asset_POST.h"
-#include "asset_PUT.h"
-#include "assets_in.h"
-#include "auth.h"
-#include "auth-verify.h"
-#include "average.h"
-#include "config.h"
-#include "conf_scan.h"
-#include "current.h"
-#include "datacenter_indicators.h"
-#include "email_feedback.h"
-#include "email_test.h"
-#include "email_vote.h"
-#include "getlog_GET.h"
-#include "gpo_action.h"
-#include "info.h"
-#include "input_power_chain.h"
-#include "json.h"
-#include "license.h"
-#include "license_POST.h"
-#include "license_status.h"
-#include "license_text.h"
-#include "list_gpio.h"
-#include "my_profile.h"
-#include "netcfg.h"
-#include "not_found.h"
-#include "rack_total.h"
-#include "scan_progress.h"
-#include "scan_run.h"
-#include "security_headers.h"
-#include "server_status.h"
-#include "ssl-redirect.h"
-#include "sysinfo.h"
-#include "systemctl.h"
-#include "time.h"
-#include "uptime.h"
-#include "topology_location_from2.h"
-#include "topology_location_from.h"
-#include "topology_location_to.h"
-#include "topology_power.h"
-#include "admin_passwd.h"
+#include "web/src/add_gpio.h"
+#include "web/src/admin_iface.h"
+#include "web/src/admin_ifaces.h"
+#include "web/src/admin_sse.h"
+#include "web/src/alert_ack.h"
+#include "web/src/alert_list.h"
+#include "web/src/alert_rules_detail.h"
+#include "web/src/alert_rules.h"
+#include "web/src/alert_rules_list.h"
+#include "web/src/asset_DELETE.h"
+#include "web/src/asset_export.h"
+#include "web/src/asset_GET.h"
+#include "web/src/asset_import.h"
+#include "web/src/asset_list.h"
+#include "web/src/asset_POST.h"
+#include "web/src/asset_PUT.h"
+#include "web/src/assets_in.h"
+#include "web/src/auth.h"
+#include "web/src/auth-verify.h"
+#include "web/src/average.h"
+#include "web/src/config.h"
+#include "web/src/conf_scan.h"
+#include "web/src/current.h"
+#include "web/src/datacenter_indicators.h"
+#include "web/src/email_feedback.h"
+#include "web/src/email_test.h"
+#include "web/src/email_vote.h"
+#include "web/src/getlog_GET.h"
+#include "web/src/gpo_action.h"
+#include "web/src/info.h"
+#include "web/src/input_power_chain.h"
+#include "web/src/json.h"
+#include "web/src/license.h"
+#include "web/src/license_POST.h"
+#include "web/src/license_status.h"
+#include "web/src/license_text.h"
+#include "web/src/list_gpio.h"
+#include "web/src/my_profile.h"
+#include "web/src/netcfg.h"
+#include "web/src/not_found.h"
+#include "web/src/rack_total.h"
+#include "web/src/scan_progress.h"
+#include "web/src/scan_run.h"
+#include "web/src/security_headers.h"
+#include "web/src/server_status.h"
+#include "web/src/ssl-redirect.h"
+#include "web/src/sysinfo.h"
+#include "web/src/systemctl.h"
+#include "web/src/time.h"
+#include "web/src/uptime.h"
+#include "web/src/topology_location_from2.h"
+#include "web/src/topology_location_from.h"
+#include "web/src/topology_location_to.h"
+#include "web/src/topology_power.h"
+#include "web/src/admin_passwd.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef FTY_REST_BUILD_DRAFT_API

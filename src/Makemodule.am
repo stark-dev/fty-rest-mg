@@ -13,7 +13,7 @@ lib_LTLIBRARIES += src/libfty_rest.la
 pkgconfig_DATA = src/libfty_rest.pc
 
 include_HEADERS = \
-    include/fty-rest.h \
+    include/fty_rest.h \
     include/app.h \
     include/bios_agent.h \
     include/bios_agent++.h \
@@ -77,61 +77,61 @@ src_libfty_rest_la_SOURCES = \
     src/persist/persist_error.cc \
     src/shared/magic.cc \
     src/warranty/warranty-metric.cc \
-    src/add_gpio.cc \
-    src/admin_iface.cc \
-    src/admin_ifaces.cc \
-    src/admin_sse.cc \
-    src/alert_ack.cc \
-    src/alert_list.cc \
-    src/alert_rules_detail.cc \
-    src/alert_rules.cc \
-    src/alert_rules_list.cc \
-    src/asset_DELETE.cc \
-    src/asset_export.cc \
-    src/asset_GET.cc \
-    src/asset_import.cc \
-    src/asset_list.cc \
-    src/asset_POST.cc \
-    src/asset_PUT.cc \
-    src/assets_in.cc \
-    src/auth.cc \
-    src/auth-verify.cc \
-    src/average.cc \
-    src/config.cc \
-    src/conf_scan.cc \
-    src/current.cc \
-    src/datacenter_indicators.cc \
-    src/email_feedback.cc \
-    src/email_test.cc \
-    src/email_vote.cc \
-    src/getlog_GET.cc \
-    src/gpo_action.cc \
-    src/info.cc \
-    src/input_power_chain.cc \
-    src/json.cc \
-    src/license.cc \
-    src/license_POST.cc \
-    src/license_status.cc \
-    src/license_text.cc \
-    src/list_gpio.cc \
-    src/my_profile.cc \
-    src/netcfg.cc \
-    src/not_found.cc \
-    src/rack_total.cc \
-    src/scan_progress.cc \
-    src/scan_run.cc \
-    src/security_headers.cc \
-    src/server_status.cc \
-    src/ssl-redirect.cc \
-    src/sysinfo.cc \
-    src/systemctl.cc \
-    src/time.cc \
-    src/uptime.cc \
-    src/topology_location_from2.cc \
-    src/topology_location_from.cc \
-    src/topology_location_to.cc \
-    src/topology_power.cc \
-    src/admin_passwd.cc \
+    src/web/src/add_gpio.cc \
+    src/web/src/admin_iface.cc \
+    src/web/src/admin_ifaces.cc \
+    src/web/src/admin_sse.cc \
+    src/web/src/alert_ack.cc \
+    src/web/src/alert_list.cc \
+    src/web/src/alert_rules_detail.cc \
+    src/web/src/alert_rules.cc \
+    src/web/src/alert_rules_list.cc \
+    src/web/src/asset_DELETE.cc \
+    src/web/src/asset_export.cc \
+    src/web/src/asset_GET.cc \
+    src/web/src/asset_import.cc \
+    src/web/src/asset_list.cc \
+    src/web/src/asset_POST.cc \
+    src/web/src/asset_PUT.cc \
+    src/web/src/assets_in.cc \
+    src/web/src/auth.cc \
+    src/web/src/auth-verify.cc \
+    src/web/src/average.cc \
+    src/web/src/config.cc \
+    src/web/src/conf_scan.cc \
+    src/web/src/current.cc \
+    src/web/src/datacenter_indicators.cc \
+    src/web/src/email_feedback.cc \
+    src/web/src/email_test.cc \
+    src/web/src/email_vote.cc \
+    src/web/src/getlog_GET.cc \
+    src/web/src/gpo_action.cc \
+    src/web/src/info.cc \
+    src/web/src/input_power_chain.cc \
+    src/web/src/json.cc \
+    src/web/src/license.cc \
+    src/web/src/license_POST.cc \
+    src/web/src/license_status.cc \
+    src/web/src/license_text.cc \
+    src/web/src/list_gpio.cc \
+    src/web/src/my_profile.cc \
+    src/web/src/netcfg.cc \
+    src/web/src/not_found.cc \
+    src/web/src/rack_total.cc \
+    src/web/src/scan_progress.cc \
+    src/web/src/scan_run.cc \
+    src/web/src/security_headers.cc \
+    src/web/src/server_status.cc \
+    src/web/src/ssl-redirect.cc \
+    src/web/src/sysinfo.cc \
+    src/web/src/systemctl.cc \
+    src/web/src/time.cc \
+    src/web/src/uptime.cc \
+    src/web/src/topology_location_from2.cc \
+    src/web/src/topology_location_from.cc \
+    src/web/src/topology_location_to.cc \
+    src/web/src/topology_power.cc \
+    src/web/src/admin_passwd.cc \
     src/platform.h
 
 if ENABLE_DRAFTS
@@ -337,7 +337,7 @@ coverage: src/fty_rest_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddi
 	lcov --remove coverage.info "/usr*" -o coverage.info
 	lcov --remove coverage.info "fty_rest_selftest.cc" -o coverage.info
 	$(RM) -rf coverage/*
-	genhtml -o coverage/ -t "fty-rest test coverage" --num-spaces 4 coverage.info
+	genhtml -o coverage/ -t "fty_rest test coverage" --num-spaces 4 coverage.info
 else
 coverage: src/fty_rest_selftest
 	@echo "call make clean && configure --with-gcov to enable code coverage"
