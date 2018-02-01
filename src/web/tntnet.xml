@@ -27,7 +27,16 @@
           <X-Content-Type-Options>nosniff</X-Content-Type-Options>
       </args>
     </mapping>
-    <!-- Serve static files -->
+    <!-- Unset security HTTP header for specific mapping -->
+    <mapping>
+      <target>security_removeheaders@bios_web</target>
+      <url>\.(ttf|otf|eot|woff)$</url>
+      <args>
+          <Cache-Control/>
+          <Pragma/>
+      </args>
+    </mapping>
+     <!-- Serve static files -->
     <mapping>
       <target>static@tntnet</target>
       <pathinfo>./$1</pathinfo>
