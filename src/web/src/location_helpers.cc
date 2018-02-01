@@ -25,16 +25,16 @@
  * \author Jim Klimov <EvgenyKlimov@Eaton.com>
  * \brief Not yet documented file
  */
-#include "location_helpers.h"
+#include "web/src/location_helpers.h"
 
 #include <list>
 #include <tnt/http.h>
 
 #include "shared/asset_types.h"
 #include "cleanup.h"
-#include "utils++.h"
-#include "utils_web.h"
-#include "assets.h"
+#include "shared/utils++.h"
+#include "shared/utils_web.h"
+#include "db/assets.h"
 
 int asset_location_r(asset_msg_t** asset_msg, std::string& json) {
     int element_id = asset_msg_element_id(*asset_msg);

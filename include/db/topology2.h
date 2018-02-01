@@ -27,6 +27,9 @@
 #ifndef SRC_INCLUDE_TOPOLOGY2
 #define SRC_INCLUDE_TOPOLOGY2
 
+#include <cxxtools/serializationinfo.h>
+#include "shared/asset_types.h"
+
 namespace persist {
 
 struct Item
@@ -212,6 +215,6 @@ topology2_from_json_recursive (
 bool
     is_power_device (tntdb::Connection &conn, std::string &asset_name);
 
-};  // namespace persist
+}  // namespace persist
 
 #endif //SRC_INCLUDE_TOPOLOGY2

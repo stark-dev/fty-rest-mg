@@ -69,62 +69,62 @@
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
 #ifdef FTY_REST_BUILD_DRAFT_API
-typedef struct _db/topology2_t db/topology2_t;
-#define DB/TOPOLOGY2_T_DEFINED
+typedef struct _db_topology2_t db_topology2_t;
+#define DB_TOPOLOGY2_T_DEFINED
 typedef struct _git_details_override_t git_details_override_t;
 #define GIT_DETAILS_OVERRIDE_T_DEFINED
-typedef struct _shared/asset_types_t shared/asset_types_t;
-#define SHARED/ASSET_TYPES_T_DEFINED
-typedef struct _shared/augtool_t shared/augtool_t;
-#define SHARED/AUGTOOL_T_DEFINED
-typedef struct _shared/cidr_t shared/cidr_t;
-#define SHARED/CIDR_T_DEFINED
-typedef struct _shared/configure_inform_t shared/configure_inform_t;
-#define SHARED/CONFIGURE_INFORM_T_DEFINED
-typedef struct _shared/csv_t shared/csv_t;
-#define SHARED/CSV_T_DEFINED
-typedef struct _shared/data_t shared/data_t;
-#define SHARED/DATA_T_DEFINED
-typedef struct _shared/dbpath_t shared/dbpath_t;
-#define SHARED/DBPATH_T_DEFINED
-typedef struct _shared/filesystem_t shared/filesystem_t;
-#define SHARED/FILESYSTEM_T_DEFINED
-typedef struct _shared/fty_asset_uptime_configurator_t shared/fty_asset_uptime_configurator_t;
-#define SHARED/FTY_ASSET_UPTIME_CONFIGURATOR_T_DEFINED
-typedef struct _shared/ic_t shared/ic_t;
-#define SHARED/IC_T_DEFINED
-typedef struct _shared/log_t shared/log_t;
-#define SHARED/LOG_T_DEFINED
-typedef struct _shared/data_t shared/data_t;
-#define SHARED/DATA_T_DEFINED
-typedef struct _shared/str_defs_t shared/str_defs_t;
-#define SHARED/STR_DEFS_T_DEFINED
-typedef struct _shared/subprocess_t shared/subprocess_t;
-#define SHARED/SUBPROCESS_T_DEFINED
-typedef struct _shared/tntmlm_t shared/tntmlm_t;
-#define SHARED/TNTMLM_T_DEFINED
-typedef struct _shared/topic_cache_t shared/topic_cache_t;
-#define SHARED/TOPIC_CACHE_T_DEFINED
-typedef struct _shared/upsstatus_t shared/upsstatus_t;
-#define SHARED/UPSSTATUS_T_DEFINED
-typedef struct _shared/utils_t shared/utils_t;
-#define SHARED/UTILS_T_DEFINED
-typedef struct _shared/utils++_t shared/utils++_t;
-#define SHARED/UTILS++_T_DEFINED
-typedef struct _shared/utils_web_t shared/utils_web_t;
-#define SHARED/UTILS_WEB_T_DEFINED
-typedef struct _web/src/asset_computed_impl_t web/src/asset_computed_impl_t;
-#define WEB/SRC/ASSET_COMPUTED_IMPL_T_DEFINED
-typedef struct _web/src/helpers_t web/src/helpers_t;
-#define WEB/SRC/HELPERS_T_DEFINED
-typedef struct _web/src/iface_t web/src/iface_t;
-#define WEB/SRC/IFACE_T_DEFINED
-typedef struct _web/src/location_helpers_t web/src/location_helpers_t;
-#define WEB/SRC/LOCATION_HELPERS_T_DEFINED
-typedef struct _web/src/sasl_t web/src/sasl_t;
-#define WEB/SRC/SASL_T_DEFINED
-typedef struct _web/src/tokens_t web/src/tokens_t;
-#define WEB/SRC/TOKENS_T_DEFINED
+typedef struct _shared_asset_types_t shared_asset_types_t;
+#define SHARED_ASSET_TYPES_T_DEFINED
+typedef struct _shared_augtool_t shared_augtool_t;
+#define SHARED_AUGTOOL_T_DEFINED
+typedef struct _shared_cidr_t shared_cidr_t;
+#define SHARED_CIDR_T_DEFINED
+typedef struct _shared_configure_inform_t shared_configure_inform_t;
+#define SHARED_CONFIGURE_INFORM_T_DEFINED
+typedef struct _shared_csv_t shared_csv_t;
+#define SHARED_CSV_T_DEFINED
+typedef struct _shared_data_t shared_data_t;
+#define SHARED_DATA_T_DEFINED
+typedef struct _shared_dbpath_t shared_dbpath_t;
+#define SHARED_DBPATH_T_DEFINED
+typedef struct _shared_filesystem_t shared_filesystem_t;
+#define SHARED_FILESYSTEM_T_DEFINED
+typedef struct _shared_fty_asset_uptime_configurator_t shared_fty_asset_uptime_configurator_t;
+#define SHARED_FTY_ASSET_UPTIME_CONFIGURATOR_T_DEFINED
+typedef struct _shared_ic_t shared_ic_t;
+#define SHARED_IC_T_DEFINED
+typedef struct _shared_log_t shared_log_t;
+#define SHARED_LOG_T_DEFINED
+typedef struct _shared_data_t shared_data_t;
+#define SHARED_DATA_T_DEFINED
+typedef struct _shared_str_defs_t shared_str_defs_t;
+#define SHARED_STR_DEFS_T_DEFINED
+typedef struct _shared_subprocess_t shared_subprocess_t;
+#define SHARED_SUBPROCESS_T_DEFINED
+typedef struct _shared_tntmlm_t shared_tntmlm_t;
+#define SHARED_TNTMLM_T_DEFINED
+typedef struct _shared_topic_cache_t shared_topic_cache_t;
+#define SHARED_TOPIC_CACHE_T_DEFINED
+typedef struct _shared_upsstatus_t shared_upsstatus_t;
+#define SHARED_UPSSTATUS_T_DEFINED
+typedef struct _shared_utils_t shared_utils_t;
+#define SHARED_UTILS_T_DEFINED
+typedef struct _shared_utilspp_t shared_utilspp_t;
+#define SHARED_UTILSPP_T_DEFINED
+typedef struct _shared_utils_web_t shared_utils_web_t;
+#define SHARED_UTILS_WEB_T_DEFINED
+typedef struct _web_src_asset_computed_impl_t web_src_asset_computed_impl_t;
+#define WEB_SRC_ASSET_COMPUTED_IMPL_T_DEFINED
+typedef struct _web_src_helpers_t web_src_helpers_t;
+#define WEB_SRC_HELPERS_T_DEFINED
+typedef struct _web_src_iface_t web_src_iface_t;
+#define WEB_SRC_IFACE_T_DEFINED
+typedef struct _web_src_location_helpers_t web_src_location_helpers_t;
+#define WEB_SRC_LOCATION_HELPERS_T_DEFINED
+typedef struct _web_src_sasl_t web_src_sasl_t;
+#define WEB_SRC_SASL_T_DEFINED
+typedef struct _web_src_tokens_t web_src_tokens_t;
+#define WEB_SRC_TOKENS_T_DEFINED
 #endif // FTY_REST_BUILD_DRAFT_API
 
 
@@ -138,8 +138,8 @@ typedef struct _web/src/tokens_t web/src/tokens_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "defs.h"
-#include "filesystem.h"
-#include "preproc.h.h"
+#include "shared/filesystem.h"
+#include "preproc.h"
 #ifdef FTY_REST_BUILD_DRAFT_API
 #include "db/topology2.h"
 #include "git_details_override.h"
