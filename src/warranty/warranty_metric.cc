@@ -19,7 +19,7 @@
  #
 */
 /*!
- * \file warranty-metric.cc
+ * \file warranty_metric.cc
  * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
  * \brief  Send a warranty metric for all elements with element_date in the DB
  */

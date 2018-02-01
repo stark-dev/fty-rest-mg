@@ -49,14 +49,13 @@
 
     <header name = "app"  />
     <header name = "bios_agent"  />
-    <header name = "bios_agent++"  />
+    <header name = "bios_agentpp"  />
     <header name = "bios_export"  />
     <header name = "ymsg"  />
 
-    <header name = "bios-magic" />
+    <header name = "bios_magic" />
     <header name = "cleanup" />
     <header name = "dbtypes" />
-    <header name = "defs" />
     <header name = "shared/filesystem" />
     <header name = "preproc" />
 
@@ -103,17 +102,16 @@
    <class name = "shared/ic" private = "0" selftest = "0" />
    <class name = "shared/log" private = "0" selftest = "0" />
    <class name = "shared/magic" private = "1" selftest = "0" />
-   <class name = "shared/data" private = "0" selftest = "0" />
    <class name = "shared/str_defs" private = "0" selftest = "0" />
    <class name = "shared/subprocess" private = "0" selftest = "0" />
    <class name = "shared/tntmlm" private = "0" selftest = "0" />
    <class name = "shared/topic_cache" private = "0" selftest = "0" />
    <class name = "shared/upsstatus" private = "0" selftest = "0" />
    <class name = "shared/utils" private = "0" selftest = "0" />
-   <class name = "shared/utils++" private = "0" selftest = "0" />
+   <class name = "shared/utilspp" private = "0" selftest = "0" />
    <class name = "shared/utils_web" private = "0" selftest = "0" />
 
-   <class name = "warranty/warranty-metric" private = "1" selftest = "0" />
+   <class name = "warranty/warranty_metric" private = "1" selftest = "0" />
 
    <class name = "web/src/asset_computed_impl" selftest = "0" />
    <class name = "web/src/helpers" selftest = "0" />
@@ -158,7 +156,7 @@
     <class name = "web/src/asset_PUT" private="1" selftest = "0">root object</class>
     <class name = "web/src/assets_in" private="1" selftest = "0">root object</class>
     <class name = "web/src/auth" private="1" selftest = "0">root object</class>
-    <class name = "web/src/auth-verify" private="1" selftest = "0">root object</class>
+    <class name = "web/src/auth_verify" private="1" selftest = "0">root object</class>
     <class name = "web/src/average" private="1" selftest = "0">root object</class>
 
     <class name = "web/src/config" private="1" selftest = "0">root object</class>
@@ -191,7 +189,7 @@
     <class name = "web/src/security_headers" private="1" selftest = "0">root object</class>
     <class name = "web/src/server_status" private="1" selftest = "0">root object</class>
 
-    <class name = "web/src/ssl-redirect" private="1" selftest = "0">root object</class>
+    <class name = "web/src/ssl_redirect" private="1" selftest = "0">root object</class>
     <class name = "web/src/sysinfo" private="1" selftest = "0">root object</class>
     <class name = "web/src/systemctl" private="1" selftest = "0">root object</class>
     <class name = "web/src/time" private="1" selftest = "0">root object</class>

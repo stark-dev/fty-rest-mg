@@ -51,8 +51,8 @@ shared/upsstatus.txt
 shared/upsstatus.doc
 shared/utils.txt
 shared/utils.doc
-shared/utils++.txt
-shared/utils++.doc
+shared/utilspp.txt
+shared/utilspp.doc
 shared/utils_web.txt
 shared/utils_web.doc
 web/src/asset_computed_impl.txt

@@ -51,6 +51,7 @@
 #include "shared/utils.h"
 #include "git_details_override.h"
 #include "config.h" //TODO KRIAGKI
+#include "platform.h" //TODO
 #include "shared/tntmlm.h"
 
 // Magic numbers - dpkg fancy formatting du-jour

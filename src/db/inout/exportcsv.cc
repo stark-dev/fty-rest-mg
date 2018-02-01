@@ -33,7 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "db/assets.h"
 #include "shared/dbpath.h"
 #include "shared/log.h"
-#include "shared/utils++.h"
+#include "shared/utilspp.h"
 
 namespace persist {
 

@@ -40,7 +40,7 @@
 #include "shared/log.h"
 #include "web/src/helpers.h"
 
-#include "shared/utils++.h"
+#include "shared/utilspp.h"
 
 #define RT_PROVIDER_PEER "fty-metric-cache"
 #define RT_SUBJECT "latest-rt-data"

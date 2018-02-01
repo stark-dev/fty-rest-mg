@@ -1,5 +1,5 @@
 /*  =========================================================================
-    warranty/warranty-metric - class description
+    warranty/warranty_metric - class description
 
     Copyright (c) the Authors
     =========================================================================

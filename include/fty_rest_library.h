@@ -68,79 +68,22 @@
 //  Opaque class structures to allow forward references
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
-#ifdef FTY_REST_BUILD_DRAFT_API
-typedef struct _db_topology2_t db_topology2_t;
-#define DB_TOPOLOGY2_T_DEFINED
-typedef struct _git_details_override_t git_details_override_t;
-#define GIT_DETAILS_OVERRIDE_T_DEFINED
-typedef struct _shared_asset_types_t shared_asset_types_t;
-#define SHARED_ASSET_TYPES_T_DEFINED
-typedef struct _shared_augtool_t shared_augtool_t;
-#define SHARED_AUGTOOL_T_DEFINED
-typedef struct _shared_cidr_t shared_cidr_t;
-#define SHARED_CIDR_T_DEFINED
-typedef struct _shared_configure_inform_t shared_configure_inform_t;
-#define SHARED_CONFIGURE_INFORM_T_DEFINED
-typedef struct _shared_csv_t shared_csv_t;
-#define SHARED_CSV_T_DEFINED
-typedef struct _shared_data_t shared_data_t;
-#define SHARED_DATA_T_DEFINED
-typedef struct _shared_dbpath_t shared_dbpath_t;
-#define SHARED_DBPATH_T_DEFINED
-typedef struct _shared_filesystem_t shared_filesystem_t;
-#define SHARED_FILESYSTEM_T_DEFINED
-typedef struct _shared_fty_asset_uptime_configurator_t shared_fty_asset_uptime_configurator_t;
-#define SHARED_FTY_ASSET_UPTIME_CONFIGURATOR_T_DEFINED
-typedef struct _shared_ic_t shared_ic_t;
-#define SHARED_IC_T_DEFINED
-typedef struct _shared_log_t shared_log_t;
-#define SHARED_LOG_T_DEFINED
-typedef struct _shared_data_t shared_data_t;
-#define SHARED_DATA_T_DEFINED
-typedef struct _shared_str_defs_t shared_str_defs_t;
-#define SHARED_STR_DEFS_T_DEFINED
-typedef struct _shared_subprocess_t shared_subprocess_t;
-#define SHARED_SUBPROCESS_T_DEFINED
-typedef struct _shared_tntmlm_t shared_tntmlm_t;
-#define SHARED_TNTMLM_T_DEFINED
-typedef struct _shared_topic_cache_t shared_topic_cache_t;
-#define SHARED_TOPIC_CACHE_T_DEFINED
-typedef struct _shared_upsstatus_t shared_upsstatus_t;
-#define SHARED_UPSSTATUS_T_DEFINED
-typedef struct _shared_utils_t shared_utils_t;
-#define SHARED_UTILS_T_DEFINED
-typedef struct _shared_utilspp_t shared_utilspp_t;
-#define SHARED_UTILSPP_T_DEFINED
-typedef struct _shared_utils_web_t shared_utils_web_t;
-#define SHARED_UTILS_WEB_T_DEFINED
-typedef struct _web_src_asset_computed_impl_t web_src_asset_computed_impl_t;
-#define WEB_SRC_ASSET_COMPUTED_IMPL_T_DEFINED
-typedef struct _web_src_helpers_t web_src_helpers_t;
-#define WEB_SRC_HELPERS_T_DEFINED
-typedef struct _web_src_iface_t web_src_iface_t;
-#define WEB_SRC_IFACE_T_DEFINED
-typedef struct _web_src_location_helpers_t web_src_location_helpers_t;
-#define WEB_SRC_LOCATION_HELPERS_T_DEFINED
-typedef struct _web_src_sasl_t web_src_sasl_t;
-#define WEB_SRC_SASL_T_DEFINED
-typedef struct _web_src_tokens_t web_src_tokens_t;
-#define WEB_SRC_TOKENS_T_DEFINED
-#endif // FTY_REST_BUILD_DRAFT_API
+
 
 
 //  Public classes, each with its own header file
 #include "app.h"
 #include "bios_agent.h"
-#include "bios_agent++.h"
+#include "bios_agentpp.h"
 #include "bios_export.h"
 #include "ymsg.h"
-#include "bios-magic.h"
+#include "bios_magic.h"
 #include "cleanup.h"
 #include "dbtypes.h"
-#include "defs.h"
 #include "shared/filesystem.h"
 #include "preproc.h"
 #ifdef FTY_REST_BUILD_DRAFT_API
+#include "shared/data.h"
 #include "db/topology2.h"
 #include "git_details_override.h"
 #include "shared/asset_types.h"
@@ -148,7 +91,6 @@ typedef struct _web_src_tokens_t web_src_tokens_t;
 #include "shared/cidr.h"
 #include "shared/configure_inform.h"
 #include "shared/csv.h"
-#include "shared/data.h"
 #include "shared/dbpath.h"
 #include "shared/filesystem.h"
 #include "shared/fty_asset_uptime_configurator.h"
@@ -161,7 +103,7 @@ typedef struct _web_src_tokens_t web_src_tokens_t;
 #include "shared/topic_cache.h"
 #include "shared/upsstatus.h"
 #include "shared/utils.h"
-#include "shared/utils++.h"
+#include "shared/utilspp.h"
 #include "shared/utils_web.h"
 #include "web/src/asset_computed_impl.h"
 #include "web/src/helpers.h"

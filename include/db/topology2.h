@@ -26,8 +26,9 @@
  */
 #ifndef SRC_INCLUDE_TOPOLOGY2
 #define SRC_INCLUDE_TOPOLOGY2
-
+#include <tntdb/connect.h>
 #include <cxxtools/serializationinfo.h>
+#include <algorithm>
 #include "shared/asset_types.h"
 
 namespace persist {

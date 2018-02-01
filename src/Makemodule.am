@@ -16,15 +16,15 @@ include_HEADERS = \
     include/fty_rest.h \
     include/app.h \
     include/bios_agent.h \
-    include/bios_agent++.h \
+    include/bios_agentpp.h \
     include/bios_export.h \
     include/ymsg.h \
-    include/bios-magic.h \
+    include/bios_magic.h \
     include/cleanup.h \
     include/dbtypes.h \
     include/defs.h \
-    include/filesystem.h \
-    include/preproc.h.h \
+    include/shared/filesystem.h \
+    include/preproc.h \
     include/fty_rest_library.h
 
 if ENABLE_DRAFTS
@@ -49,7 +49,7 @@ include_HEADERS += \
     include/shared/topic_cache.h \
     include/shared/upsstatus.h \
     include/shared/utils.h \
-    include/shared/utils++.h \
+    include/shared/utilspp.h \
     include/shared/utils_web.h \
     include/web/src/asset_computed_impl.h \
     include/web/src/helpers.h \
@@ -76,7 +76,7 @@ src_libfty_rest_la_SOURCES = \
     src/persist/monitor.cc \
     src/persist/persist_error.cc \
     src/shared/magic.cc \
-    src/warranty/warranty-metric.cc \
+    src/warranty/warranty_metric.cc \
     src/web/src/add_gpio.cc \
     src/web/src/admin_iface.cc \
     src/web/src/admin_ifaces.cc \
@@ -95,7 +95,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/asset_PUT.cc \
     src/web/src/assets_in.cc \
     src/web/src/auth.cc \
-    src/web/src/auth-verify.cc \
+    src/web/src/auth_verify.cc \
     src/web/src/average.cc \
     src/web/src/config.cc \
     src/web/src/conf_scan.cc \
@@ -122,7 +122,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/scan_run.cc \
     src/web/src/security_headers.cc \
     src/web/src/server_status.cc \
-    src/web/src/ssl-redirect.cc \
+    src/web/src/ssl_redirect.cc \
     src/web/src/sysinfo.cc \
     src/web/src/systemctl.cc \
     src/web/src/time.cc \
@@ -156,7 +156,7 @@ src_libfty_rest_la_SOURCES += \
     src/shared/topic_cache.cc \
     src/shared/upsstatus.cc \
     src/shared/utils.cc \
-    src/shared/utils++.cc \
+    src/shared/utilspp.cc \
     src/shared/utils_web.cc \
     src/web/src/asset_computed_impl.cc \
     src/web/src/helpers.cc \

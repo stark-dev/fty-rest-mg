@@ -66,7 +66,7 @@ EXTRA_DIST += \
     src/persist/monitor.h \
     src/persist/persist_error.h \
     src/shared/magic.h \
-    src/warranty/warranty-metric.h \
+    src/warranty/warranty_metric.h \
     src/web/src/add_gpio.h \
     src/web/src/admin_iface.h \
     src/web/src/admin_ifaces.h \
@@ -85,7 +85,7 @@ EXTRA_DIST += \
     src/web/src/asset_PUT.h \
     src/web/src/assets_in.h \
     src/web/src/auth.h \
-    src/web/src/auth-verify.h \
+    src/web/src/auth_verify.h \
     src/web/src/average.h \
     src/web/src/config.h \
     src/web/src/conf_scan.h \
@@ -112,7 +112,7 @@ EXTRA_DIST += \
     src/web/src/scan_run.h \
     src/web/src/security_headers.h \
     src/web/src/server_status.h \
-    src/web/src/ssl-redirect.h \
+    src/web/src/ssl_redirect.h \
     src/web/src/sysinfo.h \
     src/web/src/systemctl.h \
     src/web/src/time.h \

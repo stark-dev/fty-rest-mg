@@ -32,10 +32,10 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/join.h>
 
-#include "subprocess.h"
-#include "cidr.h"
+#include "shared/subprocess.h"
+#include "shared/cidr.h"
 #include "sasl.h"
-#include "filesystem.h"
+#include "shared/filesystem.h"
 #include "helpers.h"
 
 #define SSH_NOT_TO_BE_RUN "/etc/ssh/sshd_not_to_be_run"

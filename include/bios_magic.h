@@ -19,7 +19,7 @@
  */
 
 /*!
- * \file bios-magic.h
+ * \file bios_magic.h
  * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
  * \author Alena Chernikava <AlenaChernikava@Eaton.com>
  * \brief Not yet documented file
