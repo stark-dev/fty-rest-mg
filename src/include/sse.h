@@ -21,14 +21,11 @@
 /*!
  * \file sse.h
  * \author Nicolas DAVIET <nicolasdaviet@Eaton.com>
- * \brief Header file for sse functions
+ * \brief Header file for sse (Server Side Events) Class
  *
  * How it works
  * ============
  * This files contains class and functions use for the sse connection.
- *
- *
- *
  */
 
 #ifndef SRC_WEB_INCLUDE_SSE_H
@@ -46,10 +43,6 @@
 #include <tntdb/connection.h>
 #include <tntdb/error.h>
 
-
-#define ASSET_AGENT "asset-agent-stream"
-//! Class to generate and verify tokens
-
 class Sse
 {
 private:
@@ -63,14 +56,12 @@ private:
   zsock_t *_pipe = NULL;
   zpoller_t *_poller = NULL;
   
-
 public:
   //Constructor/destructor
   Sse();
   ~Sse();
 
   //getter/setter
-
   zsock_t * pipe()
   {
     return _pipe;
@@ -133,3 +124,4 @@ public:
 };
 
 #endif // SRC_WEB_INCLUDE_SSE_H
+

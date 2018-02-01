@@ -205,7 +205,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       return json;
     }
     json += "data:{\"topic\":\"asset-delete\",\"payload\":";
-    json += "{\"name\":\"" + nameElement + "\"}}\n\n";
+    json += "{\"id\":\"" + nameElement + "\"}}\n\n";
 
     //remove this asset from the assets list
     _assetsOfDatacenter.erase(nameElement);
@@ -214,19 +214,6 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
   {
     log_debug("Sse get an update or create message");
-
-    //get id of this element
-    int64_t elemId = persist::name_to_asset_id(nameElement);
-    if (elemId == -1)
-    {
-      log_warning("Asset id not found");
-      return json;
-    }
-    else if (elemId == -2)
-    {
-      log_warning("Error when get asset id");
-    }
-    log_debug("Sse-update get id Ok !!!");
 
     std::string action;
     if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
@@ -244,7 +231,8 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     }
     else
     {
-      //Check if the ne parent is the filtered datacenter
+      //fty_proto_operation(asset) ==  FTY_PROTO_ASSET_OP_CREATE
+      //Check if the parent is the filtered datacenter
       int i = 1;
       const char * parentName = fty_proto_aux_string(asset, ("parent_name." + std::to_string(i)).c_str(), "not found");
       bool found = streq(parentName, _datacenter.c_str());
@@ -268,6 +256,20 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       //update the asset list
       _assetsOfDatacenter.emplace(std::make_pair(nameElement, 5));
     }
+
+    //get id of this element
+    int64_t elemId = persist::name_to_asset_id(nameElement);
+    if (elemId == -1)
+    {
+      log_warning("Asset id not found");
+      return json;
+    }
+    else if (elemId == -2)
+    {
+      log_warning("Error when get asset id");
+    }
+    log_debug("Sse-update get id Ok !!!");
+
     //All check Done and Ok 
     std::string jsonPayload = getJsonAsset(_clientMlm,elemId);
     
@@ -278,8 +280,6 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       json += "}\n\n";
       
     }
-
   }
-
   return json;
 }
