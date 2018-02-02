@@ -16,13 +16,16 @@ AM_CPPFLAGS = \
     ${libzmq_CFLAGS} \
     ${czmq_CFLAGS} \
     ${malamute_CFLAGS} \
+    ${cidr_CFLAGS} \
     ${cxxtools_CFLAGS} \
     ${tntnet_CFLAGS} \
+    ${tntdb_CFLAGS} \
+    ${magic_CFLAGS} \
     ${fty_proto_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${fty_proto_LIBS}
+project_libs = ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS}
 
 SUBDIRS = doc
 DIST_SUBDIRS = doc
@@ -43,8 +46,11 @@ EXTRA_DIST += \
     Findlibzmq.cmake \
     Findczmq.cmake \
     Findmalamute.cmake \
+    Findcidr.cmake \
     Findcxxtools.cmake \
     Findtntnet.cmake \
+    Findtntdb.cmake \
+    Findmagic.cmake \
     Findfty_proto.cmake \
     CMakeLists.txt
 endif

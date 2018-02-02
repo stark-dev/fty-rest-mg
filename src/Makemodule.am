@@ -22,8 +22,6 @@ include_HEADERS = \
     include/bios_magic.h \
     include/cleanup.h \
     include/dbtypes.h \
-    include/defs.h \
-    include/shared/filesystem.h \
     include/preproc.h \
     include/fty_rest_library.h
 
@@ -42,7 +40,6 @@ include_HEADERS += \
     include/shared/fty_asset_uptime_configurator.h \
     include/shared/ic.h \
     include/shared/log.h \
-    include/shared/data.h \
     include/shared/str_defs.h \
     include/shared/subprocess.h \
     include/shared/tntmlm.h \
@@ -149,7 +146,6 @@ src_libfty_rest_la_SOURCES += \
     src/shared/fty_asset_uptime_configurator.cc \
     src/shared/ic.cc \
     src/shared/log.cc \
-    src/shared/data.cc \
     src/shared/str_defs.cc \
     src/shared/subprocess.cc \
     src/shared/tntmlm.cc \

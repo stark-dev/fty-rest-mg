@@ -7,7 +7,7 @@
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 #
-AC_INIT([fty_rest],[1.0.0],[eatonproductfeedback@eaton.com])
+AC_INIT([fty_rest],[1.0.0],[eatonipcopensource@eaton.com])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(config)
@@ -386,6 +386,95 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libmlm
 dnl END of enabled attempts to search for libmlm
 
 
+was_cidr_check_lib_detected=no
+
+search_cidr="yes"
+
+AC_ARG_WITH([cidr],
+    [
+        AS_HELP_STRING([--with-cidr],
+        [yes or no. Optionally specify cidr prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_cidr="yes"
+    ],
+    [
+        search_cidr="yes"
+    ])
+AS_CASE([x"${with_cidr}"],
+    [xyes], [search_cidr="yes"],
+    [xno],  [search_cidr="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_cidr}" = xno],
+    [AC_MSG_WARN([Required dependency on cidr was explicitly disabled during configuration by '--with-cidr=no'; subsequent full build of fty_rest may fail])])
+
+AS_IF([test x"${search_cidr}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([cidr], [cidr >= 0.0.0],
+    [
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $cidr_LIBS"
+        was_cidr_check_lib_detected=pkgcfg
+        found_pkgconfig="cidr"
+    ],
+    [
+        AC_MSG_NOTICE([Package cidr not found; falling back to defined compilability tests])
+
+        cidr_synthetic_cflags=""
+        cidr_synthetic_libs="-lcidr"
+
+        if test -n "${with_cidr}" && test x"${with_cidr}" != xyes && test x"${with_cidr}" != xno; then
+            if test -r "${with_cidr}/include/libcidr.h"; then
+                cidr_synthetic_cflags="-I${with_cidr}/include"
+                cidr_synthetic_libs="-L${with_cidr}/lib -lcidr"
+            else
+            AC_MSG_ERROR([Header file ${with_cidr}/include/libcidr.h was not found. Please check cidr prefix])
+            fi
+        else
+            AC_CHECK_HEADER([libcidr.h], [],
+            AC_MSG_ERROR([Header file libcidr.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([cidr], [cidr_alloc],
+            [
+                was_cidr_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lcidr"
+                found_linkname="cidr"
+            ],
+            [AC_MSG_ERROR([cannot link with -lcidr, install cidr])])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for cidr
+    AS_CASE(["x${was_cidr_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_cidr],[${found_pkgconfig}])
+                CFLAGS="${cidr_CFLAGS} ${CFLAGS}"
+                LIBS="${cidr_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_cidr],[${found_linkname}])
+                CFLAGS="${cidr_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${cidr_synthetic_libs} ${LDFLAGS}"
+                LIBS="${cidr_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([cidr_CFLAGS],[${cidr_synthetic_cflags}])
+                AC_SUBST([cidr_LIBS],[${cidr_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_cidr],[cidr])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for cidr 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for cidr
+
+
 was_cxxtools_check_lib_detected=no
 
 search_cxxtools="yes"
@@ -535,6 +624,184 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for tntnet
     ])
 ])
 dnl END of enabled attempts to search for tntnet
+
+
+was_tntdb_check_lib_detected=no
+
+search_tntdb="yes"
+
+AC_ARG_WITH([tntdb],
+    [
+        AS_HELP_STRING([--with-tntdb],
+        [yes or no. Optionally specify tntdb prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_tntdb="yes"
+    ],
+    [
+        search_tntdb="yes"
+    ])
+AS_CASE([x"${with_tntdb}"],
+    [xyes], [search_tntdb="yes"],
+    [xno],  [search_tntdb="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_tntdb}" = xno],
+    [AC_MSG_WARN([Required dependency on tntdb was explicitly disabled during configuration by '--with-tntdb=no'; subsequent full build of fty_rest may fail])])
+
+AS_IF([test x"${search_tntdb}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([tntdb], [tntdb >= 0.0.0],
+    [
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $tntdb_LIBS"
+        was_tntdb_check_lib_detected=pkgcfg
+        found_pkgconfig="tntdb"
+    ],
+    [
+        AC_MSG_NOTICE([Package tntdb not found; falling back to defined compilability tests])
+
+        tntdb_synthetic_cflags=""
+        tntdb_synthetic_libs="-ltntdb"
+
+        if test -n "${with_tntdb}" && test x"${with_tntdb}" != xyes && test x"${with_tntdb}" != xno; then
+            if test -r "${with_tntdb}/include/tntdb.h"; then
+                tntdb_synthetic_cflags="-I${with_tntdb}/include"
+                tntdb_synthetic_libs="-L${with_tntdb}/lib -ltntdb"
+            else
+            AC_MSG_ERROR([Header file ${with_tntdb}/include/tntdb.h was not found. Please check tntdb prefix])
+            fi
+        else
+            AC_CHECK_HEADER([tntdb.h], [],
+            AC_MSG_ERROR([Header file tntdb.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([tntdb], [tntdb::Date::gmtime],
+            [
+                was_tntdb_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -ltntdb"
+                found_linkname="tntdb"
+            ],
+            [AC_MSG_ERROR([cannot link with -ltntdb, install tntdb])])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for tntdb
+    AS_CASE(["x${was_tntdb_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_tntdb],[${found_pkgconfig}])
+                CFLAGS="${tntdb_CFLAGS} ${CFLAGS}"
+                LIBS="${tntdb_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_tntdb],[${found_linkname}])
+                CFLAGS="${tntdb_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${tntdb_synthetic_libs} ${LDFLAGS}"
+                LIBS="${tntdb_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([tntdb_CFLAGS],[${tntdb_synthetic_cflags}])
+                AC_SUBST([tntdb_LIBS],[${tntdb_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_tntdb],[tntdb])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for tntdb 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for tntdb
+
+
+was_magic_check_lib_detected=no
+
+search_libmagic="yes"
+
+AC_ARG_WITH([libmagic],
+    [
+        AS_HELP_STRING([--with-libmagic],
+        [yes or no. Optionally specify libmagic prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+    ],
+    [
+        search_libmagic="yes"
+    ],
+    [
+        search_libmagic="yes"
+    ])
+AS_CASE([x"${with_libmagic}"],
+    [xyes], [search_libmagic="yes"],
+    [xno],  [search_libmagic="no"])
+
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_libmagic}" = xno],
+    [AC_MSG_WARN([Required dependency on magic was explicitly disabled during configuration by '--with-libmagic=no'; subsequent full build of fty_rest may fail])])
+
+AS_IF([test x"${search_libmagic}" = xyes], [
+    # Archive previously detected and supplied flags
+    PRE_SEARCH_CFLAGS="${CFLAGS}"
+    PRE_SEARCH_LIBS="${LIBS}"
+
+    found_pkgconfig=""
+    found_linkname=""
+    PKG_CHECK_MODULES([magic], [libmagic >= 0.0.0],
+    [
+        PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $magic_LIBS"
+        was_magic_check_lib_detected=pkgcfg
+        found_pkgconfig="libmagic"
+    ],
+    [
+        AC_MSG_NOTICE([Package libmagic not found; falling back to defined compilability tests])
+
+        magic_synthetic_cflags=""
+        magic_synthetic_libs="-lmagic"
+
+        if test -n "${with_libmagic}" && test x"${with_libmagic}" != xyes && test x"${with_libmagic}" != xno; then
+            if test -r "${with_libmagic}/include/magic.h"; then
+                magic_synthetic_cflags="-I${with_libmagic}/include"
+                magic_synthetic_libs="-L${with_libmagic}/lib -lmagic"
+            else
+            AC_MSG_ERROR([Header file ${with_libmagic}/include/magic.h was not found. Please check libmagic prefix])
+            fi
+        else
+            AC_CHECK_HEADER([magic.h], [],
+            AC_MSG_ERROR([Header file magic.h was not found in default search paths])
+                )
+        fi
+
+        AC_CHECK_LIB([magic], [magic_close],
+            [
+                was_magic_check_lib_detected=yes
+                PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lmagic"
+                found_linkname="magic"
+            ],
+            [AC_MSG_ERROR([cannot link with -lmagic, install libmagic])])
+    ])
+
+dnl END of PKG_CHECK_MODULES and/or direct tests for libmagic
+    AS_CASE(["x${was_magic_check_lib_detected}"],
+        [xpkgcfg], [
+                AC_SUBST([pkgconfig_name_libmagic],[${found_pkgconfig}])
+                CFLAGS="${magic_CFLAGS} ${CFLAGS}"
+                LIBS="${magic_LIBS} ${LIBS}"
+            ],
+        [xyes], [
+                AC_SUBST([pkgconfig_name_libmagic],[${found_linkname}])
+                CFLAGS="${magic_synthetic_cflags} ${CFLAGS}"
+                LDFLAGS="${magic_synthetic_libs} ${LDFLAGS}"
+                LIBS="${magic_synthetic_libs} ${LIBS}"
+
+                AC_SUBST([magic_CFLAGS],[${magic_synthetic_cflags}])
+                AC_SUBST([magic_LIBS],[${magic_synthetic_libs}])
+            ],
+        [xno], [
+                AC_SUBST([pkgconfig_name_libmagic],[libmagic])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for libmagic 0.0.0 or higher])
+    ])
+])
+dnl END of enabled attempts to search for libmagic
 
 
 was_fty_proto_check_lib_detected=no

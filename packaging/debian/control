@@ -6,15 +6,18 @@
 Source:         fty-rest
 Section:        net
 Priority:       optional
-Maintainer:     fty_rest Developers <eatonproductfeedback@eaton.com>
+Maintainer:     fty_rest Developers <eatonipcopensource@eaton.com>
 Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
     pkg-config,
     libzmq3-dev,
     libczmq-dev,
     libmlm-dev,
+    libcidr0-dev,
     libcxxtools-dev,
     libtntnet-dev,
+    libtntdb-dev,
+    libmagic-dev,
     libfty-proto-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
@@ -34,8 +37,11 @@ Depends:
     libzmq3-dev,
     libczmq-dev,
     libmlm-dev,
+    libcidr0-dev,
     libcxxtools-dev,
     libtntnet-dev,
+    libtntdb-dev,
+    libmagic-dev,
     libfty-proto-dev,
     libfty-rest1 (= ${binary:Version})
 Description: fty_rest development tools

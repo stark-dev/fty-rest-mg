@@ -70,7 +70,7 @@
 //        fscanf(src,"%ms\n", &accepted_license_version);
 //        fclose(src);
 //    }
-    if ( !accepted_license_version.empty() /*== NULL*/ )
+    if ( accepted_license_version.empty() )
         http_die("action-forbidden", "REST API call", "Please accept license first.");
     if ( !streq(accepted_license_version.c_str(), current_license_version) ) {
         std::string msg = std::string{"License version changed (new is "} + current_license_version + ", accepted is " + accepted_license_version.c_str() + "). Please accept new license first";

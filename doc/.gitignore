@@ -37,8 +37,6 @@ shared/ic.txt
 shared/ic.doc
 shared/log.txt
 shared/log.doc
-shared/data.txt
-shared/data.doc
 shared/str_defs.txt
 shared/str_defs.doc
 shared/subprocess.txt

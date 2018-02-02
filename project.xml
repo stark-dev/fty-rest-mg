@@ -2,9 +2,11 @@
     name = "fty_rest"
     description = "REST API for auth Convergence"
     script = "zproject.gsl"
-    license = "Eaton Proprietary License"
-    url = "http://pqsoftware.eaton.com/"
-    email = "EatonProductFeedback@Eaton.com"
+    email = "EatonIPCOpenSource@eaton.com"
+    url = "https://42ity.org"
+    license = "GPL-2.0+"
+    repository = "https://github.com/42ity/fty-proto"
+    header = "fty_rest.h"
     >
 
     <target name = "debian" />
@@ -30,6 +32,11 @@
         repository="https://github.com/42ity/malamute.git"
         release = "1.0-FTY-master" />
 
+    <use project = "cidr" test = "cidr_alloc" header="libcidr.h"
+	debian_name = "libcidr0-dev" redhat_name = "libcidr-devel"
+	repository = "https://github.com/42ity/libcidr.git"
+        release = "1.2.3-FTY-master" />
+
     <use project = "cxxtools" test="cxxtools::Utf8Codec::Utf8Codec" header = "cxxtools/allocator.h"
         repository = "https://github.com/42ity/cxxtools.git"
         release = "2.2-FTY-master"
@@ -39,6 +46,17 @@
         repository = "https://github.com/42ity/tntnet.git"
         release = "2.2-FTY-master"
         />
+
+    <use project = "tntdb" test="tntdb::Date::gmtime"
+        repository = "https://github.com/42ity/tntdb.git"
+        release = "1.3-FTY-master"
+        builddir = "tntdb"/>
+
+    <use project = "magic" libname = "libmagic"
+        repository = "https://github.com/42ity/libmagic.git"
+        test = "magic_close"
+        redhat_name = "file-devel"
+        release = "5.18-FTY-master" />
 
     <use project = "fty-proto" libname = "libfty_proto" header="ftyproto.h" prefix="fty_proto"
         min_major = "1" min_minor = "0" min_patch = "0"
@@ -56,7 +74,6 @@
     <header name = "bios_magic" />
     <header name = "cleanup" />
     <header name = "dbtypes" />
-    <header name = "shared/filesystem" />
     <header name = "preproc" />
 
    <header name = "db/agentstate" private = "1" />
