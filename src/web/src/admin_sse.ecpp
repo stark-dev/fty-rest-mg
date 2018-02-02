@@ -131,7 +131,29 @@ bool database_ready;
     int64_t now = 0;
 
     //get the token from the request
-    sseManager.token(request.getCookie("eaton_token").getValue());
+    std::string access_token = "";
+    
+    //in cookie if present
+    if (request.hasCookie("eaton_token")) {
+        access_token = request.getCookie("eaton_token").getValue();
+        if (access_token == "null") /* Avoid set but invalid cookies */
+                access_token = "";
+    }
+    
+    //in header if not found
+    if(access_token.empty() && request.hasHeader(tnt::httpheader::authorization)) {
+        access_token = request.getHeader(tnt::httpheader::authorization);
+        if(!access_token.compare(0,7,"Bearer ")) {
+            access_token = access_token.substr(7);
+        }
+    }
+    
+    if (access_token.empty()){
+      log_error("Token empty");
+      http_die ("internal-error", "Cannot get token value");      
+    }
+    
+    sseManager.token(access_token);
     long int tme;
     unsigned tntRequestTimeout = tnt::TntConfig::it().maxRequestTime * 1000 / 2 ;
 
