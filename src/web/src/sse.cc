@@ -33,11 +33,13 @@
 #include "str_defs.h"
 
 //constructor
+
 Sse::Sse()
 {
 }
 
 //Clean object in destructor
+
 Sse::~Sse()
 {
   if (_clientMlm)
@@ -101,8 +103,8 @@ long int Sse::checkTokenValidity()
   long int gid;
   char * user_name;
 
-  log_debug("Token : [%s]",_token.c_str());
-  
+  log_debug("Token : [%s]", _token.c_str());
+
   if (BiosProfile::Anonymous == tokens::get_instance()->verify_token(_token, &tme, &uid, &gid, &user_name))
   {
     log_info("sse : Token revoked or expired");
@@ -136,12 +138,12 @@ const char * Sse::loadAssetFromDatacenter()
   try
   {
     int rv = persist::select_assets_by_container(_connection, _datacenter_id,
-      [&elements](const tntdb::Row & row) -> void
-      {
-        std::string name;
-        row[0].get(name);
-        elements.emplace(std::make_pair(name, 5));
-      });
+                                                 [&elements](const tntdb::Row & row) -> void
+                                                 {
+                                                   std::string name;
+                                                   row[0].get(name);
+                                                   elements.emplace(std::make_pair(name, 5));
+                                                 });
     if (rv != 0)
     {
       return "persist::select_assets_by_container () failed.";
@@ -170,21 +172,19 @@ std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
 {
 
   std::string json = "";
-
   if (_assetsOfDatacenter.find(fty_proto_name(alert)) == _assetsOfDatacenter.end())
   {
     log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(alert));
     return json;
   }
-  
-  std::string jsonPayload = getJsonAlert(_connection,alert);
-  
+
+  std::string jsonPayload = getJsonAlert(_connection, alert);
   if (!jsonPayload.empty())
   {
-    json += "data:{\"topic\":\"alarm\",\"payload\":";
+    const char * rule_name = fty_proto_rule(alert);
+    json += "data:{\"topic\":\"alarm/" + std::string(rule_name) + "\",\"payload\":";
     json += jsonPayload;
     json += "}\n\n";
-    
   }
 
   return json;
@@ -206,8 +206,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(asset));
       return json;
     }
-    json += "data:{\"topic\":\"asset-delete\",\"payload\":";
-    json += "{\"id\":\"" + nameElement + "\"}}\n\n";
+    json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
 
     //remove this asset from the assets list
     _assetsOfDatacenter.erase(nameElement);
@@ -217,11 +216,8 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
   {
     log_debug("Sse get an update or create message");
 
-    std::string action;
     if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
     {
-      action = "update";
-
       //if update
       //Check if asset is in asset element
       if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
@@ -254,7 +250,6 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
         return json;
       }
 
-      action = "new";
       //update the asset list
       _assetsOfDatacenter.emplace(std::make_pair(nameElement, 5));
     }
@@ -273,14 +268,14 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     log_debug("Sse-update get id Ok !!!");
 
     //All check Done and Ok 
-    std::string jsonPayload = getJsonAsset(_clientMlm,elemId);
-    
+    std::string jsonPayload = getJsonAsset(_clientMlm, elemId);
+
     if (!jsonPayload.empty())
     {
-      json += "data:{\"topic\":\"asset-" + action + "\",\"payload\":";
+      json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":";
       json += jsonPayload;
       json += "}\n\n";
-      
+
     }
   }
   return json;
