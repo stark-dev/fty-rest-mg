@@ -181,7 +181,7 @@ std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
   
   if (!jsonPayload.empty())
   {
-    json += "data:{\"topic\":\"alert\",\"payload\":";
+    json += "data:{\"topic\":\"alarm\",\"payload\":";
     json += jsonPayload;
     json += "}\n\n";
     
