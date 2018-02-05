@@ -518,6 +518,16 @@
          </args>
     </mapping>
 
+    <!-- GET admin/hw_capability -->
+    <mapping>
+      <target>hw_capability@bios_web</target>
+      <url>^/api/v1/admin/hw_capability/(.*)$</url>
+      <method>GET</method>
+      <args>
+        <id>$1</id>
+      </args>
+    </mapping>
+
     <!-- POST admin/email/test -->
     <mapping>
         <target>email_test@bios_web</target>
