@@ -257,6 +257,8 @@ libpriv_utils_la_SOURCES = 	\
 				src/include/defs.h \
 				src/include/utils_web.h \
 				src/shared/utils_web.cc \
+				src/include/utils_json.h \
+				src/shared/utils_json.cc \
 				src/shared/utils++.cc \
 				src/include/utils++.h \
 				src/include/filesystem.h \
@@ -742,6 +744,7 @@ bios_web_la_SOURCES = \
                       src/web/src/location_helpers.cc   \
                       src/web/src/sasl.cc               \
                       src/web/src/tokens.cc             \
+                      src/web/src/sse.cc             \
                       src/shared/data.cc                \
                       src/shared/upsstatus.cc           \
                       src/web/src/asset_computed_impl.cc \
@@ -751,6 +754,7 @@ bios_web_la_SOURCES = \
 					  src/include/sasl.h \
 					  src/include/helpers.h \
 					  src/include/tokens.h \
+					  src/include/sse.h \
 					  src/persist/assetcrud.h \
 					  src/include/dbpath.h
 
