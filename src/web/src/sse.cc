@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2015-2016 Eaton
+ * Copyright (C) 2018 Eaton
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 /*!
  * \file sse.cc
  * \author Nicolas DAVIET<nicolasdaviet@Eaton.com>
- * \brief Class and functions use by sse connection
+ * \brief Class and functions used by sse connection
  */
 
 
@@ -54,7 +54,6 @@ Sse::~Sse()
 
 const char * Sse::connectMalamute()
 {
-
   // connect to malamute
   _clientMlm = mlm_client_new();
   if (!_clientMlm)
@@ -125,7 +124,6 @@ zmsg_t * Sse::getMessageFromMlm()
 
 const char * Sse::loadAssetFromDatacenter()
 {
-
   std::map<std::string, int> elements;
   auto asset_element = persist::select_asset_element_web_byId(_connection, _datacenter_id);
   if (asset_element.status != 1)
@@ -138,12 +136,12 @@ const char * Sse::loadAssetFromDatacenter()
   try
   {
     int rv = persist::select_assets_by_container(_connection, _datacenter_id,
-                                                 [&elements](const tntdb::Row & row) -> void
-                                                 {
-                                                   std::string name;
-                                                   row[0].get(name);
-                                                   elements.emplace(std::make_pair(name, 5));
-                                                 });
+      [&elements](const tntdb::Row & row) -> void
+      {
+        std::string name;
+        row[0].get(name);
+        elements.emplace(std::make_pair(name, 5));
+      });
     if (rv != 0)
     {
       return "persist::select_assets_by_container () failed.";
@@ -170,7 +168,6 @@ const char * Sse::loadAssetFromDatacenter()
 
 std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
 {
-
   std::string json = "";
   if (_assetsOfDatacenter.find(fty_proto_name(alert)) == _assetsOfDatacenter.end())
   {
@@ -186,7 +183,6 @@ std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
     json += jsonPayload;
     json += "}\n\n";
   }
-
   return json;
 }
 
@@ -275,7 +271,6 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":";
       json += jsonPayload;
       json += "}\n\n";
-
     }
   }
   return json;

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright (C) 2015-2016 Eaton
+ * Copyright (C) 2018 Eaton
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -62,32 +62,32 @@ public:
   ~Sse();
 
   //getter/setter
-  zsock_t * pipe()
+  zsock_t * getPipe()
   {
     return _pipe;
   };
 
-  zpoller_t *poller()
+  zpoller_t *getPoller()
   {
     return _poller;
   };
 
-  void token(std::string value)
+  void setToken(std::string value)
   {
     _token = value;
   };
 
-  void datacenter(std::string value)
+  void setDatacenter(std::string value)
   {
     _datacenter = value;
   };
 
-  void connection(tntdb::Connection value)
+  void setConnection(tntdb::Connection value)
   {
     _connection = value;
   };
 
-  void datacenter_id(uint32_t value)
+  void setDatacenterId(uint32_t value)
   {
     _datacenter_id = value;
   };
@@ -100,7 +100,7 @@ public:
   int consumeStream(std::string stream, std::string pattern);
 
   //Check if the token is still valid
-  //return the time in second before expiration or -1 if token in't valid
+  //return the time in second before expiration or -1 if token isn't valid
   long int checkTokenValidity();
 
   //Check if the message comes from a channel in parameter
