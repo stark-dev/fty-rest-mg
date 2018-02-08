@@ -735,7 +735,8 @@ BUILT_SOURCES_bios_web_la = \
 		      src/web/src/add_gpio.cpp \
 		      src/web/src/security_headers.cpp \
 		      src/web/src/security_removeheaders.cpp \
-		      src/web/src/gpo_action.cpp
+		      src/web/src/gpo_action.cpp \
+		      src/web/src/hw_capability.cpp
 
 # Track real-git and nodist (generated) sources SEPARATELY
 nodist_bios_web_la_SOURCES = $(BUILT_SOURCES_bios_web_la)

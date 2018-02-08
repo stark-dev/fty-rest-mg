@@ -1,0 +1,161 @@
+<#
+ #
+ # Copyright (C) 2015-2016 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file    hw_capability.ecpp
+ * \author  Jana Rapava <JanaRapava@Eaton.com>
+ * \brief   This call provides info about GPIO pins.
+ */
+ #><%pre>
+#include <string>
+#include "tntmlm.h"
+#include "helpers.h"
+#include "utils_web.h"
+
+// info request
+static zmsg_t *
+req_hw_cap (zuuid_t *uuid, const char *type)
+{
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, "HW_CAP");
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zmsg_addstr (msg, type);
+    return msg;
+}
+
+void
+build_json (std::string &output, std::string &gpi_count, std::string &gpo_count)
+{
+    output.clear();
+    output = "{\n";
+    output += utils::json::jsonify("gpi", gpi_count) + ",\n";
+    output += utils::json::jsonify("gpo", gpo_count) + "\n";
+    output += "}";
+}
+
+// get GPIO ports counts
+int
+get_hw_capability (const char *type, std::string &count)
+{
+    // connect to mlm client
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        log_critical ("hw_capability: mlm_pool.get () failed.");
+        return -1;
+    }
+
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *send = req_hw_cap (uuid, type);
+    int rv = client->sendto ("fty-info", "hwcapabaility", 1000, &send);
+
+    if (rv == -1)
+    {
+        log_critical ("hw_capability: client->sendto (address = '%s') failed.", "fty-info");
+        zmsg_destroy (&send);
+        zuuid_destroy (&uuid);
+        return -2;
+    }
+
+    zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
+    zuuid_destroy (&uuid);
+    if (!resp)
+    {
+        log_critical ("hw_capability: client->recv (timeout = '5') returned NULL");
+        zmsg_destroy (&resp);
+        return -3;
+    }
+    char *result = zmsg_popstr (resp);
+    if (streq (result, "OK")) {
+        zstr_free (&result); 
+        char *resp_type = zmsg_popstr (resp);
+        if (streq(resp_type, type)) {
+            zstr_free (&resp_type);
+            count = zmsg_popstr (resp);
+            zmsg_destroy (&resp);
+        }
+        else {
+            zstr_free (&resp_type);
+            zmsg_destroy (&resp);
+            return -5;
+        }
+    }
+    else {
+        zstr_free (&result);
+        zmsg_destroy (&resp);
+        return -4; 
+    }
+    return 0;
+}
+</%pre>
+<%request scope="global">
+UserInfo user;
+</%request>
+<%cpp>
+    // permission check
+    static const std::map <BiosProfile, std::string> PERMISSIONS = {
+            {BiosProfile::Anonymous, "R"},
+            {BiosProfile::Dashboard, "R"},
+            {BiosProfile::Admin,     "R"}
+            };
+    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+    std::string id = request.getArg("id");
+    if (id.empty())
+        http_die("request-param-required", "id");
+    if (id != "rackcontroller-0")
+        http_die ("request-param-bad", "id", id.c_str (), "not supported");
+
+    std::string output, gpi_count, gpo_count;
+    int rv = get_hw_capability ("gpi", gpi_count);
+    if (rv == -1)
+        http_die ("internal-error", "mlmpool.get () failed.");
+    else
+    if (rv == -2)
+        http_die ("internal-error", "client->sendto () failed.");
+    else
+    if (rv == -3)
+        http_die ("internal-error", "client->recv () failed.");
+    else
+    if (rv == -4)
+        http_die ("internal-error", "ERROR response from fty-info.");
+    else
+    if (rv == -5)
+        http_die ("internal-error", "unexpected response from fty-info.");
+    else {
+        rv = get_hw_capability ("gpo", gpo_count);
+        if (rv == -1)
+            http_die ("internal-error", "mlmpool.get () failed.");
+        else
+        if (rv == -2)
+            http_die ("internal-error", "client->sendto () failed.");
+        else
+        if (rv == -3)
+            http_die ("internal-error", "client->recv () failed.");
+        else
+        if (rv == -4)
+            http_die ("internal-error", "ERROR response from fty-info.");
+        else
+        if (rv == -5)
+            http_die ("internal-error", "unexpected response from fty-info.");
+        else
+            build_json (output, gpi_count, gpo_count);
+    }
+</%cpp>
+<$$ output $>
