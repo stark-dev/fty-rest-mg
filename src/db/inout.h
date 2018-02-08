@@ -33,7 +33,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "shared/asset_types.h"
 #include "shared/csv.h"
 
-#include "dbhelpers.h"
+#include "db/dbhelpers.h"
 
 #define CREATE_MODE_ONE_ASSET   1
 #define CREATE_MODE_CSV         2

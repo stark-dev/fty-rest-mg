@@ -20,11 +20,7 @@
 
 //  Extra headers
 #include "db/agentstate.h"
-#include "db/assetdef.h"
-#include "db/assets.h"
-#include "db/dbhelpers.h"
 #include "db/inout.h"
-#include "db/types.h"
 
 //  Opaque class structures to allow forward references
 #ifndef DB_AGENTSTATE_AGENTSTATE_T_DEFINED
@@ -35,22 +31,6 @@ typedef struct _db_agentstate_agentstate_t db_agentstate_agentstate_t;
 typedef struct _db_asset_general_t db_asset_general_t;
 #define DB_ASSET_GENERAL_T_DEFINED
 #endif
-#ifndef DB_ASSETS_ASSETCR_T_DEFINED
-typedef struct _db_assets_assetcr_t db_assets_assetcr_t;
-#define DB_ASSETS_ASSETCR_T_DEFINED
-#endif
-#ifndef DB_ASSETS_ASSETD_T_DEFINED
-typedef struct _db_assets_assetd_t db_assets_assetd_t;
-#define DB_ASSETS_ASSETD_T_DEFINED
-#endif
-#ifndef DB_ASSETS_ASSETR_T_DEFINED
-typedef struct _db_assets_assetr_t db_assets_assetr_t;
-#define DB_ASSETS_ASSETR_T_DEFINED
-#endif
-#ifndef DB_ASSETS_ASSETU_T_DEFINED
-typedef struct _db_assets_assetu_t db_assets_assetu_t;
-#define DB_ASSETS_ASSETU_T_DEFINED
-#endif
 #ifndef DB_INOUT_EXPORTCSV_T_DEFINED
 typedef struct _db_inout_exportcsv_t db_inout_exportcsv_t;
 #define DB_INOUT_EXPORTCSV_T_DEFINED
@@ -58,14 +38,6 @@ typedef struct _db_inout_exportcsv_t db_inout_exportcsv_t;
 #ifndef DB_INOUT_IMPORTCSV_T_DEFINED
 typedef struct _db_inout_importcsv_t db_inout_importcsv_t;
 #define DB_INOUT_IMPORTCSV_T_DEFINED
-#endif
-#ifndef MSG_ASSET_MSG_T_DEFINED
-typedef struct _msg_asset_msg_t msg_asset_msg_t;
-#define MSG_ASSET_MSG_T_DEFINED
-#endif
-#ifndef MSG_COMMON_MSG_T_DEFINED
-typedef struct _msg_common_msg_t msg_common_msg_t;
-#define MSG_COMMON_MSG_T_DEFINED
 #endif
 #ifndef PERSIST_ASSETCRUD_T_DEFINED
 typedef struct _persist_assetcrud_t persist_assetcrud_t;
@@ -320,14 +292,8 @@ typedef struct _web_src_admin_passwd_t web_src_admin_passwd_t;
 
 #include "db/agentstate/agentstate.h"
 #include "db/asset_general.h"
-#include "db/assets/assetcr.h"
-#include "db/assets/assetd.h"
-#include "db/assets/assetr.h"
-#include "db/assets/assetu.h"
 #include "db/inout/exportcsv.h"
 #include "db/inout/importcsv.h"
-#include "msg/asset_msg.h"
-#include "msg/common_msg.h"
 #include "persist/assetcrud.h"
 #include "persist/assettopology.h"
 #include "persist/dbhelpers.h"

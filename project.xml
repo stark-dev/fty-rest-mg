@@ -19,7 +19,7 @@
         <option name = "dist_docs" value = "1" />
     </target>
 
-   <classfilename pretty-print = "no" source-extension = "cc" />
+   <classfilename keep-tree = "true" use-cxx = "true" pretty-print = "no" source-extension = "cc" />
   <!--  <include filename = "license.xml" /> -->
     <version major = "1" minor = "0" patch = "0" />
     <abi current = "1" revision = "0" age = "0" />
@@ -32,7 +32,7 @@
         repository="https://github.com/42ity/malamute.git"
         release = "1.0-FTY-master" />
 
-    <use project = "cidr" test = "cidr_alloc" header="libcidr.h"
+    <use project = "cidr" libname = "libcidr" test = "cidr_alloc" header="libcidr.h"
 	debian_name = "libcidr0-dev" redhat_name = "libcidr-devel"
 	repository = "https://github.com/42ity/libcidr.git"
         release = "1.2.3-FTY-master" />
@@ -52,7 +52,7 @@
         release = "1.3-FTY-master"
         builddir = "tntdb"/>
 
-    <use project = "magic" libname = "libmagic"
+    <use project = "magic" libname = "libmagic" header = "magic.h" optional = "1"
         repository = "https://github.com/42ity/libmagic.git"
         test = "magic_close"
         redhat_name = "file-devel"
@@ -77,27 +77,27 @@
     <header name = "preproc" />
 
    <header name = "db/agentstate" private = "1" />
-   <header name = "db/assetdef" private = "1" />
+   <header name = "db/assetdef" private = "0" />
    <class name = "db/agentstate/agentstate" private = "1" selftest = "0" />
    <class name = "db/asset_general" private = "1" selftest = "0" />
    <class name = "db/topology2" private = "0" selftest = "0" />
-   <class name = "db/assets/assetcr" private = "1" selftest = "0" />
-   <class name = "db/assets/assetd" private = "1" selftest = "0" />
-   <class name = "db/assets/assetr" private = "1" selftest = "0" />
-   <class name = "db/assets/assetu" private = "1" selftest = "0" />
+   <class name = "db/assets/assetcr" private = "0" selftest = "0" />
+   <class name = "db/assets/assetd" private = "0" selftest = "0" />
+   <class name = "db/assets/assetr" private = "0" selftest = "0" />
+   <class name = "db/assets/assetu" private = "0" selftest = "0" />
 
-   <header name = "db/assets" private = "1" />
-   <header name = "db/dbhelpers" private = "1" />
+   <header name = "db/assets" private = "0" />
+   <header name = "db/dbhelpers" private = "0" />
    <header name = "db/inout" private = "1" />
-   <header name = "db/types" private = "1" />
+   <header name = "db/types" private = "0" />
 
    <class name = "db/inout/exportcsv" private = "1" selftest = "0" />
    <class name = "db/inout/importcsv" private = "1" selftest = "0" />
 
    <class name = "git_details_override" private = "0" selftest ="0" />
 
-   <class name = "msg/asset_msg" private = "1" selftest = "0" />
-   <class name = "msg/common_msg" private = "1" selftest = "0" />
+   <class name = "msg/asset_msg" private = "0" selftest = "0" />
+   <class name = "msg/common_msg" private = "0" selftest = "0" />
 
 
    <class name = "persist/assetcrud" private = "1" selftest = "0" />

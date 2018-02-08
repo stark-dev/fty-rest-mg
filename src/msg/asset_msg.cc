@@ -38,7 +38,7 @@
 @end
 */
 
-#include "./asset_msg.h"
+#include "msg/asset_msg.h"
 
 //  Structure of our class
 

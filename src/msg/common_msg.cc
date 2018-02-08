@@ -38,7 +38,7 @@
 @end
 */
 
-#include "./common_msg.h"
+#include "msg/common_msg.h"
 
 //  Structure of our class
 

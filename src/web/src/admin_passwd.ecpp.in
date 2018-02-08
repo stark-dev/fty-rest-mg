@@ -34,9 +34,9 @@
 
 #include "shared/subprocess.h"
 #include "shared/cidr.h"
-#include "sasl.h"
+#include "web/src/sasl.h"
 #include "shared/filesystem.h"
-#include "helpers.h"
+#include "web/src/helpers.h"
 
 #define SSH_NOT_TO_BE_RUN "/etc/ssh/sshd_not_to_be_run"
 using namespace shared;
@@ -123,7 +123,7 @@ UserInfo user;
         }
 
         if (bad_request)
-            http_die("bad-request-document");
+            http_die("bad-request-document", "");
 
         if (check_regex_text ("user", user, "^[-_a-z0-9]{1,50}$", errors)) {
             checked_user = user;
@@ -155,7 +155,7 @@ UserInfo user;
     // otherwise you can change only your own
     if (user.profile () != BiosProfile::Admin) {
         if (user.login () != checked_user)
-            http_die ("not-authorized");
+            http_die ("not-authorized", "");
     }
 
     if (!authenticate(checked_user.c_str(), checked_old_passwd.c_str()))

@@ -1,5 +1,5 @@
 // WARNING: This file is generated during make, DO NOT EDIT
-#include <include/git_details_override.h>
+#include "git_details_override.h"
 char * PACKAGE_BUILD_HOST_UNAME_ESCAPED= (char*)"Linux ftydevel 3.16.0-4-amd64 #1 SMP Debian 3.16.39-1+deb8u2 (2017-03-07) x86_64 GNU/Linux";
 char * PACKAGE_BUILD_HOST_NAME_ESCAPED=(char*)"ftydevel";
 char * PACKAGE_BUILD_HOST_OS_ESCAPED=(char*)"Linux 3.16.0-4-amd64 #1 SMP Debian 3.16.39-1+deb8u2 (2017-03-07)";

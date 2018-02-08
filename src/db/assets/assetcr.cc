@@ -19,7 +19,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
     \brief  Pure DB API for insert for different tables
     \author Alena Chernikava <AlenaChernikava@Eaton.com>
 */
-#include "assetcr.h"
+#include "db/assets/assetcr.h"
 
 #include <tntdb/row.h>
 #include <tntdb/result.h>
@@ -29,7 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "shared/log.h"
 #include "defs.h"
 #include "shared/asset_types.h"
-#include "assetr.h"
+#include "db/assets/assetr.h"
 #include "shared/utils_web.h"
 
 namespace persist {

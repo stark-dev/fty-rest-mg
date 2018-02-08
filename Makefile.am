@@ -28,7 +28,9 @@ AM_CPPFLAGS = \
 project_libs = ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS}
 
 SUBDIRS = doc
+SUBDIRS += include
 DIST_SUBDIRS = doc
+DIST_SUBDIRS += include
 lib_LTLIBRARIES =
 bin_PROGRAMS =
 noinst_PROGRAMS =
@@ -58,14 +60,8 @@ endif
 EXTRA_DIST += \
     src/db/agentstate/agentstate.h \
     src/db/asset_general.h \
-    src/db/assets/assetcr.h \
-    src/db/assets/assetd.h \
-    src/db/assets/assetr.h \
-    src/db/assets/assetu.h \
     src/db/inout/exportcsv.h \
     src/db/inout/importcsv.h \
-    src/msg/asset_msg.h \
-    src/msg/common_msg.h \
     src/persist/assetcrud.h \
     src/persist/assettopology.h \
     src/persist/dbhelpers.h \

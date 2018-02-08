@@ -94,7 +94,7 @@ This package contains development files for fty_rest: rest api for auth converge
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-tntnet=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-tntnet=yes --with-libmagic=yes
 make %{_smp_mflags}
 
 %install

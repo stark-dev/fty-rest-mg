@@ -13,8 +13,20 @@
 # Ignore the source doc texts generated from program sources
 db/topology2.txt
 db/topology2.doc
+db/assets/assetcr.txt
+db/assets/assetcr.doc
+db/assets/assetd.txt
+db/assets/assetd.doc
+db/assets/assetr.txt
+db/assets/assetr.doc
+db/assets/assetu.txt
+db/assets/assetu.doc
 git_details_override.txt
 git_details_override.doc
+msg/asset_msg.txt
+msg/asset_msg.doc
+msg/common_msg.txt
+msg/common_msg.doc
 shared/asset_types.txt
 shared/asset_types.doc
 shared/augtool.txt

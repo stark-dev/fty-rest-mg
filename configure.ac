@@ -60,6 +60,11 @@ PKG_PROG_PKG_CONFIG
 # Check endianess of the system
 AC_C_BIGENDIAN
 
+# See if cppcheck is in PATH; this variable unblocks the "cppcheck" recipe
+# (note that "make cppcheck.xml" can be used - and perhaps fail - regardless)
+AC_CHECK_PROG([WITH_CPPCHECK], [cppcheck], [true], [false])
+AM_CONDITIONAL(WITH_CPPCHECK, $WITH_CPPCHECK)
+
 # Code coverage
 AC_MSG_CHECKING([whether to enable GCov])
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
@@ -95,6 +100,19 @@ else
     AM_CONDITIONAL(ENABLE_ASAN, false)
     AC_MSG_RESULT([no])
 fi
+
+# See if clang-format is in PATH; the result unblocks the relevant recipes
+WITH_CLANG_FORMAT=""
+AS_IF([test x"$CLANG_FORMAT" = x],
+    [AC_PATH_PROG([CLANG_FORMAT], [clang-format], [])],
+    [AC_CHECK_PROG([WITH_CLANG_FORMAT], [$CLANG_FORMAT], [true], [fail])])
+AS_IF([test x"$CLANG_FORMAT" != x && test x"$WITH_CLANG_FORMAT" = x],
+    [AS_IF([test -x "$CLANG_FORMAT"],
+        [WITH_CLANG_FORMAT=true],
+        [AC_CHECK_PROG([WITH_CLANG_FORMAT], [$CLANG_FORMAT], [true], [false])])])
+AS_IF([test "$WITH_CLANG_FORMAT" = fail],
+    [AC_MSG_ERROR([Caller explicitly referenced CLANG_FORMAT=$CLANG_FORMAT which was not found])])
+AM_CONDITIONAL([WITH_CLANG_FORMAT], [$WITH_CLANG_FORMAT])
 
 # Set pkgconfigdir
 AC_ARG_WITH([pkgconfigdir], AS_HELP_STRING([--with-pkgconfigdir=PATH],
@@ -388,53 +406,53 @@ dnl END of enabled attempts to search for libmlm
 
 was_cidr_check_lib_detected=no
 
-search_cidr="yes"
+search_libcidr="yes"
 
-AC_ARG_WITH([cidr],
+AC_ARG_WITH([libcidr],
     [
-        AS_HELP_STRING([--with-cidr],
-        [yes or no. Optionally specify cidr prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
+        AS_HELP_STRING([--with-libcidr],
+        [yes or no. Optionally specify libcidr prefix (directory where its include/ and lib/ are located), but that is only used if pkgconfig metadata is not found first])
     ],
     [
-        search_cidr="yes"
+        search_libcidr="yes"
     ],
     [
-        search_cidr="yes"
+        search_libcidr="yes"
     ])
-AS_CASE([x"${with_cidr}"],
-    [xyes], [search_cidr="yes"],
-    [xno],  [search_cidr="no"])
+AS_CASE([x"${with_libcidr}"],
+    [xyes], [search_libcidr="yes"],
+    [xno],  [search_libcidr="no"])
 
 dnl We do not abort right now, because the maintainer/developer may have
 dnl something particular in mind, e.g. to build just parts of a project.
-AS_IF([test x"${search_cidr}" = xno],
-    [AC_MSG_WARN([Required dependency on cidr was explicitly disabled during configuration by '--with-cidr=no'; subsequent full build of fty_rest may fail])])
+AS_IF([test x"${search_libcidr}" = xno],
+    [AC_MSG_WARN([Required dependency on cidr was explicitly disabled during configuration by '--with-libcidr=no'; subsequent full build of fty_rest may fail])])
 
-AS_IF([test x"${search_cidr}" = xyes], [
+AS_IF([test x"${search_libcidr}" = xyes], [
     # Archive previously detected and supplied flags
     PRE_SEARCH_CFLAGS="${CFLAGS}"
     PRE_SEARCH_LIBS="${LIBS}"
 
     found_pkgconfig=""
     found_linkname=""
-    PKG_CHECK_MODULES([cidr], [cidr >= 0.0.0],
+    PKG_CHECK_MODULES([cidr], [libcidr >= 0.0.0],
     [
         PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $cidr_LIBS"
         was_cidr_check_lib_detected=pkgcfg
-        found_pkgconfig="cidr"
+        found_pkgconfig="libcidr"
     ],
     [
-        AC_MSG_NOTICE([Package cidr not found; falling back to defined compilability tests])
+        AC_MSG_NOTICE([Package libcidr not found; falling back to defined compilability tests])
 
         cidr_synthetic_cflags=""
         cidr_synthetic_libs="-lcidr"
 
-        if test -n "${with_cidr}" && test x"${with_cidr}" != xyes && test x"${with_cidr}" != xno; then
-            if test -r "${with_cidr}/include/libcidr.h"; then
-                cidr_synthetic_cflags="-I${with_cidr}/include"
-                cidr_synthetic_libs="-L${with_cidr}/lib -lcidr"
+        if test -n "${with_libcidr}" && test x"${with_libcidr}" != xyes && test x"${with_libcidr}" != xno; then
+            if test -r "${with_libcidr}/include/libcidr.h"; then
+                cidr_synthetic_cflags="-I${with_libcidr}/include"
+                cidr_synthetic_libs="-L${with_libcidr}/lib -lcidr"
             else
-            AC_MSG_ERROR([Header file ${with_cidr}/include/libcidr.h was not found. Please check cidr prefix])
+            AC_MSG_ERROR([Header file ${with_libcidr}/include/libcidr.h was not found. Please check libcidr prefix])
             fi
         else
             AC_CHECK_HEADER([libcidr.h], [],
@@ -448,18 +466,18 @@ AS_IF([test x"${search_cidr}" = xyes], [
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lcidr"
                 found_linkname="cidr"
             ],
-            [AC_MSG_ERROR([cannot link with -lcidr, install cidr])])
+            [AC_MSG_ERROR([cannot link with -lcidr, install libcidr])])
     ])
 
-dnl END of PKG_CHECK_MODULES and/or direct tests for cidr
+dnl END of PKG_CHECK_MODULES and/or direct tests for libcidr
     AS_CASE(["x${was_cidr_check_lib_detected}"],
         [xpkgcfg], [
-                AC_SUBST([pkgconfig_name_cidr],[${found_pkgconfig}])
+                AC_SUBST([pkgconfig_name_libcidr],[${found_pkgconfig}])
                 CFLAGS="${cidr_CFLAGS} ${CFLAGS}"
                 LIBS="${cidr_LIBS} ${LIBS}"
             ],
         [xyes], [
-                AC_SUBST([pkgconfig_name_cidr],[${found_linkname}])
+                AC_SUBST([pkgconfig_name_libcidr],[${found_linkname}])
                 CFLAGS="${cidr_synthetic_cflags} ${CFLAGS}"
                 LDFLAGS="${cidr_synthetic_libs} ${LDFLAGS}"
                 LIBS="${cidr_synthetic_libs} ${LIBS}"
@@ -468,11 +486,11 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for cidr
                 AC_SUBST([cidr_LIBS],[${cidr_synthetic_libs}])
             ],
         [xno], [
-                AC_SUBST([pkgconfig_name_cidr],[cidr])
-            AC_MSG_ERROR([Cannot find pkg-config metadata for cidr 0.0.0 or higher])
+                AC_SUBST([pkgconfig_name_libcidr],[libcidr])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for libcidr 0.0.0 or higher])
     ])
 ])
-dnl END of enabled attempts to search for cidr
+dnl END of enabled attempts to search for libcidr
 
 
 was_cxxtools_check_lib_detected=no
@@ -717,7 +735,7 @@ dnl END of enabled attempts to search for tntdb
 
 was_magic_check_lib_detected=no
 
-search_libmagic="yes"
+search_libmagic="no"
 
 AC_ARG_WITH([libmagic],
     [
@@ -734,10 +752,6 @@ AS_CASE([x"${with_libmagic}"],
     [xyes], [search_libmagic="yes"],
     [xno],  [search_libmagic="no"])
 
-dnl We do not abort right now, because the maintainer/developer may have
-dnl something particular in mind, e.g. to build just parts of a project.
-AS_IF([test x"${search_libmagic}" = xno],
-    [AC_MSG_WARN([Required dependency on magic was explicitly disabled during configuration by '--with-libmagic=no'; subsequent full build of fty_rest may fail])])
 
 AS_IF([test x"${search_libmagic}" = xyes], [
     # Archive previously detected and supplied flags
@@ -748,6 +762,7 @@ AS_IF([test x"${search_libmagic}" = xyes], [
     found_linkname=""
     PKG_CHECK_MODULES([magic], [libmagic >= 0.0.0],
     [
+        AC_DEFINE(HAVE_LIBMAGIC, 1, [The optional libmagic library is to be used])
         PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $magic_LIBS"
         was_magic_check_lib_detected=pkgcfg
         found_pkgconfig="libmagic"
@@ -763,11 +778,11 @@ AS_IF([test x"${search_libmagic}" = xyes], [
                 magic_synthetic_cflags="-I${with_libmagic}/include"
                 magic_synthetic_libs="-L${with_libmagic}/lib -lmagic"
             else
-            AC_MSG_ERROR([Header file ${with_libmagic}/include/magic.h was not found. Please check libmagic prefix])
+            AC_MSG_WARN([Header file ${with_libmagic}/include/magic.h was not found. Please check libmagic prefix])
             fi
         else
             AC_CHECK_HEADER([magic.h], [],
-            AC_MSG_ERROR([Header file magic.h was not found in default search paths])
+            AC_MSG_WARN([Header file magic.h was not found in default search paths])
                 )
         fi
 
@@ -776,8 +791,9 @@ AS_IF([test x"${search_libmagic}" = xyes], [
                 was_magic_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lmagic"
                 found_linkname="magic"
+                AC_DEFINE(HAVE_LIBMAGIC, 1, [The optional libmagic library is to be used (as -lmagic)])
             ],
-            [AC_MSG_ERROR([cannot link with -lmagic, install libmagic])])
+            [])
     ])
 
 dnl END of PKG_CHECK_MODULES and/or direct tests for libmagic
@@ -798,7 +814,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for libmagic
             ],
         [xno], [
                 AC_SUBST([pkgconfig_name_libmagic],[libmagic])
-            AC_MSG_ERROR([Cannot find pkg-config metadata for libmagic 0.0.0 or higher])
+            AC_MSG_WARN([Cannot find pkg-config metadata for libmagic 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for libmagic
@@ -1151,6 +1167,7 @@ AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
 # Specify output files
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
+                 include/Makefile
                  src/libfty_rest.pc
                  ])
 
@@ -1227,6 +1244,11 @@ echo "    - 'make memcheck'      run the project's selftest with valgrind to"
 echo "                           check for memory leaks"
 echo "    - 'make coverage'      generate project's selftest coverage report"
 echo "                           expects --with-gcov option for configure"
+echo "    - 'make clang-format-check'   check if project sources conform"
+echo "                           to style requirements"
+echo "    - 'make clang-format'         modify project sources to conform"
+echo "                           to style requirements"
+echo "    - 'make clang-format-diff'    modify as above and print 'git diff'"
 echo
 ])
 

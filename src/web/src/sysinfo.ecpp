@@ -49,7 +49,7 @@
 #include "db/assets.h"
 #include "shared/asset_types.h"
 #include "shared/utils.h"
-#include "git_details_override.h"
+#include "git_details_override.h" //TODO This file is no more auto-generated.
 #include "config.h" //TODO This file is no more auto-generated. 
 #include "platform.h"
 #include "shared/tntmlm.h"

@@ -21,7 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Then for every succesfull delete statement
 // 0 would be return as rowid
 
-#include "assetr.h"
+#include "db/assets/assetr.h"
 #include "shared/asset_types.h"
 
 #include <exception>
