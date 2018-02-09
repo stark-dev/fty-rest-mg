@@ -289,7 +289,7 @@ coverage: src/fty_rest_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddi
 	lcov --remove coverage.info "/usr*" -o coverage.info
 	lcov --remove coverage.info "fty_rest_selftest.cc" -o coverage.info
 	$(RM) -rf coverage/*
-	genhtml -o coverage/ -t "fty_rest test coverage" --num-spaces 4 coverage.info
+	genhtml -o coverage/ -t "fty-rest test coverage" --num-spaces 4 coverage.info
 else
 coverage: src/fty_rest_selftest
 	@echo "call make clean && configure --with-gcov to enable code coverage"

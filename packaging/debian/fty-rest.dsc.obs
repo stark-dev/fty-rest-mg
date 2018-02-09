@@ -1,8 +1,8 @@
 Format: 3.0 (quilt)
-Binary: fty_rest
-Source: fty_rest
+Binary: fty-rest
+Source: fty-rest
 Version: 1.0.0
-Maintainer: fty_rest Developers <eatonipcopensource@eaton.com>
+Maintainer: fty-rest Developers <eatonipcopensource@eaton.com>
 Architecture: any
 Build-Depends: debhelper (>= 9),
     pkg-config,

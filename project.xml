@@ -1,5 +1,5 @@
 <project
-    name = "fty_rest"
+    name = "fty-rest"
     description = "REST API for auth Convergence"
     script = "zproject.gsl"
     email = "EatonIPCOpenSource@eaton.com"

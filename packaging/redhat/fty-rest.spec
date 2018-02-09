@@ -18,8 +18,8 @@ Name:           fty-rest
 Version:        1.0.0
 Release:        1
 Summary:        rest api for auth convergence
-License:        Eaton Proprietary License
-URL:            http://pqsoftware.eaton.com/
+License:        GPL-2.0+
+URL:            https://42ity.org
 Source0:        %{name}-%{version}.tar.gz
 Group:          System/Libraries
 # Note: ghostscript is required by graphviz which is required by
@@ -36,8 +36,11 @@ BuildRequires:  gcc-c++
 BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel
 BuildRequires:  malamute-devel
+BuildRequires:  libcidr-devel
 BuildRequires:  cxxtools-devel
 BuildRequires:  tntnet-devel
+BuildRequires:  tntdb-devel
+BuildRequires:  file-devel
 BuildRequires:  fty-proto-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
@@ -66,8 +69,11 @@ Requires:       libfty_rest1 = %{version}
 Requires:       zeromq-devel
 Requires:       czmq-devel
 Requires:       malamute-devel
+Requires:       libcidr-devel
 Requires:       cxxtools-devel
 Requires:       tntnet-devel
+Requires:       tntdb-devel
+Requires:       file-devel
 Requires:       fty-proto-devel
 
 %description devel
@@ -88,7 +94,7 @@ This package contains development files for fty-rest: rest api for auth converge
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-tntnet=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-tntnet=yes --with-libmagic=yes
 make %{_smp_mflags}
 
 %install

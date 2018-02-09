@@ -52,7 +52,7 @@ static void
 test_runall (bool verbose)
 {
     test_item_t *item;
-    printf ("Running fty_rest selftests...\n");
+    printf ("Running fty-rest selftests...\n");
     for (item = all_tests; item->test; item++)
         item->test (verbose);
 
@@ -126,7 +126,7 @@ main (int argc, char **argv)
     #endif //
 
     if (test) {
-        printf ("Running fty_rest test '%s'...\n", test->testname);
+        printf ("Running fty-rest test '%s'...\n", test->testname);
         test->test (verbose);
     }
     else

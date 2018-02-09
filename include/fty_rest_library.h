@@ -1,5 +1,5 @@
 /*  =========================================================================
-    fty_rest - generated layer of public API
+    fty-rest - generated layer of public API
 
     Copyright (c) the Authors
 

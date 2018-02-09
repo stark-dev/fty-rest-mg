@@ -1,12 +1,12 @@
 #
-#    fty_rest - REST API for auth Convergence
+#    fty-rest - REST API for auth Convergence
 #
 #    Copyright (c) the Authors
 
 Source:         fty-rest
 Section:        net
 Priority:       optional
-Maintainer:     fty_rest Developers <eatonipcopensource@eaton.com>
+Maintainer:     fty-rest Developers <eatonipcopensource@eaton.com>
 Standards-Version: 4.0.1.0
 Build-Depends: debhelper (>= 9),
     pkg-config,
@@ -25,8 +25,8 @@ Build-Depends: debhelper (>= 9),
 Package: libfty-rest1
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: fty_rest shared library
- This package contains shared library for fty_rest:
+Description: fty-rest shared library
+ This package contains shared library for fty-rest:
  rest api for auth convergence
 
 Package: libfty-rest-dev
@@ -44,8 +44,8 @@ Depends:
     libmagic-dev,
     libfty-proto-dev,
     libfty-rest1 (= ${binary:Version})
-Description: fty_rest development tools
- This package contains development files for fty_rest:
+Description: fty-rest development tools
+ This package contains development files for fty-rest:
  rest api for auth convergence
 
 
@@ -56,6 +56,6 @@ Priority: optional
 Depends:
     libfty-rest1 (= ${binary:Version}),
     ${misc:Depends}
-Description: fty_rest debugging symbols
- This package contains the debugging symbols for fty_rest:
+Description: fty-rest debugging symbols
+ This package contains the debugging symbols for fty-rest:
  rest api for auth convergence.
