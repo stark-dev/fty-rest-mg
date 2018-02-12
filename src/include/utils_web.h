@@ -94,7 +94,7 @@ constexpr ssize_t
 _die_idx(const char* key)
 {
     static_assert(std::tuple_size<_WSErrors>::value > N, "_die_idx asked for too big N");
-    return (_errors.at(N).key == key || _errors.at(N).message == key) ? N: _die_idx<N-1>(key);
+    return (strcmp(_errors.at(N).key, key) == 0 || strcmp(_errors.at(N).message, key) == 0) ? N: _die_idx<N-1>(key);
 }
 
 template <>
@@ -102,7 +102,7 @@ constexpr ssize_t
 _die_idx<1>(const char* key)
 {
     static_assert(std::tuple_size<_WSErrors>::value > 1 , "_die_idx asked for too big N");
-    return (_errors.at(1).key == key || _errors.at(1).message == key) ? 1: 0;
+    return (strcmp(_errors.at(1).key, key) == 0 || strcmp(_errors.at(1).message, key) == 0) ? 1: 0;
 }
 
 static int
