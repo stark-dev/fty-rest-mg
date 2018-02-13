@@ -31,7 +31,7 @@
 #include <cxxtools/serializationinfo.h>
 #include "shared/configure_inform.h"
 #include "web/src/helpers.h"
-#include "db/inout.h"
+#include "../../db/inout.h"
 #include "shared/log.h"
 #include "db/assets.h"
 </%pre>

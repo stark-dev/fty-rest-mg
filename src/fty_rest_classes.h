@@ -19,8 +19,6 @@
 #include "../include/fty_rest.h"
 
 //  Extra headers
-#include "db/agentstate.h"
-#include "db/inout.h"
 
 //  Opaque class structures to allow forward references
 #ifndef DB_AGENTSTATE_AGENTSTATE_T_DEFINED
@@ -30,6 +28,10 @@ typedef struct _db_agentstate_agentstate_t db_agentstate_agentstate_t;
 #ifndef DB_ASSET_GENERAL_T_DEFINED
 typedef struct _db_asset_general_t db_asset_general_t;
 #define DB_ASSET_GENERAL_T_DEFINED
+#endif
+#ifndef DB_INOUT_T_DEFINED
+typedef struct _db_inout_t db_inout_t;
+#define DB_INOUT_T_DEFINED
 #endif
 #ifndef DB_INOUT_EXPORTCSV_T_DEFINED
 typedef struct _db_inout_exportcsv_t db_inout_exportcsv_t;
@@ -287,11 +289,20 @@ typedef struct _web_src_topology_power_t web_src_topology_power_t;
 typedef struct _web_src_admin_passwd_t web_src_admin_passwd_t;
 #define WEB_SRC_ADMIN_PASSWD_T_DEFINED
 #endif
+#ifndef WEB_SRC_SECURITY_REMOVEHEADERS_T_DEFINED
+typedef struct _web_src_security_removeheaders_t web_src_security_removeheaders_t;
+#define WEB_SRC_SECURITY_REMOVEHEADERS_T_DEFINED
+#endif
+#ifndef WEB_SRC_HW_CAPABILITY_T_DEFINED
+typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
+#define WEB_SRC_HW_CAPABILITY_T_DEFINED
+#endif
 
 //  Internal API
 
 #include "db/agentstate/agentstate.h"
 #include "db/asset_general.h"
+#include "db/inout.h"
 #include "db/inout/exportcsv.h"
 #include "db/inout/importcsv.h"
 #include "persist/assetcrud.h"
@@ -356,6 +367,8 @@ typedef struct _web_src_admin_passwd_t web_src_admin_passwd_t;
 #include "web/src/topology_location_to.h"
 #include "web/src/topology_power.h"
 #include "web/src/admin_passwd.h"
+#include "web/src/security_removeheaders.h"
+#include "web/src/hw_capability.h"
 
 //  *** To avoid double-definitions, only define if building without draft ***
 #ifndef FTY_REST_BUILD_DRAFT_API

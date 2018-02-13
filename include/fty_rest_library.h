@@ -128,6 +128,8 @@ typedef struct _shared_utilspp_t shared_utilspp_t;
 #define SHARED_UTILSPP_T_DEFINED
 typedef struct _shared_utils_web_t shared_utils_web_t;
 #define SHARED_UTILS_WEB_T_DEFINED
+typedef struct _shared_utils_json_t shared_utils_json_t;
+#define SHARED_UTILS_JSON_T_DEFINED
 typedef struct _web_src_asset_computed_impl_t web_src_asset_computed_impl_t;
 #define WEB_SRC_ASSET_COMPUTED_IMPL_T_DEFINED
 typedef struct _web_src_helpers_t web_src_helpers_t;
@@ -140,6 +142,8 @@ typedef struct _web_src_sasl_t web_src_sasl_t;
 #define WEB_SRC_SASL_T_DEFINED
 typedef struct _web_src_tokens_t web_src_tokens_t;
 #define WEB_SRC_TOKENS_T_DEFINED
+typedef struct _web_src_sse_t web_src_sse_t;
+#define WEB_SRC_SSE_T_DEFINED
 #endif // FTY_REST_BUILD_DRAFT_API
 
 
@@ -153,6 +157,7 @@ typedef struct _web_src_tokens_t web_src_tokens_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "preproc.h"
+#include "defs.h"
 #include "db/assetdef.h"
 #include "db/assets.h"
 #include "db/dbhelpers.h"
@@ -185,12 +190,14 @@ typedef struct _web_src_tokens_t web_src_tokens_t;
 #include "shared/utils.h"
 #include "shared/utilspp.h"
 #include "shared/utils_web.h"
+#include "shared/utils_json.h"
 #include "web/src/asset_computed_impl.h"
 #include "web/src/helpers.h"
 #include "web/src/iface.h"
 #include "web/src/location_helpers.h"
 #include "web/src/sasl.h"
 #include "web/src/tokens.h"
+#include "web/src/sse.h"
 #endif // FTY_REST_BUILD_DRAFT_API
 
 #ifdef FTY_REST_BUILD_DRAFT_API

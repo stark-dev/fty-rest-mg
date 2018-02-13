@@ -27,6 +27,15 @@
           <X-Content-Type-Options>nosniff</X-Content-Type-Options>
       </args>
     </mapping>
+    <!-- Unset security HTTP header for specific mapping -->
+    <mapping>
+      <target>security_removeheaders@libfty_rest</target>
+      <url>\.(ttf|otf|eot|woff)$</url>
+      <args>
+          <Cache-Control/>
+          <Pragma/>
+      </args>
+    </mapping>
     <!-- Serve static files -->
     <mapping>
       <target>static@tntnet</target>
@@ -507,6 +516,16 @@
             <sensor>$1</sensor>
             <action>$2</action>
          </args>
+    </mapping>
+
+    <!-- GET admin/hw_capability -->
+    <mapping>
+      <target>hw_capability@libfty_rest</target>
+      <url>^/api/v1/admin/hw_capability/(.*)$</url>
+      <method>GET</method>
+      <args>
+        <id>$1</id>
+      </args>
     </mapping>
 
     <!-- POST admin/email/test -->

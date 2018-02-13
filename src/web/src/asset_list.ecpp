@@ -27,7 +27,7 @@
 #include <cxxtools/split.h>
 #include "shared/data.h"
 #include "shared/log.h"
-#include "persist/assetcrud.h"
+#include "../../persist/assetcrud.h"
 #include "web/src/helpers.h"
 #include "db/assets.h"
 </%pre>

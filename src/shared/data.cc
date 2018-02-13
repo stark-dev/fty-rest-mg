@@ -38,7 +38,7 @@
 #include "shared/dbpath.h"
 #include "defs.h"
 
-#include "db/asset_general.h"
+#include "../db/asset_general.h"
 
 static std::vector<std::tuple <a_elmnt_id_t, std::string, std::string, std::string>>
 s_get_parents (tntdb::Connection &conn, a_elmnt_id_t id)

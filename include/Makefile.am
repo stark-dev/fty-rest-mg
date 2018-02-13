@@ -13,6 +13,7 @@ nobase_include_HEADERS = \
     cleanup.h \
     dbtypes.h \
     preproc.h \
+    defs.h \
     db/assetdef.h \
     db/assets.h \
     db/dbhelpers.h \
@@ -48,12 +49,14 @@ nobase_include_HEADERS += \
     shared/utils.h \
     shared/utilspp.h \
     shared/utils_web.h \
+    shared/utils_json.h \
     web/src/asset_computed_impl.h \
     web/src/helpers.h \
     web/src/iface.h \
     web/src/location_helpers.h \
     web/src/sasl.h \
-    web/src/tokens.h
+    web/src/tokens.h \
+    web/src/sse.h
 
 endif
 

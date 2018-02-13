@@ -60,6 +60,7 @@ endif
 EXTRA_DIST += \
     src/db/agentstate/agentstate.h \
     src/db/asset_general.h \
+    src/db/inout.h \
     src/db/inout/exportcsv.h \
     src/db/inout/importcsv.h \
     src/persist/assetcrud.h \
@@ -124,6 +125,8 @@ EXTRA_DIST += \
     src/web/src/topology_location_to.h \
     src/web/src/topology_power.h \
     src/web/src/admin_passwd.h \
+    src/web/src/security_removeheaders.h \
+    src/web/src/hw_capability.h \
     src/fty_rest_classes.h
 
 # NOTE: this "include" syntax is not a "make" but an "autotools" keyword,

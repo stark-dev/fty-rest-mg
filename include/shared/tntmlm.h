@@ -35,8 +35,8 @@ class MlmClient {
         static const std::string ENDPOINT;
 
         MlmClient ();
+        virtual ~MlmClient ();
         MlmClient (void * p) {_client = NULL; _uuid = NULL; _poller = NULL; if (NULL == p) return;};
-        ~MlmClient ();
 
         // timeout <0, 300> seconds, greater number trimmed
         // based on specified uuid returns expected message or NULL on expire/interrupt
@@ -48,7 +48,7 @@ class MlmClient {
         bool        connected () { return mlm_client_connected (_client); }
         const char* subject () { return mlm_client_subject (_client); }
         const char* sender () { return mlm_client_sender (_client); }
-
+        
     private:
         void connect ();
         mlm_client_t*   _client;

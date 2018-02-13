@@ -65,6 +65,8 @@ shared_utilspp.txt
 shared_utilspp.doc
 shared_utils_web.txt
 shared_utils_web.doc
+shared_utils_json.txt
+shared_utils_json.doc
 web_src_asset_computed_impl.txt
 web_src_asset_computed_impl.doc
 web_src_helpers.txt
@@ -77,6 +79,8 @@ web_src_sasl.txt
 web_src_sasl.doc
 web_src_tokens.txt
 web_src_tokens.doc
+web_src_sse.txt
+web_src_sse.doc
 
 # Make sure to track the manually maintained project description
 !*.adoc

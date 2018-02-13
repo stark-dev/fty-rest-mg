@@ -82,7 +82,7 @@ main (int argc, char **argv)
         else
         if (streq (argv [argn], "--number")
         ||  streq (argv [argn], "-n")) {
-            puts ("99");
+            puts ("104");
             return 0;
         }
         else

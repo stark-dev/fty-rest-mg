@@ -15,6 +15,7 @@ pkgconfig_DATA = src/libfty_rest.pc
 src_libfty_rest_la_SOURCES = \
     src/db/agentstate/agentstate.cc \
     src/db/asset_general.cc \
+    src/db/inout.cc \
     src/db/inout/exportcsv.cc \
     src/db/inout/importcsv.cc \
     src/persist/assetcrud.cc \
@@ -79,6 +80,8 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/topology_location_to.cc \
     src/web/src/topology_power.cc \
     src/web/src/admin_passwd.cc \
+    src/web/src/security_removeheaders.cc \
+    src/web/src/hw_capability.cc \
     src/platform.h
 
 if ENABLE_DRAFTS
@@ -110,12 +113,14 @@ src_libfty_rest_la_SOURCES += \
     src/shared/utils.cc \
     src/shared/utilspp.cc \
     src/shared/utils_web.cc \
+    src/shared/utils_json.cc \
     src/web/src/asset_computed_impl.cc \
     src/web/src/helpers.cc \
     src/web/src/iface.cc \
     src/web/src/location_helpers.cc \
     src/web/src/sasl.cc \
-    src/web/src/tokens.cc
+    src/web/src/tokens.cc \
+    src/web/src/sse.cc
 
 endif
 

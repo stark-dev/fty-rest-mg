@@ -213,7 +213,7 @@ struct _common_msg_t {
 static int zsocket_type (void *socket) {
     assert (socket);
     assert (zsock_is (socket));
-    assert (streq (zsock_type_str (socket), "ROUTER"));
+    assert (streq (zsock_type_str ((zsock_t*)socket), "ROUTER"));
     return ZMQ_ROUTER;
 }
 #endif

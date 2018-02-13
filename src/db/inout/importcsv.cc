@@ -33,15 +33,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <fty_proto.h>
 
-#include "db/inout.h"
-
 #include "shared/log.h"
-#include "persist/assetcrud.h"
+#include "../../persist/assetcrud.h"
 #include "shared/dbpath.h"
 #include "cleanup.h"
-#include "db/asset_general.h"
+#include "../asset_general.h"
 #include "db/assets.h"
-#include "db/inout.h"
+#include "../inout.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
 #include "shared/utils_web.h"
