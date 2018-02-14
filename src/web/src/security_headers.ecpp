@@ -33,6 +33,7 @@
         //log_debug("set HTTP Reply header %s %s",key.c_str(),value.c_str());
         reply.setHeader( key, value);
     }
+    //log_debug("dumpHeader: %s",reply.dumpHeader().c_str());
 
     /* Go on to next module in tntnet.xml */
     return DECLINED;
