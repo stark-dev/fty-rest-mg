@@ -98,7 +98,6 @@ enum internal_err {
 #define KEY_STATUS "status"
 #define KEY_CONTENT_TYPE "content-type"
 #define PREFIX_X "x-"
-#define OK      "ok"
 #define ERROR   "error"
 #define YES     "yes"
 #define NO      "no"
