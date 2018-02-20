@@ -30,14 +30,14 @@
 #include "utils_json.h"
 
 struct Outlet
-{
-  std::string label;
-  bool label_r;
-  std::string type;
-  bool type_r;
-  std::string group;
-  bool group_r;
-};
+  {
+    std::string label;
+    bool label_r;
+    std::string type;
+    bool type_r;
+    std::string group;
+    bool group_r;
+  };
 
 std::string getOutletNumber(const std::string &extAttributeName)
 {
