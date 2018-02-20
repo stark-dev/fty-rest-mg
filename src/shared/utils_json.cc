@@ -30,14 +30,14 @@
 #include "utils_json.h"
 
 struct Outlet
-  {
-    std::string label;
-    bool label_r;
-    std::string type;
-    bool type_r;
-    std::string group;
-    bool group_r;
-  };
+{
+  std::string label;
+  bool label_r;
+  std::string type;
+  bool type_r;
+  std::string group;
+  bool group_r;
+};
 
 std::string getOutletNumber(const std::string &extAttributeName)
 {
@@ -85,11 +85,17 @@ s_rack_realpower_nominal(
   zstr_free(&uuid);
 
   char *result = zmsg_popstr(msg);
-  if (!streq(result, "OK"))
+  if (NULL == result || !streq(result, "OK"))
   {
     log_warning("Error reply for device '%s', result=%s", name.c_str(), result);
-    zstr_free(&result);
-    zmsg_destroy(&msg);
+    if (NULL != result)
+    {
+      zstr_free(&result);
+    }
+    if (msg)
+    {
+      zmsg_destroy(&msg);
+    }
     return ret;
   }
 

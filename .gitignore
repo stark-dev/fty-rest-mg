@@ -167,6 +167,9 @@ src/web/src/add_gpio.cpp
 src/web/src/server_status.cpp
 src/web/src/security_headers.cpp
 src/web/src/topology_location_from2.cpp
+src/web/src/hw_capability.cpp
+src/web/src/security_removeheaders.cpp
+
 
 tntnet.xml.example
 !src/web/tntnet.xml
