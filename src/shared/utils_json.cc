@@ -92,7 +92,7 @@ s_rack_realpower_nominal(
     {
       zstr_free(&result);
     }
-    if (msg)
+    if (NULL != msg)
     {
       zmsg_destroy(&msg);
     }
