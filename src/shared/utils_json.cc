@@ -85,11 +85,17 @@ s_rack_realpower_nominal(
   zstr_free(&uuid);
 
   char *result = zmsg_popstr(msg);
-  if (!streq(result, "OK"))
+  if (NULL == result || !streq(result, "OK"))
   {
     log_warning("Error reply for device '%s', result=%s", name.c_str(), result);
-    zstr_free(&result);
-    zmsg_destroy(&msg);
+    if (NULL != result)
+    {
+      zstr_free(&result);
+    }
+    if (NULL != msg)
+    {
+      zmsg_destroy(&msg);
+    }
     return ret;
   }
 

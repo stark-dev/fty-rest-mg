@@ -164,7 +164,6 @@ src/web/src/topology_location_from2.cc
 src/web/src/hw_capability.cc
 src/web/src/security_removeheaders.cc
 
-
 tntnet.xml.example
 !src/web/tntnet.xml
 tntnet.xml
