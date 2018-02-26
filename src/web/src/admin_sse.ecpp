@@ -121,7 +121,6 @@ bool database_ready;
 
     // Sse specification :  https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
     reply.setContentType("text/event-stream");
-    reply.setHeader(tnt::httpheader::cacheControl, "no-store");
     reply.setDirectMode();
     reply.out().flush();
     
