@@ -30,10 +30,10 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "log.h"
-#include "helpers.h"
-#include "str_defs.h"
-#include "assets.h"
+#include "shared/log.h"
+#include "web/src/helpers.h"
+#include "shared/str_defs.h"
+#include "db/assets.h"
 
 static
 int state_valid (const char *state) {

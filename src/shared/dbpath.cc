@@ -18,15 +18,15 @@
  *
  */
 
-#include "dbpath.h"
-#include "log.h"
+#include "shared/dbpath.h"
+#include "shared/log.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
-#include "filesystem.h"
+#include "shared/filesystem.h"
 
 static std::string
 s_get_dbpath() {

@@ -1,0 +1,109 @@
+<#
+ #
+ # Copyright (C) 2015-2016 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file auth_verify.ecpp
+ * \author Jim Klimov <EvgenyKlimov@Eaton.com>
+ * \author Michal Hrusecky <MichalHrusecky@Eaton.com>
+ * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
+ * \brief  Check if token is valid or not
+ */
+ #><%pre>
+#include "web/src/tokens.h"
+#include <tnt/httpmessage.h>
+#include <tnt/httpheader.h>
+#include "shared/utils_web.h"
+#include "web/src/helpers.h"
+#include "shared/log.h"
+
+#ifdef DEBUG
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <string>
+#endif
+
+</%pre>
+<%request scope="global">
+UserInfo user;
+</%request>
+<%cpp>
+std::string checked_access_token;
+{
+    // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
+    //       this is where the token is actually verified and user info
+    //       fill'ed
+
+    // sanitize check
+    std::string access_token;
+
+    access_token = qparam.param ("access_token");
+
+    if (access_token.empty() || access_token == "null") /* GET/POST params override a cookie, if any */
+        if (request.hasCookie("eaton_token")) {
+            access_token = request.getCookie("eaton_token").getValue();
+            if (access_token == "null") /* Avoid set but invalid cookies */
+                access_token = "";
+        }
+
+    if(request.hasHeader(tnt::httpheader::authorization)) {
+        /* Auth header overrides GET/POST parameters even if header is wrong */
+        access_token = request.getHeader(tnt::httpheader::authorization);
+
+        if(access_token.compare(0,7,"Bearer ")) {
+            access_token = "";
+        } else {
+            access_token = access_token.substr(7);
+        }
+    }
+    check_regex_text_or_die ("access_token", access_token, checked_access_token, "^[-/._~+/a-z0-9]{0,255}={0,10}$");
+    // sanitize check end
+}
+
+/* We can get the token from header, or from GET or POST request args */
+if(!checked_access_token.empty()) {
+    long int uid;
+    long int tme;
+    long int gid;
+    char *user_name;
+    BiosProfile profile = tokens::get_instance()->verify_token(checked_access_token,&tme, &uid, &gid, &user_name);
+
+    if (profile != BiosProfile::Anonymous) {
+        user.profile (profile);
+        user.uid (uid);
+        user.gid (gid);
+        user.login (user_name);
+        free (user_name); user_name = NULL;
+    } else {
+        http_die("not-authorized", "");
+    }
+}
+
+#ifdef DEBUG
+    reply.setHeader( (std::string)"X-Auth-Token-Presented: ",
+                "\"" + checked_access_token + "\"" );
+
+    std::ostringstream os;
+    os << "access_auth_level=\"" << static_cast<int> (user.profile ()) << "\"";
+    reply.setHeader( (std::string)"X-Auth-Verify: ", os.str() );
+#endif // DEBUG
+
+/* Go on to next module in tntnet.xml */
+return DECLINED;
+</%cpp>

@@ -24,10 +24,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <cxxtools/csvdeserializer.h>
 
-#include "csv.h"
-#include "assetcrud.h"
-#include "dbpath.h"
-#include "log.h"
+#include "shared/csv.h"
+#include "../persist/assetcrud.h"
+#include "shared/dbpath.h"
+#include "shared/log.h"
 
 namespace shared {
 

@@ -42,15 +42,17 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
-#include "helpers.h"
-#include "subprocess.h"
-#include "log.h"
-#include "dbpath.h"
-#include "assets.h"
-#include "asset_types.h"
-#include "utils.h"
-#include "git_details_override.h"
-#include "tntmlm.h"
+#include "web/src/helpers.h"
+#include "shared/subprocess.h"
+#include "shared/log.h"
+#include "shared/dbpath.h"
+#include "db/assets.h"
+#include "shared/asset_types.h"
+#include "shared/utils.h"
+#include "git_details_override.h" //TODO This file is no more auto-generated.
+#include "config.h" //TODO This file is no more auto-generated. 
+#include "platform.h"
+#include "shared/tntmlm.h"
 
 // Magic numbers - dpkg fancy formatting du-jour
 #ifndef DPKG__LIST__STRIP_HEADER

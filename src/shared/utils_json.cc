@@ -21,13 +21,13 @@
 #include <cxxtools/regex.h>
 #include <fty_proto.h>
 
-#include "utils_web.h"
-#include "utils.h"
-#include "asset_computed_impl.h"
-#include "data.h"
+#include "shared/utils_web.h"
+#include "shared/utils.h"
+#include "web/src/asset_computed_impl.h"
+#include "shared/data.h"
 #include "defs.h"
-#include "log.h"
-#include "utils_json.h"
+#include "shared/log.h"
+#include "shared/utils_json.h"
 
 struct Outlet
   {

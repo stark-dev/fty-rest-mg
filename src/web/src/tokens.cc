@@ -35,9 +35,9 @@
 #include <pwd.h>
 #include <mutex>
 
-#include "tokens.h"
+#include "web/src/tokens.h"
 
-#include "log.h"
+#include "shared/log.h"
 
 //! Max time key is alive
 #define MAX_LIVE 24*3600
@@ -128,7 +128,7 @@ BiosProfile tokens::gen_token(const char* user, std::string& token, long int* ex
         }
         pwnam_lock.unlock();
         if (!pwd) {
-            log_error ("Cannnot get uid for user %s: %m", user);
+            log_error ("Cannnot get uid for user %s: %s", user, strerror(errno));
             return BiosProfile::Anonymous;
         }
     }
@@ -244,7 +244,7 @@ BiosProfile tokens::verify_token(const std::string token, long int* expInSec, lo
 
     int r = sscanf (buff, "%ld %ld %ld", &tme, &l_uid, &l_gid);
     if (r != 3) {
-        log_debug ("verify_token: sscanf read of tme, uid, gid, failed: %m");
+        log_debug ("verify_token: sscanf read of tme, uid, gid, failed: %s", strerror(errno));
         return BiosProfile::Anonymous;
     }
 
@@ -261,7 +261,8 @@ BiosProfile tokens::verify_token(const std::string token, long int* expInSec, lo
     *expInSec = tme - now;
     
     if (user_name) {
-        char *foo = NULL;
+        char *foo = new char[MESSAGE_LEN + 1];
+        //char *foo = NULL;
         size_t foo_len;
         // find 4th space
         char *buff2 = buff;
@@ -270,9 +271,9 @@ BiosProfile tokens::verify_token(const std::string token, long int* expInSec, lo
             buff2++;
         }
         log_debug ("buff=%s, buff=%s", buff, buff2);
-        r = sscanf (buff2, " %zu%ms", &foo_len, &foo);
+        r = sscanf (buff2, " %zu%s", &foo_len, foo);
         if (r != 2) {
-            log_debug ("verify_token: read of username failed: %m");
+            log_debug ("verify_token: read of username failed: %s", strerror(errno));
             if (foo)
                 free (foo);
             return BiosProfile::Anonymous;

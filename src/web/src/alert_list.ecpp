@@ -34,16 +34,16 @@
 #include <tntdb/error.h>
 
 #include <fty_proto.h>
-#include "log.h"
-#include "utils.h"
-#include "utils_web.h"
-#include "utils++.h"
-#include "str_defs.h"
-#include "dbpath.h"
+#include "shared/log.h"
+#include "shared/utils.h"
+#include "shared/utils_web.h"
+#include "shared/utilspp.h"
+#include "shared/str_defs.h"
+#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "cleanup.h"
-#include "helpers.h"
-#include "utils_json.h"
+#include "web/src/helpers.h"
+#include "shared/utils_json.h"
 
 #define RFC_ALERTS_LIST "rfc-alerts-list"
 
@@ -365,9 +365,9 @@ if (streq (part, "LIST")) {
 %       frame = zmsg_pop (recv_msg);
 %       continue;
 %   }
-%   
+%
 %   std::string jsonAlert = getJsonAlert(connection,decoded);
-%   
+%
 %   if (jsonAlert.empty()){
 %       continue;
 %   }
@@ -377,7 +377,7 @@ if (streq (part, "LIST")) {
 %      first = false;
 %   }
 %   else {
-, 
+,
       <$$ jsonAlert  $>
 %   }
 %   fty_proto_destroy (&decoded);

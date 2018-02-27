@@ -8,16 +8,16 @@
   <mappings>
     <!-- Global variables setup regarding server status -->
     <mapping>
-      <target>server_status@bios_web</target>
+      <target>server_status@libfty_rest</target>
     </mapping>
 
     <!-- Everything SSL only -->
     <mapping>
-      <target>ssl-redirect@bios_web</target>
+      <target>ssl_redirect@libfty_rest</target>
     </mapping>
     <!-- Set reply default and security HTTP header -->
     <mapping>
-      <target>security_headers@bios_web</target>
+      <target>security_headers@libfty_rest</target>
       <args>
           <!-- default headers -->
           <Cache-Control>no-store</Cache-Control>
@@ -29,14 +29,14 @@
     </mapping>
     <!-- Unset security HTTP header for specific mapping -->
     <mapping>
-      <target>security_removeheaders@bios_web</target>
+      <target>security_removeheaders@libfty_rest</target>
       <url>\.(ttf|otf|eot|woff)$</url>
       <args>
           <Cache-Control/>
           <Pragma/>
       </args>
     </mapping>
-     <!-- Serve static files -->
+    <!-- Serve static files -->
     <mapping>
       <target>static@tntnet</target>
       <pathinfo>./$1</pathinfo>
@@ -65,11 +65,11 @@
 
     <!-- Make sure everybody speaks json from now on -->
     <mapping>
-      <target>json@bios_web</target>
+      <target>json@libfty_rest</target>
     </mapping>
     <!-- We are getting authorized -->
     <mapping>
-      <target>auth@bios_web</target>
+      <target>auth@libfty_rest</target>
       <url>^/api/v1/oauth2/token$</url>
     </mapping>
     <!-- Set BiosProfile profile variable if the request is authenticated
@@ -77,7 +77,7 @@
          Defaults to BiosProfile::Anonymous
       -->
     <mapping>
-      <target>auth-verify@bios_web</target>
+      <target>auth_verify@libfty_rest</target>
     </mapping>
 
 
@@ -87,33 +87,33 @@
     <!-- SysInfo mapping -->
     <!-- Implementation tests BiosProfile profile variable to limit visibility of some data -->
     <mapping>
-      <target>sysinfo@bios_web</target>
+      <target>sysinfo@libfty_rest</target>
       <url>^/api/v1/admin/sysinfo(/?|\?.+=.+)$</url>
     </mapping>
 
     <!-- Token revocation -->
     <mapping>
-      <target>auth@bios_web</target>
+      <target>auth@libfty_rest</target>
       <url>^/api/v1/oauth2/revoke$</url>
       <method>(POST|PUT)</method>
     </mapping>
 
     <!-- alerts/activelist -->
     <mapping>
-        <target>alert_list@bios_web</target>
+        <target>alert_list@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/alerts/activelist(\?[^/]+)?$</url>
     </mapping>
 
     <mapping>
-        <target>admin_sse@bios_web</target>
+        <target>admin_sse@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/sse.*$</url>
     </mapping>
 
     <!-- alerts/ack -->
     <mapping>
-        <target>alert_ack@bios_web</target>
+        <target>alert_ack@libfty_rest</target>
         <method>PUT</method>
         <url>^/api/v1/alerts/ack/([^/]+)/([^/]+)/?$</url>
         <args>
@@ -124,13 +124,13 @@
 
     <!-- alerts/rules -->
     <mapping>
-        <target>alert_rules_list@bios_web</target>
+        <target>alert_rules_list@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/alerts/rules([^/]*)$</url>
     </mapping>
 
     <mapping>
-        <target>alert_rules_detail@bios_web</target>
+        <target>alert_rules_detail@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/alerts/rules/([^/]*)$</url>
         <args>
@@ -139,7 +139,7 @@
     </mapping>
 
     <mapping>
-        <target>alert_rules@bios_web</target>
+        <target>alert_rules@libfty_rest</target>
         <method>(POST|PUT)</method>
         <url>^/api/v1/alerts/rules(/|/([^/]+)){0,1}$</url>
         <args>
@@ -149,7 +149,7 @@
 
     <!-- admin/systemctl GET -->
     <mapping>
-        <target>systemctl@bios_web</target>
+        <target>systemctl@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/admin/systemctl/([^/]+)(/(.*))?$</url>
         <args>
@@ -161,7 +161,7 @@
 
     <!-- admin/systemctl POST -->
     <mapping>
-        <target>systemctl@bios_web</target>
+        <target>systemctl@libfty_rest</target>
         <method>POST</method>
         <url>^/api/v1/admin/systemctl/(.+?)$</url>
         <args>
@@ -171,7 +171,7 @@
 
     <!-- admin/info GET rack controller info-->
     <mapping>
-        <target>info@bios_web</target>
+        <target>info@libfty_rest</target>
         <method>GET</method>
         <url>^/api/v1/admin/info$</url>
     </mapping>
@@ -179,16 +179,16 @@
 
     <!-- Network configuration -->
     <mapping>
-      <target>augtool@bios_web</target>
+      <target>augtool@libfty_rest</target>
       <url>^/api/v1/admin/(netcfg|time).*</url>
     </mapping>
     <mapping>
-      <target>netcfg@bios_web</target>
+      <target>netcfg@libfty_rest</target>
       <url>^/api/v1/admin/netcfgs$</url>
       <method>GET</method>
     </mapping>
     <mapping>
-      <target>netcfg@bios_web</target>
+      <target>netcfg@libfty_rest</target>
       <url>^/api/v1/admin/netcfg/(.*)$</url>
       <method>(GET|PUT)</method>
       <args>
@@ -196,11 +196,11 @@
       </args>
     </mapping>
     <mapping>
-      <target>admin_ifaces@bios_web</target>
+      <target>admin_ifaces@libfty_rest</target>
       <url>^/api/v1/admin/ifaces$</url>
     </mapping>
     <mapping>
-      <target>admin_iface@bios_web</target>
+      <target>admin_iface@libfty_rest</target>
       <url>^/api/v1/admin/iface/(.*)$</url>
       <method>GET</method>
       <args>
@@ -210,14 +210,14 @@
 
     <!-- Time settings -->
     <mapping>
-      <target>time@bios_web</target>
+      <target>time@libfty_rest</target>
       <method>(GET|POST)</method>
       <url>^/api/v1/admin/time.*$</url>
     </mapping>
 
     <!-- Change password -->
     <mapping>
-      <target>admin_passwd@bios_web</target>
+      <target>admin_passwd@libfty_rest</target>
       <url>^/api/v1/admin/passwd(/)?</url>
       <method>POST</method>
     </mapping>
@@ -225,12 +225,12 @@
     <!-- Asset management -->
     <!-- list of asset by container -->
     <mapping>
-      <target>assets_in@bios_web</target>
+      <target>assets_in@libfty_rest</target>
       <url>^/api/v1/assets$</url>
     </mapping>
 
     <mapping>
-      <target>asset_list@bios_web</target>
+      <target>asset_list@libfty_rest</target>
       <url>^/api/v1/asset/(datacenter|room|row|rack|group|device)s.*$</url>
       <args>
         <type>$1</type>
@@ -239,13 +239,13 @@
 
     <!-- Asset import -->
     <mapping>
-      <target>asset_import@bios_web</target>
+      <target>asset_import@libfty_rest</target>
       <url>^/api/v1/asset/import.*</url>
     </mapping>
 
     <!-- Asset export -->
     <mapping>
-      <target>asset_export@bios_web</target>
+      <target>asset_export@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/asset/export.*</url>
     </mapping>
@@ -256,7 +256,7 @@
               asset API, like /asset/import!!!
          -->
     <mapping>
-      <target>asset_GET@bios_web</target>
+      <target>asset_GET@libfty_rest</target>
       <url>^/api/v1/asset/?(datacenter|room|row|rack|group|device)?/?(.*)$</url>
       <method>GET</method>
       <args>
@@ -266,7 +266,7 @@
     </mapping>
 
     <mapping>
-      <target>asset_DELETE@bios_web</target>
+      <target>asset_DELETE@libfty_rest</target>
       <url>^/api/v1/asset/(.*)$</url>
       <method>DELETE</method>
       <args>
@@ -275,7 +275,7 @@
     </mapping>
 
     <mapping>
-      <target>asset_PUT@bios_web</target>
+      <target>asset_PUT@libfty_rest</target>
       <url>^/api/v1/asset/(.*)$</url>
       <method>PUT</method>
       <args>
@@ -284,7 +284,7 @@
     </mapping>
 
     <mapping>
-      <target>asset_POST@bios_web</target>
+      <target>asset_POST@libfty_rest</target>
       <url>^/api/v1/asset/?$</url>
       <method>POST</method>
     </mapping>
@@ -294,39 +294,39 @@
         this MUST be allowed before license is accepted
     -->
     <mapping>
-      <target>my_profile@bios_web</target>
+      <target>my_profile@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/admin/myuser$</url>
     </mapping>
 
     <!-- admin/myuser PUT -->
     <mapping>
-      <target>my_profile@bios_web</target>
+      <target>my_profile@libfty_rest</target>
       <method>PUT</method>
       <url>^/api/v1/admin/myuser$</url>
     </mapping>
 
     <!-- License management -->
     <mapping>
-      <target>license_text@bios_web</target>
+      <target>license_text@libfty_rest</target>
       <url>^/api/v1/admin/license$</url>
       <method>GET</method>
     </mapping>
 
     <mapping>
-      <target>license_POST@bios_web</target>
+      <target>license_POST@libfty_rest</target>
       <url>^/api/v1/admin/license$</url>
       <method>POST</method>
     </mapping>
 
     <mapping>
-      <target>license_status@bios_web</target>
+      <target>license_status@libfty_rest</target>
       <url>^/api/v1/admin/license/status$</url>
       <method>GET</method>
     </mapping>
 
     <mapping>
-      <target>license@bios_web</target>
+      <target>license@libfty_rest</target>
       <url>^/api/v1/.*</url>
     </mapping>
     <!-- API itself -->
@@ -334,7 +334,7 @@
     <!-- Enforce processing of supported extensions by using this order: -->
     <!-- Download as... (attachment with a filename) -->
     <mapping>
-      <target>getlog_GET@bios_web</target>
+      <target>getlog_GET@libfty_rest</target>
       <url>^/api/v1/admin/getlog/(.*)\.(gz|txt)$</url>
       <method>GET</method>
       <args>
@@ -345,7 +345,7 @@
 
     <!-- List supported lognames and extensions at the base URL -->
     <mapping>
-      <target>getlog_GET@bios_web</target>
+      <target>getlog_GET@libfty_rest</target>
       <url>^/api/v1/admin/getlog$</url>
       <method>GET</method>
       <args>
@@ -355,7 +355,7 @@
 
     <!-- Display log raw in the browser -->
     <mapping>
-      <target>getlog_GET@bios_web</target>
+      <target>getlog_GET@libfty_rest</target>
       <url>^/api/v1/admin/getlog/(.*)$</url>
       <method>GET</method>
       <args>
@@ -365,34 +365,34 @@
     </mapping>
 
     <mapping>
-      <target>topology_location_from2@bios_web</target>
+      <target>topology_location_from2@libfty_rest</target>
       <url>^/api/v1/topology/location.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- topology/location -->
     <mapping>
-      <target>topology_location_from@bios_web</target>
+      <target>topology_location_from@libfty_rest</target>
       <url>^/api/v1/topology/location.*$</url>
       <method>GET</method>
     </mapping>
 
     <mapping>
-      <target>topology_location_to@bios_web</target>
+      <target>topology_location_to@libfty_rest</target>
       <url>^/api/v1/topology/location.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- topology/power -->
     <mapping>
-      <target>topology_power@bios_web</target>
+      <target>topology_power@libfty_rest</target>
       <url>^/api/v1/topology/power.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- Get input power chain -->
     <mapping>
-      <target>input_power_chain@bios_web</target>
+      <target>input_power_chain@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/topology/input_power_chain/(.+)$</url>
       <args>
@@ -402,40 +402,40 @@
 
     <!-- Current meassurements -->
     <mapping>
-      <target>current@bios_web</target>
+      <target>current@libfty_rest</target>
       <url>^/api/v1/metric/current.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- rack consumption -->
     <mapping>
-      <target>rack_total@bios_web</target>
+      <target>rack_total@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/metric/computed/rack_total.*$</url>
     </mapping>
 
     <!-- datacenter indicators -->
     <mapping>
-      <target>datacenter_indicators@bios_web</target>
+      <target>datacenter_indicators@libfty_rest</target>
       <url>^/api/v1/metric/computed/datacenter_indicators.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- uptime -->
     <mapping>
-      <target>uptime@bios_web</target>
+      <target>uptime@libfty_rest</target>
       <url>^/api/v1/metric/computed/uptime.*$</url>
     </mapping>
 
     <!-- Make sure we have malamute connection -->
     <!-- Currently doesn't work, needs to be debugged
     <mapping>
-      <target>agent@bios_web</target>
+      <target>agent@libfty_rest</target>
     </mapping> -->
 
     <!-- Average GET -->
     <mapping>
-      <target>average@bios_web</target>
+      <target>average@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/metric/computed/average/csv.*$</url>
       <args>
@@ -444,7 +444,7 @@
     </mapping>
 
     <mapping>
-      <target>average@bios_web</target>
+      <target>average@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/metric/computed/average.*$</url>
       <args>
@@ -454,41 +454,41 @@
 
     <!-- admin/config -->
     <mapping>
-        <target>config@bios_web</target>
+        <target>config@libfty_rest</target>
         <url>^/api/v1/admin/config.*$</url>
     </mapping>
 
     <!-- POST admin/scan -->
     <mapping>
-      <target>scan_run@bios_web</target>
+      <target>scan_run@libfty_rest</target>
       <url>^/api/v1/admin/scan.*$</url>
       <method>POST</method>
     </mapping>
 
     <!-- GET admin/scan -->
     <mapping>
-      <target>scan_progress@bios_web</target>
+      <target>scan_progress@libfty_rest</target>
       <url>^/api/v1/admin/scan.*$</url>
       <method>GET</method>
     </mapping>
 
     <!-- DELETE admin/scan -->
     <mapping>
-        <target>scan_run@bios_web</target>
+        <target>scan_run@libfty_rest</target>
         <url>^/api/v1/admin/scan.*$</url>
         <method>DELETE</method>
     </mapping>
 
     <!-- POST admin/confscan -->
     <mapping>
-      <target>conf_scan@bios_web</target>
+      <target>conf_scan@libfty_rest</target>
       <url>^/api/v1/admin/confscan.*$</url>
       <method>POST</method>
     </mapping>
 
     <!-- GET admin/confscan -->
     <mapping>
-      <target>conf_scan@bios_web</target>
+      <target>conf_scan@libfty_rest</target>
       <url>^/api/v1/admin/confscan.*$</url>
       <method>GET</method>
     </mapping>
@@ -496,21 +496,21 @@
     <!-- GET admin/gpio -->
     <mapping>
         <method>GET</method>
-        <target>list_gpio@bios_web</target>
+        <target>list_gpio@libfty_rest</target>
         <url>^/api/v1/admin/gpio$</url>
     </mapping>
 
     <!-- POST admin/gpio -->
     <mapping>
         <method>POST</method>
-        <target>add_gpio@bios_web</target>
+        <target>add_gpio@libfty_rest</target>
         <url>^/api/v1/admin/gpio/?$</url>
     </mapping>
 
     <!-- POST admin/gpo -->
     <mapping>
         <method>POST</method>
-        <target>gpo_action@bios_web</target>
+        <target>gpo_action@libfty_rest</target>
         <url>^/api/v1/admin/gpo</url>
         <args>
             <sensor>$1</sensor>
@@ -520,7 +520,7 @@
 
     <!-- GET admin/hw_capability -->
     <mapping>
-      <target>hw_capability@bios_web</target>
+      <target>hw_capability@libfty_rest</target>
       <url>^/api/v1/admin/hw_capability/(.*)$</url>
       <method>GET</method>
       <args>
@@ -530,28 +530,28 @@
 
     <!-- POST admin/email/test -->
     <mapping>
-        <target>email_test@bios_web</target>
+        <target>email_test@libfty_rest</target>
         <url>^/api/v1/admin/email[/_]test.*$</url>
 	<method>POST</method>
     </mapping>
 
     <!-- POST admin/email/feedback -->
     <mapping>
-        <target>email_feedback@bios_web</target>
+        <target>email_feedback@libfty_rest</target>
         <url>^/api/v1/admin/email/feedback.*$</url>
         <method>POST</method>
     </mapping>
 
     <!-- POST admin/email/cpre -->
     <mapping>
-        <target>email_vote@bios_web</target>
+        <target>email_vote@libfty_rest</target>
         <url>^/api/v1/admin/email/vote.*$</url>
         <method>POST</method>
     </mapping>
 
     <!-- not found error  -->
     <mapping>
-        <target>not_found@bios_web</target>
+        <target>not_found@libfty_rest</target>
         <url>^/api/v1/*.*$</url>
     </mapping>
 
@@ -581,7 +581,7 @@
         <level>INFO</level>
       </logger>
       <logger>
-        <category>component.bios_web-web</category>
+        <category>component.libfty_rest-web</category>
         <level>INFO</level>
       </logger>
     </loggers>

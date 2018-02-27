@@ -43,6 +43,11 @@
 #define xstr(a) str(a)
 #define str(a) #a
 
+//TODO CHECK HOW DO IT IN A CLEAN WAY
+#ifndef SASLAUTHD_MUX
+#define SASLAUTHD_MUX   /var/run/saslauthd/mux
+#endif
+//ENDOF TODO
 #ifndef SASLAUTHD_MUX
 #error Build with -DSASLAUTHD_MUX=/path/to/saslauthd/mux
 #else

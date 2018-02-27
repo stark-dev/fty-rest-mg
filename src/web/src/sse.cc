@@ -25,12 +25,12 @@
  */
 
 
-#include "sse.h"
-#include "tokens.h"
-#include "data.h"
-#include "log.h"
-#include "utils_json.h"
-#include "str_defs.h"
+#include "web/src/sse.h"
+#include "web/src/tokens.h"
+#include "shared/data.h"
+#include "shared/log.h"
+#include "shared/utils_json.h"
+#include "shared/str_defs.h"
 
 //constructor
 

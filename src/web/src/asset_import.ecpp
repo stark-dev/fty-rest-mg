@@ -31,11 +31,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "log.h"
-#include "db/inout.h"
-#include "bios-magic.h"
-#include "configure_inform.h"
-#include "helpers.h"
+#include "shared/log.h"
+#include "../../db/inout.h"
+#include "bios_magic.h"
+#include "shared/configure_inform.h"
+#include "web/src/helpers.h"
 </%pre>
 <%request scope="global">
 UserInfo user;

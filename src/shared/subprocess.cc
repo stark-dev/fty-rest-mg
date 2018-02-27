@@ -16,7 +16,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "subprocess.h"
+#include "shared/subprocess.h"
 #include "preproc.h"
 
 #include <cassert>
@@ -247,8 +247,9 @@ const char* SubProcess::state() const {
 }
 
 std::string read_all(int fd) {
+    //Why not #define BUF_SIZE ?
     static size_t BUF_SIZE = 4096;
-    char buf[BUF_SIZE+1];
+    char buf[4097]; // BUF_SIZE +1
     ssize_t r;
 
     std::stringbuf sbuf;
@@ -283,17 +284,22 @@ int output2(const Argv& args, std::string& o, uint64_t timeout, size_t timestep)
 }
 
 int output(const Argv& args, std::string& o, std::string& e, const std::string& i, uint64_t timeout, size_t timestep) {
+    ssize_t r;
     SubProcess p(args, SubProcess::STDOUT_PIPE | SubProcess::STDERR_PIPE| SubProcess::STDIN_PIPE);
     p.run();
-    ::write(p.getStdin(), i.c_str(), i.size());
+    r = ::write(p.getStdin(), i.c_str(), i.size());
+    if (r < 0) {
+        return -1;
+    }
     ::fsync(p.getStdin());
     p.closeStdin();
     return s_output (p, o, e, timeout, timestep);
 }
 
 std::string wait_read_all(int fd) {
+    //Why not #define BUF_SIZE ?
     static size_t BUF_SIZE = 4096;
-    char buf[BUF_SIZE+1];
+    char buf[4097]; // BUF_SIZE +1
     ssize_t r;
     int exit = 0;
 
@@ -383,6 +389,7 @@ xzloop_add_fd (zloop_t *self, int fd, zloop_fn handler, void *arg)
 static int
 s_handler (zloop_t *loop, zmq_pollitem_t *item, void *arg)
 {
+    ssize_t r;
     assert (loop); //remove compiler warning
     struct sbp_info_t *i = (struct sbp_info_t*) arg;
 
@@ -390,7 +397,12 @@ s_handler (zloop_t *loop, zmq_pollitem_t *item, void *arg)
     //     because s_handler won't return - so lets read only PIPE_BUF and exit
     char buf[PIPE_BUF+1];
     memset(buf, '\0', PIPE_BUF+1);
-    ::read(item->fd, buf, PIPE_BUF);
+    r =::read(item->fd, buf, PIPE_BUF);
+    //TODO Make it cleaner
+    if (r < 0) {
+        return -1;
+    }
+
     i->buff << buf;
 
     return 0;

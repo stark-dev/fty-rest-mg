@@ -22,12 +22,12 @@
 #include <cxxtools/regex.h>
 #include <unistd.h> // make "readlink" available on ARM
 #include <tntdb.h>
-#include "utils_web.h"
-#include "helpers.h"
-#include "str_defs.h" // EV_LICENSE_DIR, EV_DATA_DIR
+#include "shared/utils_web.h"
+#include "web/src/helpers.h"
+#include "shared/str_defs.h" // EV_LICENSE_DIR, EV_DATA_DIR
 
-#include "log.h"
-#include "dbpath.h"
+#include "shared/log.h"
+#include "shared/dbpath.h"
 
 /**
  * TODO: This list should not be precompiled once and forever in the
@@ -398,7 +398,7 @@ check_user_permissions (
     if (permissions.count (user.profile ()) != 1) {
         // actually it is not an error :)
         log_info ("Permission not defined for given profile");
-        http_add_error (debug, errors, "not-authorized");
+        http_add_error (debug, errors, "not-authorized", "");
         return;
     }
 
@@ -414,7 +414,7 @@ check_user_permissions (
         return;
     }
 
-    http_add_error (debug, errors, "not-authorized");
+    http_add_error (debug, errors, "not-authorized", "");
     return;
 }
 

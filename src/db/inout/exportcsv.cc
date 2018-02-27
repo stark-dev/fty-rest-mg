@@ -3,7 +3,7 @@ Copyright (C) 2014-2015 Eaton
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundatino; either version 2 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -31,9 +31,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 
 #include "db/assets.h"
-#include "dbpath.h"
-#include "log.h"
-#include "utils++.h"
+#include "shared/dbpath.h"
+#include "shared/log.h"
+#include "shared/utilspp.h"
 
 namespace persist {
 

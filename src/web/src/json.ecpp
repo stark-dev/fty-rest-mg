@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <cxxtools/regex.h>
 
-#include "log.h"
+#include "shared/log.h"
 </%pre>
 <%cpp>
 	// NOTE: json.ecpp is not limited by CHECK_USER_PERMISSIONS_OR_DIE

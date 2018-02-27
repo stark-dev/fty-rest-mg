@@ -23,20 +23,20 @@
  \brief Open an sse connection to send any notification to UI
 */
 #><%pre>
-
 #include <fty_proto.h>
 
-#include "sse.h"
-#include "log.h"
-#include "utils.h"
-#include "tokens.h"
-#include "utils_web.h"
-#include "utils++.h"
-#include "str_defs.h"
-#include "dbpath.h"
+#include "web/src/sse.h"
+#include "shared/log.h"
+#include "shared/utils.h"
+#include "web/src/tokens.h"
+#include "shared/utils_web.h"
+#include "shared/utilspp.h"
+#include "shared/str_defs.h"
+#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "cleanup.h"
-#include "helpers.h"
+#include "web/src/helpers.h"
+
 
 </%pre>
 <%request scope="global">
@@ -81,11 +81,11 @@ bool database_ready;
             http_die ("internal-error", "Connecting to database failed.");
     }
     log_debug ("datacenter id = '%" PRIu32 "'.", (uint32_t) dbid);
-    
+
     Sse sseManager;
     sseManager.setDatacenter(dc);
     sseManager.setDatacenterId((uint32_t) dbid);
-    
+
     try {
         sseManager.setConnection(tntdb::connectCached (url));
     }
@@ -103,7 +103,7 @@ bool database_ready;
     if (errorMsgAsset) {
         http_die ("internal-error", errorMsgAsset);
     }
-    
+
     // connect to malamute and streams
     const char * errorMsgMlm  = sseManager.connectMalamute();
     if (errorMsgMlm) {
@@ -111,12 +111,12 @@ bool database_ready;
     }
     //Stream Alert
     if (-1 == sseManager.consumeStream("ALERTS", ".*")) {
-        http_die ("internal-error", "Cannot consume ALERT stream");        
+        http_die ("internal-error", "Cannot consume ALERT stream");
     }
 
     //Stream Asset
     if (-1 == sseManager.consumeStream("ASSETS", ".*")) {
-        http_die ("internal-error", "Cannot consume ASSETS stream");        
+        http_die ("internal-error", "Cannot consume ASSETS stream");
     }
 
     // Sse specification :  https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
@@ -131,14 +131,14 @@ bool database_ready;
 
     //get the token from the request
     std::string access_token = "";
-    
+
     //in cookie if present
     if (request.hasCookie("eaton_token")) {
         access_token = request.getCookie("eaton_token").getValue();
         if (access_token == "null") /* Avoid set but invalid cookies */
                 access_token = "";
     }
-    
+
     //in header if not found
     if(access_token.empty() && request.hasHeader(tnt::httpheader::authorization)) {
         access_token = request.getHeader(tnt::httpheader::authorization);
@@ -146,12 +146,12 @@ bool database_ready;
             access_token = access_token.substr(7);
         }
     }
-    
+
     if (access_token.empty()){
       log_error("Token empty");
-      http_die ("internal-error", "Cannot get token value");      
+      http_die ("internal-error", "Cannot get token value");
     }
-    
+
     sseManager.setToken(access_token);
     long int tme;
     unsigned tntRequestTimeout = tnt::TntConfig::it().maxRequestTime * 1000 / 2 ;

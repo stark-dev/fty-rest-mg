@@ -23,7 +23,7 @@
  * \author Alena Chernikava <AlenaChernikava@Eaton.com>
  * \author Michal Hrusecky <MichalHrusecky@Eaton.com>
  */
-#include "asset_types.h"
+#include "shared/asset_types.h"
 
 #include <algorithm>
 
@@ -250,4 +250,4 @@ is_ups(int x) {
     return x == asset_subtype::UPS;
 }
 
-}; // namesace end
+} // namesace end

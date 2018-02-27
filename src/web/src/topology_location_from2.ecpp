@@ -32,12 +32,12 @@
 #include <exception>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "data.h"
-#include "location_helpers.h"
-#include "asset_types.h"
-#include "helpers.h"
-#include "topology2.h"
+#include "shared/dbpath.h"
+#include "shared/data.h"
+#include "web/src/location_helpers.h"
+#include "shared/asset_types.h"
+#include "web/src/helpers.h"
+#include "db/topology2.h"
 </%pre>
 <%request scope="global">
 UserInfo user;

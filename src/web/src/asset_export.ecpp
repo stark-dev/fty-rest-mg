@@ -27,10 +27,10 @@
 #include <string.h>
 #include <time.h>
 
-#include "db/inout.h"
-#include "utils.h"
-#include "log.h"
-#include "helpers.h"
+#include "../../db/inout.h"
+#include "shared/utils.h"
+#include "shared/log.h"
+#include "web/src/helpers.h"
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -75,7 +75,7 @@ bool database_ready;
     }
     catch (const std::exception &e) {
         LOG_END_ABNORMAL(e);
-        http_die("internal-error");
+        http_die("internal-error", "");
     }
     reply.setContentType ("text/csv;charset=UTF-8");
 }

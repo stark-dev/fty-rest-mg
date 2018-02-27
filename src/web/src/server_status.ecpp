@@ -28,9 +28,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include "utils.h"
-#include "helpers.h"
-#include "log.h"
+#include "shared/utils.h"
+#include "web/src/helpers.h"
+#include "shared/log.h"
 </%pre>
 <%request scope="global">
 bool database_ready;

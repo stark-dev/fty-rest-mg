@@ -31,9 +31,9 @@
 
 #include <magic.h>
 
-#include "bios-magic.h"
-#include "subprocess.h"
-#include "log.h"
+#include "bios_magic.h"
+#include "shared/subprocess.h"
+#include "shared/log.h"
 
 namespace shared {
 

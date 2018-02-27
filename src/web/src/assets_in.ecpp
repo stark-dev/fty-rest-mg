@@ -29,12 +29,12 @@
 #include <tntdb/connect.h>
 #include <tntdb/error.h>
 #include <cxxtools/split.h>
-#include "log.h"
-#include "utils_web.h"
-#include "dbpath.h"
-#include "asset_types.h"
+#include "shared/log.h"
+#include "shared/utils_web.h"
+#include "shared/dbpath.h"
+#include "shared/asset_types.h"
 #include "db/assets.h"
-#include "helpers.h"
+#include "web/src/helpers.h"
 
 static std::string
     assets_all_container(

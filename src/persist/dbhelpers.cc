@@ -25,9 +25,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/error.h>
 
-#include "log.h"
+#include "shared/log.h"
 #include "persist_error.h"
-#include "asset_types.h"
+#include "shared/asset_types.h"
 
 int convert_asset_to_monitor_safe(const char* url,
                 a_elmnt_id_t asset_element_id, m_dvc_id_t *device_id)

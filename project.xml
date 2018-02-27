@@ -1,0 +1,227 @@
+<project
+    name = "fty-rest"
+    description = "REST API for auth Convergence"
+    script = "zproject.gsl"
+    email = "EatonIPCOpenSource@eaton.com"
+    url = "https://42ity.org"
+    license = "GPL-2.0+"
+    repository = "https://github.com/42ity/fty-proto"
+    header = "fty_rest.h"
+    >
+
+    <target name = "debian" />
+    <target name = "redhat" />
+    <target name = "jenkins" >
+        <option name = "agent_label" value = "devel-image &amp;&amp; x86_64" />
+        <option name = "triggers_pollSCM" value = "H/2 * * * *" />
+        <option name = "test_cppcheck" value = "1" />
+        <option name = "build_docs" value = "1" />
+        <option name = "dist_docs" value = "1" />
+    </target>
+
+   <classfilename keep-tree = "true" use-cxx = "true" pretty-print = "no" source-extension = "cc" />
+  <!--  <include filename = "license.xml" /> -->
+    <version major = "1" minor = "0" patch = "0" />
+    <abi current = "1" revision = "0" age = "0" />
+
+    <use project = "czmq"
+        repository="https://github.com/42ity/czmq.git" release = "v3.0.2-FTY-master"
+        min_major = "3" min_minor = "0" min_patch = "2" />
+
+    <use project = "malamute" min_major = "1" test = "mlm_server_test"
+        repository="https://github.com/42ity/malamute.git"
+        release = "1.0-FTY-master" />
+
+    <use project = "cidr" libname = "libcidr" test = "cidr_alloc" header="libcidr.h"
+	debian_name = "libcidr0-dev" redhat_name = "libcidr-devel"
+	repository = "https://github.com/42ity/libcidr.git"
+        release = "1.2.3-FTY-master" />
+
+    <use project = "cxxtools" test="cxxtools::Utf8Codec::Utf8Codec" header = "cxxtools/allocator.h"
+        repository = "https://github.com/42ity/cxxtools.git"
+        release = "2.2-FTY-master"
+        />
+
+    <use project = "tntnet" optional = "1"
+        repository = "https://github.com/42ity/tntnet.git"
+        release = "2.2-FTY-master"
+        />
+
+    <use project = "tntdb" test="tntdb::Date::gmtime"
+        repository = "https://github.com/42ity/tntdb.git"
+        release = "1.3-FTY-master"
+        builddir = "tntdb"/>
+
+    <use project = "magic" libname = "libmagic" header = "magic.h" optional = "1"
+        repository = "https://github.com/42ity/libmagic.git"
+        test = "magic_close"
+        redhat_name = "file-devel"
+        release = "5.18-FTY-master" />
+
+    <use project = "fty-proto" libname = "libfty_proto" header="ftyproto.h" prefix="fty_proto"
+        min_major = "1" min_minor = "0" min_patch = "0"
+        repository = "https://github.com/42ity/fty-proto.git"
+        test = "fty_proto_test">
+        <use project = "malamute"/>
+    </use>
+
+    <header name = "app"  />
+    <header name = "bios_agent"  />
+    <header name = "bios_agentpp"  />
+    <header name = "bios_export"  />
+    <header name = "ymsg"  />
+
+    <header name = "bios_magic" />
+    <header name = "cleanup" />
+    <header name = "dbtypes" />
+    <header name = "preproc" />
+    <header name = "defs" private = "0" />
+
+   <header name = "db/assetdef" private = "0" />
+   <class name = "db/agentstate/agentstate" private = "1" selftest = "0" />
+   <class name = "db/asset_general" private = "1" selftest = "0" />
+   <class name = "db/topology2" private = "0" selftest = "0" />
+   <class name = "db/assets/assetcr" private = "0" selftest = "0" />
+   <class name = "db/assets/assetd" private = "0" selftest = "0" />
+   <class name = "db/assets/assetr" private = "0" selftest = "0" />
+   <class name = "db/assets/assetu" private = "0" selftest = "0" />
+
+   <header name = "db/assets" private = "0" />
+   <header name = "db/dbhelpers" private = "0" />
+   <class name = "db/inout" private = "1" selftest = "0" />
+   <header name = "db/types" private = "0" />
+
+   <class name = "db/inout/exportcsv" private = "1" selftest = "0" />
+   <class name = "db/inout/importcsv" private = "1" selftest = "0" />
+
+   <class name = "git_details_override" private = "0" selftest ="0" />
+
+   <class name = "msg/asset_msg" private = "0" selftest = "0" />
+   <class name = "msg/common_msg" private = "0" selftest = "0" />
+
+
+   <class name = "persist/assetcrud" private = "1" selftest = "0" />
+   <class name = "persist/assettopology" private = "1" selftest = "0" />
+   <class name = "persist/dbhelpers" private = "1" selftest = "0" />
+   <class name = "persist/monitor" private = "1" selftest = "0" />
+   <class name = "persist/persist_error" private = "1" selftest = "0" />
+
+
+   <class name = "shared/asset_types" private = "0" selftest = "0" />
+   <class name = "shared/augtool" private = "0" selftest = "0" />
+   <class name = "shared/cidr" private = "0" selftest = "0" />
+   <class name = "shared/configure_inform" private = "0" selftest = "0" />
+   <class name = "shared/csv" private = "0" selftest = "0" />
+   <class name = "shared/data" private = "0" selftest = "0" />
+   <class name = "shared/dbpath" private = "0" selftest = "0" />
+   <class name = "shared/filesystem" private = "0" selftest = "0" />
+   <class name = "shared/fty_asset_uptime_configurator" private = "0" selftest = "0" />
+   <class name = "shared/ic" private = "0" selftest = "0" />
+   <class name = "shared/log" private = "0" selftest = "0" />
+   <class name = "shared/magic" private = "1" selftest = "0" />
+   <class name = "shared/str_defs" private = "0" selftest = "0" />
+   <class name = "shared/subprocess" private = "0" selftest = "0" />
+   <class name = "shared/tntmlm" private = "0" selftest = "0" />
+   <class name = "shared/topic_cache" private = "0" selftest = "0" />
+   <class name = "shared/upsstatus" private = "0" selftest = "0" />
+   <class name = "shared/utils" private = "0" selftest = "0" />
+   <class name = "shared/utilspp" private = "0" selftest = "0" />
+   <class name = "shared/utils_web" private = "0" selftest = "0" />
+   <class name = "shared/utils_json" private = "0" selftest = "0" />
+
+   <class name = "warranty/warranty_metric" private = "1" selftest = "0" />
+
+   <class name = "web/src/asset_computed_impl" selftest = "0" />
+   <class name = "web/src/helpers" selftest = "0" />
+   <class name = "web/src/iface" selftest = "0" />
+   <class name = "web/src/location_helpers" selftest = "0" />
+   <class name = "web/src/sasl" selftest = "0" />
+   <class name = "web/src/tokens" selftest = "0" />
+   <class name = "web/src/sse" selftest = "0" />
+
+
+
+
+   
+    <!-- Note: the .cpp file is generated by ECPP parser during build
+         from .ecpp file that is EXTRA_DISTed in Makemodule-local.am,
+         and renamed to a .cc file just to abuse pregenerated zproject
+         recipes. The "extra" or "bin" tags did not produce the effect
+         we needed, since they refer verbatim to the "name" (new GSLs
+         are needed to handle this).
+         The "license.cc" file generated by zproject should be discarded
+         and ignored; the "license.h" is harmless to have and include
+         in other generated files. There is no selftest.
+     -->
+
+    <class name = "web/src/add_gpio" private="1" selftest = "0">root object</class>
+    <class name = "web/src/admin_iface" private="1" selftest = "0">root object</class>
+    <class name = "web/src/admin_ifaces" private="1" selftest = "0">root object</class>
+    <class name = "web/src/admin_sse" private="1" selftest = "0">root object</class>
+    <class name = "web/src/alert_ack" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/alert_list" private="1" selftest = "0">root object</class>
+    <class name = "web/src/alert_rules_detail" private="1" selftest = "0">root object</class>
+    <class name = "web/src/alert_rules" private="1" selftest = "0">root object</class>
+    <class name = "web/src/alert_rules_list" private="1" selftest = "0">root object</class>
+    <class name = "web/src/asset_DELETE" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/asset_export" private="1" selftest = "0">root object</class>
+    <class name = "web/src/asset_GET" private="1" selftest = "0">root object</class>
+    <class name = "web/src/asset_import" private="1" selftest = "0">root object</class>
+    <class name = "web/src/asset_list" private="1" selftest = "0">root object</class>
+    <class name = "web/src/asset_POST" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/asset_PUT" private="1" selftest = "0">root object</class>
+    <class name = "web/src/assets_in" private="1" selftest = "0">root object</class>
+    <class name = "web/src/auth" private="1" selftest = "0">root object</class>
+    <class name = "web/src/auth_verify" private="1" selftest = "0">root object</class>
+    <class name = "web/src/average" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/config" private="1" selftest = "0">root object</class>
+    <class name = "web/src/conf_scan" private="1" selftest = "0">root object</class>
+    <class name = "web/src/current" private="1" selftest = "0">root object</class>
+    <class name = "web/src/datacenter_indicators" private="1" selftest = "0">root object</class>
+    <class name = "web/src/email_feedback" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/email_test" private="1" selftest = "0">root object</class>
+    <class name = "web/src/email_vote" private="1" selftest = "0">root object</class>
+    <class name = "web/src/getlog_GET" private="1" selftest = "0">root object</class>
+    <class name = "web/src/gpo_action" private="1" selftest = "0">root object</class>
+    <class name = "web/src/info" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/input_power_chain" private="1" selftest = "0">root object</class>
+    <class name = "web/src/json" private="1" selftest = "0">root object</class>
+    <class name = "web/src/license" private="1" selftest = "0">root object</class>
+    <class name = "web/src/license_POST" private="1" selftest = "0">root object</class>
+    <class name = "web/src/license_status" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/license_text" private="1" selftest = "0">root object</class>
+    <class name = "web/src/list_gpio" private="1" selftest = "0">root object</class>
+    <class name = "web/src/my_profile" private="1" selftest = "0">root object</class>
+    <class name = "web/src/netcfg" private="1" selftest = "0">root object</class>
+    <class name = "web/src/not_found" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/rack_total" private="1" selftest = "0">root object</class>
+    <class name = "web/src/scan_progress" private="1" selftest = "0">root object</class>
+    <class name = "web/src/scan_run" private="1" selftest = "0">root object</class>
+    <class name = "web/src/security_headers" private="1" selftest = "0">root object</class>
+    <class name = "web/src/server_status" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/ssl_redirect" private="1" selftest = "0">root object</class>
+    <class name = "web/src/sysinfo" private="1" selftest = "0">root object</class>
+    <class name = "web/src/systemctl" private="1" selftest = "0">root object</class>
+    <class name = "web/src/time" private="1" selftest = "0">root object</class>
+    <class name = "web/src/uptime" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/topology_location_from2" private="1" selftest = "0">root object</class>
+    <class name = "web/src/topology_location_from" private="1" selftest = "0">root object</class>
+    <class name = "web/src/topology_location_to" private="1" selftest = "0">root object</class>
+    <class name = "web/src/topology_power" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/admin_passwd" private="1" selftest = "0">root object</class>
+
+    <class name = "web/src/security_removeheaders" private="1" selftest = "0">root object</class>
+    <class name = "web/src/hw_capability" private="1" selftest = "0">root object</class>
+
+</project>

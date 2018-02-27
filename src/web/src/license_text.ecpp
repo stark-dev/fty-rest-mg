@@ -26,8 +26,8 @@
 #include <fstream>
 #include <string>
 #include <map>
-#include "helpers.h"
-#include "log.h"
+#include "web/src/helpers.h"
+#include "shared/log.h"
 
 </%pre>
 <%request scope="global">
