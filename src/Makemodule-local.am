@@ -116,10 +116,21 @@ clean-local:
 	    /bin/rm -f $(top_builddir)/src/web/src/$$file; \
 	done
 
-uninstall-local:
+# Technically the implementation of tntnet servlets is a shared library
+# It is not intended for linking by other apps, and needs no static version
+uninstall-tntnet-nonshared:
+	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).a* \
+	           $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).pc* \
+	           $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).la*
+	/bin/rm -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).a* \
+	           $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).pc* \
+	           $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).la*
+
+uninstall-local: uninstall-tntnet-nonshared
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
 
-install-exec-hook:
+# Install the built shared objects for tntnet; remove the static coutnerparts if any
+install-exec-hook: uninstall-tntnet-nonshared
 	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
