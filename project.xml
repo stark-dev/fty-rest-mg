@@ -11,6 +11,7 @@
 
     <target name = "debian" />
     <target name = "redhat" />
+    <target name = "travis" />
     <target name = "jenkins" >
         <option name = "agent_label" value = "devel-image &amp;&amp; x86_64" />
         <option name = "triggers_pollSCM" value = "H/2 * * * *" />
