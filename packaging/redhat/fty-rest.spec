@@ -60,7 +60,7 @@ This package contains shared library for fty-rest: rest api for auth convergence
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING
-%{_libdir}/libfty_rest.so.*
+%{_libdir}/libfty_rest.so*
 
 %package devel
 Summary:        rest api for auth convergence
@@ -83,8 +83,8 @@ This package contains development files for fty-rest: rest api for auth converge
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_libdir}/libfty_rest.so
-%{_libdir}/pkgconfig/libfty_rest.pc
+###%{_libdir}/libfty_rest.so
+###%{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
 %{_mandir}/man7/*
 
