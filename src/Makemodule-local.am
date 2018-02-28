@@ -1,4 +1,4 @@
-
+# Custom targets, not managed via zproject
 
 SED ?= sed
 autopathedit = ${SED} \
@@ -34,7 +34,7 @@ endef
 	@case "`basename "$@"`" in \
 	    admin_passwd.ecpp) \
 	        $(call process-in-file,$<,$(dir $<)$(notdir $@)); \
-	 esac; 
+	 esac
 
 ECPPC=ecppc
 ECPPFLAGS=
@@ -95,7 +95,7 @@ ECPPFILES= \
   web/src/topology_location_from.ecpp \
   web/src/topology_location_to.ecpp \
   web/src/topology_power.ecpp \
-  web/src/uptime.ecpp 
+  web/src/uptime.ecpp
 
 TNTLIB_BASENAME=libfty_rest
 TNTLIB_DIRNAME=$(prefix)/lib/bios
@@ -150,4 +150,3 @@ EXTRA_DIST +=		$(exampleconf_DATA)
 dist_noinst_DATA =	tntnet.xml $(top_srcdir)/src/web/tntnet.xml
 
 CLEANFILES +=		tntnet.xml tntnet.xml.example
-
