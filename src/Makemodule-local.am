@@ -102,7 +102,7 @@ TNTLIB_DIRNAME=$(prefix)/lib/bios
 
 ECPPCCFILES = $(ECPPFILES:.ecpp=.cc)
 
-#EXTRA_DIST += $(addprefix src/web/src/,$(ECPPFILES))
+#EXTRA_DIST += $(addprefix $(top_srcdir)/src/web/src/,$(ECPPFILES))
 EXTRA_DIST += $(top_srcdir)/src/web/src/admin_passwd.ecpp
 
 project_libs += -ltntnet
