@@ -42,7 +42,7 @@ CLEANFILES +=	$(GENERATEDSCRIPTS)
 # pulled by EXTRA_DIST, so we just verify it exists
 %:: %.in $(abs_top_builddir)/Makefile
 	@case "`basename "$@"`" in \
-	    admin_passwd.ecpp) \
+	    admin_passwd.ecpp|bios-passwd|bios_agent++.h) \
 	        $(call process-in-file,$<,$(dir $<)$(notdir $@)) ;; \
 	 esac
 
