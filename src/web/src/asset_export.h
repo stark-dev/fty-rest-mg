@@ -1,6 +1,4 @@
 /*  =========================================================================
-    web/src/asset_export - root object
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef WEB_SRC_ASSET_EXPORT_H_INCLUDED
 #define WEB_SRC_ASSET_EXPORT_H_INCLUDED

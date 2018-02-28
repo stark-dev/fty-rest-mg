@@ -1,6 +1,4 @@
 /*  =========================================================================
-    db/inout/exportcsv - class description
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef DB_INOUT_EXPORTCSV_H_INCLUDED
 #define DB_INOUT_EXPORTCSV_H_INCLUDED

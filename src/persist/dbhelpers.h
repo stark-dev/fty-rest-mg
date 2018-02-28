@@ -1,6 +1,4 @@
 /*  =========================================================================
-    persist/dbhelpers - class description
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef PERSIST_DBHELPERS_H_INCLUDED
 #define PERSIST_DBHELPERS_H_INCLUDED

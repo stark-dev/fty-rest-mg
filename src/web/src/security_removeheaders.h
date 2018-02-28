@@ -1,6 +1,4 @@
 /*  =========================================================================
-    web/src/security_removeheaders - root object
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef WEB_SRC_SECURITY_REMOVEHEADERS_H_INCLUDED
 #define WEB_SRC_SECURITY_REMOVEHEADERS_H_INCLUDED

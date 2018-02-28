@@ -1,6 +1,4 @@
 /*  =========================================================================
-    warranty/warranty_metric - class description
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef WARRANTY_WARRANTY_METRIC_H_INCLUDED
 #define WARRANTY_WARRANTY_METRIC_H_INCLUDED

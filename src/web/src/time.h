@@ -1,6 +1,4 @@
 /*  =========================================================================
-    web/src/time - root object
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -19,6 +17,7 @@
 
     =========================================================================
 */
+
 
 #ifndef WEB_SRC_TIME_H_INCLUDED
 #define WEB_SRC_TIME_H_INCLUDED

@@ -1,6 +1,4 @@
 /*  =========================================================================
-    web/src/alert_rules - root object
-
     Copyright (C) 2014 - 2018 Eaton
 
     This program is free software; you can redistribute it and/or modify
@@ -17,8 +15,9 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-    =========================================================================
+`    =========================================================================
 */
+
 
 #ifndef WEB_SRC_ALERT_RULES_H_INCLUDED
 #define WEB_SRC_ALERT_RULES_H_INCLUDED
