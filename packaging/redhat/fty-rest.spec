@@ -100,9 +100,9 @@ This package contains development files for fty-rest: common core rest api for 4
 
 %files devel
 %defattr(-,root,root)
-%{_includedir}/*
 # Note: this file was amended to NOT include these files
 # since tntnet shared object is not a typical library
+###%{_includedir}/*
 ###%{_libdir}/libfty_rest.so
 ###%{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
