@@ -173,6 +173,11 @@ tntnet.xml
 src/api/libbiosapi.pc
 !src/api/libbiosapi.pc.in
 
+# CMake cache
+builds/cmake/
+CMake*
+*.cmake
+
 # Travis deps
 tmp/
 cidr/
