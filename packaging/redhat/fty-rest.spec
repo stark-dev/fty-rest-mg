@@ -60,6 +60,8 @@ This package contains shared library for fty-rest: rest api for auth convergence
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING
+# Note: this file was amended to include .so here too
+# since tntnet shared object is not a typical library
 %{_libdir}/libfty_rest.so*
 
 %package devel
@@ -83,6 +85,8 @@ This package contains development files for fty-rest: rest api for auth converge
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
+# Note: this file was amended to NOT include these files
+# since tntnet shared object is not a typical library
 ###%{_libdir}/libfty_rest.so
 ###%{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
