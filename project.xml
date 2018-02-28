@@ -1,6 +1,6 @@
 <project
     name = "fty-rest"
-    description = "REST API for auth Convergence"
+    description = "Common core REST API for 42ity project"
     script = "zproject.gsl"
     email = "EatonIPCOpenSource@eaton.com"
     url = "https://42ity.org"
