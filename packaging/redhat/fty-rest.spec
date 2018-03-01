@@ -109,6 +109,46 @@ This package contains development files for fty-rest: common core rest api for 4
 %{_mandir}/man3/*
 %{_mandir}/man7/*
 
+# Note: Customization over zproject-generated code follows:
+%package -n fty-rest-scripts
+Group:          System/Libraries
+Summary:        helper scripts used by fty-rest
+
+%description -n fty-rest-scripts
+This package contains helper scripts and data files used by the overall solution with fty-rest.
+
+%files -n fty-rest-scripts
+%defattr(-,root,root)
+%{_libexecdir}/bios-passwd
+%{_libexecdir}/testpass.sh
+%{_datadir}/examples/tntnet.xml.example
+#%{_datadir}/.git_details
+
+%package -n fty-rest-clients
+Group:          System/Libraries
+Requires:       libfty_rest1 = %{version}
+Summary:        binary programs using fty-rest elements
+
+%description -n fty-rest-clients
+This package contains binary programs that go along with fty-rest.
+
+%files -n fty-rest-clients
+%defattr(-,root,root)
+### TODO : Makefile, install and uncomment
+#%{_libexecdir}/warranty-metric
+#%{_libexecdir}/bios-csv
+
+%package -n fty-rest
+Group:          System/Libraries
+Requires:       libfty_rest1 = %{version}
+Requires:       fty-rest-clients = %{version}
+Requires:       fty-rest-scripts = %{version}
+Summary:        grouping of end-user solution with fty-rest
+
+%description -n fty-rest
+This metapackage depends on actual packages needed to implement the core 42ity REST API with fty-rest for end-users of a product.
+
+
 %prep
 
 %setup -q
