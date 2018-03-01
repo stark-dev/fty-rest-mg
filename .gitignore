@@ -190,10 +190,10 @@ fty-proto/
 libzmq/
 malamute/
 sodium/
+libsodium/
 tntdb/
 tntnet/
 magic/
-libsodium/
 
 # Distcheck products under various possible names
 libfty-rest-*.zip
