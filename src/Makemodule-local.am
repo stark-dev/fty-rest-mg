@@ -174,6 +174,9 @@ install-exec-hook:
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
 	cd $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    ln -fs "`ls -1 $(TNTLIB_BASENAME).so.* | tail -1`" $(TNTLIB_BASENAME).so
+	mkdir -p $(DESTDIR)$(includedir)/$(PACKAGE) && \
+	    cd $(DESTDIR)$(includedir) && \
+	    mv -f `ls -1A | egrep -v '^'"$(PACKAGE)"'$$' ` $(PACKAGE)/
 
 ### This file contains the TNTNET settings relevant for our test runs
 ### Note: in non-daemon mode, stderr is logged to stderr
