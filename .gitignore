@@ -68,6 +68,7 @@ make.output*
 cppcheck.supp
 cppcheck.xml
 
+fty_rest_selftest
 test-agents
 test-api
 test-cidr
@@ -173,6 +174,13 @@ tntnet.xml
 src/api/libbiosapi.pc
 !src/api/libbiosapi.pc.in
 
+src/platform.h
+
+# CMake cache
+builds/cmake/
+CMake*
+*.cmake
+
 # Travis deps
 tmp/
 cidr/
@@ -182,6 +190,13 @@ fty-proto/
 libzmq/
 malamute/
 sodium/
+libsodium/
 tntdb/
 tntnet/
 magic/
+
+# Distcheck products under various possible names
+libfty-rest-*.zip
+libfty-rest-*.tar*
+fty-rest-*.zip
+fty-rest-*.tar*
