@@ -145,6 +145,15 @@ Group:          System/Libraries
 Requires:       libfty_rest1 = %{version}
 Requires:       fty-rest-clients = %{version}
 Requires:       fty-rest-scripts = %{version}
+Requires:       ipc-data
+Requires:       augeas-tools
+Requires:       tntdb-mysql
+Requires:       libcidr0
+Requires:       tntnet-runtime
+Requires:       malamute
+Requires:       libsnmp30
+Requires:       cracklib-runtime
+Requires:       msmtp
 Summary:        grouping of end-user solution with fty-rest
 
 %description -n fty-rest

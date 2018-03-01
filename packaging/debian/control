@@ -95,7 +95,7 @@ Section: net
 Priority: optional
 Depends:
     libfty-rest1 (= ${binary:Version}),
-    ${misc:Depends}
+    ${misc:Depends}, ${shlibs:Depends}
 Description: binary programs using fty-rest elements
  This package contains binary programs that go along with fty-rest.
 
@@ -107,7 +107,16 @@ Depends:
     libfty-rest1 (= ${binary:Version}),
     fty-rest-scripts (= ${binary:Version}),
     fty-rest-clients (= ${binary:Version}),
-    ${misc:Depends}
+    ${misc:Depends},
+    augeas-tools,
+    tntdb-mysql4,
+    libcidr0,
+    tntnet-runtime,
+    malamute,
+    libsnmp30,
+    cracklib-runtime,
+    ipc-data
+Recommends: msmtp, nut
 Description: grouping of end-user solution with fty-rest
  This metapackage depends on actual packages needed to implement
  the core 42ity REST API with fty-rest for end-users of a product.
