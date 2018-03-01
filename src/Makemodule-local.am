@@ -125,10 +125,13 @@ ECPPFILES= \
   web/src/uptime.ecpp
 
 TNTLIB_BASENAME=libfty_rest
-TNTLIB_DIRNAME=$(prefix)/lib/$(TNTLIB_BASENAME)
+TNTLIB_DIRNAME=$(prefix)/$(pkglibdir)
 # Note: TNTLIB_DIRNAME used to be /usr/lib/bios before renaming in the project
-# structure, but tntnet looks for shared objects accorging to their "@name" in
-# its XML config, which impacts the directory pathname as well.
+# structure, but tntnet looks for shared objects according to their "@name" in
+# its XML config, which impacts the directory pathname as well. Note that this
+# path should be the one set via <compPath>/<entry> items in the XML config
+# (see below for the tntnet.xml.example file generation - it seeds the OS image
+# configuration later on).
 
 ECPPCCFILES = $(ECPPFILES:.ecpp=.cc)
 
