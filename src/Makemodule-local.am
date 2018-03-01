@@ -167,13 +167,16 @@ uninstall-tntnet-includes:
 uninstall-local: uninstall-tntnet-nonshared uninstall-tntnet-includes
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
 
-# Install the built shared objects for tntnet; remove the static coutnerparts if any
-install-exec-hook: uninstall-tntnet-nonshared uninstall-tntnet-includes
+# Install the built shared objects for tntnet
+install-exec-hook:
 	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
 	cd $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    ln -fs "`ls -1 $(TNTLIB_BASENAME).so.* | tail -1`" $(TNTLIB_BASENAME).so
+	mkdir -p $(DESTDIR)$(includedir)/$(PACKAGE) && \
+	    cd $(DESTDIR)$(includedir) && \
+	    mv -f `ls -1A | egrep -v '^'"$(PACKAGE)"'$$' ` $(PACKAGE)/
 
 ### This file contains the TNTNET settings relevant for our test runs
 ### Note: in non-daemon mode, stderr is logged to stderr

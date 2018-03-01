@@ -1,5 +1,6 @@
-# Note: this file was amended to NOT include these files
+# Note: this file was amended to NOT include some files
 # since tntnet shared object is not a typical library
-###usr/include/*
+# Note that the .so symlink is delivered by main "library" package
+usr/include/*
 ###usr/lib/*/libfty_rest.so
-###usr/lib/*/pkgconfig/libfty_rest.pc
+usr/lib/*/pkgconfig/libfty_rest.pc

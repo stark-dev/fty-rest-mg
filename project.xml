@@ -78,6 +78,10 @@
         <use project = "malamute" />
     </use>
 
+    <use project = "libsasl2" header = "sasl/sasl.h"
+        debian_name="libsasl2-dev"
+        redhat_name="libsasl2-devel" />
+
     <header name = "app"  />
     <header name = "bios_agent"  />
     <header name = "bios_agentpp"  />

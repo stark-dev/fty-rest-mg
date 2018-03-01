@@ -23,7 +23,6 @@
     =========================================================================
 */
 
-
 #ifndef FTY_REST_CLASSES_H_INCLUDED
 #define FTY_REST_CLASSES_H_INCLUDED
 

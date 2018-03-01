@@ -42,6 +42,7 @@
 #include <magic.h>
 #endif
 #include <ftyproto.h>
+#include <sasl/sasl.h>
 
 //  FTY_REST version macros for compile-time API detection
 #define FTY_REST_VERSION_MAJOR 1

@@ -23,10 +23,11 @@ AM_CPPFLAGS = \
     ${tntdb_CFLAGS} \
     ${magic_CFLAGS} \
     ${fty_proto_CFLAGS} \
+    ${libsasl2_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS} ${libsasl2_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -57,6 +58,7 @@ EXTRA_DIST += \
     Findtntdb.cmake \
     Findmagic.cmake \
     Findfty_proto.cmake \
+    Findlibsasl2.cmake \
     CMakeLists.txt
 endif
 
