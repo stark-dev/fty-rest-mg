@@ -102,6 +102,7 @@ This package contains development files for fty-rest: common core rest api for 4
 %defattr(-,root,root)
 # Note: this file was amended to NOT include these files
 # since tntnet shared object is not a typical library
+# Note that the .so symlink is delivered by main "library" package
 ###%{_includedir}/*
 ###%{_libdir}/libfty_rest.so
 ###%{_libdir}/pkgconfig/libfty_rest.pc
