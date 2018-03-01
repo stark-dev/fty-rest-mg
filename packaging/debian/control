@@ -34,6 +34,7 @@ Build-Depends: debhelper (>= 9),
     libtntdb-dev,
     libmagic-dev,
     libfty-proto-dev,
+    libsasl2-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
@@ -59,6 +60,7 @@ Depends:
     libtntdb-dev,
     libmagic-dev,
     libfty-proto-dev,
+    libsasl2-dev,
     libfty-rest1 (= ${binary:Version})
 Description: fty-rest development tools
  This package contains development files for fty-rest:
