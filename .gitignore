@@ -194,3 +194,9 @@ tntdb/
 tntnet/
 magic/
 libsodium/
+
+# Distcheck products under various possible names
+libfty-rest-*.zip
+libfty-rest-*.tar*
+fty-rest-*.zip
+fty-rest-*.tar*
