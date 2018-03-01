@@ -151,16 +151,21 @@ clean-local:
 uninstall-tntnet-nonshared:
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).a* \
 	           $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).pc* \
+	           $(DESTDIR)$(TNTLIB_DIRNAME)/*/$(TNTLIB_BASENAME).pc* \
 	           $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).la*
 	/bin/rm -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).a* \
 	           $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).pc* \
+	           $(DESTDIR)$(libdir)/*/$(TNTLIB_BASENAME).pc* \
 	           $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).la*
 
-uninstall-local: uninstall-tntnet-nonshared
+uninstall-tntnet-includes:
+	/bin/rm -fr $(DESTDIR)$(includedir)
+
+uninstall-local: uninstall-tntnet-nonshared uninstall-tntnet-includes
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
 
 # Install the built shared objects for tntnet; remove the static coutnerparts if any
-install-exec-hook: uninstall-tntnet-nonshared
+install-exec-hook: uninstall-tntnet-nonshared uninstall-tntnet-includes
 	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
