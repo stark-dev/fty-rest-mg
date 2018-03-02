@@ -176,6 +176,13 @@ install-exec-hook:
 	mkdir -p $(DESTDIR)$(includedir)/$(PACKAGE) && \
 	    cd $(DESTDIR)$(includedir) && \
 	    mv -f `ls -1A | egrep -v '^'"$(PACKAGE)"'$$' ` $(PACKAGE)/
+	mkdir -p "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)"
+	if test x"$(ci_helperdir)" != x"$(prefix)/libexec/$(PACKAGE)" ; then \
+	    for F in $(ci_helper_SCRIPTS) ; do \
+	        F="`basename "$$F"`"; \
+	        ln -fsr "$(DESTDIR)$(ci_helperdir)/$$F" "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)/"
+	    done ; \
+	fi
 
 ### This file contains the TNTNET settings relevant for our test runs
 ### Note: in non-daemon mode, stderr is logged to stderr
