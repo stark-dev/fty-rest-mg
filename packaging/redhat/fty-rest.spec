@@ -76,7 +76,7 @@ Requires:       cracklib-runtime
 Requires:       msmtp
 Summary:        grouping of end-user solution with fty-rest
 
-%description -n
+%description
 This metapackage depends on actual packages needed to implement the core 42ity REST API with fty-rest for end-users of a product.
 
 #fty-rest common core rest api for 42ity project.
