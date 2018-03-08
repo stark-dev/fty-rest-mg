@@ -23,11 +23,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <sstream>
 
 #include <cxxtools/csvdeserializer.h>
+#include <fty_common.h>
 
 #include "shared/csv.h"
 #include "../persist/assetcrud.h"
-#include "shared/dbpath.h"
-#include "shared/log.h"
 
 namespace shared {
 

@@ -30,8 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/result.h>
 #include <tntdb/error.h>
-#include "shared/dbpath.h"
-#include "shared/log.h"
+#include <fty_common.h>
 #include "defs.h"
 
 

@@ -28,9 +28,8 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
+#include <fty_common.h>
 #include <map>
-#include "log.h"
 
 #include "persist/assettopology.h"
 #include "dbhelpers.h"
@@ -42,7 +41,6 @@
 
 TEST_CASE("DC power #1 v2","[db][power][dc][calc][v2][dc_power.sql]")
 {
-    log_open();
     log_info ("=============== DC POWER #1 v2 ==================");
 /*    
     tntdb::Connection conn;

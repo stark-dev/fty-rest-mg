@@ -1,6 +1,5 @@
 #
 #    fty-rest - Common core REST API for 42ity project
-# Note: this file is customized after zproject generation, be sure to keep it
 #
 #    Copyright (C) 2014 - 2018 Eaton
 #
@@ -32,7 +31,7 @@
 Name:           fty-rest
 Version:        1.0.0
 Release:        1
-#Summary:        common core rest api for 42ity project
+Summary:        common core rest api for 42ity project
 License:        GPL-2.0+
 URL:            https://42ity.org
 Source0:        %{name}-%{version}.tar.gz
@@ -58,30 +57,13 @@ BuildRequires:  tntnet-devel
 BuildRequires:  tntdb-devel
 BuildRequires:  file-devel
 BuildRequires:  fty-proto-devel
-#BuildRequires:  (libsasl2-devel or cyrus-sasl-devel)
 BuildRequires:  cyrus-sasl-devel
+BuildRequires:  log4cplus-devel
+BuildRequires:  fty-common-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-# Note: Customization over zproject-generated code follows:
-BuildRequires:  libxslt
-BuildRequires:  docbook-style-xsl
-Requires:       libfty_rest1 = %{version}
-Requires:       fty-rest-clients = %{version}
-Requires:       fty-rest-scripts = %{version}
-Requires:       ipc-data
-Requires:       augeas-tools
-Requires:       tntdb-mysql
-Requires:       libcidr0
-Requires:       tntnet-runtime
-Requires:       malamute
-Requires:       libsnmp30
-Requires:       cracklib-runtime
-Requires:       msmtp
-Summary:        grouping of end-user solution with fty-rest
 
 %description
-This metapackage depends on actual packages needed to implement the core 42ity REST API with fty-rest for end-users of a product.
-
-#fty-rest common core rest api for 42ity project.
+fty-rest common core rest api for 42ity project.
 
 %package -n libfty_rest1
 Group:          System/Libraries
@@ -96,9 +78,7 @@ This package contains shared library for fty-rest: common core rest api for 42it
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING
-# Note: this file was amended to include .so here too
-# since tntnet shared object is not a typical library
-%{_libdir}/libfty_rest.so*
+%{_libdir}/libfty_rest.so.*
 
 %package devel
 Summary:        common core rest api for 42ity project
@@ -114,8 +94,9 @@ Requires:       tntnet-devel
 Requires:       tntdb-devel
 Requires:       file-devel
 Requires:       fty-proto-devel
-#Requires:       (libsasl2-devel or cyrus-sasl-devel)
 Requires:       cyrus-sasl-devel
+Requires:       log4cplus-devel
+Requires:       fty-common-devel
 
 %description devel
 common core rest api for 42ity project development tools
@@ -123,44 +104,11 @@ This package contains development files for fty-rest: common core rest api for 4
 
 %files devel
 %defattr(-,root,root)
-# Note: this file was amended to NOT include some files
-# since tntnet shared object is not a typical library
-# Note that the .so symlink is delivered by main "library" package
 %{_includedir}/*
-###%{_libdir}/libfty_rest.so
+%{_libdir}/libfty_rest.so
 %{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
 %{_mandir}/man7/*
-
-# Note: Customization over zproject-generated code follows:
-%package -n fty-rest-scripts
-Group:          System/Libraries
-Summary:        helper scripts used by fty-rest
-
-%description -n fty-rest-scripts
-This package contains helper scripts and data files used by the overall solution with fty-rest.
-
-%files -n fty-rest-scripts
-%defattr(-,root,root)
-%{_libexecdir}/bios-passwd
-%{_libexecdir}/testpass.sh
-%{_datadir}/examples/tntnet.xml.example
-#%{_datadir}/.git_details
-
-%package -n fty-rest-clients
-Group:          System/Libraries
-Requires:       libfty_rest1 = %{version}
-Summary:        binary programs using fty-rest elements
-
-%description -n fty-rest-clients
-This package contains binary programs that go along with fty-rest.
-
-%files -n fty-rest-clients
-%defattr(-,root,root)
-### TODO : Makefile, install and uncomment
-#%{_libexecdir}/warranty-metric
-#%{_libexecdir}/bios-csv
-
 
 %prep
 

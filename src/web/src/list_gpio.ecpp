@@ -25,8 +25,7 @@
  #><%pre>
 #include <string>
 #include "shared/tntmlm.h"
-#include "web/src/helpers.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 
 
 // list request
@@ -116,7 +115,7 @@ get_list (std::string &output)
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        log_critical ("list_gpio: mlm_pool.get () failed.");
+        log_fatal ("list_gpio: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -127,7 +126,7 @@ get_list (std::string &output)
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical ("list_gpio: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
+        log_fatal ("list_gpio: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
         return -2;
     }
 
@@ -135,7 +134,7 @@ get_list (std::string &output)
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_critical ("info: client->recv (timeout = '5') returned NULL");
+        log_fatal ("info: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);

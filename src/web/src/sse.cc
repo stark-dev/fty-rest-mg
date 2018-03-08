@@ -24,13 +24,10 @@
  * \brief Class and functions used by sse connection
  */
 
-
+#include <fty_common.h>
 #include "web/src/sse.h"
-#include "web/src/tokens.h"
 #include "shared/data.h"
-#include "shared/log.h"
 #include "shared/utils_json.h"
-#include "shared/str_defs.h"
 
 //constructor
 
@@ -58,7 +55,7 @@ const char * Sse::connectMalamute()
   _clientMlm = mlm_client_new();
   if (!_clientMlm)
   {
-    log_critical("mlm_client_new() failed.");
+    log_fatal("mlm_client_new() failed.");
     return "mlm_client_new() failed.";
   }
 
@@ -68,7 +65,7 @@ const char * Sse::connectMalamute()
   int rv = mlm_client_connect(_clientMlm, MLM_ENDPOINT, 1000, client_name.c_str());
   if (rv == -1)
   {
-    log_critical("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
+    log_fatal("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
                  MLM_ENDPOINT, 1000, client_name.c_str());
     return "mlm_client_connect() failed.";
   }
@@ -76,14 +73,14 @@ const char * Sse::connectMalamute()
   _pipe = mlm_client_msgpipe(_clientMlm);
   if (!_pipe)
   {
-    log_critical("mlm_client_msgpipe() failed.");
+    log_fatal("mlm_client_msgpipe() failed.");
     return "mlm_client_msgpipe()";
   }
 
   _poller = zpoller_new(_pipe, NULL);
   if (!_poller)
   {
-    log_critical("zpoller_new() failed.");
+    log_fatal("zpoller_new() failed.");
     return "zpoller_new() failed.";
   }
 

@@ -29,13 +29,11 @@
  * \brief Not yet documented file
  */
 #include <algorithm>
+#include <fty_common.h>
 
 #include "shared/data.h"
-#include "shared/utils_web.h"
 
-#include "shared/log.h"
 #include "shared/asset_types.h"
-#include "shared/dbpath.h"
 #include "defs.h"
 
 #include "../db/asset_general.h"

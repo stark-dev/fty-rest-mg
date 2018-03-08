@@ -26,12 +26,11 @@
  * \brief Not yet documented file
  */
 #include <catch.hpp>
-
+#include <fty_common.h>
 #include <tntdb/connect.h>
 
 #include "dbhelpers.h"
 #include "persist_error.h"
-#include "dbpath.h"
 
 TEST_CASE("helper functions: convert_asset_to_monitor_old", "[db][convert_to_monitor]")
 {

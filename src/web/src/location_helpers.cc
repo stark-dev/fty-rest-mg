@@ -29,11 +29,11 @@
 
 #include <list>
 #include <tnt/http.h>
+#include <fty_common.h>
 
 #include "shared/asset_types.h"
 #include "cleanup.h"
 #include "shared/utilspp.h"
-#include "shared/utils_web.h"
 #include "db/assets.h"
 
 int asset_location_r(asset_msg_t** asset_msg, std::string& json) {

@@ -34,11 +34,9 @@
 #include <unistd.h>
 
 #include <math.h>
-#include "shared/str_defs.h"
+#include <fty_common.h>
+
 #include "shared/data.h"
-#include "shared/utils_web.h"
-#include "shared/log.h"
-#include "web/src/helpers.h"
 
 #include "shared/utilspp.h"
 

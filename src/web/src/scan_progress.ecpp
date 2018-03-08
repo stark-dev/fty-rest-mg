@@ -25,8 +25,7 @@
  #><%pre>
 #include <string>
 #include "shared/tntmlm.h"
-#include "web/src/helpers.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 
 // progress request
 static zmsg_t *
@@ -47,7 +46,7 @@ get_scan_progress (std::string &output)
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        log_critical ("scan_progress: mlm_pool.get () failed.");
+        log_fatal ("scan_progress: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -58,7 +57,7 @@ get_scan_progress (std::string &output)
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical ("scan_progress: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_fatal ("scan_progress: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
@@ -66,7 +65,7 @@ get_scan_progress (std::string &output)
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_critical ("info: client->recv (timeout = '5') returned NULL");
+        log_fatal ("info: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     

@@ -24,7 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/error.h>
 #include <tntdb/transaction.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
 #include "defs.h"
 #include "db/assets/assetu.h"
 

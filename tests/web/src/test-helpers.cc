@@ -24,8 +24,7 @@
  * \brief Not yet documented file
  */
 #include <catch.hpp>
-#include "helpers.h"
-#include "dbpath.h"
+#include <fty_common.h>
 
 TEST_CASE ("unicode related stuff", "[helpers]") {
 

@@ -21,9 +21,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/error.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
 #include "shared/utils.h"
-#include "shared/dbpath.h"
 
 namespace persist {
 

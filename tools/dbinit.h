@@ -28,7 +28,7 @@
 #define DBINIT_H_
 
 #include "../src/persist/databaseobject.h"
-#include "dbpath.h"
+#include <fty_common.h>
 
 static const std::string osnew       = persist::objectStatetoString(persist::ObjectState::OS_NEW);
 static const std::string osdeleted   = persist::objectStatetoString(persist::ObjectState::OS_DELETED);

@@ -30,8 +30,7 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assettopology.h"
 #include "common_msg.h"
@@ -41,8 +40,6 @@
 
 TEST_CASE("Power topology group #1","[db][topology][power][group][power_topology.sql][pg1]")
 {
-    log_open();
-
     log_info ("=============== POWER GROUP #1 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_GROUP);
     assert ( getmsg );

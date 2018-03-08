@@ -35,7 +35,7 @@
 #include <algorithm>
 
 #include "shared/subprocess.h"
-#include "web/src/helpers.h"
+#include <fty_common.h>
 
 using namespace shared;
 

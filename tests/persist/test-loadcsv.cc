@@ -30,12 +30,11 @@
 #include <cxxtools/csvdeserializer.h>
 #include <tntdb/result.h>
 #include <tntdb/statement.h>
+#include <fty_common.h>
 
 #include "csv.h"
-#include "log.h"
 #include "db/inout.h"
 #include "assetcrud.h"
-#include "dbpath.h"
 
 using namespace persist;
 

@@ -29,17 +29,14 @@
 #include <exception>
 #include <stack>
 #include <czmq.h>
+#include <fty_common.h>
 
-#include "shared/log.h"
 #include "defs.h"
-#include "shared/dbpath.h"
 #include "shared/data.h"
 #include "web/src/location_helpers.h"
 #include "shared/asset_types.h"
 #include "../../persist/assettopology.h"
-#include "shared/utils_web.h"
 #include "cleanup.h"
-#include "web/src/helpers.h"
 #include "shared/utilspp.h"
 </%pre>
 <%request scope="global">

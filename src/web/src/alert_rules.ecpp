@@ -32,10 +32,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "shared/log.h"
-#include "shared/utils_web.h"
-#include "shared/str_defs.h"
-#include "web/src/helpers.h"
+#include <fty_common.h>
 
 </%pre>
 <%request scope="global">
@@ -79,7 +76,7 @@ log_debug ("requested rule name = '%s'.", checked_name.c_str ());
 // connect to malamute
 mlm_client_t *client = mlm_client_new ();
 if (!client) {
-    log_critical ("mlm_client_new() failed.");
+    log_fatal ("mlm_client_new() failed.");
     http_die ("internal-error", "mlm_client_new() failed.");
 }
 
@@ -88,7 +85,7 @@ log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
 int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
 if (rv == -1) {
-    log_critical ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
+    log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_connect() failed.");
@@ -97,7 +94,7 @@ if (rv == -1) {
 // prepare rfc-evaluator-rules ADD message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
-    log_critical ("zmsg_new() failed.");
+    log_fatal ("zmsg_new() failed.");
     http_die ("internal-error", "zmsg_new() failed.");
 }
 zmsg_addstr (send_msg, "ADD");
@@ -126,14 +123,14 @@ if (mlm_client_sendto (client, dest, "rfc-evaluator-rules", NULL, 1000, &send_ms
 zmsg_t *recv_msg = NULL;
 zsock_t *pipe = mlm_client_msgpipe (client);
 if (!pipe) {
-    log_critical ("mlm_client_msgpipe() failed.");
+    log_fatal ("mlm_client_msgpipe() failed.");
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_msgpipe() failed.");
 }
 
 zpoller_t *poller = zpoller_new (pipe, NULL);
 if (!poller) {
-    log_critical ("zpoller_new() failed.");
+    log_fatal ("zpoller_new() failed.");
     mlm_client_destroy (&client);
     http_die ("internal-error", "zpoller_new() failed.");
 }

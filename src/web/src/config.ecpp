@@ -33,9 +33,7 @@
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/regex.h>
-#include "web/src/helpers.h"
-#include "shared/log.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 
 
 // define json serialization objects

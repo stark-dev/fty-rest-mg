@@ -24,16 +24,13 @@
  * \brief Not yet documented file
  */
 #include <catch.hpp>
-
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assetcrud.h"
 #include "db/assets.h"
 
 TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test.sql][999]")
 {
-    log_open ();
     log_info ("=============== UPDATE asset element #1 ==================");
 
     tntdb::Connection conn;

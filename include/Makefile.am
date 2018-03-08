@@ -36,26 +36,18 @@ nobase_include_HEADERS += \
     shared/configure_inform.h \
     shared/csv.h \
     shared/data.h \
-    shared/dbpath.h \
-    shared/filesystem.h \
     shared/fty_asset_uptime_configurator.h \
     shared/ic.h \
-    shared/log.h \
-    shared/str_defs.h \
     shared/subprocess.h \
     shared/tntmlm.h \
     shared/topic_cache.h \
     shared/upsstatus.h \
     shared/utils.h \
     shared/utilspp.h \
-    shared/utils_web.h \
     shared/utils_json.h \
     web/src/asset_computed_impl.h \
-    web/src/helpers.h \
     web/src/iface.h \
     web/src/location_helpers.h \
-    web/src/sasl.h \
-    web/src/tokens.h \
     web/src/sse.h
 
 endif

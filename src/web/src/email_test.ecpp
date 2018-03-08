@@ -23,7 +23,7 @@
  * \brief Sends test email.
  */
  #><%pre>
-#include "web/src/helpers.h"
+#include <fty_common.h>
 #include "shared/tntmlm.h"
 #include "defs.h"
 #include <stdlib.h>
@@ -83,7 +83,7 @@ UserInfo user;
     // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("Error: mlm_pool.get () failed.");
+        log_fatal ("Error: mlm_pool.get () failed.");
         http_die ("internal-error", "mlm_pool.get () failed.");
     }
 
@@ -95,7 +95,7 @@ UserInfo user;
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical (
+        log_fatal (
                     "Error: client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
                         FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL");
         http_die ("internal-error", "client->sendto () failed");
@@ -127,7 +127,7 @@ UserInfo user;
     else
     {
         status = "Failed";
-        log_critical ("Error: message recieved with invalid subject.");
+        log_fatal ("Error: message recieved with invalid subject.");
         http_die ("internal-error", "client->recv () invalid message subject");
     }
 

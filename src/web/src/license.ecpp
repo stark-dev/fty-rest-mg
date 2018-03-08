@@ -30,10 +30,9 @@
 #include <fstream>
 #include <string.h>
 #include <stdlib.h>
-
+#include <fty_common.h>
 #include "shared/utils.h"
-#include "web/src/helpers.h"
-#include "shared/log.h"
+
 </%pre>
 <%cpp>
 {

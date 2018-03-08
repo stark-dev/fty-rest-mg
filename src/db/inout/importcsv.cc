@@ -33,16 +33,15 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <fty_proto.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
+
 #include "../../persist/assetcrud.h"
-#include "shared/dbpath.h"
 #include "cleanup.h"
 #include "../asset_general.h"
 #include "db/assets.h"
 #include "../inout.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "shared/utils_web.h"
 #include "shared/tntmlm.h"
 
 using namespace shared;

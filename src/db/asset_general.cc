@@ -21,7 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 #include <locale.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
 #include "shared/asset_types.h"
 #include "defs.h"
 #include "shared/ic.h"

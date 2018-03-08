@@ -26,9 +26,9 @@
  #><%pre>
 #include <fstream>
 #include <cxxtools/regex.h>
-#include "shared/log.h"
-#include "web/src/helpers.h"
 #include "web/src/iface.h"
+#include <fty_common.h>
+
 </%pre>
 <%request scope="global">
 UserInfo user;

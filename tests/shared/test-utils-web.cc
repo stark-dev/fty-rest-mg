@@ -30,8 +30,7 @@
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/jsondeserializer.h>
 #include <limits.h>
-
-#include "utils_web.h"
+#include <fty_common.h>
 
 TEST_CASE ("utils::json::escape","[utils::math::dtos][json][escape]")
 {

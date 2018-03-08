@@ -22,9 +22,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdexcept>
 
 #include <fty_proto.h>
-#include "shared/str_defs.h"
+#include <fty_common.h>
 #include "db/assets.h"
-#include "shared/dbpath.h"
 #include "shared/fty_asset_uptime_configurator.h"
 
 static zhash_t*

@@ -36,16 +36,12 @@
 #include <cxxtools/split.h>
 #include <cxxtools/csvserializer.h>
 #include <sys/types.h>
+#include <fty_common.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "shared/log.h"
-#include "shared/str_defs.h"
 #include "cleanup.h"
-#include "shared/utils_web.h"
-#include "web/src/helpers.h"
 #include <tntdb.h>
-#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "shared/tntmlm.h"
 #include "defs.h"
@@ -220,7 +216,7 @@ bool database_ready;
     // connect to malamute
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("mlm_pool.get () failed.");
+        log_fatal ("mlm_pool.get () failed.");
         http_die ("internal-error", "mlm_pool.get () failed.");
     }
 
@@ -247,14 +243,14 @@ bool database_ready;
             int rv = client->sendto ("fty-metric-store", "aggregated data", 1000, &msg);
             if (rv == -1) {
                 zuuid_destroy (&uuid);
-                log_critical ("Cannot send message to fty-metric-store");
+                log_fatal ("Cannot send message to fty-metric-store");
                 http_die ("internal-error", "mlm_client_sendto failed.");
             }
 
             zmsg_t *recv_msg = client->recv (zuuid_str_canonical (uuid), 30);
             zuuid_destroy (&uuid);
             if (!recv_msg) {
-                log_critical ("client->recv (timeout = '30') returned NULL");
+                log_fatal ("client->recv (timeout = '30') returned NULL");
                 http_die ("internal-error", "client->recv () returned NULL");
             }
 
@@ -339,14 +335,14 @@ bool database_ready;
         int rv = client->sendto ("fty-metric-store", "aggregated data", 1000, &msg);
         if (rv == -1) {
             zuuid_destroy (&uuid);
-            log_critical ("Cannot send message to fty-metric-store");
+            log_fatal ("Cannot send message to fty-metric-store");
             http_die ("internal-error", "mlm_client_sendto failed.");
         }
 
         zmsg_t *recv_msg = client->recv (zuuid_str_canonical (uuid), 30);
         zuuid_destroy (&uuid);
         if (!recv_msg) {
-            log_critical ("client->recv (timeout = '30') returned NULL");
+            log_fatal ("client->recv (timeout = '30') returned NULL");
             http_die ("internal-error", "client->recv () returned NULL");
         }
 

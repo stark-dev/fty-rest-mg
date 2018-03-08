@@ -30,9 +30,8 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
+#include <fty_common.h>
 #include <map>
-#include "log.h"
 
 #include "assettopology.h"
 #include "dbhelpers.h"
@@ -44,7 +43,6 @@
 // TODO move it somewhere else
 TEST_CASE("Rack power v2","[db][power][rack][calc][v2][rack_power.sql]")
 {
-    log_open();
     log_info ("=============== RACK POWER v2 ==================");
 /*    
     tntdb::Connection conn;

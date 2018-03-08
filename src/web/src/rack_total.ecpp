@@ -35,15 +35,13 @@
 
 #include <sys/types.h>
 
+#include <fty_common.h>
+
 #include "../../persist/assetcrud.h"
 #include "shared/data.h"
-#include "shared/dbpath.h"
 #include "cleanup.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "shared/utils_web.h"
-#include "shared/log.h"
-#include "web/src/helpers.h"
 #include "shared/tntmlm.h"
 
 static const std::map<std::string, const std::string> PARAM_TO_SRC = {
@@ -85,7 +83,7 @@ s_total_rack_power(
     int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
     if (rv == -1) {
         zuuid_destroy (&uuid);
-        log_critical (
+        log_fatal (
                 "client->sendto (address = '%s', subject = '%s') failed",
                 "fty-metric-cache", "latest-rt-data");
         throw std::runtime_error ("client->sendto () failed.");
@@ -217,7 +215,7 @@ std::string checked_arg2;
     // connect to malamute
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("mlm_pool.get () failed");
+        log_fatal ("mlm_pool.get () failed");
         http_die ("internal-error", "mlm_pool.get () failed.");
     }
 

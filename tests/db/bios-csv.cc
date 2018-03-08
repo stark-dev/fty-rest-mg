@@ -30,9 +30,9 @@
 #include <fstream>
 #include <algorithm>
 #include <cxxtools/inifile.h>
+#include <fty_common.h>
 
 #include "db/inout.h"
-#include "shared/log.h"
 #include "shared/csv.h"
 
 static void
@@ -178,13 +178,13 @@ int main(int argc, char** argv)
 
         if (!strcmp(argv[1], "export"))
         {
-            log_set_level(LOG_WARNING); //to suppress messages from src/db
+            ManageFtyLog::getInstanceFtylog()->setLogLevelWarning();//to suppress messages from src/db
             persist::export_asset_csv(std::cout);
         }
         else
         if (!strcmp(argv[1], "compare"))
         {
-            log_set_level(LOG_INFO);
+            ManageFtyLog::getInstanceFtylog()->setLogLevelInfo();
             if (argc < 4)
                 s_die_usage();
 
