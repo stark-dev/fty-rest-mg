@@ -28,6 +28,8 @@
 #include <exception>
 #include <tntdb/connect.h>
 #include <tntdb/error.h>
+#include <cxxtools/jsonserializer.h>
+#include <cxxtools/serializationinfo.h>
 #include <cxxtools/split.h>
 #include "log.h"
 #include "utils_web.h"
@@ -36,35 +38,28 @@
 #include "db/assets.h"
 #include "helpers.h"
 
-static std::string
-    assets_all_container(
-        tntdb::Connection &connection,
-        const std::vector<a_elmnt_tp_id_t> &types,
-        const std::vector<a_elmnt_stp_id_t> &subtypes,
-        const std::string &without,
-        const std::string &status
-    )
+class Asset {
+public:
+    Asset(const std::string &i, const std::string &n,
+          const std::string &t, const std::string &s)
+        : id(i), name(n), type(t), sub_type(s)
+    {}
+private:
+    std::string id, name, type, sub_type;
+    friend void operator<<=(cxxtools::SerializationInfo &si, const Asset &asset);
+};
+
+typedef std::vector<Asset> Assets;
+
+void operator<<=(cxxtools::SerializationInfo &si, const Asset &asset)
 {
-    std::string result;
-    auto func = [&result](const tntdb::Row& row) {
-        result +=
-            "{\"id\":\"" + row.getValue("name").getString() + "\",\n" +
-            "\"name\":\"" + persist::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second + "\",\n" +
-            "\"type\":\"" + persist::typeid_to_type (row.getValue("type_id").getInt()) + "\",\n" +
-            "\"sub_type\":\"" + utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() )) + "\"\n"
-            "},";
-    };
-    int rv = persist::select_assets_all_container(connection, types, subtypes, without, status, func);
-    if (rv != 0) {
-        result.clear ();
-        result = "error";
-        return result;
-    }
-    return result.substr(0, result.size() - 1); // need to get ri of the last ','
-    
+    si.addMember("id")       <<= asset.id;
+    si.addMember("name")     <<= asset.name;
+    si.addMember("type")     <<= asset.type;
+    si.addMember("sub_type") <<= asset.sub_type;
 }
 
-static std::string
+Assets
     assets_in_container(
         tntdb::Connection &connection,
         a_elmnt_id_t container,
@@ -74,22 +69,24 @@ static std::string
         const std::string &status
     )
 {
-    std::string result;
+    Assets result;
     auto func = [&result](const tntdb::Row& row) {
-        result +=
-            "{\"id\":\"" + row.getValue("name").getString() + "\",\n" +
-            "\"name\":\"" + persist::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second + "\",\n" +
-            "\"type\":\"" + persist::typeid_to_type (row.getValue("type_id").getInt()) + "\",\n" +
-            "\"sub_type\":\"" + utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() )) + "\"\n"
-            "},";
+        result.emplace_back(
+            row.getValue("name").getString(),
+            persist::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
+            persist::typeid_to_type (row.getValue("type_id").getInt()),
+            utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() ))
+        );
     };
-    int rv = persist::select_assets_by_container(connection, container, types, subtypes, without, status, func);
-    if (rv != 0) {
-        result.clear ();
-        result = "error";
-        return result;
-    }
-    return result.substr(0, result.size() - 1); // need to get ri of the last ','
+    int rv;
+    if (container)
+        rv = persist::select_assets_by_container(connection, container, types, subtypes, without, status, func);
+    else
+        rv = persist::select_assets_all_container(connection, types, subtypes, without, status, func);
+
+    if (rv != 0)
+        throw std::runtime_error("Database failure");
+    return result;
 }
 
 </%pre>
@@ -98,7 +95,6 @@ UserInfo user;
 bool database_ready;
 </%request>
 <%cpp>
-{
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
@@ -192,14 +188,16 @@ bool database_ready;
         http_die ("internal-error", e.what ());
     }
     // do the stuff
-    std::string output;
-    if(in_parameter_present) {
-        output = assets_in_container(connection, checked_id, checked_types, checked_subtypes, without, status);
-    } else {
-        output = assets_all_container(connection, checked_types, checked_subtypes, without, status);
+    Assets assets;
+    try {
+        assets = assets_in_container(connection, checked_id, checked_types, checked_subtypes, without, status);
+    } catch (std::exception &e) {
+        http_die ("internal-error", e.what());
     }
-    if (output == "error")
-        http_die ("internal-error", "Database failure");
+    cxxtools::JsonSerializer serializer(reply.out ());
+    serializer.inputUtf8(true);
+    serializer.beautify(true);
+    serializer.serialize(assets).finish();
+
+    return HTTP_OK;
 </%cpp>
-[<$$ output $>]
-%}
