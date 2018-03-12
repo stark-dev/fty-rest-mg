@@ -32,6 +32,7 @@
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/split.h>
 #include <fty_common.h>
+#include "shared/utilspp.h"
 #include "shared/asset_types.h"
 #include "db/assets.h"
 

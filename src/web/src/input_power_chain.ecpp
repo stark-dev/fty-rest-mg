@@ -30,6 +30,7 @@
 #include <cxxtools/serializationinfo.h>
 #include <fty_common.h>
 #include "db/assets.h"
+#include "shared/utilspp.h"
 #include "../../persist/assettopology.h"
 #include <cxxtools/utf8codec.h>
 

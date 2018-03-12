@@ -31,12 +31,10 @@
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/regex.h>
 #include <cxxtools/join.h>
+#include <fty_common.h>
 
 #include "shared/subprocess.h"
 #include "shared/cidr.h"
-#include "web/src/sasl.h"
-#include "shared/filesystem.h"
-#include "web/src/helpers.h"
 
 #define SSH_NOT_TO_BE_RUN "/etc/ssh/sshd_not_to_be_run"
 using namespace shared;
