@@ -51,10 +51,13 @@ private:
   std::string _datacenter;
   tntdb::Connection _connection;
   std::map<std::string, int> _assetsOfDatacenter;
+  std::map<std::string, int> _assetsWithNoLocation;
   uint32_t _datacenter_id;
   mlm_client_t *_clientMlm = NULL;
   zsock_t *_pipe = NULL;
   zpoller_t *_poller = NULL;
+  
+  bool isAssetInDatacenter(fty_proto_t *asset);
   
 public:
   //Constructor/destructor
