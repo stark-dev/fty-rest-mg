@@ -28,10 +28,9 @@
 #include <unistd.h>
 
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common.h>
 #include "shared/configure_inform.h"
 #include "../../db/inout.h"
-#include "web/src/helpers.h"
-#include "shared/log.h"
 #include "db/assets.h"
 </%pre>
 <%request scope="global">

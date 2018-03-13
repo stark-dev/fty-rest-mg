@@ -25,8 +25,7 @@
  #><%pre>
 #include <string>
 #include "shared/tntmlm.h"
-#include "web/src/helpers.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 #include <cxxtools/jsondeserializer.h>
 
 // stop request
@@ -56,7 +55,7 @@ stop_scan()
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        log_critical ("stop_scan: mlm_pool.get () failed.");
+        log_fatal ("stop_scan: mlm_pool.get () failed.");
         return -1;
     }
     
@@ -68,7 +67,7 @@ stop_scan()
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical ("stop_scan: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_fatal ("stop_scan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
@@ -76,7 +75,7 @@ stop_scan()
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_critical ("stop_scan: client->recv (timeout = '20') returned NULL");
+        log_fatal ("stop_scan: client->recv (timeout = '20') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);
@@ -107,7 +106,7 @@ run_scan ()
      // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("run_scan: mlm_pool.get () failed.");
+        log_fatal ("run_scan: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -118,14 +117,14 @@ run_scan ()
     
     if (rv == -1) {
         zuuid_destroy (&uuid);
-        log_critical ("run_scan: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_fatal ("run_scan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
     zuuid_destroy (&uuid);
     if (!resp) {
-        log_critical ("run_scan: client->recv (timeout = '5') returned NULL");
+        log_fatal ("run_scan: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);

@@ -29,8 +29,7 @@
 #include "shared/data.h"
 #include "shared/configure_inform.h"
 #include "defs.h"
-#include "shared/log.h"
-#include "web/src/helpers.h"
+#include <fty_common.h>
 </%pre>
 <%thread scope="global">
 asset_manager     asset_mgr;

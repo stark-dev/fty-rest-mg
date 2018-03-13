@@ -30,8 +30,7 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assettopology.h"
 #include "common_msg.h"
@@ -49,8 +48,6 @@
 
 TEST_CASE("Location topology to #1","[db][topology][location][location_topology.sql][to][lt1]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #1 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -120,8 +117,6 @@ TEST_CASE("Location topology to #1","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #2","[db][topology][location][location_topology.sql][to][lt2]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #2 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -194,8 +189,6 @@ TEST_CASE("Location topology to #2","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #3","[db][topology][location][location_topology.sql][to][lt3]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #3 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -265,8 +258,6 @@ TEST_CASE("Location topology to #3","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #4","[db][topology][location][location_topology.sql][to][lt4]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #4 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -334,8 +325,6 @@ TEST_CASE("Location topology to #4","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #5","[db][topology][location][location_topology.sql][to][lt5]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #5 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -403,8 +392,6 @@ TEST_CASE("Location topology to #5","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #6","[db][topology][location][location_topology.sql][to][lt6]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #6 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -471,8 +458,6 @@ TEST_CASE("Location topology to #6","[db][topology][location][location_topology.
 
 TEST_CASE("Location topology to #7","[db][topology][location][location_topology.sql][to][lt7]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #7 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );
@@ -537,8 +522,6 @@ TEST_CASE("Location topology to #7","[db][topology][location][location_topology.
 }
 TEST_CASE("Location topology to #8","[db][topology][location][location_topology.sql][to][lt8]")
 {
-    log_open();
-
     log_info ("=============== LOCATION TO #8 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
     assert ( getmsg );

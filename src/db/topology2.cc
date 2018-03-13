@@ -27,10 +27,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
+#include <fty_common.h>
 
 #include "shared/asset_types.h"
 #include "db/topology2.h"
-#include "shared/log.h"
 
 /**
  *  topologyv2.cc

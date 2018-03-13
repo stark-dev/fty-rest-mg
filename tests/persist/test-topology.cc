@@ -30,8 +30,7 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assettopology.h"
 #include "common_msg.h"
@@ -41,8 +40,6 @@
 
 TEST_CASE("Power topology group","[db][topology][power][group]")
 {
-    log_open();
-
     log_info ("=============== POWER GROUP id = 4999 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_GROUP);
     assert ( getmsg );
@@ -63,8 +60,6 @@ TEST_CASE("Power topology group","[db][topology][power][group]")
 
 TEST_CASE("Power topology group empty","[db][topology][power][group]")
 {
-    log_open();
-
     log_info ("=============== POWER GROUP id = 4998 EMPTY ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_GROUP);
     assert ( getmsg );
@@ -84,8 +79,6 @@ TEST_CASE("Power topology group empty","[db][topology][power][group]")
 
 TEST_CASE("Power topology datacenter1","[db][topology][power][datacenter]")
 {
-    log_open();
-
     log_info ("=============== POWER DATACENTER id = 1 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
     assert ( getmsg );
@@ -107,8 +100,6 @@ TEST_CASE("Power topology datacenter1","[db][topology][power][datacenter]")
  * DROPS the connection to the database, so other tests cannot continue, temporary disabled
 TEST_CASE("Power topology datacenter10","[db][topology][power][datacenter]")
 {
-    log_open();
-
     log_info ("=============== POWER DATACENTER id = 10 NIC ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
     assert ( getmsg );

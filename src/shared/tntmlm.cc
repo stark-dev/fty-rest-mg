@@ -18,9 +18,8 @@
  *
  */
 
-#include "shared/log.h"
+#include <fty_common.h>
 #include "shared/tntmlm.h"
-#include "shared/str_defs.h"
 
 MlmClientPool mlm_pool {10};
 

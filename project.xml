@@ -87,6 +87,13 @@
         debian_name="libsasl2-dev"
         redhat_name="cyrus-sasl-devel"
     />
+    
+    <use project = "fty-common" libname = "libfty_common" header="fty_common.h"
+        repository = "https://github.com/42ity/fty-common.git"
+        test = "fty_commmon_selftest" >
+        <use project = "log4cplus" header = "log4cplus/logger.h"
+        test = "appender_test" release="REL_1_1_2" repository="https://github.com/log4cplus/log4cplus.git" />
+    </use>
 
 <!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
 
@@ -138,30 +145,22 @@
    <class name = "shared/configure_inform" private = "0" selftest = "0" />
    <class name = "shared/csv" private = "0" selftest = "0" />
    <class name = "shared/data" private = "0" selftest = "0" />
-   <class name = "shared/dbpath" private = "0" selftest = "0" />
-   <class name = "shared/filesystem" private = "0" selftest = "0" />
    <class name = "shared/fty_asset_uptime_configurator" private = "0" selftest = "0" />
    <class name = "shared/ic" private = "0" selftest = "0" />
-   <class name = "shared/log" private = "0" selftest = "0" />
    <class name = "shared/magic" private = "1" selftest = "0" />
-   <class name = "shared/str_defs" private = "0" selftest = "0" />
    <class name = "shared/subprocess" private = "0" selftest = "0" />
    <class name = "shared/tntmlm" private = "0" selftest = "0" />
    <class name = "shared/topic_cache" private = "0" selftest = "0" />
    <class name = "shared/upsstatus" private = "0" selftest = "0" />
    <class name = "shared/utils" private = "0" selftest = "0" />
    <class name = "shared/utilspp" private = "0" selftest = "0" />
-   <class name = "shared/utils_web" private = "0" selftest = "0" />
    <class name = "shared/utils_json" private = "0" selftest = "0" />
 
    <class name = "warranty/warranty_metric" private = "1" selftest = "0" />
 
    <class name = "web/src/asset_computed_impl" selftest = "0" />
-   <class name = "web/src/helpers" selftest = "0" />
    <class name = "web/src/iface" selftest = "0" />
    <class name = "web/src/location_helpers" selftest = "0" />
-   <class name = "web/src/sasl" selftest = "0" />
-   <class name = "web/src/tokens" selftest = "0" />
    <class name = "web/src/sse" selftest = "0" />
 
 

@@ -34,16 +34,13 @@
 #include <tntdb/error.h>
 
 #include <fty_proto.h>
-#include "shared/log.h"
 #include "shared/utils.h"
-#include "shared/utils_web.h"
 #include "shared/utilspp.h"
-#include "shared/str_defs.h"
-#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "cleanup.h"
-#include "web/src/helpers.h"
 #include "shared/utils_json.h"
+
+#include <fty_common.h>
 
 #define RFC_ALERTS_LIST "rfc-alerts-list"
 
@@ -221,7 +218,7 @@ log_debug ("=== end ===");
 // connect to malamute
 _scoped_mlm_client_t *client = mlm_client_new ();
 if (!client) {
-    log_critical ("mlm_client_new() failed.");
+    log_fatal ("mlm_client_new() failed.");
     http_die ("internal-error", "mlm_client_new() failed.");
 }
 
@@ -230,7 +227,7 @@ log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
 int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
 if (rv == -1) {
-    log_critical ("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
+    log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_connect() failed.");
@@ -239,7 +236,7 @@ if (rv == -1) {
 // prepare rfc-alerts-list LIST message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
-    log_critical ("zmsg_new() failed.");
+    log_fatal ("zmsg_new() failed.");
     http_die ("internal-error", "zmsg_new() failed.");
 }
 zmsg_addstr (send_msg, "LIST");
@@ -258,14 +255,14 @@ if (mlm_client_sendto (client, FTY_ALERT_LIST, RFC_ALERTS_LIST, NULL, 1000, &sen
 zmsg_t *recv_msg = NULL;
 zsock_t *pipe = mlm_client_msgpipe (client);
 if (!pipe) {
-    log_critical ("mlm_client_msgpipe() failed.");
+    log_fatal ("mlm_client_msgpipe() failed.");
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_msgpipe() failed.");
 }
 
 zpoller_t *poller = zpoller_new (pipe, NULL);
 if (!poller) {
-    log_critical ("zpoller_new() failed.");
+    log_fatal ("zpoller_new() failed.");
     mlm_client_destroy (&client);
     http_die ("internal-error", "zpoller_new() failed.");
 }

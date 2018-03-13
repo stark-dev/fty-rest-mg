@@ -30,8 +30,7 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assettopology.h"
 #include "common_msg.h"
@@ -42,8 +41,6 @@
 
 TEST_CASE("Power topology datacenter #1","[db][topology][power][datacenter][power_topology.sql][pd1]")
 {
-    log_open();
-
     log_info ("=============== POWER DATACENTER #1 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
     assert ( getmsg );
@@ -142,8 +139,6 @@ TEST_CASE("Power topology datacenter #1","[db][topology][power][datacenter][powe
 
 TEST_CASE("Power topology datacenter #2","[db][topology][power][datacenter][power_topology.sql][pd2]")
 {
-    log_open();
-
     log_info ("=============== POWER DATACENTER #2 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
     assert ( getmsg );

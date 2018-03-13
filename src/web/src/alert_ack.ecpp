@@ -30,10 +30,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "shared/log.h"
-#include "web/src/helpers.h"
-#include "shared/str_defs.h"
 #include "db/assets.h"
+#include <fty_common.h>
 
 static
 int state_valid (const char *state) {
@@ -123,7 +121,7 @@ std::string checked_state;
 // connect to malamute
 mlm_client_t *client = mlm_client_new ();
 if (!client) {
-    log_critical ("mlm_client_new() failed.");
+    log_fatal ("mlm_client_new() failed.");
     http_die ("internal-error", "mlm_client_new() failed.");
 }
 
@@ -132,7 +130,7 @@ log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
 int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
 if (rv == -1) {
-    log_critical ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
+    log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_connect() failed.");
@@ -141,7 +139,7 @@ if (rv == -1) {
 // prepare rfc-evaluator-rules ADD message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
-    log_critical ("zmsg_new() failed.");
+    log_fatal ("zmsg_new() failed.");
     http_die ("internal-error", "zmsg_new() failed.");
 }
 std::string asset_id;
@@ -167,12 +165,12 @@ if (mlm_client_sendto (client, FTY_ALERT_LIST, "rfc-alerts-acknowledge", NULL, 1
 zmsg_t *recv_msg = NULL;
 zsock_t *pipe = mlm_client_msgpipe (client);
 if (!pipe) {
-    log_critical ("mlm_client_msgpipe() failed.");
+    log_fatal ("mlm_client_msgpipe() failed.");
     http_die ("internal-error", "mlm_client_msgpipe() failed.");
 }
 zpoller_t *poller = zpoller_new (pipe, NULL);
 if (!poller) {
-    log_critical ("zpoller_new() failed.");
+    log_fatal ("zpoller_new() failed.");
     http_die ("internal-error", "zpoller_new() failed.");
 }
 while (true) {

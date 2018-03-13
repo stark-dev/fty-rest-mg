@@ -28,9 +28,7 @@
  * \brief Not yet documented file
  */
 #include <catch.hpp>
-
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assetcrud.h"
 #include "db/assets.h"
@@ -43,7 +41,6 @@
 
 TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][asset_ext_attribute][crud_test.sql]")
 {
-    log_open ();
 
     log_info ("=============== ASSET EXT ATTRIBUTE DELETE/INSERT #1 NULL ->true, true->true ==================");
 
@@ -109,7 +106,6 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
 
 TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][asset_ext_attribute][crud_test.sql]")
 {
-    log_open ();
 
     log_info ("=============== ASSET EXT ATTRIBUTE DELETE/INSERT #2 NULL -> false, false->false ==================");
     
@@ -190,7 +186,6 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
 
 TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_element][crud_test.sql]")
 {
-    log_open ();
 
     log_info ("=============== ASSET ELEMENT DELETE/INSERT #3 ==================");
     
@@ -250,7 +245,6 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
 
 TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_element][crud_test.sql]")
 {
-    log_open ();
 
     log_info ("=============== ASSET ELEMENT INTO GROUP INSERT/DELETE #5 ==================");
     
@@ -296,8 +290,6 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
 
 TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_link][crud_test.sql][66]")
 {
-    log_open ();
-
     log_info ("=============== ASSET LINK INSERT/DELETE #6 ==================");
     
     tntdb::Connection conn;
@@ -350,8 +342,6 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
 
 TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unlockated][crud_test.sql]")
 {
-    log_open ();
-
     log_info ("=============== dc INSERT/DELETE #7 ==================");
     
     tntdb::Connection conn;
@@ -435,8 +425,6 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
 
 TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockated][room][crud_test.sql]")
 {
-    log_open ();
-
     log_info ("=============== room INSERT/DELETE #8 ==================");
     
     tntdb::Connection conn;
@@ -508,8 +496,6 @@ TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlocka
 
 TEST_CASE("row unlockated INSERT/DELETE #9","[db][CRUD][insert][delete][unlockated][row][crud_test.sql]")
 {
-    log_open ();
-
     log_info ("=============== row INSERT/DELETE #9 ==================");
 
     tntdb::Connection conn;
@@ -582,8 +568,6 @@ TEST_CASE("row unlockated INSERT/DELETE #9","[db][CRUD][insert][delete][unlockat
 
 TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRUD][insert][delete][unlockated][rack][crud_test.sql]")
 {
-    log_open ();
-
     log_info ("=============== rack INSERT/DELETE #persist::asset_subtype::N_A ==================");
 
     tntdb::Connection conn;
@@ -668,8 +652,6 @@ TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRU
 
 TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unlockated][group][crud_test.sql]")
 {
-    log_open ();
-
     log_info ("=============== group INSERT/DELETE #11 ==================");
     
     tntdb::Connection conn;
@@ -743,7 +725,6 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
 
 TEST_CASE("device unlockated INSERT/DELETE #12","[db][CRUD][insert][delete][unlockated][device][crud_test.sql]")
 {
-    log_open ();
     log_info ("=============== device INSERT/DELETE #12 ==================");
 
     tntdb::Connection conn;

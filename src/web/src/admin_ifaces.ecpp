@@ -25,9 +25,9 @@
  * \brief Function for accessing network interfaces on Linux
  */
  #><%pre>
-#include "shared/log.h"
-#include "web/src/helpers.h"
 #include "web/src/iface.h"
+#include <fty_common.h>
+
 </%pre>
 <%request scope="global">
 UserInfo user;

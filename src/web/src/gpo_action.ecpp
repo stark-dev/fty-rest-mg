@@ -25,8 +25,7 @@
  #><%pre>
 #include <string>
 #include "shared/tntmlm.h"
-#include "web/src/helpers.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 #include "db/assets.h"
 
 // request GPO interaction
@@ -49,7 +48,7 @@ gpo_action (std::string sensor, std::string action)
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        log_critical ("gpo_action: mlm_pool.get () failed.");
+        log_fatal ("gpo_action: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -60,7 +59,7 @@ gpo_action (std::string sensor, std::string action)
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical ("gpo_action: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
+        log_fatal ("gpo_action: client->sendto (address = '%s') failed.", "fty-sensor-gpio");
         return -2;
     }
 
@@ -68,7 +67,7 @@ gpo_action (std::string sensor, std::string action)
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_critical ("gpo_action: client->recv (timeout = '5') returned NULL");
+        log_fatal ("gpo_action: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);

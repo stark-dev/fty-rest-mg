@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <cxxtools/regex.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
 </%pre>
 <%cpp>
 	// NOTE: json.ecpp is not limited by CHECK_USER_PERMISSIONS_OR_DIE
@@ -47,8 +47,6 @@
 	// Do not let zeromq took away our signals
 	setenv("ZSYS_SIGHANDLER", "false", 1);
 
-	// setup BIOS logging
-	log_open ();
 
 	// Silence the warning about unused "request" variable
 	request.keepAlive();

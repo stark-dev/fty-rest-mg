@@ -32,18 +32,15 @@
 #include <string>
 #include <exception>
 #include <czmq.h>
+#include <fty_common.h>
 
-#include "shared/log.h"
 #include "defs.h"
-#include "shared/dbpath.h"
 #include "shared/data.h"
 #include "msg/common_msg.h"
 #include "web/src/location_helpers.h"
 #include "shared/asset_types.h"
 #include "../../persist/assettopology.h"
-#include "shared/utils_web.h"
 #include "cleanup.h"
-#include "web/src/helpers.h"
 </%pre>
 <%thread scope="global">
 asset_manager asset_mgr;

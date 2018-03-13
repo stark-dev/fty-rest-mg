@@ -25,8 +25,7 @@
  #><%pre>
 #include <string>
 #include "shared/tntmlm.h"
-#include "web/src/helpers.h"
-#include "shared/utils_web.h"
+#include <fty_common.h>
 #include <cxxtools/jsondeserializer.h>
 
 static zmsg_t *
@@ -131,7 +130,7 @@ set_confscan(std::string json)
      // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("set_confscan: mlm_pool.get () failed.");
+        log_fatal ("set_confscan: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -146,14 +145,14 @@ set_confscan(std::string json)
     
     if (rv == -1) {
         zuuid_destroy (&uuid);
-        log_critical ("set_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_fatal ("set_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
     zmsg_t *resp = client->recv (zuuid_str_canonical (uuid), 5);
     zuuid_destroy (&uuid);
     if (!resp) {
-        log_critical ("set_confscan: client->recv (timeout = '5') returned NULL");
+        log_fatal ("set_confscan: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     char *result = zmsg_popstr (resp);
@@ -205,7 +204,7 @@ get_confscan (std::string &output)
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        log_critical ("get_confscan: mlm_pool.get () failed.");
+        log_fatal ("get_confscan: mlm_pool.get () failed.");
         return -1;
     }
 
@@ -216,7 +215,7 @@ get_confscan (std::string &output)
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
-        log_critical ("get_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
+        log_fatal ("get_confscan: client->sendto (address = '%s') failed.", "fty-discovery");
         return -2;
     }
 
@@ -224,7 +223,7 @@ get_confscan (std::string &output)
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_critical ("info: client->recv (timeout = '5') returned NULL");
+        log_fatal ("info: client->recv (timeout = '5') returned NULL");
         return -3;
     }
     

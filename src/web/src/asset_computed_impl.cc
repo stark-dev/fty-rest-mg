@@ -22,12 +22,11 @@
 #include <functional>
 #include <tntdb/connection.h>
 #include <tntdb/row.h>
+#include <fty_common.h>
 
 #include "shared/utils.h"
-#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "shared/asset_types.h"
-#include "shared/log.h"
 
 static int
 s_get_devices_usize(

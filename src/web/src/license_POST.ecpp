@@ -35,11 +35,8 @@
 
 #include "shared/utils.h"
 #include "cleanup.h"
-#include "web/src/helpers.h"
-#include "shared/log.h"
-#include "shared/dbpath.h"
+#include <fty_common.h>
 #include "shared/subprocess.h"
-#include "shared/filesystem.h"
 
 </%pre>
 <%request scope="global">

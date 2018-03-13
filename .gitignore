@@ -194,6 +194,8 @@ libsodium/
 tntdb/
 tntnet/
 magic/
+fty-common/
+log4cplus/
 
 # Distcheck products under various possible names
 libfty-rest-*.zip

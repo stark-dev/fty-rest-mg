@@ -20,7 +20,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/error.h>
 
 #include "monitor.h"
-#include "shared/log.h"
+#include <fty_common.h>
 #include "defs.h"
 
 ////////////////////////////////////////////////////////////////////////

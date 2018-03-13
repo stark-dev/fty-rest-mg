@@ -25,12 +25,9 @@
  * \brief  Check if token is valid or not
  */
  #><%pre>
-#include "web/src/tokens.h"
 #include <tnt/httpmessage.h>
 #include <tnt/httpheader.h>
-#include "shared/utils_web.h"
-#include "web/src/helpers.h"
-#include "shared/log.h"
+#include <fty_common.h>
 
 #ifdef DEBUG
 #include <iostream>

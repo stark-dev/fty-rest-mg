@@ -25,12 +25,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/result.h>
 #include <tntdb/error.h>
 #include <tntdb/transaction.h>
+#include <fty_common.h>
 
-#include "shared/log.h"
 #include "defs.h"
 #include "shared/asset_types.h"
 #include "db/assets/assetr.h"
-#include "shared/utils_web.h"
 
 namespace persist {
 

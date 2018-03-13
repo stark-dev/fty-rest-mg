@@ -28,7 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/value.h>
 #include <tntdb/result.h>
 
-#include "shared/log.h"
+#include <fty_common.h>
 #include "assetcrud.h"
 #include "msg/common_msg.h"
 #include "shared/asset_types.h"
@@ -279,7 +279,6 @@ input_power_group_response
 // and messages are going to be deleted, so add it as normal parameter.
 zmsg_t *process_assettopology (const char *database_url,
                         asset_msg_t **message_p, a_elmnt_id_t feed_by_id) {
-    log_open ();
 
     assert (message_p);
     assert (database_url);

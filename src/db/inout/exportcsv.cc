@@ -31,8 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 
 #include "db/assets.h"
-#include "shared/dbpath.h"
-#include "shared/log.h"
+#include <fty_common.h>
 #include "shared/utilspp.h"
 
 namespace persist {

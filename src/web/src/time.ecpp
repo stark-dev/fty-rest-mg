@@ -30,7 +30,7 @@
 #include <cxxtools/jsondeserializer.h>
 #include "shared/augtool.h"
 #include "shared/utils.h"
-#include "web/src/helpers.h"
+#include <fty_common.h>
 </%pre>
 <%request scope="global">
 UserInfo user;

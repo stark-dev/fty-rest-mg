@@ -30,10 +30,10 @@
 #include <fstream>
 
 #include <magic.h>
+#include <fty_common.h>
 
 #include "bios_magic.h"
 #include "shared/subprocess.h"
-#include "shared/log.h"
 
 namespace shared {
 

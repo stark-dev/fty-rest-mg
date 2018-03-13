@@ -28,12 +28,8 @@
 #include <unistd.h>
 #include <cxxtools/split.h>
 #include <tntdb/error.h>
+#include <fty_common.h>
 #include "shared/data.h"
-#include "shared/str_defs.h"
-#include "shared/dbpath.h"
-#include "shared/utils_web.h"
-#include "shared/log.h"
-#include "web/src/helpers.h"
 #include "db/assets.h"
 </%pre>
 

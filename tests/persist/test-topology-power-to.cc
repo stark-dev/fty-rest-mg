@@ -30,8 +30,7 @@
 #include <iostream>
 #include <czmq.h>
 
-#include "dbpath.h"
-#include "log.h"
+#include <fty_common.h>
 
 #include "assettopology.h"
 #include "common_msg.h"
@@ -41,8 +40,6 @@
 
 TEST_CASE("Power topology to #1","[db][topology][power][to][power_topology.sql][t1]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #1 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -65,8 +62,6 @@ TEST_CASE("Power topology to #1","[db][topology][power][to][power_topology.sql][
 
 TEST_CASE("Power topology to #2","[db][topology][power][power_topology.sql][to][t2]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #2 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -89,8 +84,6 @@ TEST_CASE("Power topology to #2","[db][topology][power][power_topology.sql][to][
 
 TEST_CASE("Power topology to #3","[db][topology][power][power_topology.sql][to][t3]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #3 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -151,8 +144,6 @@ TEST_CASE("Power topology to #3","[db][topology][power][power_topology.sql][to][
 
 TEST_CASE("Power topology to #4","[db][topology][power][power_topology.sql][to][t4]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #4 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -209,8 +200,6 @@ TEST_CASE("Power topology to #4","[db][topology][power][power_topology.sql][to][
 
 TEST_CASE("Power topology to #5","[db][topology][power][power_topology.sql][to][t5]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #5 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -303,9 +292,7 @@ TEST_CASE("Power topology to #5","[db][topology][power][power_topology.sql][to][
 }
 
 TEST_CASE("Power topology to #6","[db][topology][power_topology.sql][power][to][t6]")
-{   
-    log_open();
-
+{
     log_info ("=============== POWER TO #6 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -403,8 +390,6 @@ TEST_CASE("Power topology to #6","[db][topology][power_topology.sql][power][to][
  
 TEST_CASE("Power topology to #7","[db][topology][power_topology.sql][power][to][t7]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #7 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -492,8 +477,6 @@ TEST_CASE("Power topology to #7","[db][topology][power_topology.sql][power][to][
 
 TEST_CASE("Power topology to #8","[db][topology][power_topology.sql][power][to][t8]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #8 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -584,8 +567,6 @@ TEST_CASE("Power topology to #8","[db][topology][power_topology.sql][power][to][
 
 TEST_CASE("Power topology to #9","[db][topology][power_topology.sql][power][to][t9]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #9 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -685,8 +666,6 @@ TEST_CASE("Power topology to #9","[db][topology][power_topology.sql][power][to][
 
 TEST_CASE("Power topology to #10","[db][topology][power_topology.sql][power][to][t10]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #10 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );
@@ -775,8 +754,6 @@ TEST_CASE("Power topology to #10","[db][topology][power_topology.sql][power][to]
 
 TEST_CASE("Power topology to #11","[db][topology][power][power_topology.sql][to][t11]")
 {
-    log_open();
-
     log_info ("=============== POWER TO #11 ==================");
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_POWER_TO);
     assert ( getmsg );

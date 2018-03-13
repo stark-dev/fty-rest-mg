@@ -29,15 +29,11 @@
 #include <fty_proto.h>
 
 #include <sys/types.h>
+#include <fty_common.h>
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
-#include "shared/log.h"
-#include "shared/dbpath.h" // temporary
-#include "shared/utils_web.h"
 #include "shared/asset_types.h"
-#include "web/src/helpers.h"
-#include "shared/str_defs.h"
 #include "shared/tntmlm.h"
 #include "defs.h"
 
@@ -202,7 +198,7 @@ std::vector<uint32_t> asset_ids;
     // connect to malamute
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
-        log_critical ("mlm_pool.get () failed.");
+        log_fatal ("mlm_pool.get () failed.");
         http_die ("internal-error", "mlm_pool.get () failed.");
     }
 
@@ -230,7 +226,7 @@ std::vector<uint32_t> asset_ids;
         int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
         if (rv == -1) {
             zuuid_destroy (&uuid);
-            log_critical (
+            log_fatal (
                     "client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
                     "fty-metric-cache", "latest-rt-data");
             http_die ("internal-error", "client->sendto () failed");
@@ -239,7 +235,7 @@ std::vector<uint32_t> asset_ids;
         zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
         zuuid_destroy (&uuid);
         if (!msg) {
-            log_critical ("client->recv (timeout = '5') returned NULL");
+            log_fatal ("client->recv (timeout = '5') returned NULL");
             http_die ("internal-error", "client->recv () returned NULL");
         }
 

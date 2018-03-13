@@ -26,11 +26,10 @@
 #include <string>
 #include <string.h>
 #include <time.h>
+#include <fty_common.h>
 
 #include "../../db/inout.h"
 #include "shared/utils.h"
-#include "shared/log.h"
-#include "web/src/helpers.h"
 </%pre>
 <%request scope="global">
 UserInfo user;

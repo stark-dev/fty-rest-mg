@@ -31,15 +31,12 @@
 #include <sstream>
 #include <vector>
 #include <czmq.h>
+#include <fty_common.h>
 
 #include "defs.h"
-#include "shared/dbpath.h"
 #include "shared/asset_types.h"
 #include "../../persist/assettopology.h"
-#include "shared/utils_web.h"
-#include "shared/log.h"
 #include "cleanup.h"
-#include "web/src/helpers.h"
 #include "db/assets/assetr.h"
 #include "shared/utilspp.h"
 </%pre>

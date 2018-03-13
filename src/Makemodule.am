@@ -100,26 +100,18 @@ src_libfty_rest_la_SOURCES += \
     src/shared/configure_inform.cc \
     src/shared/csv.cc \
     src/shared/data.cc \
-    src/shared/dbpath.cc \
-    src/shared/filesystem.cc \
     src/shared/fty_asset_uptime_configurator.cc \
     src/shared/ic.cc \
-    src/shared/log.cc \
-    src/shared/str_defs.cc \
     src/shared/subprocess.cc \
     src/shared/tntmlm.cc \
     src/shared/topic_cache.cc \
     src/shared/upsstatus.cc \
     src/shared/utils.cc \
     src/shared/utilspp.cc \
-    src/shared/utils_web.cc \
     src/shared/utils_json.cc \
     src/web/src/asset_computed_impl.cc \
-    src/web/src/helpers.cc \
     src/web/src/iface.cc \
     src/web/src/location_helpers.cc \
-    src/web/src/sasl.cc \
-    src/web/src/tokens.cc \
     src/web/src/sse.cc
 
 endif

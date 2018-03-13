@@ -42,10 +42,8 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
-#include "web/src/helpers.h"
+#include <fty_common.h>
 #include "shared/subprocess.h"
-#include "shared/log.h"
-#include "shared/dbpath.h"
 #include "db/assets.h"
 #include "shared/asset_types.h"
 #include "shared/utils.h"

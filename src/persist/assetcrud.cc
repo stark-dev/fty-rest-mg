@@ -30,10 +30,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/result.h>
 #include <tntdb/error.h>
 #include <tntdb/transaction.h>
+#include <fty_common.h>
 
-#include "shared/log.h"
 #include "defs.h"
-#include "shared/dbpath.h"
 #include "assetcrud.h"
 #include "monitor.h"
 #include "persist_error.h"

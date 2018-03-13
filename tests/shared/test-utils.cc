@@ -27,10 +27,10 @@
  */
 #include <czmq.h>
 #include <catch.hpp>
+#include <fty_common.h>
 
 #include "defs.h"
 #include "utils.h"
-#include "filesystem.h"
 
 TEST_CASE ("average_step_seconds", "[average_step_seconds][utils][average]") {
 

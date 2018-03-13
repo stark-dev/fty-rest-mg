@@ -28,9 +28,7 @@
 #include <fty_proto.h>
 #include <tntdb.h>
 
-#include "shared/log.h"
-#include "shared/str_defs.h"
-#include "shared/dbpath.h"
+#include <fty_common.h>
 #include "db/assets.h"
 
 /*
@@ -47,7 +45,6 @@
 uint32_t TTL = 24*60*60;//[s]
 int main()
 {
-    log_open ();
 
     mlm_client_t *client = mlm_client_new ();
     assert (client);

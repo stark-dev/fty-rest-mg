@@ -26,11 +26,7 @@
             * get poken
  */
  #><%pre>
-#include "web/src/sasl.h"
-#include "web/src/tokens.h"
-#include "shared/log.h"
-#include "shared/utils_web.h"
-#include "web/src/helpers.h"
+#include <fty_common.h>
 #include <string>
 #include <iostream>
 #include <cxxtools/regex.h>

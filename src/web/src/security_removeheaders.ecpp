@@ -31,7 +31,7 @@
  * \brief  remove HTTP headers defined as args in tntnet.xml
  */
 #><%pre>
-#include "shared/log.h"
+#include <fty_common.h>
 </%pre>
 <%cpp>
     tnt::HttpRequest::args_type my_args=request.getArgs();

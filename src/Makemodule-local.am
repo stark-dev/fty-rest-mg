@@ -71,7 +71,7 @@ ci_helper_SCRIPTS =    tools/bios-passwd tools/testpass.sh
 ci_helperdir =         $(clientdir)
 
 ECPPC=ecppc
-ECPPFLAGS=
+ECPPFLAGS= --nolog
 ECPPFLAGS_CPP=
 
 ECPPFILES= \
