@@ -39,7 +39,7 @@
 #include "msg/common_msg.h"
 #include "web/src/location_helpers.h"
 #include "shared/asset_types.h"
-#include "../../persist/assettopology.h"
+#include "src/persist/assettopology.h"
 #include "cleanup.h"
 </%pre>
 <%thread scope="global">

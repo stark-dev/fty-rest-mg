@@ -37,7 +37,7 @@
 
 #include <fty_common.h>
 
-#include "../../persist/assetcrud.h"
+#include "src/persist/assetcrud.h"
 #include "shared/data.h"
 #include "cleanup.h"
 #include "shared/utils.h"
