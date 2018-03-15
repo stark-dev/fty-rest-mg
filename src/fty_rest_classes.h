@@ -341,7 +341,6 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/auth.h"
 #include "web/src/auth_verify.h"
 #include "web/src/average.h"
-#include "web/src/config.h"
 #include "web/src/conf_scan.h"
 #include "web/src/current.h"
 #include "web/src/datacenter_indicators.h"

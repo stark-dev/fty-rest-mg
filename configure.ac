@@ -47,7 +47,11 @@ FTY_REST_ORIG_CFLAGS="${CFLAGS:-none}"
 
 # Note: This is a custom edit over zproject-generated code
 # brought in from legacy implementation to identify the
-# main version of REST API
+# main baseline version of REST API on a deployment.
+# TODO: Move into includable .m4 file (see how zprojects supports that)
+
+### PACKAGING METADATA (for sysinfo, etc.)
+
 PACKAGE_VENDOR="Eaton"
 AC_ARG_WITH([package-vendor],
 	[AS_HELP_STRING([--with-package-vendor=ARG],
@@ -58,7 +62,7 @@ AC_ARG_WITH([package-vendor],
 	# This may be left empty by explicit request
 )
 
-### Allow to revise the packaging strings in config.h
+### Allow to revise the packaging strings in platform.h
 m4_define([__AC_UNDEFINE],[_AC_DEFINE([#ifdef $1
  #undef $1
 #endif])])
