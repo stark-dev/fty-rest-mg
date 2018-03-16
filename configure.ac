@@ -1512,6 +1512,16 @@ fi
      AC_MSG_RESULT([$enable_dist_cmakefiles])])
 AM_CONDITIONAL(ENABLE_DIST_CMAKEFILES, test "x$enable_dist_cmakefiles" = "xyes")
 
+# Check for db/bios-csv intent
+AC_ARG_ENABLE([db/bios-csv],
+    AS_HELP_STRING([--enable-db/bios-csv],
+        [Compile and install 'db/bios-csv' [default=yes]]),
+    [enable_db_bios_csv=$enableval],
+    [enable_db_bios_csv=yes])
+
+AM_CONDITIONAL([ENABLE_DB_BIOS_CSV], [test x$enable_db_bios_csv != xno])
+AM_COND_IF([ENABLE_DB_BIOS_CSV], [AC_MSG_NOTICE([ENABLE_DB_BIOS_CSV defined])])
+
 # Check for fty_rest_selftest intent
 AC_ARG_ENABLE([fty_rest_selftest],
     AS_HELP_STRING([--enable-fty_rest_selftest],

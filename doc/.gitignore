@@ -65,6 +65,8 @@ web_src_location_helpers.txt
 web_src_location_helpers.doc
 web_src_sse.txt
 web_src_sse.doc
+db/bios-csv.txt
+db/bios-csv.doc
 
 # Make sure to track the manually maintained project description
 !*.adoc

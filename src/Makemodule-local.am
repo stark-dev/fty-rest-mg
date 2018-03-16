@@ -68,6 +68,7 @@ EXTRA_DIST +=	tools/testpass.sh
 # This is an optional target - without this script working (including the
 # sudoers setup), the REST API tests involving password changes will fail.
 ci_helper_SCRIPTS =    tools/bios-passwd tools/testpass.sh
+package_CLIENTS_BIOS_CSV =    $(DESTDIR)$(bindir)/bios-csv
 ci_helperdir =         $(clientdir)
 
 ECPPC=ecppc
@@ -182,7 +183,8 @@ install-exec-hook:
 	mkdir -p $(DESTDIR)$(includedir)/$(PACKAGE) && \
 	    cd $(DESTDIR)$(includedir) && \
 	    mv -f `ls -1A | egrep -v '^'"$(PACKAGE)"'$$' ` $(PACKAGE)/
-	mkdir -p "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)"
+	mkdir -p "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)" && \
+	    mv -f "$(package_CLIENTS_BIOS_CSV)" "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)/"
 	if test x"$(ci_helperdir)" != x"$(prefix)/libexec/$(PACKAGE)" ; then \
 	    for F in $(ci_helper_SCRIPTS) ; do \
 	        F="`basename "$$F"`"; \
