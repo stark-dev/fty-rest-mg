@@ -27,7 +27,7 @@
 #include <cxxtools/split.h>
 #include <fty_common.h>
 #include "shared/data.h"
-#include "../../persist/assetcrud.h"
+#include "src/persist/assetcrud.h"
 #include "db/assets.h"
 </%pre>
 <%thread scope="global">

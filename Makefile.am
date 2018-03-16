@@ -98,7 +98,6 @@ EXTRA_DIST += \
     src/web/src/auth.h \
     src/web/src/auth_verify.h \
     src/web/src/average.h \
-    src/web/src/config.h \
     src/web/src/conf_scan.h \
     src/web/src/current.h \
     src/web/src/datacenter_indicators.h \

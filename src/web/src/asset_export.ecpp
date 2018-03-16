@@ -28,7 +28,7 @@
 #include <time.h>
 #include <fty_common.h>
 
-#include "../../db/inout.h"
+#include "src/db/inout.h"
 #include "shared/utils.h"
 </%pre>
 <%request scope="global">
