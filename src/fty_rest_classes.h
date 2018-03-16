@@ -159,10 +159,6 @@ typedef struct _web_src_auth_verify_t web_src_auth_verify_t;
 typedef struct _web_src_average_t web_src_average_t;
 #define WEB_SRC_AVERAGE_T_DEFINED
 #endif
-#ifndef WEB_SRC_CONFIG_T_DEFINED
-typedef struct _web_src_config_t web_src_config_t;
-#define WEB_SRC_CONFIG_T_DEFINED
-#endif
 #ifndef WEB_SRC_CONF_SCAN_T_DEFINED
 typedef struct _web_src_conf_scan_t web_src_conf_scan_t;
 #define WEB_SRC_CONF_SCAN_T_DEFINED
@@ -186,6 +182,10 @@ typedef struct _web_src_email_test_t web_src_email_test_t;
 #ifndef WEB_SRC_EMAIL_VOTE_T_DEFINED
 typedef struct _web_src_email_vote_t web_src_email_vote_t;
 #define WEB_SRC_EMAIL_VOTE_T_DEFINED
+#endif
+#ifndef WEB_SRC_FIND_ACCESS_TOKEN_T_DEFINED
+typedef struct _web_src_find_access_token_t web_src_find_access_token_t;
+#define WEB_SRC_FIND_ACCESS_TOKEN_T_DEFINED
 #endif
 #ifndef WEB_SRC_GETLOG_GET_T_DEFINED
 typedef struct _web_src_getlog_get_t web_src_getlog_get_t;
@@ -347,6 +347,7 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/email_feedback.h"
 #include "web/src/email_test.h"
 #include "web/src/email_vote.h"
+#include "web/src/find_access_token.h"
 #include "web/src/getlog_GET.h"
 #include "web/src/gpo_action.h"
 #include "web/src/info.h"

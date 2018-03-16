@@ -67,6 +67,10 @@
     <mapping>
       <target>json@libfty_rest</target>
     </mapping>
+    <!-- Get the access Token to make it easier to handle it later. -->
+    <mapping>
+      <target>find_access_token@libfty_rest</target>
+    </mapping>
     <!-- We are getting authorized -->
     <mapping>
       <target>auth@libfty_rest</target>

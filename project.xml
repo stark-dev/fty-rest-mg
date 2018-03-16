@@ -201,7 +201,6 @@
     <class name = "web/src/auth_verify" private="1" selftest = "0">root object</class>
     <class name = "web/src/average" private="1" selftest = "0">root object</class>
 
-    <class name = "web/src/config" private="1" selftest = "0">root object</class>
     <class name = "web/src/conf_scan" private="1" selftest = "0">root object</class>
     <class name = "web/src/current" private="1" selftest = "0">root object</class>
     <class name = "web/src/datacenter_indicators" private="1" selftest = "0">root object</class>
@@ -209,6 +208,7 @@
 
     <class name = "web/src/email_test" private="1" selftest = "0">root object</class>
     <class name = "web/src/email_vote" private="1" selftest = "0">root object</class>
+    <class name = "web/src/find_access_token" private="1" selftest = "0">root object</class>
     <class name = "web/src/getlog_GET" private="1" selftest = "0">root object</class>
     <class name = "web/src/gpo_action" private="1" selftest = "0">root object</class>
     <class name = "web/src/info" private="1" selftest = "0">root object</class>
