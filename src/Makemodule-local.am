@@ -44,6 +44,7 @@ EXTRA_DIST +=	$(GENERATEDSCRIPTS)
 CLEANFILES +=	$(GENERATEDSCRIPTS)
 
 EXTRA_DIST +=	tools/testpass.sh
+EXTRA_DIST +=   src/fty_rest_classes.h
 
 # Catch-all undetailed recipes for .in files to be converted into sources
 # Also used from sub-Makefiles, see docs/examples/Makefile.am for call-syntax
@@ -95,7 +96,7 @@ ECPPFILES= \
   web/src/asset_PUT.ecpp \
   web/src/assets_in.ecpp \
   web/src/auth.ecpp \
-  web/src/auth-verify.ecpp \
+  web/src/auth_verify.ecpp \
   web/src/average.ecpp \
   web/src/config.ecpp \
   web/src/conf_scan.ecpp \
@@ -122,7 +123,7 @@ ECPPFILES= \
   web/src/scan_run.ecpp \
   web/src/security_headers.ecpp \
   web/src/server_status.ecpp \
-  web/src/ssl-redirect.ecpp \
+  web/src/ssl_redirect.ecpp \
   web/src/sysinfo.ecpp \
   web/src/systemctl.ecpp \
   web/src/time.ecpp \
@@ -130,7 +131,9 @@ ECPPFILES= \
   web/src/topology_location_from.ecpp \
   web/src/topology_location_to.ecpp \
   web/src/topology_power.ecpp \
-  web/src/uptime.ecpp
+  web/src/uptime.ecpp \
+  web/src/security_removeheaders.ecpp \
+  web/src/hw_capability.ecpp
 
 TNTLIB_BASENAME=libfty_rest
 TNTLIB_DIRNAME=$(pkglibdir)
@@ -172,6 +175,7 @@ uninstall-tntnet-includes:
 
 uninstall-local: uninstall-tntnet-nonshared uninstall-tntnet-includes
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
+	/bin/rm -f $(DESTDIR)$(prefix)/libexec/$(PACKAGE)/bios-csv
 
 # Install the built shared objects for tntnet
 install-exec-hook:
