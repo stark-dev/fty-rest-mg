@@ -141,6 +141,13 @@ endif
 
 src_libfty_rest_la_LIBADD = ${project_libs}
 
+if ENABLE_DB_BIOS_CSV
+bin_PROGRAMS += src/db/bios-csv
+src_db_bios_csv_CPPFLAGS = ${AM_CPPFLAGS}
+src_db_bios_csv_LDADD = ${program_libs}
+src_db_bios_csv_SOURCES = src/db/bios-csv.cc
+endif #ENABLE_DB_BIOS_CSV
+
 if ENABLE_FTY_REST_SELFTEST
 check_PROGRAMS += src/fty_rest_selftest
 noinst_PROGRAMS += src/fty_rest_selftest
@@ -151,6 +158,7 @@ endif #ENABLE_FTY_REST_SELFTEST
 
 # define custom target for all products of /src
 src: \
+		src/db/bios-csv \
 		src/fty_rest_selftest \
 		src/libfty_rest.la
 

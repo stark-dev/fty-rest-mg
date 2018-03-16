@@ -126,5 +126,11 @@ make install DESTDIR=%{buildroot} %{?_smp_mflags}
 find %{buildroot} -name '*.a' | xargs rm -f
 find %{buildroot} -name '*.la' | xargs rm -f
 
+%files
+%defattr(-,root,root)
+%doc README.md
+%doc COPYING
+%{_bindir}/db/bios-csv
+%{_mandir}/man1/db/bios-csv*
 
 %changelog
