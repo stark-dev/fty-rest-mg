@@ -6,7 +6,6 @@
 all-local: doc
 
 # Public programs ("main" tags in project.xml), auto-regenerated:
-# Commented because this binary does not have a manpage
 MAN1 = db/bios-csv.1
 # Public classes ("class" tags in project.xml), auto-regenerated:
 MAN3 = db_topology2.3 db_assets_assetcr.3 db_assets_assetd.3 db_assets_assetr.3 db_assets_assetu.3 git_details_override.3 msg_asset_msg.3 msg_common_msg.3 shared_asset_types.3 shared_augtool.3 shared_cidr.3 shared_configure_inform.3 shared_csv.3 shared_data.3 shared_fty_asset_uptime_configurator.3 shared_ic.3 shared_subprocess.3 shared_tntmlm.3 shared_topic_cache.3 shared_upsstatus.3 shared_utils.3 shared_utilspp.3 shared_utils_json.3 web_src_asset_computed_impl.3 web_src_iface.3 web_src_location_helpers.3 web_src_sse.3
@@ -173,8 +172,12 @@ GENERATED_DOCS += web_src_sse.txt web_src_sse.doc
 web_src_sse.txt: $(top_srcdir)/src/web/src/sse.cc
 	"$(srcdir)/mkman" "web/src/sse" "$(builddir)/web_src_sse.txt" "$(srcdir)/.."
 
+### Note: for mains, we keep the source name rather than flattened name:c
+### so that the manpages for binary programs match their name, at expense
+### of perhaps being built in a subdirectory under doc/.
 GENERATED_DOCS += db/bios-csv.txt db/bios-csv.doc
 db/bios-csv.txt: $(top_srcdir)/src/db/bios-csv.cc
+	mkdir -p "$(builddir)/$(@D)"
 	"$(srcdir)/mkman" "db/bios-csv" "$(builddir)/db/bios-csv.txt" "$(srcdir)/.."
 
 
