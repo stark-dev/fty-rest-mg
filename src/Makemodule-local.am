@@ -154,7 +154,7 @@ ci_helperdir =         $(clientdir)
 
 ECPPC=ecppc
 ECPPFLAGS= --nolog
-ECPPFLAGS_CPP=
+ECPPFLAGS_CPP=-I$(top_builddir)/include -I$(top_srcdir)/include
 
 ECPPFILES= \
   web/src/add_gpio.ecpp \
@@ -234,7 +234,7 @@ EXTRA_DIST += $(top_srcdir)/src/web/src/admin_passwd.ecpp
 	${ECPPC} ${ECPPFLAGS} ${ECPPFLAGS_CPP} -o $(top_builddir)/src/web/src/$(@F) $(top_srcdir)/src/web/src/$(<F) && \
 	    mv -f $(top_builddir)/src/web/src/$(@F).cpp $(top_builddir)/src/web/src/$(@F)
 
-src/web/src/sysinfo.cpp: include/git_details_override.h
+src/web/src/sysinfo.ecpp: include/git_details_override.h
 
 #----------------------------------------------------------------------
 #                        hook for make all => generate files too
