@@ -25,7 +25,6 @@
  */
 
 #include <fty_common.h>
-#include <fty-common/log/fty_log.h>
 #include "web/src/sse.h"
 #include "shared/data.h"
 #include "shared/utils_json.h"
