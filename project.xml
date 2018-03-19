@@ -87,15 +87,16 @@
         debian_name="libsasl2-dev"
         redhat_name="cyrus-sasl-devel"
     />
-    
+<!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
+
     <use project = "fty-common" libname = "libfty_common" header="fty_common.h"
         repository = "https://github.com/42ity/fty-common.git"
         test = "fty_commmon_selftest" >
         <use project = "log4cplus" header = "log4cplus/logger.h"
-        test = "appender_test" release="REL_1_1_2" repository="https://github.com/log4cplus/log4cplus.git" />
+            test = "appender_test"
+            release="1.1.2-FTY-master"
+            repository="https://github.com/42ity/log4cplus.git" />
     </use>
-
-<!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
 
     <header name = "app"  />
     <header name = "bios_agent"  />
@@ -125,6 +126,7 @@
 
    <class name = "db/inout/exportcsv" private = "1" selftest = "0" />
    <class name = "db/inout/importcsv" private = "1" selftest = "0" />
+   <main name = "db/bios-csv" selftest = "0"/>
 
    <class name = "git_details_override" private = "0" selftest ="0" />
 
@@ -155,8 +157,6 @@
    <class name = "shared/utils" private = "0" selftest = "0" />
    <class name = "shared/utilspp" private = "0" selftest = "0" />
    <class name = "shared/utils_json" private = "0" selftest = "0" />
-
-   <class name = "warranty/warranty_metric" private = "1" selftest = "0" />
 
    <class name = "web/src/asset_computed_impl" selftest = "0" />
    <class name = "web/src/iface" selftest = "0" />

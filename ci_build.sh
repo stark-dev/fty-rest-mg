@@ -33,7 +33,7 @@ case "$CI_TRACE" in
 esac
 
 case "$BUILD_TYPE" in
-default|default-Werror|default-with-docs|valgrind)
+default|default-Werror|default-with-docs|valgrind|clang-format-check)
     LANG=C
     LC_ALL=C
     export LANG LC_ALL
@@ -47,7 +47,8 @@ default|default-Werror|default-with-docs|valgrind)
     PATH="`echo "$PATH" | sed -e 's,^/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?:,,' -e 's,:/usr/lib/ccache/?$,,' -e 's,^/usr/lib/ccache/?$,,'2`"
     CCACHE_PATH="$PATH"
     CCACHE_DIR="${HOME}/.ccache"
-    PATH="${BUILD_PREFIX}/sbin:${BUILD_PREFIX}/bin:$PATH"
+    # Use tools from prerequisites we might have built
+    PATH="${BUILD_PREFIX}/sbin:${BUILD_PREFIX}/bin:${PATH}"
     export CCACHE_PATH CCACHE_DIR PATH
     HAVE_CCACHE=no
     if which ccache && ls -la /usr/lib/ccache ; then
@@ -565,7 +566,7 @@ default|default-Werror|default-with-docs|valgrind)
         echo ""
         BASE_PWD=${PWD}
         echo "`date`: INFO: Building prerequisite 'log4cplus' from Git repository..." >&2
-        $CI_TIME git clone --quiet --depth 1 -b REL_1_1_2 https://github.com/log4cplus/log4cplus.git log4cplus
+        $CI_TIME git clone --quiet --depth 1 -b 1.1.2-FTY-master https://github.com/42ity/log4cplus.git log4cplus
         cd log4cplus
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
@@ -643,13 +644,19 @@ default|default-Werror|default-with-docs|valgrind)
     echo "+ ./configure" "${CONFIG_OPTS[@]}"
 
     $CI_TIME ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
-    if [ "$BUILD_TYPE" == "valgrind" ] ; then
-        # Build and check this project
-        $CI_TIME make VERBOSE=1 memcheck && exit
-        echo "Re-running failed ($?) memcheck with greater verbosity" >&2
-        $CI_TIME make VERBOSE=1 memcheck-verbose
-        exit $?
-    fi
+    case "$BUILD_TYPE" in
+        valgrind)
+            # Build and check this project
+            $CI_TIME make VERBOSE=1 memcheck && exit
+            echo "Re-running failed ($?) memcheck with greater verbosity" >&2
+            $CI_TIME make VERBOSE=1 memcheck-verbose
+            exit $?
+            ;;
+        clang-format-check)
+            $CI_TIME make VERBOSE=1 clang-format-check-CI
+            exit $?
+            ;;
+    esac
     $CI_TIME make VERBOSE=1 all
 
     echo "=== Are GitIgnores good after 'make all' with drafts?"

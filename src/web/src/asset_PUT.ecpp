@@ -30,7 +30,7 @@
 #include <cxxtools/jsondeserializer.h>
 #include <fty_common.h>
 #include "shared/configure_inform.h"
-#include "../../db/inout.h"
+#include "src/db/inout.h"
 #include "db/assets.h"
 </%pre>
 <%request scope="global">

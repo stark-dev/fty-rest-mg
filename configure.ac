@@ -45,6 +45,78 @@ AM_CONDITIONAL([USING_VPATH], [test "x${srcdir}" != "x."])
 # Capture c flags
 FTY_REST_ORIG_CFLAGS="${CFLAGS:-none}"
 
+# Note: This is a custom edit over zproject-generated code
+# brought in from legacy implementation to identify the
+# main baseline version of REST API on a deployment.
+# TODO: Move into includable .m4 file (see how zprojects supports that)
+
+### PACKAGING METADATA (for sysinfo, etc.)
+
+PACKAGE_VENDOR="Eaton"
+AC_ARG_WITH([package-vendor],
+	[AS_HELP_STRING([--with-package-vendor=ARG],
+		[name of the entity which distributes this build
+		 of the package (default is '$PACKAGE_VENDOR')])],
+	[PACKAGE_VENDOR="${withval}"
+	 AC_MSG_NOTICE([Using requested PACKAGE_VENDOR='$PACKAGE_VENDOR'])]
+	# This may be left empty by explicit request
+)
+
+### Allow to revise the packaging strings in platform.h
+m4_define([__AC_UNDEFINE],[_AC_DEFINE([#ifdef $1
+ #undef $1
+#endif])])
+
+# General substitutions for all these packaging variables
+AS_IF([test x"$_FIX_PACKAGE_NAME" = xy],
+	[AC_MSG_NOTICE([Overriding PACKAGE_NAME='$PACKAGE_NAME'])
+	 __AC_UNDEFINE([PACKAGE_NAME])
+	 AC_DEFINE_UNQUOTED([PACKAGE_NAME],
+	    ["$PACKAGE_NAME"],
+	    [Packaging metadata: distro source code name])
+])
+AS_IF([test x"$_FIX_PACKAGE_VERSION" = xy],
+	[AC_MSG_NOTICE([Overriding PACKAGE_VERSION='$PACKAGE_VERSION'])
+	 __AC_UNDEFINE([PACKAGE_VERSION])
+	 AC_DEFINE_UNQUOTED([PACKAGE_VERSION],
+	    ["$PACKAGE_VERSION"],
+	    [Packaging metadata: distro source code/packaged release version])
+])
+AS_IF([test x"$_FIX_VERSION" = xy],
+	[AC_MSG_NOTICE([Overriding VERSION='$VERSION'])
+	 __AC_UNDEFINE([VERSION])
+	 AC_DEFINE_UNQUOTED([VERSION],
+	    ["$VERSION"],
+	    [Version number of package])
+])
+AS_IF([test x"$_FIX_PACKAGE_STRING" = xy],
+	[AC_MSG_NOTICE([Overriding PACKAGE_STRING='$PACKAGE_STRING'])
+	 __AC_UNDEFINE([PACKAGE_STRING])
+	 AC_DEFINE_UNQUOTED([PACKAGE_STRING],
+	    ["$PACKAGE_STRING"],
+	    [Packaging metadata: distro source code name+version])
+])
+AS_IF([test x"$_FIX_PACKAGE_URL" = xy],
+	[AC_MSG_NOTICE([Overriding PACKAGE_URL='$PACKAGE_URL'])
+	 __AC_UNDEFINE([PACKAGE_URL])
+	 AC_DEFINE_UNQUOTED([PACKAGE_URL],
+	    ["$PACKAGE_URL"],
+	    [Packaging metadata: distro contact (website)])
+])
+AS_IF([test x"$_FIX_PACKAGE_BUGREPORT" = xy],
+	[AC_MSG_NOTICE([Overriding PACKAGE_BUGREPORT='$PACKAGE_BUGREPORT'])
+	 __AC_UNDEFINE([PACKAGE_BUGREPORT])
+	 AC_DEFINE_UNQUOTED([PACKAGE_BUGREPORT],
+	    ["$PACKAGE_BUGREPORT"],
+	    [Packaging metadata: distro contact (email/tracker)])
+])
+AC_MSG_NOTICE([Overriding PACKAGE_VENDOR='$PACKAGE_VENDOR'])
+AC_DEFINE_UNQUOTED([PACKAGE_VENDOR],
+	    ["$PACKAGE_VENDOR"],
+	    [Packaging metadata: name of the entity which distributes this build of the package])
+
+### // End of customized code from legacy days
+
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CC_C99
@@ -1439,6 +1511,16 @@ else
 fi
      AC_MSG_RESULT([$enable_dist_cmakefiles])])
 AM_CONDITIONAL(ENABLE_DIST_CMAKEFILES, test "x$enable_dist_cmakefiles" = "xyes")
+
+# Check for db/bios-csv intent
+AC_ARG_ENABLE([db/bios-csv],
+    AS_HELP_STRING([--enable-db/bios-csv],
+        [Compile and install 'db/bios-csv' [default=yes]]),
+    [enable_db_bios_csv=$enableval],
+    [enable_db_bios_csv=yes])
+
+AM_CONDITIONAL([ENABLE_DB_BIOS_CSV], [test x$enable_db_bios_csv != xno])
+AM_COND_IF([ENABLE_DB_BIOS_CSV], [AC_MSG_NOTICE([ENABLE_DB_BIOS_CSV defined])])
 
 # Check for fty_rest_selftest intent
 AC_ARG_ENABLE([fty_rest_selftest],
