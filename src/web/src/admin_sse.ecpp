@@ -36,6 +36,7 @@
 </%pre>
 <%request scope="global">
 UserInfo user;
+std::string gaccess_token;
 bool database_ready;
 </%request>
 <%cpp>
@@ -125,22 +126,7 @@ bool database_ready;
     int64_t now = 0;
 
     //get the token from the request
-    std::string access_token = "";
-
-    //in cookie if present
-    if (request.hasCookie("eaton_token")) {
-        access_token = request.getCookie("eaton_token").getValue();
-        if (access_token == "null") /* Avoid set but invalid cookies */
-                access_token = "";
-    }
-
-    //in header if not found
-    if(access_token.empty() && request.hasHeader(tnt::httpheader::authorization)) {
-        access_token = request.getHeader(tnt::httpheader::authorization);
-        if(!access_token.compare(0,7,"Bearer ")) {
-            access_token = access_token.substr(7);
-        }
-    }
+    std::string access_token = gaccess_token;
 
     if (access_token.empty()){
       log_error("Token empty");

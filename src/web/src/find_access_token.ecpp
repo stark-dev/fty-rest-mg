@@ -1,0 +1,71 @@
+<#
+ #
+ # Copyright (C) 2015-2018 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file find_access_token.ecpp
+ * \brief  Store access token in global string "gaccess_toekn"
+ */
+ #><%pre>
+#include <tnt/httpmessage.h>
+#include <tnt/httpheader.h>
+#include <fty_common.h>
+
+#ifdef DEBUG
+#include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <string>
+#endif
+
+</%pre>
+<%request scope="global">
+std::string gaccess_token;
+</%request>
+<%cpp>
+
+{
+    // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
+    //       this is where the token is actually verified and user info
+    //       fill'ed
+
+    // sanitize check
+    std::string access_token;
+
+    access_token = qparam.param ("access_token");
+
+    if (access_token.empty() || access_token == "null") /* GET/POST params override a cookie, if any */
+        if (request.hasCookie("eaton_token")) {
+            access_token = request.getCookie("eaton_token").getValue();
+            if (access_token == "null") /* Avoid set but invalid cookies */
+                access_token = "";
+        }
+
+    if(request.hasHeader(tnt::httpheader::authorization)) {
+        /* Auth header overrides GET/POST parameters even if header is wrong */
+        access_token = request.getHeader(tnt::httpheader::authorization);
+
+        if(access_token.compare(0,7,"Bearer ")) {
+            access_token = "";
+        } else {
+            access_token = access_token.substr(7);
+        }
+    }
+    gaccess_token = access_token;
+}
+</%cpp>

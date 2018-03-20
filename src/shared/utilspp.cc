@@ -22,13 +22,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_common.h>
 #include "shared/utilspp.h"
 
-int LoadFtylog::_ftylog=LoadFtylog::setFtylog();
-
-int LoadFtylog::setFtylog()
+//Initilialize the logger for tntnet process
+int setFtylog()
 {
   ManageFtyLog::setInstanceFtylog("tntnet","/etc/fty/ftylog.cfg");
   return 1;
 }
+
+static int _ftylog=setFtylog();
 
 namespace utils {
 
