@@ -104,6 +104,7 @@ EXTRA_DIST += \
     src/web/src/email_feedback.h \
     src/web/src/email_test.h \
     src/web/src/email_vote.h \
+    src/web/src/find_access_token.h \
     src/web/src/getlog_GET.h \
     src/web/src/gpo_action.h \
     src/web/src/info.h \

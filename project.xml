@@ -87,15 +87,16 @@
         debian_name="libsasl2-dev"
         redhat_name="cyrus-sasl-devel"
     />
-    
+<!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
+
     <use project = "fty-common" libname = "libfty_common" header="fty_common.h"
         repository = "https://github.com/42ity/fty-common.git"
         test = "fty_commmon_selftest" >
         <use project = "log4cplus" header = "log4cplus/logger.h"
-        test = "appender_test" release="REL_1_1_2" repository="https://github.com/log4cplus/log4cplus.git" />
+            test = "appender_test"
+            release="1.1.2-FTY-master"
+            repository="https://github.com/42ity/log4cplus.git" />
     </use>
-
-<!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
 
     <header name = "app"  />
     <header name = "bios_agent"  />
@@ -201,7 +202,6 @@
     <class name = "web/src/auth_verify" private="1" selftest = "0">root object</class>
     <class name = "web/src/average" private="1" selftest = "0">root object</class>
 
-    <class name = "web/src/config" private="1" selftest = "0">root object</class>
     <class name = "web/src/conf_scan" private="1" selftest = "0">root object</class>
     <class name = "web/src/current" private="1" selftest = "0">root object</class>
     <class name = "web/src/datacenter_indicators" private="1" selftest = "0">root object</class>
@@ -209,6 +209,7 @@
 
     <class name = "web/src/email_test" private="1" selftest = "0">root object</class>
     <class name = "web/src/email_vote" private="1" selftest = "0">root object</class>
+    <class name = "web/src/find_access_token" private="1" selftest = "0">root object</class>
     <class name = "web/src/getlog_GET" private="1" selftest = "0">root object</class>
     <class name = "web/src/gpo_action" private="1" selftest = "0">root object</class>
     <class name = "web/src/info" private="1" selftest = "0">root object</class>
