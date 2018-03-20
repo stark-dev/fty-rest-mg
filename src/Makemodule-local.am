@@ -79,7 +79,7 @@ src_db_bios_csv_SOURCES += \
 	 include/web/src/asset_computed_impl.h \
 	 src/web/src/asset_computed_impl.cc
 
-src_db_bios_csv_CFLAGS =-I./src
+src_db_bios_csv_CPPFLAGS += -I$(srcdir)/src
 endif #ENABLE_DB_BIOS_CSV
 
 
