@@ -39,6 +39,7 @@
 </%pre>
 <%request scope="global">
 UserInfo user;
+std::string gaccess_token;
 </%request>
 <%cpp>
 std::string checked_access_token;
@@ -48,27 +49,7 @@ std::string checked_access_token;
     //       fill'ed
 
     // sanitize check
-    std::string access_token;
-
-    access_token = qparam.param ("access_token");
-
-    if (access_token.empty() || access_token == "null") /* GET/POST params override a cookie, if any */
-        if (request.hasCookie("eaton_token")) {
-            access_token = request.getCookie("eaton_token").getValue();
-            if (access_token == "null") /* Avoid set but invalid cookies */
-                access_token = "";
-        }
-
-    if(request.hasHeader(tnt::httpheader::authorization)) {
-        /* Auth header overrides GET/POST parameters even if header is wrong */
-        access_token = request.getHeader(tnt::httpheader::authorization);
-
-        if(access_token.compare(0,7,"Bearer ")) {
-            access_token = "";
-        } else {
-            access_token = access_token.substr(7);
-        }
-    }
+    std::string access_token = gaccess_token;
     check_regex_text_or_die ("access_token", access_token, checked_access_token, "^[-/._~+/a-z0-9]{0,255}={0,10}$");
     // sanitize check end
 }
