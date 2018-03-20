@@ -19,8 +19,16 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <limits>
 #include <cmath>
 #include <algorithm>
-
+#include <fty_common.h>
 #include "shared/utilspp.h"
+
+int LoadFtylog::_ftylog=LoadFtylog::setFtylog();
+
+int LoadFtylog::setFtylog()
+{
+  ManageFtyLog::setInstanceFtylog("tntnet","/etc/fty/ftylog.cfg");
+  return 1;
+}
 
 namespace utils {
 

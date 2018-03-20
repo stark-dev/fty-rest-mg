@@ -29,6 +29,23 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <map>
 #include <czmq.h>
 
+class LoadFtylog
+{
+private:
+  //Avoid use of the following procedures/functions
+  LoadFtylog(){};
+  ~LoadFtylog(){};
+  LoadFtylog(const LoadFtylog&) = delete;
+  LoadFtylog& operator=(const LoadFtylog&) = delete;
+  static int  _ftylog;
+public:
+  
+  // initialize the static ftylog object 
+  static int setFtylog();
+};
+
+
+
 namespace utils {
 
 namespace math {
