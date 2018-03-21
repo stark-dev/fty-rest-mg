@@ -19,8 +19,17 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <limits>
 #include <cmath>
 #include <algorithm>
-
+#include <fty_common.h>
 #include "shared/utilspp.h"
+
+//Initilialize the logger for tntnet process
+int setFtylog()
+{
+  ManageFtyLog::setInstanceFtylog("tntnet","/etc/fty/ftylog.cfg");
+  return 1;
+}
+
+static int _ftylog=setFtylog();
 
 namespace utils {
 
