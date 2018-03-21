@@ -97,8 +97,8 @@ pipeline {
             description: 'When running tests, use this timeout (in minutes; be sure to leave enough for double-job of a distcheck too)',
             name: 'USE_TEST_TIMEOUT')
         booleanParam (
-            defaultValue: true,
-            description: 'When using temporary subdirs in build/test workspaces, wipe them after successful builds?',
+            defaultValue: false,
+            description: 'When using temporary subdirs in build/test workspaces, wipe them after successful builds? (Note: in current fty-rest codebase, abs_top_srcdir etc. are used, so the original build dir name is required to exist during distcheck etc.)',
             name: 'DO_CLEANUP_AFTER_BUILD')
     }
     triggers {
