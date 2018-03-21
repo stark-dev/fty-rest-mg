@@ -236,6 +236,10 @@ EXTRA_DIST += $(top_srcdir)/src/web/src/admin_passwd.ecpp
 
 src/web/src/sysinfo.ecpp src/web/src/sysinfo.cc src/web/src/sysinfo.cpp: include/git_details_override.h
 
+# Find the generated include-file (only exists under builddir)
+src_libfty_rest_la_CXXFLAGS += -I$(abs_top_builddir)/include
+src_libfty_rest_la_CPPFLAGS += -I$(abs_top_builddir)/include
+
 #----------------------------------------------------------------------
 #                        hook for make all => generate files too
 #----------------------------------------------------------------------
