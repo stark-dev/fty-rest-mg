@@ -24,6 +24,7 @@
 */
 #><%pre>
 #include <fty_proto.h>
+#include <tnt/tntnet.h>
 
 #include "web/src/sse.h"
 #include "shared/utils.h"
@@ -142,6 +143,13 @@ bool database_ready;
     std::string json;
     while (diff < tntRequestTimeout) {
 
+        //Check if a request shutdown was initiated
+        if (tnt::Tntnet::shouldStop())
+        {
+            log_info("Initialization shutdown request for tntnet: Sse stop");
+            break;
+        }
+      
         now = zclock_mono();
         diff = now - start; 
         
@@ -153,7 +161,7 @@ bool database_ready;
             log_info ("sse : Token revoked or expired");
             break;
         }
-
+        
         // Each minute, send the time before expiration
         if (now - sendNextExpTime > 60000) {
             // send the time before the token is expired
