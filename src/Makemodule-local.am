@@ -344,6 +344,8 @@ EXTRA_DIST +=		.git_details \
 			tools/git_details.sh \
 			tools/JSON.sh
 
+# For tarballs that no longer have a .git index and
+# need these source files to complete their builds...
 EXTRA_DIST +=		src/git_details_override.cc \
 			include/git_details_override.h
 
@@ -432,6 +434,11 @@ $(abs_top_builddir)/src/git_details_override.cc: $(abs_top_builddir)/.git_detail
 	@[ -s "$@" ] || { echo "WARNING: Overriding absent '$@' with empty file to satisfy 'make'"; \
 	  touch -r "$<" "$@"; } || true
 	@sync || true
+
+# NOTE: Legacy compatibility support: This alias may have been
+# needed by some recipes, including codebase out of this repo.
+git_details_override.h:
+	@cd $(top_builddir) && $(MAKE) include/git_details_override.h
 
 include/git_details_override.h: $(abs_top_builddir)/include/git_details_override.h
 	@sync || true
