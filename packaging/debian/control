@@ -101,7 +101,7 @@ Architecture: any
 Section: debug
 Priority: optional
 Depends:
-    libfty-rest1 (= ${binary:Version}),
+    fty-rest (= ${binary:Version}),
     ${misc:Depends}
 Description: fty-rest debugging symbols
  This package contains the debugging symbols for fty-rest:
