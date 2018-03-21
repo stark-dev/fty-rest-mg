@@ -198,6 +198,12 @@ magic/
 fty-common/
 log4cplus/
 
+# At least at this time, we do not deliver files under "fty-rest" .deb
+# It is a metapackage to satisfy simple installation of OS image with
+# recipes that also fulfill legacy code wording
+packaging/debian/fty-rest.install
+packaging/debian/fty-rest.manpages
+
 # Distcheck products under various possible names
 libfty-rest-*.zip
 libfty-rest-*.tar*
