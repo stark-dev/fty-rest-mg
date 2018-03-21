@@ -90,7 +90,6 @@ src_libfty_rest_la_SOURCES += \
     src/db/assets/assetd.cc \
     src/db/assets/assetr.cc \
     src/db/assets/assetu.cc \
-    src/git_details_override.cc \
     src/msg/asset_msg.cc \
     src/msg/common_msg.cc \
     src/shared/asset_types.cc \

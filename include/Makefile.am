@@ -27,7 +27,6 @@ nobase_include_HEADERS += \
     db/assets/assetd.h \
     db/assets/assetr.h \
     db/assets/assetu.h \
-    git_details_override.h \
     msg/asset_msg.h \
     msg/common_msg.h \
     shared/asset_types.h \
