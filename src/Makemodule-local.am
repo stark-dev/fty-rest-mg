@@ -3,6 +3,86 @@
 ### No-arch pathnames wanted
 clientdir ?= $(libexecdir)/$(PACKAGE)
 
+# Do not link bios-csv with libfty_rest or libtntnet
+src_db_bios_csv_LDADD = ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS} ${libsasl2_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS}
+
+# Statically link bios-csv with everything needed
+if ENABLE_DB_BIOS_CSV
+src_db_bios_csv_SOURCES += \
+	 src/shared/utils.cc \
+	 include/shared/utils.h \
+	 include/defs.h \
+	 include/shared/utils_json.h \
+	 src/shared/utils_json.cc \
+	 src/shared/utilspp.cc \
+	 include/shared/utilspp.h \
+	 include/shared/subprocess.h \
+	 src/shared/subprocess.cc \
+	 include/shared/augtool.h \
+	 src/shared/augtool.cc \
+	 include/shared/ic.h \
+	 src/shared/ic.cc \
+	 include/shared/csv.h \
+	 src/shared/csv.cc \
+	 include/shared/cidr.h \
+	 src/shared/cidr.cc \
+	 include/db/types.h \
+	 src/persist/assetcrud.cc \
+	 src/persist/assetcrud.h \
+	 src/persist/assettopology.cc \
+	 src/persist/assettopology.h \
+	 src/persist/persist_error.cc \
+	 src/persist/persist_error.h \
+	 src/persist/monitor.cc \
+	 src/persist/monitor.h \
+	 src/persist/dbhelpers.cc \
+	 include/db/dbhelpers.h \
+	 src/db/agentstate/agentstate.cc \
+	 src/db/agentstate/agentstate.h \
+	 src/shared/asset_types.cc \
+	 include/shared/asset_types.h \
+	 include/dbtypes.h \
+	 src/shared/topic_cache.cc \
+	 include/shared/topic_cache.h \
+	 include/db/assets.h \
+	 include/db/assets/assetcr.h \
+	 include/db/assets/assetr.h \
+	 include/db/assets/assetu.h \
+	 include/db/assets/assetd.h \
+	 include/db/assetdef.h \
+	 src/db/assets/assetcr.cc \
+	 src/db/assets/assetr.cc \
+	 src/db/assets/assetu.cc \
+	 src/db/assets/assetd.cc \
+	 src/db/inout.h \
+	 src/db/inout.cc \
+	 src/db/inout/importcsv.cc \
+	 src/db/inout/exportcsv.cc \
+	 src/db/asset_general.cc \
+	 src/db/asset_general.h \
+	 include/shared/tntmlm.h \
+	 src/shared/tntmlm.cc \
+	 src/shared/configure_inform.cc \
+	 include/shared/configure_inform.h \
+	 include/shared/fty_asset_uptime_configurator.h \
+	 src/shared/fty_asset_uptime_configurator.cc \
+	 src/shared/magic.cc \
+	 include/bios_magic.h \
+	 src/msg/asset_msg.cc \
+	 include/msg/asset_msg.h \
+	 src/msg/common_msg.cc \
+	 include/msg/common_msg.h \
+	 include/db/topology2.h \
+	 src/db/topology2.cc \
+	 include/shared/data.h \
+	 src/shared/data.cc \
+	 include/web/src/asset_computed_impl.h \
+	 src/web/src/asset_computed_impl.cc
+
+src_db_bios_csv_CPPFLAGS += -I$(srcdir)/src
+endif #ENABLE_DB_BIOS_CSV
+
+
 # The /usr/libexec/bios is known and used by several components
 bios_libexecdir ?= $(prefix)/libexec/bios
 bios_libdir ?= $(prefix)/lib/bios
