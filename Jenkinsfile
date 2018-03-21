@@ -115,6 +115,7 @@ pipeline {
                             deleteDir()
                         }
                         sh './autogen.sh'
+                        sh './tools/git_details.sh > .git_details'
                         stash (name: 'prepped', includes: '**/*', excludes: '**/cppcheck.xml')
                     }
         }
