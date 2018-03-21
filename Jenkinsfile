@@ -89,7 +89,7 @@ pipeline {
             description: 'Attempt "cppcheck" analysis before this run? (Note: corresponding tools are required in the build environment)',
             name: 'DO_CPPCHECK')
         booleanParam (
-            defaultValue: true,
+            defaultValue: false,
             description: 'Require that there are no files not discovered changed/untracked via .gitignore after builds and tests?',
             name: 'CI_REQUIRE_GOOD_GITIGNORE')
         string (
