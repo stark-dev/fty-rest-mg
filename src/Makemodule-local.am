@@ -240,6 +240,10 @@ src/web/src/sysinfo.ecpp src/web/src/sysinfo.cc src/web/src/sysinfo.cpp: include
 src_libfty_rest_la_CXXFLAGS += -I$(abs_top_builddir)/include
 src_libfty_rest_la_CPPFLAGS += -I$(abs_top_builddir)/include
 
+# Find the fty_rest_classes.h which is under src and not part of builddir
+src_libfty_rest_la_CXXFLAGS += -I$(abs_top_srcdir)/src
+src_libfty_rest_la_CPPFLAGS += -I$(abs_top_srcdir)/src
+
 #----------------------------------------------------------------------
 #                        hook for make all => generate files too
 #----------------------------------------------------------------------
