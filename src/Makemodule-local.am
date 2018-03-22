@@ -227,7 +227,7 @@ TNTLIB_DIRNAME=$(pkglibdir)
 
 ECPPCCFILES = $(ECPPFILES:.ecpp=.cc)
 
-#EXTRA_DIST += $(addprefix $(top_srcdir)/src/web/src/,$(ECPPFILES))
+EXTRA_DIST += $(addprefix $(top_srcdir)/src/,$(ECPPFILES))
 EXTRA_DIST += $(top_srcdir)/src/web/src/admin_passwd.ecpp
 
 .ecpp.cc:
