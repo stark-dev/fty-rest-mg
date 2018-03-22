@@ -124,7 +124,7 @@ EXTRA_DIST +=	$(GENERATEDSCRIPTS)
 CLEANFILES +=	$(GENERATEDSCRIPTS)
 
 EXTRA_DIST +=	tools/testpass.sh
-EXTRA_DIST +=   src/fty_rest_classes.h
+EXTRA_DIST +=	src/fty_rest_classes.h
 
 # Catch-all undetailed recipes for .in files to be converted into sources
 # Also used from sub-Makefiles, see docs/examples/Makefile.am for call-syntax
@@ -345,7 +345,7 @@ CLEANFILES +=		tntnet.xml tntnet.xml.example
 #                        SCM details
 #----------------------------------------------------------------------
 
-gitdetaildir =	        $(datarootdir)/@PACKAGE@
+gitdetaildir =		$(datarootdir)/@PACKAGE@
 gitdetail_DATA =	.git_details
 
 EXTRA_DIST +=		.git_details \
