@@ -89,7 +89,7 @@ pipeline {
             description: 'Attempt "cppcheck" analysis before this run? (Note: corresponding tools are required in the build environment)',
             name: 'DO_CPPCHECK')
         booleanParam (
-            defaultValue: true,
+            defaultValue: false,
             description: 'Require that there are no files not discovered changed/untracked via .gitignore after builds and tests?',
             name: 'CI_REQUIRE_GOOD_GITIGNORE')
         string (
@@ -97,8 +97,8 @@ pipeline {
             description: 'When running tests, use this timeout (in minutes; be sure to leave enough for double-job of a distcheck too)',
             name: 'USE_TEST_TIMEOUT')
         booleanParam (
-            defaultValue: true,
-            description: 'When using temporary subdirs in build/test workspaces, wipe them after successful builds?',
+            defaultValue: false,
+            description: 'When using temporary subdirs in build/test workspaces, wipe them after successful builds? (Note: in current fty-rest codebase, abs_top_srcdir etc. are used, so the original build dir name is required to exist during distcheck etc.)',
             name: 'DO_CLEANUP_AFTER_BUILD')
     }
     triggers {
@@ -115,6 +115,7 @@ pipeline {
                             deleteDir()
                         }
                         sh './autogen.sh'
+                        sh './tools/git_details.sh > .git_details'
                         stash (name: 'prepped', includes: '**/*', excludes: '**/cppcheck.xml')
                     }
         }
