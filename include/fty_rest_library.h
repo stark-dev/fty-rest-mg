@@ -101,8 +101,6 @@ typedef struct _db_assets_assetr_t db_assets_assetr_t;
 #define DB_ASSETS_ASSETR_T_DEFINED
 typedef struct _db_assets_assetu_t db_assets_assetu_t;
 #define DB_ASSETS_ASSETU_T_DEFINED
-typedef struct _git_details_override_t git_details_override_t;
-#define GIT_DETAILS_OVERRIDE_T_DEFINED
 typedef struct _msg_asset_msg_t msg_asset_msg_t;
 #define MSG_ASSET_MSG_T_DEFINED
 typedef struct _msg_common_msg_t msg_common_msg_t;
@@ -169,7 +167,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "db/assets/assetd.h"
 #include "db/assets/assetr.h"
 #include "db/assets/assetu.h"
-#include "git_details_override.h"
 #include "msg/asset_msg.h"
 #include "msg/common_msg.h"
 #include "shared/asset_types.h"

@@ -89,9 +89,21 @@ pipeline {
             description: 'Attempt "cppcheck" analysis before this run? (Note: corresponding tools are required in the build environment)',
             name: 'DO_CPPCHECK')
         booleanParam (
-            defaultValue: false,
+            defaultValue: true,
             description: 'Require that there are no files not discovered changed/untracked via .gitignore after builds and tests?',
             name: 'CI_REQUIRE_GOOD_GITIGNORE')
+        booleanParam (
+            defaultValue: true,
+            description: 'Attempt "clang-format" (v5+) analysis before this run? (Note: corresponding tools are required in the build environment)',
+            name: 'DO_CHECK_CLANG_FORMAT')
+        booleanParam (
+            defaultValue: false,
+            description: 'Require that if clang-format is executed, then it must show no differences in codebase?',
+            name: 'CI_REQUIRE_GOOD_CLANG_FORMAT')
+        string (
+            defaultValue: "",
+            description: 'The clang-format program (v5+) to use for this build, e.g. clang-format-5.0; an empty value means configure-time guesswork',
+            name: 'CLANG_FORMAT')
         string (
             defaultValue: "60",
             description: 'When running tests, use this timeout (in minutes; be sure to leave enough for double-job of a distcheck too)',
@@ -115,6 +127,7 @@ pipeline {
                             deleteDir()
                         }
                         sh './autogen.sh'
+// Note : Customized bit of code for fty-rest to build and test properly
                         sh './tools/git_details.sh > .git_details'
                         stash (name: 'prepped', includes: '**/*', excludes: '**/cppcheck.xml')
                     }
@@ -213,6 +226,37 @@ pipeline {
                             sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make cppcheck'
                             archiveArtifacts artifacts: '**/cppcheck.xml', allowEmptyArchive: true
                             sh 'rm -f cppcheck.xml'
+                            script {
+                                if ( params.DO_CLEANUP_AFTER_BUILD ) {
+                                    deleteDir()
+                                }
+                            }
+                        }
+                    }
+                }
+                stage ('clang-format-check') {
+                    when { expression { return ( params.DO_CHECK_CLANG_FORMAT ) } }
+                    steps {
+                        dir("tmp/test-clang-format-check") {
+                            deleteDir()
+                            script {
+                                // We need a configured source codebase to run
+                                // "make", any variant will do. Save some time
+                                // by using a build tree (if exists), but can
+                                // fall back to running the configure script
+                                // explicitly.
+                                if ( params.DO_BUILD_WITH_DRAFT_API ) {
+                                    unstash 'built-draft'
+                                } else if ( params.DO_BUILD_WITHOUT_DRAFT_API ) {
+                                    unstash 'built-nondraft'
+                                } else if ( params.DO_BUILD_DOCS || params.DO_DIST_DOCS ) {
+                                    unstash 'built-docs'
+                                } else {
+                                    unstash 'prepped'
+                                    sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; ./configure --enable-drafts=no --with-docs=no'
+                                }
+                            }
+                            sh 'CCACHE_BASEDIR="`pwd`" ; export CCACHE_BASEDIR; make clang-format-check-CI'
                             script {
                                 if ( params.DO_CLEANUP_AFTER_BUILD ) {
                                     deleteDir()
