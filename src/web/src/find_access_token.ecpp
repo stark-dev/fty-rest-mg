@@ -39,7 +39,6 @@ std::string gaccess_token;
 </%request>
 <%cpp>
 
-{
     // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
     //       this is where the token is actually verified and user info
     //       fill'ed
@@ -67,6 +66,6 @@ std::string gaccess_token;
         }
     }
     gaccess_token = access_token;
-}
-return DECLINED;
+
+    return DECLINED;
 </%cpp>
