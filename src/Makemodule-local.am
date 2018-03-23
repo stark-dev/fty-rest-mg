@@ -5,6 +5,11 @@ clientdir ?= $(libexecdir)/$(PACKAGE)
 ### Autotools insist on having these defined, no "?=" here:
 DISTCLEANDIRS =
 check_LTLIBRARIES =
+### Configure flag for CI runs
+ENABLE_CI_TESTS ?=
+### Note: lower-cased on purpose; the "cibin_PROGRAMS"
+### for a particular run is conditionally defined below
+cibin_programs =
 
 # Do not link bios-csv with libfty_rest or libtntnet
 # Note: ignore the Make warning that
@@ -261,11 +266,14 @@ src_libfty_rest_la_CPPFLAGS += -I$(abs_top_srcdir)/src
 
 # Just in case we don't have all dependencies properly spelled out,
 # try to ensure that certain files are built early in the process
-all-local: $(abs_top_builddir)/src/git_details_override.cc .git_details .git_details-fty-rest
+all-local: $(abs_top_builddir)/src/git_details_override.cc \
+            .git_details .git_details-fty-rest \
+            src/libfty_rest.la src/db/bios-csv
 
 # Try to build everything buildable, e.g. for further warning counters
-all-buildproducts: all-local all \
-            $(check_LTLIBRARIES) $(check_PROGRAMS) $(check_SCRIPTS)
+all-buildproducts: all-local all web-test-deps \
+            $(check_LTLIBRARIES) $(check_PROGRAMS) $(check_SCRIPTS) \
+            $(cibin_programs_list)
 
 #----------------------------------------------------------------------
 #                        hook for make check custom verifications
@@ -280,7 +288,10 @@ distclean-local:
 # Run compile/link tests defined in this Makefile
 # Note that check-gitignore should be the last target
 # FIXME: "check-pool" temporarily not included into "check-local", see below
-#check-local: check-gitignore
+# TODO POST-ZPROJECTIZATION : This target is defined in the
+#   generated src/Makemodule.am -- make a variable in zproject
+#   for additional targets to list there, or append somehow...
+#check-local: web-link-test
 
 #----------------------------------------------------------------------
 #                       hook for installation legacy-like customization
@@ -361,6 +372,46 @@ EXTRA_DIST +=		$(exampleconf_DATA)
 dist_noinst_DATA =	tntnet.xml $(top_srcdir)/src/web/tntnet.xml
 
 CLEANFILES +=		tntnet.xml tntnet.xml.example
+
+#----------------------------------------------------------------------
+#                        In-place tests for developers and CI
+#----------------------------------------------------------------------
+CLEANFILES +=		tests/CI/tntnet.xml
+
+DISTCLEANFILES += \
+		tests/CI/web/log/*.log
+
+DISTCLEANDIRS += \
+		tests/CI/web/log
+
+# Make sure needed files are up-to-date to test web-server for 42ity REST API
+web-test-deps: tntnet.xml src/libfty_rest.la web-link-test
+
+# TODO: the "tools/testpass.sh" should be invoked via TESTPASS envvar used
+# and exported in RUN_TNTNET - but this does not work for bios-passwd :(
+web-test-deps-inst: install-ci_helperSCRIPTS
+
+### Execute the test web-server for $BIOS REST API
+# LD_PRELOAD=/path/to/libasan.so is needed for fair play with external libs,
+# otherwise "new mlm_stuff; throw(exception)" breaks in ASAN as a function
+# without a proper return code-path (un-instrumented delete/free involved).
+# Note that the execution chain below is backslash-concatenated so that we
+# can both set, export and use the LD_PRELOAD value (independent lines are
+# executed as different shell scripts by make). That is why ultimate exec
+# of the tntnet program is done twice in the same manner.
+
+web-test: $(RUN_TNTNET_ENVFILE) web-test-deps
+	@echo "=== Running target $@ with credentials of this user: "; \
+	id || true; echo "";
+if ENABLE_ASAN
+	@LD_PRELOAD="$$LD_PRELOAD `ldd $(abs_top_builddir)/src/.libs/libfty_rest.so | grep libasan | awk '{print $$3}'`" || true; \
+	LD_PRELOAD="$$LD_PRELOAD `ldd $(abs_top_builddir)/src/.libs/libfty_rest.so | grep libtsan | awk '{print $$3}'`" || true; \
+	echo "===== Using LD_PRELOAD='$$LD_PRELOAD' for Address Sanitizer"; \
+	export LD_PRELOAD; \
+	$(RUN_TNTNET)
+else
+	$(RUN_TNTNET)
+endif
 
 #----------------------------------------------------------------------
 #                        Common libs for test programs
@@ -606,6 +657,144 @@ test_csv_CPPFLAGS =		$(AM_CPPFLAGS) \
 test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS}
 
 EXTRA_DIST +=	$(srcdir)/tests/shared/*.csv
+
+#----------------------------------------------------------------------
+#                        CI tests
+#----------------------------------------------------------------------
+
+cibin_programs += 	test-loadcsv
+
+test_loadcsv_SOURCES = 	tests/persist/test-loadcsv.cc
+
+test_loadcsv_LDADD = \
+			libpriv-utils.la \
+			libpriv-test-run.la
+
+test_loadcsv_CPPFLAGS = \
+			$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/ \
+			-I$(abs_top_srcdir)/src/persist \
+			-I$(abs_top_srcdir)/src/db
+
+test_loadcsv_LDFLAGS =	${tntdb_LIBS} ${cxxtools_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${fty_proto_LIBS}
+
+
+cibin_programs += 	test-db2
+
+test_db2_SOURCES = \
+			tests/persist/test-realdatamonitor.cc
+
+test_db2_LDADD = \
+			libpriv-utils.la \
+			libpriv-test-run.la
+
+test_db2_CPPFLAGS =	$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/ \
+			-I$(abs_top_srcdir)/src/persist \
+			-I$(abs_top_srcdir)/src/db
+
+test_db2_LDFLAGS =	${tntdb_LIBS} ${cxxtools_LIBS} ${cidr_LIBS} ${czmq_LIBS}
+
+cibin_programs += 	test-dbtopology
+
+test_dbtopology_SOURCES = \
+			tests/persist/test-topology.cc \
+			tests/persist/test-topology-power-to.cc \
+			tests/persist/test-topology-power-from.cc \
+			tests/persist/test-topology-power-datacenter.cc \
+			tests/persist/test-topology-power-group.cc \
+			tests/persist/test-topology-location-from.cc \
+			tests/persist/test-topology-location-to.cc
+
+test_dbtopology_LDADD = \
+			libpriv-utils.la \
+			libpriv-test-run.la
+
+test_dbtopology_CPPFLAGS = \
+			$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/ \
+			-I$(abs_top_srcdir)/src/persist \
+			-I$(abs_top_srcdir)/src/db
+
+test_dbtopology_LDFLAGS = \
+			${tntdb_LIBS} ${cxxtools_LIBS} ${cidr_LIBS} ${czmq_LIBS}
+
+
+cibin_programs += 	test-db-asset-crud
+
+test_db_asset_crud_SOURCES = \
+			tests/persist/test-asset-crud.cc \
+			tests/persist/test-asset-crud1.cc
+
+test_db_asset_crud_LDADD = \
+			libpriv-utils.la \
+			libpriv-test-run.la
+
+test_db_asset_crud_CPPFLAGS = \
+			$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/ \
+			-I$(abs_top_srcdir)/src/persist \
+			-I$(abs_top_srcdir)/src/db
+
+test_db_asset_crud_LDFLAGS = \
+			${tntdb_LIBS} ${cxxtools_LIBS} ${cidr_LIBS} ${czmq_LIBS}
+
+
+#### total power tests
+cibin_programs += 	test-totalpower
+
+test_totalpower_SOURCES = \
+			tests/persist/test-rack-power.cc \
+			tests/persist/test-dc-power.cc
+
+test_totalpower_LDADD = \
+			libpriv-utils.la \
+			libpriv-test-run.la
+
+test_totalpower_CPPFLAGS = \
+			$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/ \
+			-I$(abs_top_srcdir)/src/persist \
+			-I$(abs_top_srcdir)/src/db
+
+test_totalpower_LDFLAGS = \
+			${tntdb_LIBS} ${cxxtools_LIBS} ${cidr_LIBS} ${czmq_LIBS}
+
+
+# Do we build and install CI programs by default? (see configure)
+# LISTS for cibin_programs depending on config for this build
+cibin_programs_list := $(cibin_programs)
+cibindir = ${pkgbindir}
+if ENABLE_CI_TESTS
+cibin_PROGRAMS = $(cibin_programs)
+else
+# Try to cheat automake into NOT building these programs on simple "make check"
+cibin_PROGRAMS =
+override cibin_programs =
+endif
+
+# These may be built explicitly, so should be removable in any case
+CLEANFILES += $(cibin_programs_list)
+
+# Note: variable cibin_PROGRAMS may be empty if not enabled via configure
+#   The variable cibin_programs holds the actual list of CI programs instead
+# TARGETS for cibin_programs depending on config for this build
+if ENABLE_CI_TESTS
+cibin_PROGRAMS: $(cibin_PROGRAMS)
+else
+cibin_PROGRAMS:
+endif
+cibin_programs: $(cibin_programs_list)
+
+### Verification that libfty_rest.so is in fact usable on binary level
+### Note that this creates no retainable output file
+web-link-test: src/libfty_rest.la
+			$(CXX) $(AM_CPPFLAGS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -o /dev/null \
+			$(abs_top_srcdir)/tests/web-linking-test.cc \
+			${cxxtools_LIBS} ${tntnet_LIBS} \
+			$(abs_top_builddir)/src/.libs/libfty_rest.so && \
+			echo "PASS: dynamic-link compilation test: everything for libfty_rest.so does link ok!" || \
+			( R=$$?; echo "FAIL ($$R): dynamic-link compilation test: libfty_rest.so unusable"; exit $$R; )
 
 TESTS += $(check_PROGRAMS)
 TESTS += $(check_SCRIPTS)

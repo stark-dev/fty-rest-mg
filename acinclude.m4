@@ -170,12 +170,25 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK__GIT_DETAILS], [
     ])
 ])
 
+AC_DEFUN([AX_PROJECT_LOCAL_HOOK__CI_TESTS], [
+    ci_tests=false
+    AC_ARG_ENABLE(ci-tests,
+	    [AS_HELP_STRING([--enable-ci-tests],
+		    [turn on build of CI test programs along with "all"])],
+	    [AS_CASE(["x$enableval"],
+		    ["xyes"],[ci_tests=true],
+		    ["xno"],[ci_tests=false],
+		    [*],[AC_MSG_ERROR([bad value ${enableval} for --enable-ci-tests])])])
+    AM_CONDITIONAL([ENABLE_CI_TESTS], [test "x${ci_tests}" = xtrue])
+])
+
 AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     # Note: This is a custom edit over zproject-generated code
     # brought in from legacy implementation to identify the
     # main baseline version of REST API on a deployment.
     AX_PROJECT_LOCAL_HOOK__GIT_DETAILS
     AX_PROJECT_LOCAL_HOOK__PACKAGING_DETAILS
+    AX_PROJECT_LOCAL_HOOK__CI_TESTS
 
     ### Detect programs we need
     # sed is great!
