@@ -163,6 +163,10 @@ typedef struct _web_src_average_t web_src_average_t;
 typedef struct _web_src_conf_scan_t web_src_conf_scan_t;
 #define WEB_SRC_CONF_SCAN_T_DEFINED
 #endif
+#ifndef WEB_SRC_CONFIG_T_DEFINED
+typedef struct _web_src_config_t web_src_config_t;
+#define WEB_SRC_CONFIG_T_DEFINED
+#endif
 #ifndef WEB_SRC_CURRENT_T_DEFINED
 typedef struct _web_src_current_t web_src_current_t;
 #define WEB_SRC_CURRENT_T_DEFINED
@@ -342,6 +346,7 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/auth_verify.h"
 #include "web/src/average.h"
 #include "web/src/conf_scan.h"
+#include "web/src/config.h"
 #include "web/src/current.h"
 #include "web/src/datacenter_indicators.h"
 #include "web/src/email_feedback.h"

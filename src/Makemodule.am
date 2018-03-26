@@ -45,6 +45,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/auth_verify.cc \
     src/web/src/average.cc \
     src/web/src/conf_scan.cc \
+    src/web/src/config.cc \
     src/web/src/current.cc \
     src/web/src/datacenter_indicators.cc \
     src/web/src/email_feedback.cc \
