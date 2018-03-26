@@ -201,6 +201,7 @@
     <class name = "web/src/average" private="1" selftest = "0">root object</class>
 
     <class name = "web/src/conf_scan" private="1" selftest = "0">root object</class>
+    <class name = "web/src/config" private="1" selftest = "0">root object</class>
     <class name = "web/src/current" private="1" selftest = "0">root object</class>
     <class name = "web/src/datacenter_indicators" private="1" selftest = "0">root object</class>
     <class name = "web/src/email_feedback" private="1" selftest = "0">root object</class>
