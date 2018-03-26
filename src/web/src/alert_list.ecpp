@@ -366,6 +366,8 @@ if (streq (part, "LIST")) {
 %   std::string jsonAlert = getJsonAlert(connection,decoded);
 %
 %   if (jsonAlert.empty()){
+%       fty_proto_destroy (&decoded);
+%       frame = zmsg_pop (recv_msg);
 %       continue;
 %   }
 %
