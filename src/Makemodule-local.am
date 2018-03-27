@@ -2,6 +2,9 @@
 
 ### No-arch pathnames wanted
 clientdir ?= $(libexecdir)/$(PACKAGE)
+### Autotools insist on having these defined, no "?=" here:
+DISTCLEANDIRS =
+check_LTLIBRARIES =
 
 # Do not link bios-csv with libfty_rest or libtntnet
 # Note: ignore the Make warning that
@@ -13,6 +16,9 @@ override src_db_bios_csv_LDADD := ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} $
 
 # Statically link bios-csv with everything needed
 if ENABLE_DB_BIOS_CSV
+
+### TODO : Use libpriv-util defined below for tests?
+### Or keep this program truly with least possible run-time dependencies?
 src_db_bios_csv_SOURCES += \
 	 src/shared/utils.cc \
 	 include/shared/utils.h \
@@ -258,7 +264,8 @@ src_libfty_rest_la_CPPFLAGS += -I$(abs_top_srcdir)/src
 all-local: $(abs_top_builddir)/src/git_details_override.cc .git_details .git_details-fty-rest
 
 # Try to build everything buildable, e.g. for further warning counters
-all-buildproducts: all-local all
+all-buildproducts: all-local all \
+            $(check_LTLIBRARIES) $(check_PROGRAMS) $(check_SCRIPTS)
 
 #----------------------------------------------------------------------
 #                        hook for make check custom verifications
@@ -346,6 +353,250 @@ EXTRA_DIST +=		$(exampleconf_DATA)
 dist_noinst_DATA =	tntnet.xml $(top_srcdir)/src/web/tntnet.xml
 
 CLEANFILES +=		tntnet.xml tntnet.xml.example
+
+#----------------------------------------------------------------------
+#                        Common libs for test programs
+#----------------------------------------------------------------------
+noinst_LTLIBRARIES += 		libpriv-utils.la
+
+libpriv_utils_la_SOURCES = 	\
+				src/shared/utils.cc \
+				include/shared/utils.h \
+				include/defs.h \
+				include/shared/utils_json.h \
+				src/shared/utils_json.cc \
+				include/shared/utilspp.h \
+				src/shared/utilspp.cc \
+				include/shared/subprocess.h \
+				src/shared/subprocess.cc \
+				include/shared/augtool.h \
+				src/shared/augtool.cc \
+				include/shared/ic.h \
+				src/shared/ic.cc \
+				include/shared/csv.h \
+				src/shared/csv.cc \
+				include/shared/cidr.h \
+				src/shared/cidr.cc \
+				include/db/types.h \
+				src/persist/assetcrud.cc \
+				src/persist/assetcrud.h \
+				src/persist/assettopology.cc \
+				src/persist/assettopology.h \
+				src/persist/persist_error.cc \
+				src/persist/persist_error.h \
+				src/persist/monitor.cc \
+				src/persist/monitor.h \
+				src/persist/dbhelpers.cc \
+				src/persist/dbhelpers.h \
+				include/db/dbhelpers.h \
+				src/db/agentstate/agentstate.cc \
+				src/db/agentstate/agentstate.h \
+				src/shared/asset_types.cc \
+				include/shared/asset_types.h \
+				include/dbtypes.h \
+				src/shared/topic_cache.cc \
+				include/shared/topic_cache.h \
+				include/db/assets.h \
+				include/db/assets/assetcr.h \
+				include/db/assets/assetr.h \
+				include/db/assets/assetu.h \
+				include/db/assets/assetd.h \
+				include/db/assetdef.h \
+				src/db/assets/assetcr.cc \
+				src/db/assets/assetr.cc \
+				src/db/assets/assetu.cc \
+				src/db/assets/assetd.cc \
+				src/db/inout.h \
+				src/db/inout/importcsv.cc \
+				src/db/inout/exportcsv.cc \
+				src/db/asset_general.cc \
+				src/db/asset_general.h \
+				include/shared/tntmlm.h \
+				src/shared/tntmlm.cc \
+				src/shared/configure_inform.cc \
+				include/shared/configure_inform.h \
+				include/shared/fty_asset_uptime_configurator.h \
+				src/shared/fty_asset_uptime_configurator.cc \
+				src/shared/magic.cc \
+				include/bios_magic.h \
+				src/msg/asset_msg.cc \
+				include/msg/asset_msg.h \
+				src/msg/common_msg.cc \
+				include/msg/common_msg.h \
+				include/db/topology2.h \
+				src/db/topology2.cc
+
+libpriv_utils_la_LDFLAGS = ${cxxtools_LIBS} ${tntdb_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS}
+
+libpriv_utils_la_CPPFLAGS =$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/src/persist \
+				-I$(abs_top_srcdir)/src/db
+
+
+# Needed at least for the distcheck (post distribution tests)
+EXTRA_DIST +=		tests/run-test.sh
+LOG_COMPILER =		$(abs_top_srcdir)/tests/run-test.sh
+
+
+#Test case examples:
+#
+#thisTestOnly            Matches the test case called, 'thisTestOnly'
+#"this test only"        Matches the test case called, 'this test only'
+#these*                  Matches all cases starting with 'these'
+#exclude:notThis         Matches all tests except, 'notThis'
+#~notThis                Matches all tests except, 'notThis'
+#~*private*              Matches all tests except those that contain 'private'
+#a* ~ab* abc             Matches all tests that start with 'a', except those that
+#                        start with 'ab', except 'abc', which is included
+#
+#Names within square brackets are interpreted as tags. A series of tags form an AND expression wheras a comma-separated sequence forms an OR expression. e.g.:
+#
+#[one][two],[three]
+# setup using AM_LOG_FLAGS see an example
+# AM_LOG_FLAGS = 				~[db]
+
+check_LTLIBRARIES += 			libpriv-test-run.la
+
+libpriv_test_run_la_SOURCES = \
+				tests/include/catch.hpp \
+				tests/test-run.cc
+
+libpriv_test_run_la_CPPFLAGS = \
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+
+#----------------------------------------------------------------------
+#                        Unit test binaries
+#----------------------------------------------------------------------
+
+###
+check_PROGRAMS += test-web-helpers
+
+test_web_helpers_SOURCES = \
+				tests/web/src/test-helpers.cc
+#				src/web/src/helpers.cc
+
+test_web_helpers_LDADD = \
+				libpriv-test-run.la \
+				libpriv-utils.la
+
+test_web_helpers_CPPFLAGS =\
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+
+test_web_helpers_LDFLAGS =	${tntnet_LIBS} ${tntdb_LIBS} ${cxxtools_LIBS} ${czmq_LIBS}
+
+###
+check_PROGRAMS +=	test-utils-web
+
+test_utils_web_SOURCES = \
+				tests/shared/test-utils-web.cc
+#fty-common#	src/include/utils_web.h
+
+test_utils_web_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_utils_web_CPPFLAGS = \
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+
+test_utils_web_LDFLAGS =	${cxxtools_LIBS} ${czmq_LIBS}
+
+###
+check_PROGRAMS +=	test-tntmlm
+
+test_tntmlm_SOURCES = \
+				include/shared/tntmlm.h \
+				src/shared/tntmlm.cc \
+				tests/shared/test-tntmlm.cc
+
+test_tntmlm_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_tntmlm_CPPFLAGS = \
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+
+test_tntmlm_LDFLAGS =	${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS}
+
+check_PROGRAMS +=	test-utils-plusplus
+
+test_utils_plusplus_SOURCES = \
+				include/shared/utilspp.h \
+				tests/shared/test-utils++.cc
+
+test_utils_plusplus_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_utils_plusplus_CPPFLAGS = \
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+
+test_utils_plusplus_LDFLAGS =	${czmq_LIBS}
+
+check_PROGRAMS += 	test-utils
+
+test_utils_SOURCES = \
+				include/shared/utils.h \
+				tests/shared/test-utils.cc
+
+test_utils_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_utils_CPPFLAGS =	$(AM_CPPFLAGS) \
+			-I$(abs_top_srcdir)/tests/include/
+
+test_utils_LDFLAGS =	${czmq_LIBS}
+
+noinst_PROGRAMS += 			test-subprocess
+test_subprocess_SOURCES = \
+				include/shared/subprocess.h \
+				tests/shared/test-subprocess.cc
+
+test_subprocess_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_subprocess_CPPFLAGS = \
+				$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/tests/include/
+test_subprocess_LDFLAGS =		${cxxtools_LIBS} ${czmq_LIBS}
+
+check_PROGRAMS += 	test-cidr
+test_cidr_SOURCES = \
+				src/shared/cidr.cc \
+				tests/shared/test-cidr.cc
+test_cidr_LDADD = 	libpriv-test-run.la
+test_cidr_CFLAGS = 	${cidr_CFLAGS}
+test_cidr_CPPFLAGS = 	$(AM_CPPFLAGS) ${cidr_CPPFLAGS} \
+				-I$(abs_top_srcdir)/tests/include/
+test_cidr_LDFLAGS =	${cidr_LIBS}
+
+
+check_PROGRAMS += 	test-csv
+
+test_csv_SOURCES = \
+				include/shared/csv.h \
+				tests/shared/test-csv.cc
+
+test_csv_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
+
+test_csv_CPPFLAGS =		$(AM_CPPFLAGS) \
+				-I$(abs_top_srcdir)/src \
+				-I$(abs_top_srcdir)/src/persist \
+				-I$(abs_top_srcdir)/src/msg \
+				-I$(abs_top_srcdir)/tests/include
+
+test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS}
+
+TESTS += $(check_PROGRAMS)
+TESTS += $(check_SCRIPTS)
 
 #----------------------------------------------------------------------
 #                        SCM details

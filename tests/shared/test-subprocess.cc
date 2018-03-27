@@ -34,7 +34,7 @@
 #include <czmq.h>       // sadly, but zclock_mono is way simpler than std::chrono ...
 #include <iostream>
 
-#include "subprocess.h"
+#include "shared/subprocess.h"
 
 using namespace shared;
 

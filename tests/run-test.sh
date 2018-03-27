@@ -32,6 +32,14 @@ if [[ -z "${NEWPROGRAM}" ]]; then
     exit ${HARD_ERROR}
 fi
 
+case "${NEWPROGRAM}" in
+    fty_rest_selftest|*/fty_rest_selftest)
+        exec "${NEWPROGRAM}" ${NEWARGS}
+        exit
+        ;;
+esac
+
+# Others support CATCH JUnit logger
 mkdir -p tests/junit/
 
 exec "${NEWPROGRAM}" "${NEWARGS}" -r junit -o "tests/junit/${1}.xml"
