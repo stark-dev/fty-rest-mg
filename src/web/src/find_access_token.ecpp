@@ -19,7 +19,7 @@
  #><#
 /*!
  * \file find_access_token.ecpp
- * \brief  Store access token in global string "gaccess_toekn"
+ * \brief  Store access token in global string "gaccess_token"
  */
  #><%pre>
 #include <tnt/httpmessage.h>
@@ -67,5 +67,6 @@ std::string gaccess_token;
     }
     gaccess_token = access_token;
 
+    /* Go on to next module in tntnet.xml */
     return DECLINED;
 </%cpp>
