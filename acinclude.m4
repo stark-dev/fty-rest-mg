@@ -176,6 +176,21 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     # main baseline version of REST API on a deployment.
     AX_PROJECT_LOCAL_HOOK__GIT_DETAILS
     AX_PROJECT_LOCAL_HOOK__PACKAGING_DETAILS
+
+    ### Detect programs we need
+    # sed is great!
+    AC_CHECK_PROGS([SED], [sed])
+    # TNTnet preprocesor
+    AC_CHECK_PROGS([ECPPC], [ecppc])
+    # TNTnet
+    AC_CHECK_PROGS([TNTNET], [tntnet])
+    AS_IF([test -z "$TNTNET" -o -z "$ECPPC"],[
+        AC_MSG_ERROR([TNTnet not found!])
+    ])
+
+    # sourced from an m4/*.m4 include file during configure script compilation
+    gl_VISIBILITY
+    BS_CHECK_SASLAUTHD_MUX
     ### // End of customized code from legacy days
 ])
 

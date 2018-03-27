@@ -152,9 +152,9 @@ ci_helper_SCRIPTS =    tools/bios-passwd tools/testpass.sh
 package_CLIENTS_BIOS_CSV =    $(DESTDIR)$(bindir)/bios-csv
 ci_helperdir =         $(clientdir)
 
-ECPPC=ecppc
-ECPPFLAGS= --nolog
-ECPPFLAGS_CPP=-I$(top_builddir)/include -I$(top_srcdir)/include
+ECPPC ?= ecppc
+ECPPFLAGS = --nolog
+ECPPFLAGS_CPP = -I$(top_builddir)/include -I$(top_srcdir)/include
 
 ECPPFILES= \
   web/src/add_gpio.ecpp \
