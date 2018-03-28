@@ -112,6 +112,10 @@ pipeline {
             defaultValue: false,
             description: 'When using temporary subdirs in build/test workspaces, wipe them after successful builds? (Note: in current fty-rest codebase, abs_top_srcdir etc. are used, so the original build dir name is required to exist during distcheck etc.)',
             name: 'DO_CLEANUP_AFTER_BUILD')
+        booleanParam (
+            defaultValue: true,
+            description: 'When using temporary subdirs in build/test workspaces, wipe them after the job is done?',
+            name: 'DO_CLEANUP_AFTER_JOB')
     }
     triggers {
         pollSCM 'H/2 * * * *'
@@ -536,6 +540,11 @@ pipeline {
 
                     //slackSend (color: "#008800", message: "Build ${env.JOB_NAME} is back to normal.")
                     //emailext (to: "qa@example.com", subject: "Build ${env.JOB_NAME} is back to normal.", body: "Build ${env.JOB_NAME} is back to normal.")
+                }
+                if ( params.DO_CLEANUP_AFTER_JOB ) {
+                    dir("tmp") {
+                        deleteDir()
+                    }
                 }
             }
         }
