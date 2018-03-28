@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2015 Eaton
+# Copyright (C) 2015 - 2018 Eaton
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -31,6 +31,10 @@ if [[ -z "${NEWPROGRAM}" ]]; then
     echo "FATAL: name of test is missing, exiting!"
     exit ${HARD_ERROR}
 fi
+
+# Grab the most details we can
+[[ -n "${BIOS_LOG_LEVEL-}}" ]] || BIOS_LOG_LEVEL=LOG_DEBUG
+export BIOS_LOG_LEVEL
 
 case "${NEWPROGRAM}" in
     fty_rest_selftest|*/fty_rest_selftest)
