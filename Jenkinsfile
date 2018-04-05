@@ -114,7 +114,7 @@ pipeline {
             name: 'DO_CLEANUP_AFTER_BUILD')
         booleanParam (
             defaultValue: true,
-            description: 'When using temporary subdirs in build/test workspaces, wipe them after the job is done?',
+            description: 'When using temporary subdirs in build/test workspaces, wipe them after the whole job is done successfully?',
             name: 'DO_CLEANUP_AFTER_JOB')
     }
     triggers {
