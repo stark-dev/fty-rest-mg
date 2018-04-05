@@ -63,6 +63,8 @@ EXTRA_DIST += \
     Findlibsasl2.cmake \
     Findlog4cplus.cmake \
     Findfty_common.cmake \
+    builds/cmake/Modules/ClangFormat.cmake \
+    builds/cmake/clang-format-check.sh.in \
     CMakeLists.txt
 endif
 
