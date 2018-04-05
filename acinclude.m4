@@ -194,3 +194,8 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     ### // End of customized code from legacy days
 ])
 
+AC_DEFUN([AX_PROJECT_LOCAL_HOOK_FINAL], [
+    # Note: DO NOT refer to complete token name of this routine in the
+    # message below, or you would get an infinite loop in m4 autoconf ;)
+    AC_MSG_WARN([Running the PROJECT_LOCAL_HOOK_FINAL])
+])
