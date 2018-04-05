@@ -1,4 +1,6 @@
 # ignore generated .m4
+# Note that you must force-add desired files to git in this
+# directory since it is wholly ignored by zproject defaults
 compile
 config.guess
 config.sub
