@@ -184,8 +184,11 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     AC_CHECK_PROGS([ECPPC], [ecppc])
     # TNTnet
     AC_CHECK_PROGS([TNTNET], [tntnet])
-    AS_IF([test -z "$TNTNET" -o -z "$ECPPC"],[
-        AC_MSG_ERROR([TNTnet not found!])
+    AS_IF([test -z "$TNTNET" ],[
+        AC_MSG_WARN([TNTnet not found, might fail runtime tests!])
+    ])
+    AS_IF([-z "$ECPPC"],[
+        AC_MSG_ERROR([ECPPC not found, can not compile servlets!])
     ])
 
     # sourced from an m4/*.m4 include file during configure script compilation
