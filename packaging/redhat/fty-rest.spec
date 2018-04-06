@@ -126,11 +126,12 @@ make install DESTDIR=%{buildroot} %{?_smp_mflags}
 find %{buildroot} -name '*.a' | xargs rm -f
 find %{buildroot} -name '*.la' | xargs rm -f
 
+# Note: pathnames below were customized to match the Makefile with legacy paths
 %files
 %defattr(-,root,root)
 %doc README.md
 %doc COPYING
-%{_bindir}/db/bios-csv
-%{_mandir}/man1/db/bios-csv*
+%{_libexecdir}/%{name}/bios-csv
+%{_mandir}/man1/bios-csv*
 
 %changelog
