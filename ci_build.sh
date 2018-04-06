@@ -131,10 +131,9 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     fi
 
 # Customized just in case to cover all our ARCHes
-#    CONFIG_OPTS+=("--with-pkgconfigdir=${BUILD_PREFIX}/lib/pkgconfig")
-#    CONFIG_OPTS+=("--with-systemdtmpfilesdir=${BUILD_PREFIX}/usr/lib/tmpfiles.d")
-#    CONFIG_OPTS+=("--with-systemdsystempresetdir=${BUILD_PREFIX}/usr/lib/systemd/system-preset")
-#    CONFIG_OPTS+=("--with-systemdsystemunitdir=${BUILD_PREFIX}/usr/lib/systemd/system")
+    CONFIG_OPTS+=("--with-systemdtmpfilesdir=${BUILD_PREFIX}/usr/lib/tmpfiles.d")
+    CONFIG_OPTS+=("--with-systemdsystempresetdir=${BUILD_PREFIX}/usr/lib/systemd/system-preset")
+    CONFIG_OPTS+=("--with-systemdsystemunitdir=${BUILD_PREFIX}/usr/lib/systemd/system")
 
 #    # fty-rest itself has no notion of drafts, and from Z ecosystem we want stable APIs
 #    CONFIG_OPTS+=("--enable-drafts=no")
