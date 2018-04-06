@@ -1,5 +1,8 @@
 # Customized (manually maintained) bits of configure.ac for fty-rest
 
+###m4_include([m4/ac_prog_try_doxygen.m4])
+m4_include([m4/bs_check_saslauthd_mux.m4])
+
 ### Allow to revise the packaging strings in platform.h
 ifdef([__AC_UNDEFINE],[],[
 m4_define([__AC_UNDEFINE],[_AC_DEFINE([#ifdef $1
