@@ -187,7 +187,7 @@ AC_DEFUN([AX_PROJECT_LOCAL_HOOK], [
     AS_IF([test -z "$TNTNET" ],[
         AC_MSG_WARN([TNTnet not found, might fail runtime tests!])
     ])
-    AS_IF([-z "$ECPPC"],[
+    AS_IF([test -z "$ECPPC"],[
         AC_MSG_ERROR([ECPPC not found, can not compile servlets!])
     ])
 
