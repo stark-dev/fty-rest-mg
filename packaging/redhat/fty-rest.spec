@@ -75,10 +75,11 @@ This package contains shared library for fty-rest: common core rest api for 42it
 %post -n libfty_rest1 -p /sbin/ldconfig
 %postun -n libfty_rest1 -p /sbin/ldconfig
 
+# Note: pathnames below were customized to match the Makefile with legacy paths
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING
-%{_libdir}/libfty_rest.so.*
+%{_libdir}/%{name}/libfty_rest.so.*
 
 %package devel
 Summary:        common core rest api for 42ity project
@@ -102,10 +103,11 @@ Requires:       fty-common-devel
 common core rest api for 42ity project development tools
 This package contains development files for fty-rest: common core rest api for 42ity project
 
+# Note: pathnames below were customized to match the Makefile with legacy paths
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
-%{_libdir}/libfty_rest.so
+%{_libdir}/%{name}/libfty_rest.so
 %{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
 %{_mandir}/man7/*
@@ -131,7 +133,8 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %defattr(-,root,root)
 %doc README.md
 %doc COPYING
-%{_libexecdir}/%{name}/bios-csv
+###%{_libexecdir}/%{name}/bios-csv
+%{_prefix}/libexec/fty-rest/bios-csv
 %{_mandir}/man1/bios-csv*
 
 %changelog
