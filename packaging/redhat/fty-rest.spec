@@ -136,11 +136,11 @@ find %{buildroot} -name '*.la' | xargs rm -f
 ###%{_libexecdir}/%{name}/bios-csv
 %{_prefix}/libexec/fty-rest/bios-csv
 %{_mandir}/man1/bios-csv*
-%{_libdir}/%{name}/bios-passwd
-%{_libdir}/%{name}/testpass.sh
+%{_prefix}/lib/%{name}/bios-passwd
+%{_prefix}/lib/%{name}/testpass.sh
 %{_prefix}/libexec/%{name}/bios-passwd
 %{_prefix}/libexec/%{name}/testpass.sh
-%{_datadir}/.git_details
-%{_datadir}/examples/tntnet.xml.example
+%{_datadir}/%{name}/.git_details
+%{_datadir}/%{name}/examples/tntnet.xml.example
 
 %changelog
