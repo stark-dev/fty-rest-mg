@@ -459,7 +459,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+# Note: customized config opts for tntdb
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}" --without-postgresql --without-sqlite
         $CI_TIME make -j4
         $CI_TIME make install
         cd "${BASE_PWD}"
