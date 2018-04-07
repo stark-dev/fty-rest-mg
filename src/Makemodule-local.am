@@ -595,6 +595,8 @@ test_csv_CPPFLAGS =		$(AM_CPPFLAGS) \
 
 test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS}
 
+EXTRA_DIST +=	$(srcdir)/tests/shared/*.csv
+
 TESTS += $(check_PROGRAMS)
 TESTS += $(check_SCRIPTS)
 
