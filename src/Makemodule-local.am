@@ -315,18 +315,13 @@ uninstall-local: uninstall-tntnet-nonshared uninstall-tntnet-includes
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so*
 	/bin/rm -f $(DESTDIR)$(prefix)/libexec/$(PACKAGE)/bios-csv
 
-# Install the built shared objects for tntnet
+# Install the built shared objects for tntnet using legacy fty-rest locations
 install-exec-hook-tntnet-so:
 	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
 	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
 	cd $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    ln -fs "`ls -1 $(TNTLIB_BASENAME).so.* | tail -1`" $(TNTLIB_BASENAME).so
-
-install-exec-hook-includes:
-	mkdir -p $(DESTDIR)$(includedir)/$(PACKAGE) && \
-	    cd $(DESTDIR)$(includedir) && \
-	    mv -f `ls -1A | egrep -v '^'"$(PACKAGE)"'$$' ` $(PACKAGE)/
 
 install-exec-hook-bioscsv:
 	mkdir -p "$(DESTDIR)$(prefix)/libexec/$(PACKAGE)" && \
@@ -340,7 +335,7 @@ install-exec-hook-cihelpers:
 	    done ; \
 	fi
 
-install-exec-hook: install-exec-hook-tntnet-so install-exec-hook-includes install-exec-hook-bioscsv install-exec-hook-cihelpers
+install-exec-hook: install-exec-hook-tntnet-so install-exec-hook-bioscsv install-exec-hook-cihelpers
 
 ### This file contains the TNTNET settings relevant for our test runs
 ### Note: in non-daemon mode, stderr is logged to stderr
