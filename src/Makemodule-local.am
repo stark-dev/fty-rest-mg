@@ -286,10 +286,15 @@ distclean-local:
 #                       hook for installation legacy-like customization
 #----------------------------------------------------------------------
 
-clean-local:
+clean-junit:
+	/bin/rm -rf $(abs_top_builddir)/tests/junit
+
+clean-ecpp-cc:
 	for file in $(ECPPCCFILES); do \
 	    /bin/rm -f $(top_builddir)/src/$$file; \
 	done
+
+clean-local: clean-junit clean-ecpp-cc
 
 # Technically the implementation of tntnet servlets is a shared library
 # It is not intended for linking by other apps, and needs no static version
