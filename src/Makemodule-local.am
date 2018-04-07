@@ -438,7 +438,7 @@ libpriv_utils_la_CPPFLAGS =$(AM_CPPFLAGS) \
 				-I$(abs_top_srcdir)/src/db
 
 
-# Needed at least for the distcheck (post distribution tests)
+# Needed at least for the distcheck (post distribution tests)
 EXTRA_DIST +=		tests/run-test.sh
 LOG_COMPILER =		$(abs_top_srcdir)/tests/run-test.sh
 
