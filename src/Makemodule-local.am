@@ -570,7 +570,9 @@ check_PROGRAMS += 	test-cidr
 test_cidr_SOURCES = \
 				src/shared/cidr.cc \
 				tests/shared/test-cidr.cc
-test_cidr_LDADD = 	libpriv-test-run.la
+test_cidr_LDADD = \
+				libpriv-utils.la \
+				libpriv-test-run.la
 test_cidr_CFLAGS = 	${cidr_CFLAGS}
 test_cidr_CPPFLAGS = 	$(AM_CPPFLAGS) ${cidr_CPPFLAGS} \
 				-I$(abs_top_srcdir)/tests/include/
