@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2015 Eaton
+# Copyright (C) 2015 - 2018 Eaton
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -32,6 +32,18 @@ if [[ -z "${NEWPROGRAM}" ]]; then
     exit ${HARD_ERROR}
 fi
 
+# Grab the most details we can
+[[ -n "${BIOS_LOG_LEVEL-}}" ]] || BIOS_LOG_LEVEL=LOG_DEBUG
+export BIOS_LOG_LEVEL
+
+case "${NEWPROGRAM}" in
+    fty_rest_selftest|*/fty_rest_selftest)
+        exec "${NEWPROGRAM}" ${NEWARGS}
+        exit
+        ;;
+esac
+
+# Others support CATCH JUnit logger
 mkdir -p tests/junit/
 
 exec "${NEWPROGRAM}" "${NEWARGS}" -r junit -o "tests/junit/${1}.xml"
