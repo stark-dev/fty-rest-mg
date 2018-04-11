@@ -136,12 +136,15 @@ find %{buildroot} -name '*.la' | xargs rm -f
 ###%{_libexecdir}/%{name}/bios-csv
 %{_prefix}/libexec/fty-rest/bios-csv
 %{_mandir}/man1/bios-csv*
-#%{_prefix}/lib/%{name}/bios-passwd
-#%{_prefix}/lib/%{name}/testpass.sh
 %{_prefix}/libexec/%{name}/bios-passwd
 %{_prefix}/libexec/%{name}/testpass.sh
 #%{_datadir}/%{name}/.git_details-fty-rest
 %{_datadir}/bios/.git_details-fty-rest
 %{_datadir}/%{name}/examples/tntnet.xml.example
+%if %{defined opensuse_version}
+# Symlinks on some distro layouts
+%{_prefix}/lib/%{name}/bios-passwd
+%{_prefix}/lib/%{name}/testpass.sh
+%endif
 
 %changelog
