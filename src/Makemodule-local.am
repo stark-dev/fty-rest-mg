@@ -428,18 +428,20 @@ web-test-deps-inst: install-ci_helperSCRIPTS
 # executed as different shell scripts by make). That is why ultimate exec
 # of the tntnet program is done twice in the same manner.
 
-web-test: $(RUN_TNTNET_ENVFILE) web-test-deps
-	@echo "=== Running target $@ with credentials of this user: "; \
-	id || true; echo "";
+ASAN_TNTNET =
 if ENABLE_ASAN
-	@LD_PRELOAD="$$LD_PRELOAD `ldd $(abs_top_builddir)/src/.libs/libfty_rest.so | grep libasan | awk '{print $$3}'`" || true; \
+### Note: this must end with a command separator (;) if not empty
+ASAN_TNTNET += \
+	LD_PRELOAD="$$LD_PRELOAD `ldd $(abs_top_builddir)/src/.libs/libfty_rest.so | grep libasan | awk '{print $$3}'`" || true; \
 	LD_PRELOAD="$$LD_PRELOAD `ldd $(abs_top_builddir)/src/.libs/libfty_rest.so | grep libtsan | awk '{print $$3}'`" || true; \
 	echo "===== Using LD_PRELOAD='$$LD_PRELOAD' for Address Sanitizer"; \
-	export LD_PRELOAD; \
-	$(RUN_TNTNET)
-else
-	$(RUN_TNTNET)
+	export LD_PRELOAD;
 endif
+
+web-test: $(RUN_TNTNET_ENVFILE) web-test-deps
+	@echo "=== Running target $@ with credentials of this user: "; \
+		id || true; echo ""
+	@$(ASAN_TNTNET) $(RUN_TNTNET)
 
 #----------------------------------------------------------------------
 #                        Common libs for test programs
