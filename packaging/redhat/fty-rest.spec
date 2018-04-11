@@ -141,7 +141,7 @@ find %{buildroot} -name '*.la' | xargs rm -f
 #%{_datadir}/%{name}/.git_details-fty-rest
 %{_datadir}/bios/.git_details-fty-rest
 %{_datadir}/%{name}/examples/tntnet.xml.example
-%if %{defined opensuse_version}
+%if 0%{?suse_version} > 0
 # Symlinks on some distro layouts
 %{_prefix}/lib/%{name}/bios-passwd
 %{_prefix}/lib/%{name}/testpass.sh
