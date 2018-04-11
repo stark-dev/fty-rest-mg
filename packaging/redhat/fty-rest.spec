@@ -142,7 +142,17 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_datadir}/bios/.git_details-fty-rest
 %{_datadir}/%{name}/examples/tntnet.xml.example
 %if 0%{?suse_version} > 0
+# The validator is pickier in OpenSUSE build targets
+%dir %{_libdir}
+%dir %{_libexecdir}
+%dir %{_prefix}/libexec
+%dir %{_prefix}/libexec/%{name}
+%dir %{_datadir}
+%dir %{_datadir}/bios
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/examples
 # Symlinks on some distro layouts
+%dir %{_prefix}/lib/%{name}
 %{_prefix}/lib/%{name}/bios-passwd
 %{_prefix}/lib/%{name}/testpass.sh
 %endif
