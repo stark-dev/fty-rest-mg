@@ -144,6 +144,7 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %if 0%{?suse_version} > 0
 # The validator is pickier in OpenSUSE build targets
 %dir %{_libdir}
+%dir %{_libdir}/%{name}
 %dir %{_libexecdir}
 %dir %{_prefix}/libexec
 %dir %{_prefix}/libexec/%{name}
