@@ -94,6 +94,7 @@ warranty-metric
 bios-csv
 
 tests/junit
+tests/run_tntnet_make.env
 
 var/
 
