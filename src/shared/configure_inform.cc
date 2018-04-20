@@ -111,7 +111,7 @@ void
         zhash_t *ext = s_map2zhash (oneRow.first.ext);
         if (!zhash_lookup (ext, "uuid")) {
             fty_uuid_t *fuuid = fty_uuid_new ();
-            const char *uuid = fty_uuid_create (ext, (char*)s_asset_type.c_str(), fuuid);
+            const char *uuid = fty_uuid_create (ext, s_asset_type.c_str(), fuuid);
             zhash_insert (ext, "uuid", (void*) uuid);
             fty_uuid_destroy (&fuuid);
 
