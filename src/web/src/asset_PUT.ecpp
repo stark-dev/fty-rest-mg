@@ -28,7 +28,6 @@
 #include <unistd.h>
 
 #include <cxxtools/jsondeserializer.h>
-        //#include <cxxtools/csvdeserializer.h>
 #include <fty_common.h>
 #include "shared/configure_inform.h"
 #include "src/db/inout.h"
@@ -64,6 +63,7 @@ bool database_ready;
         std::stringstream input (request.getBody (), std::ios_base::in);
         cxxtools::JsonDeserializer deserializer (input);
         deserializer.deserialize (si);
+
         auto si_id = si.findMember("id");
         std::string status;
         si.getMember("status") >>= status;
@@ -81,8 +81,6 @@ bool database_ready;
         else {
             si_id->setValue(id);
         }
-
-
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL(e);
