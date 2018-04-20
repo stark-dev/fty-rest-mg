@@ -60,9 +60,8 @@ void
         throw std::runtime_error(" mlm_client_set_producer () failed.");
     }
     tntdb::Connection conn = tntdb::connectCached (url);
-    for ( const  auto &oneRow : rows ) {
 
-        //        if (oneRow.first.status == "active") {
+    for ( const  auto &oneRow : rows ) {
         std::string s_priority = std::to_string (oneRow.first.priority);
         std::string s_parent = std::to_string (oneRow.first.parent_id);
         std::string s_asset_name = oneRow.first.name;
@@ -125,7 +124,8 @@ void
             }
         }
 
-        if (oneRow.first.status == "active") {
+        if (oneRow.first.status == "active" ||
+            oneRow.second == persist::asset_operation::DELETE) {
             zmsg_t *msg = fty_proto_encode_asset (
                 aux,
                 oneRow.first.name.c_str(),
@@ -135,7 +135,7 @@ void
             r = mlm_client_send (client, subject.c_str (), &msg);
             if ( r != 0 ) {
                 mlm_client_destroy (&client);
-                throw std::runtime_error("mlm_client_send () failed.");
+                throw std::runtime_error ("mlm_client_send () failed.");
             }
 
             zhash_destroy (&aux);
