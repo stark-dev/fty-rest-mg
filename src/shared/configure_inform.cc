@@ -109,20 +109,6 @@ void
         }
 
         zhash_t *ext = s_map2zhash (oneRow.first.ext);
-        if (!zhash_lookup (ext, "uuid")) {
-            fty_uuid_t *fuuid = fty_uuid_new ();
-            const char *uuid = fty_uuid_create (ext, s_asset_type.c_str(), fuuid);
-            zhash_insert (ext, "uuid", (void*) uuid);
-            fty_uuid_destroy (&fuuid);
-
-            if (!streq (uuid, "ffffffff-ffff-ffff-ffff-ffffffffffff")) {
-                db_reply_t reply = persist::insert_into_asset_ext_attribute (conn,
-                                                                             uuid,
-                                                                             "uuid",
-                                                                             oneRow.first.id,
-                                                                             true);
-            }
-        }
 
         if (oneRow.first.status == "active" ||
             oneRow.second == persist::asset_operation::DELETE) {
@@ -162,7 +148,14 @@ void
                     throw std::runtime_error("mlm_client_send () failed.");
                 }
             }
-        }// if status-active
+            if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) ||
+                streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
+                zmsg_t *republish = zmsg_new ();
+                zmsg_addstr (republish, s_asset_name.c_str ());
+                mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
+            }
+
+        } // if status-active
     } // for row:rows
 
     zclock_sleep (500); // ensure that everything was send before we destroy the client
