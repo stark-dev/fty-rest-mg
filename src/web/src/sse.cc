@@ -236,13 +236,24 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     log_debug("Sse get an delete message");
     if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
     {
-      log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(asset));
-      return json;
+      //The asset is maybe without location
+      if (_assetsWithNoLocation.find(nameElement) != _assetsWithNoLocation.end())
+      {
+        //remove this asset from the list without location
+        _assetsWithNoLocation.erase(nameElement);
+      }
+      else
+      {
+        log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(asset));
+        return json;
+      }
+    }
+    else
+    {
+      //remove this asset from the assets list
+      _assetsOfDatacenter.erase(nameElement);
     }
     json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
-
-    //remove this asset from the assets list
-    _assetsOfDatacenter.erase(nameElement);
   }
   else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
