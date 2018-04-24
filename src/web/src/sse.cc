@@ -298,8 +298,12 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       if(streq(fty_proto_aux_string(asset,"parent","0"),"0"))
       {
         //Check if the asset is a device 
-        log_debug("Asset type : %s",fty_proto_aux_string(asset,"type","none"));
-        if (streq(fty_proto_aux_string(asset,"type","none"),"device")){
+        const char *type = fty_proto_aux_string(asset, "type", "none");
+        log_debug("Asset type : %s", type);
+
+        // XXX: autodiscovered items seems to not have a type, need to take a closer look...
+        if (streq(type, "device") || streq(type, "none"))
+        {
           //Add in the list of asset without location, will send a normal create message
           _assetsWithNoLocation.emplace(std::make_pair(nameElement, 5));
         } 
