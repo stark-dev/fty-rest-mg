@@ -236,13 +236,24 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     log_debug("Sse get an delete message");
     if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
     {
-      log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(asset));
-      return json;
+      //The asset is maybe without location
+      if (_assetsWithNoLocation.find(nameElement) != _assetsWithNoLocation.end())
+      {
+        //remove this asset from the list without location
+        _assetsWithNoLocation.erase(nameElement);
+      }
+      else
+      {
+        log_debug("skipping due to element_src '%s' not being in the list", fty_proto_name(asset));
+        return json;
+      }
+    }
+    else
+    {
+      //remove this asset from the assets list
+      _assetsOfDatacenter.erase(nameElement);
     }
     json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
-
-    //remove this asset from the assets list
-    _assetsOfDatacenter.erase(nameElement);
   }
   else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
@@ -287,8 +298,12 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
       if(streq(fty_proto_aux_string(asset,"parent","0"),"0"))
       {
         //Check if the asset is a device 
-        log_debug("Asset type : %s",fty_proto_aux_string(asset,"type","none"));
-        if (streq(fty_proto_aux_string(asset,"type","none"),"device")){
+        const char *type = fty_proto_aux_string(asset, "type", "none");
+        log_debug("Asset type : %s", type);
+
+        // XXX: autodiscovered items seems to not have a type, need to take a closer look...
+        if (streq(type, "device") || streq(type, "none"))
+        {
           //Add in the list of asset without location, will send a normal create message
           _assetsWithNoLocation.emplace(std::make_pair(nameElement, 5));
         } 
