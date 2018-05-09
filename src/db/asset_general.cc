@@ -152,7 +152,8 @@ int
 
     int affected_rows = 0;
 
-    if (element_id == 0 && streq (status, "nonactive")) {
+    // dbid for RC_0 is 1: element_id == 1
+    if (element_id == 1 && streq (status, "nonactive")) {
         errmsg = element_name + std::string (": Default rack controller cannot be inactivated. Change status to 'active'.");
         log_error ("%s", errmsg.c_str ());
         return 1;
