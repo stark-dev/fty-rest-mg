@@ -99,8 +99,6 @@ long int Sse::checkTokenValidity()
   long int gid;
   char * user_name;
 
-  log_debug("Token : [%s]", _token.c_str());
-
   if (BiosProfile::Anonymous == tokens::get_instance()->verify_token(_token, &tme, &uid, &gid, &user_name))
   {
     log_info("sse : Token revoked or expired");
