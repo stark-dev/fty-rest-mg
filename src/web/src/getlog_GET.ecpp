@@ -326,7 +326,7 @@ UserInfo user;
         if ( list_lognames == "yes" ) {
 </%cpp>
 { "getlog-supports": {
-    "logname_base": [ "messages" ],
+    "logname_base": [ "messages", "www-audit" ],
     "logname_ext": [ "", ".txt", ".gz" ]
 } }
 <%cpp>
@@ -334,7 +334,7 @@ UserInfo user;
             return HTTP_OK;
         }
 
-        if ( (slogname_base == "messages") &&
+        if ( (slogname_base == "messages" || slogname_base == "www-audit" ) &&
              (slogname_ext == "" || slogname_ext == ".gz" || slogname_ext == ".txt" )
         ) {
             logname_ext = slogname_ext;
@@ -342,6 +342,8 @@ UserInfo user;
 
             if (logname_base == "messages") {
                 logfile = "/var/log/" + logname_base;
+            } else if (logname_base == "www-audit") {
+                logfile = "/var/log/tntnet/" + logname_base + ".log";
             } else {
                 throw std::runtime_error("Sorry, logname '" + logname_base + "' support is currently not implemented");
             }

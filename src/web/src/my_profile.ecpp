@@ -50,14 +50,30 @@
     // ==========================================
     // information, that cannot be changed by user
     std:: string change_pwd = " ";
-    int timeout = 99;
+    int timeout = 600; //Default value in second
     if (user.profile() == BiosProfile:: Admin) {
         change_pwd = "true";
-        timeout = 10;
+        
+        //Get the no-activity timeout in config file
+        std::string checked_key = "FTY_SESSION_TIMEOUT_NO_ACTIVITY";
+        zconfig_t *root = zconfig_load (utils::config::get_path (checked_key));
+        if (root) {
+          const char *config_key = utils::config::get_mapping (checked_key);
+          zconfig_t *item = zconfig_locate (root, config_key);
+          if (item) {
+            std::string value = zconfig_value (item);
+            try {
+            timeout = std::stoi (value);
+            } catch (...) {
+              //Nothing to do, just keep the default value.
+            }
+            zconfig_destroy (&root);
+          }
+        }
     }
     if (user.profile() == BiosProfile:: Dashboard) {
         change_pwd = "false";
-        timeout = 0;
+        timeout = 0; //No inactivity timeout for Dashboard
     }
     // ==========================================
     // GET
