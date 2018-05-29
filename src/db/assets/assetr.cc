@@ -937,7 +937,6 @@ count_keytag(
         const std::string &value)
 {
     LOG_START;
-    static const int id_asset_link_type = 1;
     try{
         tntdb::Statement st = conn.prepareCached(
             " SELECT COUNT( * ) "
