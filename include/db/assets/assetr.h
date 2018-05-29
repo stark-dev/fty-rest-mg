@@ -263,6 +263,21 @@ unique_keytag(
         const std::string &value,
         a_elmnt_id_t       element_id);
 
+/** \brief how many times is gived a couple keytag/value 
+ *          in t_bios_asset_ext_attributes
+ *
+ *  \param[in] conn is tntdb connection
+ *  \param[in] keytag is a keytag to check
+ *  \param[in] value is value to check
+ *
+ *  \return -1 in case of error otherwise number of instance
+ */
+int
+count_keytag(
+        tntdb::Connection& conn,
+        const std::string &keytag,
+        const std::string &value);
+
 db_reply_t
     select_monitor_device_type_id
         (tntdb::Connection &conn,
