@@ -930,6 +930,36 @@ unique_keytag(
     }
 }
 
+int
+count_keytag(
+        tntdb::Connection& conn,
+        const std::string &keytag,
+        const std::string &value)
+{
+    LOG_START;
+    try{
+        tntdb::Statement st = conn.prepareCached(
+            " SELECT COUNT( * ) "
+            " FROM t_bios_asset_ext_attributes "
+            " WHERE keytag = :keytag AND"
+            "       value = :value"
+        );
+
+        tntdb::Row row = st.set("keytag", keytag)
+                           .set("value", value)
+                           .selectRow();
+
+        int r = 0;
+        row[0].get(r);
+        LOG_END;
+        return r;
+    }
+    catch (const std::exception &e) {
+        LOG_END_ABNORMAL(e);
+        return -1;
+    }
+}
+
 db_reply_t
     select_monitor_device_type_id
         (tntdb::Connection &conn,

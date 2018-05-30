@@ -282,6 +282,17 @@ db_reply_t
             return ret;
         }
 
+        // check if a logical_asset refer to the item we are trying to delete
+        if (persist::count_keytag(conn,"logical_asset",element_info.name) >0 ){
+            ret.status        = 0;
+            ret.errtype       = basic_info.errsubtype;
+            ret.errsubtype    = DB_ERROR_DELETEFAIL;
+            ret.msg           = "a logical_asset (sensor) refere it";
+            log_warning ("%s", ret.msg.c_str());
+            LOG_END;
+            return ret;
+        }
+
         switch ( basic_info.item.type_id ) {
             case persist::asset_type::DATACENTER:
             case persist::asset_type::ROW:
