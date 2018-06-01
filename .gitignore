@@ -180,7 +180,7 @@ src/api/libbiosapi.pc
 src/platform.h.in
 src/platform.h
 
-# CMake cache
+# CMake in general
 builds/cmake/
 CMake*
 *.cmake
