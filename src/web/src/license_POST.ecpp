@@ -107,7 +107,7 @@ bool database_ready;
         int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
         if (rv != 0) {
             log_error("Starting of start-db-services have failed. Consult system logs");
-            log_debug("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+            log_error("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                 "/usr/libexec/fty/start-db-services", rv, proc_out.c_str(), proc_err.c_str());
             http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
         }
