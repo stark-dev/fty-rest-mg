@@ -1,3 +1,5 @@
+### Note: Customized after generation; take care upon regens
+
 *.sh.bak
 *.h.bak
 *.c.bak
