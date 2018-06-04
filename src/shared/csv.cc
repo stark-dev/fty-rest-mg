@@ -205,12 +205,6 @@ CsvMap_from_istream(
 {
     std::vector <std::vector<cxxtools::String> > data;
     cxxtools::CsvDeserializer deserializer(in);
-    if ( hasApostrof(in) ) {
-        const char* msg = "CSV file contains ' (apostrof), please remove it";
-        log_error("%s\n", msg);
-        LOG_END;
-        throw std::invalid_argument (msg);
-    }
     char delimiter = findDelimiter(in);
     if (delimiter == '\x0') {
         const char* msg = "Cannot detect the delimiter, use comma (,) semicolon (;) or tabulator";

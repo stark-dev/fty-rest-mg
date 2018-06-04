@@ -20,6 +20,7 @@
  #><%pre>
 #include <cxxtools/split.h>
 #include <cxxtools/regex.h>
+#include <cxxtools/jsonserializer.h>
 #include <stdlib.h>
 #include <vector>
 #include <map>
@@ -204,6 +205,9 @@ std::vector<uint32_t> asset_ids;
 
     // Go through all passed ids
     std::string big_json{};
+    cxxtools::SerializationInfo si;
+    cxxtools::SerializationInfo& siCurrent = si.addMember("current");
+    siCurrent.setCategory(cxxtools::SerializationInfo::Category::Array);
     for ( auto asset_id : asset_ids)
     {
 
@@ -311,11 +315,11 @@ std::vector<uint32_t> asset_ids;
 
         // we are here -> everything is ok, need just to form
         // this is a small JSON for just ONE asset
-        std::string json = "{";
-        json += utils::json::jsonify ("id", asset.item.name);
-        json += ",";
-        json += utils::json::jsonify ("name", asset_names.second);
-        json += ",";
+        cxxtools::SerializationInfo& siJson = siCurrent.addMember("");
+
+        siJson.addMember("id") <<= asset.item.name;
+        siJson.addMember("name") <<= asset_names.second;
+
         std::map <std::string, OutletProperties> outlet_properties;
 
         for ( const auto &one_measurement : measurements )
@@ -335,51 +339,45 @@ std::vector<uint32_t> asset_ids;
 
             if( one_measurement.first == "status.ups" )
             {
-                json += utils::json::jsonify (one_measurement.first, shared::upsstatus_to_string(one_measurement.second));
+              siJson.addMember(one_measurement.first) <<= shared::upsstatus_to_string(one_measurement.second);
             }
             else if (one_measurement.first == "operatingStatus" )
             {
-                json += utils::json::jsonify (one_measurement.first, s_os2string(one_measurement.second));
+                siJson.addMember(one_measurement.first) <<= s_os2string(one_measurement.second);
             }
             else
             {
-                json += utils::json::jsonify (one_measurement.first, one_measurement.second);
+                siJson.addMember(one_measurement.first) <<= one_measurement.second;
             }
-            json += ",";
         }
 
         // BIOS-951 -- begin
         if (persist::is_epdu (asset.item.subtype_id)) {
-            json += "\n    \"outlets\" : {";
+            cxxtools::SerializationInfo& sioutlets = siJson.addMember("outlets");
             for (const auto &it : outlet_properties) {
-                json += "\n        \"" + it.first + "\" : " + it.second.toJson () + ",";
-            }
+                cxxtools::SerializationInfo& siOutletProperties = sioutlets.addMember(it.first);
 
-            if (json.back () == ',') {
-                json.back () = '\n';
-                json += "    }";
-            }
-            else
-                json += '}';    // outlet_properties is empty
+                siOutletProperties.addMember("realpower") <<= it.second.realpower;
+                siOutletProperties.addMember("current") <<= it.second.current;
+                siOutletProperties.addMember("voltage") <<= it.second.voltage;
 
-            json += "\n,";
+                if(it.second.status.empty())
+                {
+                  siOutletProperties.addMember("status").setNull();
+                }
+                else
+                {
+                  siOutletProperties.addMember("status") <<= it.second.status;
+                }
+            }
         }
         // BIOS-951 -- end
-
-        // replace last "," by "}"
-        json.back() = '}';
-        big_json += json;
-        big_json += ",";
     }
+    std::ostringstream outJsonStream(std::ios_base::out);
+    cxxtools::JsonSerializer serializer(outJsonStream);
+    serializer.serialize(si).finish();
+    big_json = outJsonStream.str().c_str();
 
-
-    // remove last ","
-    if (!big_json.empty())
-        big_json.pop_back();
 </%cpp>
-{
-   "current":[
     <$$ big_json $>
-   ]
-}
 %}

@@ -252,7 +252,7 @@ TEST_CASE("CSV map apostrof", "[csv]") {
     buf << "RACK-01,rack,GR-01,GR-02,\"just,my',dc\"\n";
     buf << "RACK-02,rack,GR-01,GR-02,\"just\tmy\nrack\"\n";
 
-    REQUIRE_THROWS ( shared::CsvMap cm = CsvMap_from_istream(buf));
+    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream(buf));
 }
 
 
@@ -264,7 +264,7 @@ TEST_CASE("CSV map apostrof2", "[csv]") {
     buf << "RACK'-01,rack,GR-01,GR-02,\"just,my',dc\"\n";
     buf << "RACK-02,rack,GR-01,GR-02,\"just\tmy\nrack\"\n";
 
-    REQUIRE_THROWS ( shared::CsvMap cm = CsvMap_from_istream(buf));
+    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream(buf));
 }
 
 
