@@ -30,7 +30,7 @@
 TEST_CASE ("unicode related stuff", "[helpers]") {
 
     static const std::vector <std::string> strings {
-        "Žluťou-čký kůň@",
+        "Žluťou-čký kůň@\x0f",
         "\u0441?sma__l \xf0\x90\x90\xa8@\ufe56",
         "abcd-ef%",
         "Žluťoučký kůň-"
