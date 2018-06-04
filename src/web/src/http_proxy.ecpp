@@ -66,8 +66,6 @@ UserInfo user;
             cxxtools::JsonDeserializer deserializer (input);
             deserializer.deserialize (si);
             si.getMember ("url") >>= proxy_line;
-            if (proxy_line.empty ())
-                throw std::runtime_error ("property 'proxy_line' has empty value");
         }
         catch (const std::exception& e) {
             log_debug ("Bad request document - invalid json: %s", e.what ());
@@ -75,14 +73,13 @@ UserInfo user;
         }
         log_debug ("proxy_line = '%s'", proxy_line.c_str ());
 
-        if (proxy_line.empty ())
-            http_die ("request-param-required", "url");
-
-        // Sanity check
-        // Append "http://" if not already present
-        static cxxtools::Regex url_scheme ("^http(.?)://(.*)");
-        if (!url_scheme.match (proxy_line))
-            proxy_line = "http://" + proxy_line;
+        if (!proxy_line.empty ()) {
+            // Sanity check
+            // Append "http://" if not already present
+            static cxxtools::Regex url_scheme ("^http(.?)://(.*)");
+            if (!url_scheme.match (proxy_line))
+                proxy_line = "http://" + proxy_line;
+        }
 
         std::ofstream out_file (path);
         if (!out_file) {
