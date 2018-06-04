@@ -683,7 +683,7 @@ dnl END of enabled attempts to search for cxxtools
 
 was_tntnet_check_lib_detected=no
 
-search_tntnet="no"
+search_tntnet="yes"
 
 AC_ARG_WITH([tntnet],
     [
@@ -700,6 +700,10 @@ AS_CASE([x"${with_tntnet}"],
     [xyes], [search_tntnet="yes"],
     [xno],  [search_tntnet="no"])
 
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_tntnet}" = xno],
+    [AC_MSG_WARN([Required dependency on tntnet was explicitly disabled during configuration by '--with-tntnet=no'; subsequent full build of fty-rest may fail])])
 
 AS_IF([test x"${search_tntnet}" = xyes], [
     # Archive previously detected and supplied flags
@@ -710,7 +714,6 @@ AS_IF([test x"${search_tntnet}" = xyes], [
     found_linkname=""
     PKG_CHECK_MODULES([tntnet], [tntnet >= 0.0.0],
     [
-        AC_DEFINE(HAVE_TNTNET, 1, [The optional tntnet library is to be used])
         PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE $tntnet_LIBS"
         was_tntnet_check_lib_detected=pkgcfg
         found_pkgconfig="tntnet"
@@ -737,7 +740,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for tntnet
             ],
         [xno], [
                 AC_SUBST([pkgconfig_name_tntnet],[tntnet])
-            AC_MSG_WARN([Cannot find pkg-config metadata for tntnet 0.0.0 or higher])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for tntnet 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for tntnet

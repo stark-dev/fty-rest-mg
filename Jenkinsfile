@@ -3,6 +3,8 @@
 
     Copyright (C) 2014 - 2018 Eaton
 
+    NOTE: This file has been customized, be careful during zproject regens
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or

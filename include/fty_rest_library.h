@@ -34,9 +34,7 @@
 #include <malamute.h>
 #include <libcidr.h>
 #include <cxxtools/allocator.h>
-#if defined (HAVE_TNTNET)
-#include <tntnet.h>
-#endif
+#include <tnt/tntnet.h>
 #include <tntdb.h>
 #if defined (HAVE_LIBMAGIC)
 #include <magic.h>

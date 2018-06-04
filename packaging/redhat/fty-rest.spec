@@ -1,5 +1,6 @@
 #
 #    fty-rest - Common core REST API for 42ity project
+#    NOTE: This file was customized after generation, be sure to keep it
 #
 #    Copyright (C) 2014 - 2018 Eaton
 #
@@ -83,6 +84,7 @@ This package contains shared library for fty-rest: common core rest api for 42it
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING
+#%{_libdir}/libfty_rest.so.*
 %{_libdir}/%{name}/libfty_rest.so.*
 
 %package devel
@@ -111,6 +113,7 @@ This package contains development files for fty-rest: common core rest api for 4
 %files devel
 %defattr(-,root,root)
 %{_includedir}/*
+#%{_libdir}/libfty_rest.so
 %{_libdir}/%{name}/libfty_rest.so
 %{_libdir}/pkgconfig/libfty_rest.pc
 %{_mandir}/man3/*
@@ -122,7 +125,7 @@ This package contains development files for fty-rest: common core rest api for 4
 
 %build
 sh autogen.sh
-%{configure} --enable-drafts=%{DRAFTS} --with-tntnet=yes --with-libmagic=yes
+%{configure} --enable-drafts=%{DRAFTS} --with-libmagic=yes
 make %{_smp_mflags}
 
 %install
@@ -137,8 +140,10 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %defattr(-,root,root)
 %doc README.md
 %doc COPYING
+#%{_bindir}/db/bios-csv
 ###%{_libexecdir}/%{name}/bios-csv
 %{_prefix}/libexec/fty-rest/bios-csv
+#%{_mandir}/man1/db/bios-csv*
 %{_mandir}/man1/bios-csv*
 %{_prefix}/libexec/%{name}/bios-passwd
 %{_prefix}/libexec/%{name}/testpass.sh

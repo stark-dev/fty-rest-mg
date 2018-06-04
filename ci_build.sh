@@ -10,6 +10,7 @@
 
 set -e
 
+# Note: Uncomment this to debug packaging (and before-script) install of SASL
 #dpkg -l | grep -i sasl || true
 #dpkg -S 'libsasl*.pc' || true
 #apt-cache search '.*sasl.*' || true
@@ -426,9 +427,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         $CI_TIME make -j4
         $CI_TIME make install
         cd "${BASE_PWD}"
-        CONFIG_OPTS+=("--with-tntnet=yes")
-    else
-        CONFIG_OPTS+=("--with-tntnet=yes")
     fi
 
     # Start of recipe for dependency: tntdb
@@ -543,22 +541,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         echo "and it was not installed as a package; this may cause the test to fail!" >&2
     fi
 
-    # Build and check this project; note that zprojects always have an autogen.sh
-    echo ""
-
-# Customized : make sure we have the *.pc files
-    echo "=== LIBCIDR.PC"
-    cat "${BUILD_PREFIX}"/lib/pkgconfig/libcidr.pc || true
-    echo ""
-    echo "=== LIBMAGIC.PC"
-    cat "${BUILD_PREFIX}"/lib/pkgconfig/libmagic.pc || true
-    echo ""
-    echo "=== TNTNET.PC"
-    cat "${BUILD_PREFIX}"/lib/pkgconfig/tntnet.pc || true
-    echo ""
-    echo "=== TNTDB.PC"
-    cat "${BUILD_PREFIX}"/lib/pkgconfig/tntdb.pc || true
-    echo ""
     # Start of recipe for dependency: log4cplus
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list log4cplus-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions log4cplus >/dev/null 2>&1) \
@@ -625,6 +607,21 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
 
     # Build and check this project; note that zprojects always have an autogen.sh
     echo ""
+
+# Customized : make sure we have the *.pc files
+    echo "=== LIBCIDR.PC"
+    cat "${BUILD_PREFIX}"/lib/pkgconfig/libcidr.pc || true
+    echo ""
+    echo "=== LIBMAGIC.PC"
+    cat "${BUILD_PREFIX}"/lib/pkgconfig/libmagic.pc || true
+    echo ""
+    echo "=== TNTNET.PC"
+    cat "${BUILD_PREFIX}"/lib/pkgconfig/tntnet.pc || true
+    echo ""
+    echo "=== TNTDB.PC"
+    cat "${BUILD_PREFIX}"/lib/pkgconfig/tntdb.pc || true
+    echo ""
+
     echo "`date`: INFO: Starting build of currently tested project with DRAFT APIs..."
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
@@ -640,7 +637,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     CONFIG_OPTS+=("${CONFIG_OPT_WERROR}")
     $CI_TIME ./autogen.sh 2> /dev/null
 
-# Customized: debug the used config opts
+    # Customized: debug the used config opts
     echo "+ ./configure" "${CONFIG_OPTS[@]}"
 
     $CI_TIME ./configure --enable-drafts=yes "${CONFIG_OPTS[@]}"
