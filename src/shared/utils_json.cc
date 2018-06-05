@@ -218,7 +218,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
   json += "\"power_devices_in_uri\": \"/api/v1/assets\?in=";
   json += (tmp.item.basic.name);
   json += "&sub_type=epdu,pdu,feed,genset,ups,sts,rackcontroller\",";
-  json += utils::json::jsonify("name", utils::json::escape(asset_ext_name)) + ",";
+  json += utils::json::jsonify("name", asset_ext_name) + ",";
   json += utils::json::jsonify("status", tmp.item.basic.status) + ",";
   json += utils::json::jsonify("priority", "P" + std::to_string(tmp.item.basic.priority)) + ",";
   json += utils::json::jsonify("type", tmp.item.basic.type_name) + ",";
@@ -228,7 +228,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
   {
     json += utils::json::jsonify("location_uri", "/api/v1/asset/" + parent_name) + ",";
     json += utils::json::jsonify("location_id", parent_name) + ",";
-    json += utils::json::jsonify("location", utils::json::escape(ext_parent_name)) + ",";
+    json += utils::json::jsonify("location", ext_parent_name) + ",";
   }
   else
   {
@@ -285,8 +285,8 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
           return json;
         }
         json += "{";
-        json += utils::json::jsonify("src_name", utils::json::escape(link_names.second)) + ",";
-        json += utils::json::jsonify("src_id", utils::json::escape(oneLink.src_name));
+        json += utils::json::jsonify("src_name", link_names.second) + ",";
+        json += utils::json::jsonify("src_id", oneLink.src_name);
 
         if (!oneLink.src_socket.empty())
         {
@@ -340,7 +340,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       ext_name = it_names.second;
       json += "{";
       json += utils::json::jsonify("id", std::get<1> (it));
-      json += "," + utils::json::jsonify("name", utils::json::escape(ext_name));
+      json += "," + utils::json::jsonify("name", ext_name);
       json += "," + utils::json::jsonify("type", std::get<2> (it));
       json += "," + utils::json::jsonify("sub_type", std::get<3> (it));
       json += "}";
@@ -444,8 +444,8 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
         continue;
       }
       // If we are here -> then this attribute is not special and should be returned as "ext"
-      std::string extKey = utils::json::escape(oneExt.first);
-      std::string extVal = utils::json::escape(oneExt.second.first);
+      std::string extKey = oneExt.first;
+      std::string extVal = oneExt.second.first;
 
       json += isExtCommaNeeded ? "," : "";
       json += "{";
@@ -545,7 +545,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       if (!oneOutlet.second.label.empty())
       {
 
-        std::string outletLabel = utils::json::escape(oneOutlet.second.label);
+        std::string outletLabel = oneOutlet.second.label;
 
         json += "{\"name\":\"label\",";
         json += utils::json::jsonify("value", outletLabel) + ",\"read_only\" : ";
