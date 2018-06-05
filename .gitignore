@@ -51,6 +51,8 @@ doc/*.7
 *.trs
 test-log.*
 make.output*
+# No dir prepended - match in all subdirs
+.dirstamp
 Makefile
 Makefile.in
 !builds/openwrt/Makefile
@@ -71,7 +73,6 @@ src/platform.h.in
 src/platform.h.in~
 src/stamp-h1
 src/test-suite.log
-src/.dirstamp
 .git_details
 .git_details-fty-rest
 .git_details.tmp
