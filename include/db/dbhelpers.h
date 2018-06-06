@@ -398,4 +398,13 @@ multi_insert_string(
         size_t tuple_len,
         size_t items_len);
 
+/**
+ *  \brief Get number of active power devices
+ *
+ *  \return  X - number of active power devices
+ */
+
+int
+get_active_power_devices ();
+
 #endif // SRC_DB_DBHELPERS_H_
