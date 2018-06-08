@@ -594,15 +594,22 @@ void get_licensing_limitation(LIMITATIONS_STRUCT &limitations)
         log_fatal ("client->recv (timeout = '30') returned NULL for LIMITATION_QUERY");
         bios_throw ("internal-error", "client->recv () returned NULL");
     }
+    // Pop REPLY first, then the actual value
     char *value = zmsg_popstr (reply);
+    zstr_free (&value);
+    // Now pop the actual value
+    value = zmsg_popstr (reply);
     char *item = zmsg_popstr (reply);
     char *category = zmsg_popstr (reply);
     while (value && item && category) {
+        log_debug("Licensing limitations: category/item/value => %s/%s/%s", category, item, value);
         if (streq (category, "POWER_NODES") && streq (item, "MAX_ACTIVE")) {
             limitations.max_active_power_devices = atoi(value);
+            log_debug("limitations.max_active_power_device set to %i", limitations.max_active_power_devices);
         }
         else if (streq (category, "CONFIGURABILITY") && streq (item, "GLOBAL")) {
             limitations.global_configurability = atoi(value);
+            log_debug("limitations.global_configurability set to %i", limitations.global_configurability);
         }
         zstr_free (&value);
         zstr_free (&item);
