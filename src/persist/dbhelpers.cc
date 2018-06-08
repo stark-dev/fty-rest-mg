@@ -265,3 +265,32 @@ std::string
     return s.str();
 }
 
+
+int
+get_active_power_devices ()
+{
+    int count = 0;
+    try
+    {
+        tntdb::Connection conn = tntdb::connectCached (url);
+        tntdb::Statement st = conn.prepareCached (
+            "SELECT COUNT(*) AS CNT FROM t_bios_asset_element "
+            "WHERE id_subtype IN "
+                "(SELECT id_asset_device_type FROM t_bios_asset_device_type "
+                "WHERE name IN ('epdu', 'sts', 'ups')) "
+            "AND status = 'active';"
+        );
+
+        tntdb::Row row = st.selectRow ();
+        zsys_debug ("[get_active_power_devices]: were selected %" PRIu32 " rows", 1);
+
+        row [0].get (count);
+    }
+    catch (const std::exception &e)
+    {
+        zsys_error ("exception caught %s when getting count of active power devices", e.what ());
+        return 0;
+    }
+
+    return count;
+}
