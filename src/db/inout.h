@@ -119,6 +119,7 @@ void
          bool generate_bom = true
         );
 
+void export_asset_json (std::ostream& out, std::set<std::string>* listElement = NULL);
 /*
  * \brief Identify id of row with rackcontroller-0
  * \return 0 on failure, all values in such column are empty (so other columns may match)

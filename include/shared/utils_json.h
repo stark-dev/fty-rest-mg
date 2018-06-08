@@ -27,6 +27,7 @@
 #define SRC_SHARED_WEB_JSON_H_
 
 #include <malamute.h>
+#include <fty_proto.h>
 
 //Return an alert with a json format
 std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert);
