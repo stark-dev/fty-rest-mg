@@ -39,6 +39,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "cleanup.h"
 #include "../asset_general.h"
 #include "db/assets.h"
+#include "db/dbhelpers.h"
 #include "../inout.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
@@ -47,6 +48,13 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 using namespace shared;
 
 namespace persist {
+typedef struct _LIMITATIONS_STRUCT
+{
+    int max_active_power_devices;
+    int global_configurability;
+    
+} LIMITATIONS_STRUCT;
+
 int
     get_priority
         (const std::string& s)
@@ -553,6 +561,72 @@ std::map <std::string, std::string>sanitize_row_ext_names (
     return result;
 }
 
+
+/*
+ * \brief Request licensing limitation
+ * TODO if there will be more limitations, fix return value to struct instead of int
+ *
+ */
+
+void get_licensing_limitation(LIMITATIONS_STRUCT &limitations)
+{
+    // default values
+    limitations.max_active_power_devices = -1;
+    limitations.global_configurability = 0;
+    // query values
+    MlmClientPool::Ptr client_ptr = mlm_pool.get ();
+    zmsg_t *request = zmsg_new();
+    zmsg_addstr (request, "LIMITATION_QUERY");
+    zuuid_t *zuuid = zuuid_new ();
+    const char *zuuid_str = zuuid_str_canonical (zuuid);
+    zmsg_addstr (request, zuuid_str);
+    zmsg_addstr (request, "*");
+    zmsg_addstr (request, "*");
+    int rv = client_ptr->sendto ("etn-licensing", "LIMITATION_QUERY", 1000, &request);
+    if (rv == -1) {
+        zuuid_destroy (&zuuid);
+        log_fatal ("Cannot send message to etn-licensing");
+        bios_throw ("internal-error", "mlm_client_sendto failed.");
+    }
+    zmsg_t *reply = client_ptr->recv (zuuid_str, 30);
+    zuuid_destroy (&zuuid);
+    if (!reply) {
+        log_fatal ("client->recv (timeout = '30') returned NULL for LIMITATION_QUERY");
+        bios_throw ("internal-error", "client->recv () returned NULL");
+    }
+    // Pop REPLY first, then the actual value
+    char *value = zmsg_popstr (reply);
+    zstr_free (&value);
+    // Now pop the actual value
+    value = zmsg_popstr (reply);
+    char *item = zmsg_popstr (reply);
+    char *category = zmsg_popstr (reply);
+    while (value && item && category) {
+        log_debug("Licensing limitations: category/item/value => %s/%s/%s", category, item, value);
+        if (streq (category, "POWER_NODES") && streq (item, "MAX_ACTIVE")) {
+            limitations.max_active_power_devices = atoi(value);
+            log_debug("limitations.max_active_power_device set to %i", limitations.max_active_power_devices);
+        }
+        else if (streq (category, "CONFIGURABILITY") && streq (item, "GLOBAL")) {
+            limitations.global_configurability = atoi(value);
+            log_debug("limitations.global_configurability set to %i", limitations.global_configurability);
+        }
+        zstr_free (&value);
+        zstr_free (&item);
+        zstr_free (&category);
+        value = zmsg_popstr (reply);
+        item = zmsg_popstr (reply);
+        category = zmsg_popstr (reply);
+    }
+    if (NULL != value)
+        zstr_free (&value);
+    if (NULL != item)
+        zstr_free (&item);
+    if (NULL != category)
+        zstr_free (&category);
+}
+
+
 /*
  * \brief Processes a single row from csv file
  *
@@ -573,7 +647,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
          const std::map<std::string,int> &SUBTYPES,
          std::set<a_elmnt_id_t> &ids,
          bool sanitize,
-         size_t rc_0
+         size_t rc_0,
+         LIMITATIONS_STRUCT limitations
          )
 {
     LOG_START;
@@ -581,6 +656,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     log_debug ("################ Row number is %zu", row_i);
     static const std::set<std::string> STATUSES = \
         {"active", "nonactive", "spare", "retired"};
+
+    if (0 == limitations.global_configurability) {
+        bios_throw("action-forbidden", "Asset handling", "Licensing global_configurability limit hit");
+    }
 
     // get location, powersource etc as name from ext.name
     auto sanitizedAssetNames = sanitize_row_ext_names (cm, row_i, sanitize);
@@ -716,6 +795,16 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     auto subtype_id = local_SUBTYPES.find(subtype)->second;
     unused_columns.erase("sub_type");
+
+    // since we have all the data about the asset, licensing check could be done now
+    if (-1 != limitations.max_active_power_devices && "active" == status && TYPES.find("device")->second == type_id) {
+        if ((SUBTYPES.find("epdu")->second == subtype_id
+                || SUBTYPES.find("sts")->second == subtype_id
+                || SUBTYPES.find("ups")->second == subtype_id
+                ) && get_active_power_devices() + 1 > limitations.max_active_power_devices) {
+            bios_throw("action-forbidden", "Asset handling", "Licensing maximum amount of active power devices limit reached");
+        }
+    }
 
     // now we have read all basic information about element
     // if id is set, then it is right time to check what is going on in DB
@@ -1262,7 +1351,9 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
         zsys_debug("RC-0 not detected");
         rc_0 = -1;
     }
-    auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, true, rc_0);
+    LIMITATIONS_STRUCT limitations;
+    get_licensing_limitation(limitations);
+    auto ret = process_row(conn, cm, 1, TYPES, SUBTYPES, ids, true, rc_0, limitations);
     LOG_END;
     return ret;
 }
@@ -1314,6 +1405,9 @@ void
     // if there are rackcontroller in the import, promote one of it to rackcontroller-0 if not done already
     MlmClient client;
     int rc0 = promote_rc0(&client, cm, touch_fn);
+    // get licensing limitation, if any
+    LIMITATIONS_STRUCT limitations;
+    get_licensing_limitation(limitations);
 
     std::set<size_t> processedRows;
     bool somethingProcessed;
@@ -1323,7 +1417,7 @@ void
         for (size_t row_i = 1; row_i != cm.rows(); ++row_i) {
             if (processedRows.find (row_i) != processedRows.end ()) continue;
             try{
-                auto ret = process_row(conn, cm, row_i, TYPES, SUBTYPES, ids, true, rc0);
+                auto ret = process_row(conn, cm, row_i, TYPES, SUBTYPES, ids, true, rc0, limitations);
                 touch_fn ();
                 okRows.push_back (ret);
                 log_info ("row %zu was imported successfully", row_i);
