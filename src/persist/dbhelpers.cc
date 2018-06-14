@@ -277,7 +277,7 @@ get_active_power_devices ()
             "SELECT COUNT(*) AS CNT FROM t_bios_asset_element "
             "WHERE id_subtype IN "
                 "(SELECT id_asset_device_type FROM t_bios_asset_device_type "
-                "WHERE name IN ('epdu', 'sts', 'ups')) "
+                "WHERE name IN ('epdu', 'sts', 'ups', 'pdu', 'genset')) "
             "AND status = 'active';"
         );
 
