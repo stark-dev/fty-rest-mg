@@ -35,6 +35,7 @@
 #include "shared/utilspp.h"
 #include "shared/asset_types.h"
 #include "db/assets.h"
+#include "src/db/inout.h"
 
 class Asset {
 public:
@@ -42,6 +43,7 @@ public:
           const std::string &t, const std::string &s)
         : id(i), name(n), type(t), sub_type(s)
     {}
+    std::string getId() const { return id; }
 private:
     std::string id, name, type, sub_type;
     friend void operator<<=(cxxtools::SerializationInfo &si, const Asset &asset);
@@ -117,6 +119,7 @@ bool database_ready;
     a_elmnt_id_t checked_id = 0;
     std::string without = "";
     std::string status = "";
+    std::string details = "";
     bool in_parameter_present = true;
 
     // ##################################################
@@ -131,16 +134,11 @@ bool database_ready;
         std::string sub_type = qparam.param("sub_type");
         without = qparam.param("without");
         status = qparam.param("status");
+        details = qparam.param("details");
 
         // check if mandatory parameters are present
         if ( in.empty() ) {
             in_parameter_present = false;
-        }
-        if ( type.empty() && sub_type.empty() ) {
-            http_die ("request-param-required", "type' or 'sub_type");
-        }
-        if ( !type.empty() && !sub_type.empty() ) {
-            http_die ("request-param-bad", "type and sub_type", "both", "only one of them");
         }
 
         // checked subtypes/types
@@ -154,7 +152,8 @@ bool database_ready;
                 }
                 checked_subtypes.push_back(sub_type_id);
             }
-        } else {
+        }
+        if ( !type.empty() ) {
             std::vector<std::string> items;
             cxxtools::split(',', type, std::back_inserter(items));
             for( const auto &it : items ) {
@@ -192,10 +191,19 @@ bool database_ready;
     } catch (std::exception &e) {
         http_die ("internal-error", e.what());
     }
-    cxxtools::JsonSerializer serializer(reply.out ());
-    serializer.inputUtf8(true);
-    serializer.beautify(true);
-    serializer.serialize(assets).finish();
+
+    if (!details.empty() && details == "true") {
+      std::set<std::string> listElements;
+      for(auto const& asset: assets) {
+        listElements.insert(asset.getId());
+      }
+      persist::export_asset_json (reply.out (), &listElements);
+    } else {
+      cxxtools::JsonSerializer serializer(reply.out ());
+      serializer.inputUtf8(true);
+      serializer.beautify(true);
+      serializer.serialize(assets).finish();
+    }
 
     return HTTP_OK;
 </%cpp>
