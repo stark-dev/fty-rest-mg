@@ -33,13 +33,15 @@ void
     send_configure (
         const std::vector <std::pair
             <db_a_elmnt_t, persist::asset_operation>> &rows,
-        const std::string &agent_name);
+        const std::string &agent_name,
+        bool tag_no_not_really = false);
 
 void
     send_configure (
         const db_a_elmnt_t row,
         persist::asset_operation action_type,
-        const std::string &agent_name);
+        const std::string &agent_name,
+        bool tag_no_not_really = false);
 
 void
     send_configure (
