@@ -41,7 +41,7 @@ s_map2zhash (const std::map<std::string, std::string>& m)
 void
     send_configure (
         const std::vector <std::pair<db_a_elmnt_t,persist::asset_operation>> &rows,
-        const std::string &agent_name)
+        const std::string &agent_name, bool tag_no_not_really)
 {
     mlm_client_t *client = mlm_client_new();
 
@@ -81,6 +81,11 @@ void
         zhash_insert (aux, "subtype", (void*) persist::subtypeid_to_subtype (oneRow.first.subtype_id).c_str());
         zhash_insert (aux, "parent", (void*) s_parent.c_str ());
         zhash_insert (aux, "status", (void*) oneRow.first.status.c_str());
+        if (tag_no_not_really) {
+            // FIXME: Inform covertly the SSE that this is not a real DELETE
+            // Remove hack once all agents properly handle the status attribute
+            zhash_insert (aux, "_no_not_really", (void*) "don't delete me");
+        }
 
         // this is a bit hack, but we now that our topology ends with datacenter (hopefully)
         std::string dc_name;
@@ -166,9 +171,10 @@ void
     send_configure (
         db_a_elmnt_t row,
         persist::asset_operation action_type,
-        const std::string &agent_name)
+        const std::string &agent_name,
+        bool tag_no_not_really)
 {
-    send_configure(std::vector<std::pair<db_a_elmnt_t,persist::asset_operation>>{std::make_pair(row, action_type)}, agent_name);
+    send_configure(std::vector<std::pair<db_a_elmnt_t,persist::asset_operation>>{std::make_pair(row, action_type)}, agent_name, tag_no_not_really);
 }
 
 void
