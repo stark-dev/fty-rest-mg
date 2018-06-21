@@ -228,8 +228,8 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
 
   std::string nameElement = std::string(fty_proto_name(asset));
   //Check operation 
-  //if delete send json
-  if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_DELETE))
+  //if delete for real send json
+  if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_DELETE) && !zhash_lookup(fty_proto_aux(asset), "_no_not_really"))
   {
     log_debug("Sse get an delete message");
     if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
@@ -253,12 +253,16 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     }
     json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
   }
+  // FIXME: fty-rest sends a DELETE when setting an asset to nonactive, hack it back to UPDATE
+  // Remove hack once all agents properly handle the status attribute
   else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
-          || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
+          || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE)
+          || (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_DELETE) && zhash_lookup(fty_proto_aux(asset), "_no_not_really")))
   {
     log_debug("Sse get an update or create message");
 
-    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
+    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+       || (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_DELETE) && zhash_lookup(fty_proto_aux(asset), "_no_not_really")))
     {
       //if update
       //Check if asset is in asset element
