@@ -213,6 +213,16 @@ std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
   std::string jsonPayload = getJsonAlert(_connection, alert);
   if (!jsonPayload.empty())
   {
+    /*
+     * Check if the alert has been published with the same exact state
+     * previously. The SSE doesn't have a TTL concept and thus doesn't need to
+     * republish, since this will juggle the alerts in the UI because of
+     * changing timestamps.
+     */
+    if (!shouldPublishAlert(alert)) {
+      return "";
+    }
+
     const char * rule_name = fty_proto_rule(alert);
     json += "data:{\"topic\":\"alarm/" + std::string(rule_name) + "\",\"payload\":";
     json += jsonPayload;
@@ -374,4 +384,30 @@ bool Sse::isAssetInDatacenter(fty_proto_t *asset)
   }
   log_debug("Sse : Asset %s found",found ? "":"not");
   return found;
+}
+
+bool Sse::shouldPublishAlert(fty_proto_t *alert)
+{
+  bool shouldPublish = true;
+  const char *alertRule = fty_proto_rule(alert);
+  AlertState alertState(fty_proto_state(alert), fty_proto_severity(alert));
+  auto alertStateIt = _alertStates.find(alertRule);
+
+  if (alertStateIt != _alertStates.end())
+  {
+    if (alertStateIt->second == alertState)
+    {
+      shouldPublish = false;
+    }
+    else
+    {
+      alertStateIt->second = alertState;
+    }
+  }
+  else
+  {
+    _alertStates.emplace(alertRule, alertState);
+  }
+
+  return shouldPublish;
 }

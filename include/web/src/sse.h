@@ -46,18 +46,36 @@
 class Sse
 {
 private:
+  struct AlertState
+  {
+    AlertState(std::string state, std::string severity)
+      : m_state(state), m_severity(severity)
+    {
+    }
+
+    bool operator==(const AlertState &a)
+    {
+      return m_state == a.m_state && m_severity == a.m_severity;
+    }
+
+    std::string m_state;
+    std::string m_severity;
+  };
+
   std::string _token;
   std::string _json;
   std::string _datacenter;
   tntdb::Connection _connection;
   std::map<std::string, int> _assetsOfDatacenter;
   std::map<std::string, int> _assetsWithNoLocation;
+  std::map<std::string, AlertState> _alertStates;
   uint32_t _datacenter_id;
   mlm_client_t *_clientMlm = NULL;
   zsock_t *_pipe = NULL;
   zpoller_t *_poller = NULL;
   
   bool isAssetInDatacenter(fty_proto_t *asset);
+  bool shouldPublishAlert(fty_proto_t *alert);
   
 public:
   //Constructor/destructor
