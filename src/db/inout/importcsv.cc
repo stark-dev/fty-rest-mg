@@ -804,7 +804,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     if (-1 != limitations.max_active_power_devices && "active" == status && TYPES.find("device")->second == type_id) {
         std::string db_status = get_status_from_db (iname);
         // limit applies only to assets that are attempted to be activated, but should be disabled
-        if (db_status == "nonactive") {
+        if (db_status == "nonactive" || db_status == "unknown") {
             if ((SUBTYPES.find("epdu")->second == subtype_id
                     || SUBTYPES.find("sts")->second == subtype_id
                     || SUBTYPES.find("ups")->second == subtype_id
