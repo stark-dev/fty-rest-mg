@@ -805,7 +805,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         std::string db_status = get_status_from_db (iname);
         // limit applies only to assets that are attempted to be activated, but are disabled in database
         // or to new assets, also may trigger in case of DB failure, but that's fine
-        if (db_status != "nonactive") {
+        if (db_status != "active") {
             if ((SUBTYPES.find("epdu")->second == subtype_id
                     || SUBTYPES.find("sts")->second == subtype_id
                     || SUBTYPES.find("ups")->second == subtype_id
