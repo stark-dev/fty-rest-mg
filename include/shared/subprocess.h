@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014 Eaton
+Copyright (C) 2014-2018 Eaton
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -145,6 +145,12 @@ class SubProcess {
         //! \brief terminate the subprocess with SIGKILL/9
         //
         //  This calls wait() to ensure we are not creating zombies
+        //
+        //  @return \see kill
+        int hardkill();
+
+        //! \brief gracefully terminate the subprocess with SIGTERM/15,
+        //   check if died quickly, hardkill() otherwise
         //
         //  @return \see kill
         int terminate();
