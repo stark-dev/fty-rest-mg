@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014 Eaton
+Copyright (C) 2014-2018 Eaton
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -82,19 +82,8 @@ SubProcess::SubProcess(Argv cxx_argv, int flags) :
 SubProcess::~SubProcess() {
     int _saved_errno = errno;
 
-    // update a state
-    poll();
-    // Graceful shutdown
-    if (isRunning())
-        kill(SIGTERM);
-    for (int i = 0; i<20 && isRunning(); i++) {
-        usleep(100);
-        poll(); // update a state after awhile
-    }
-    if (isRunning()) {
-        // wait is already inside terminate
-        terminate();
-    }
+    // poll, SIGTERM, wait, SIGKILL is already inside terminate
+    terminate();
 
     // close pipes
     close_forget(_inpair[0]);
@@ -226,9 +215,27 @@ int SubProcess::kill(int signal) {
     return ret;
 }
 
-int SubProcess::terminate() {
+int SubProcess::hardkill() {
     auto ret = kill(SIGKILL);
-    wait();
+    wait(); // avoid zombies
+    return ret;
+}
+
+int SubProcess::terminate() {
+    // update state
+    poll();
+
+    // Graceful shutdown
+    auto ret = kill(SIGTERM);
+
+    for (int i = 0; i<20 && isRunning(); i++) {
+        usleep(100);
+        poll(); // update state after a while
+    }
+    if (isRunning()) {
+        // wait is already in hardkill
+        ret = hardkill();
+    }
     return ret;
 }
 
@@ -459,7 +466,7 @@ static int s_output(SubProcess& p, std::string& o, std::string& e, uint64_t time
         r = p.poll ();
         if (p.isRunning ()) {
             zclock_sleep (2000);
-            p.terminate ();
+            p.hardkill ();
             r = p.poll ();
         }
     }
@@ -497,7 +504,7 @@ static int s_output2(SubProcess& p, std::string& o, uint64_t timeout, size_t tim
         r = p.poll ();
         if (p.isRunning ()) {
             zclock_sleep (2000);
-            p.terminate ();
+            p.hardkill ();
             r = p.poll ();
         }
     }
@@ -542,8 +549,8 @@ simple_output (const Argv& args, std::string& o, std::string& e)
         tme++;
     }
     if (p.isRunning ()) {
-        p.terminate ();
-        ret = p.wait ();
+        // graceful sigterm, delay, maybe sigkill+wait
+        ret = p.terminate ();
     }
     else
         ret = p.poll ();
