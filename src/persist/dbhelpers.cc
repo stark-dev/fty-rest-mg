@@ -296,7 +296,7 @@ get_active_power_devices ()
 }
 
 
-std::string get_status_from_db (std::string element_name) {
+std::string get_status_from_db (std::string &element_name) {
     tntdb::Connection conn;
     try {
         conn = tntdb::connectCached (url);
