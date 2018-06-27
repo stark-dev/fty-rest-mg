@@ -416,6 +416,6 @@ get_active_power_devices ();
  *          "unknown" - in case of failure
  */
 std::string get_status_from_db (
-        std::string element_name);
+        std::string &element_name);
 
 #endif // SRC_DB_DBHELPERS_H_
