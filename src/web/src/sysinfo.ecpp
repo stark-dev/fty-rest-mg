@@ -391,6 +391,8 @@ sysinfo_detail (
         std::string dpkg_error;
         int rv_dpkg = -1;
         bool dpkg_error_printed = false;
+        int skipped_dpkg_lines = -1; // count lines that we could not parse, but expected to
+
         {
             log_debug ("shared::output (args = '{\"dpkg\", \"--list\"}') starting");
             rv_dpkg = shared::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
@@ -427,8 +429,10 @@ sysinfo_detail (
                 proceed_loop = false;
             }
 
+            output += ",\t\"packages\" : [\n";
             if (proceed_loop) {
-                output += ",\t\"packages\" : [\n";
+                skipped_dpkg_lines = 0;
+
                 // Strip first DPKG__LIST__STRIP_HEADER lines
                 for (int i = 0; i < DPKG__LIST__STRIP_HEADER; i++) {
                     tokens.erase (tokens.begin ());
@@ -476,6 +480,7 @@ sysinfo_detail (
                             dpkg_error_printed = true;
                         }
                         proceed_line = false;
+                        skipped_dpkg_lines++;
                     }
 
                     if (proceed_line) {
@@ -504,9 +509,42 @@ sysinfo_detail (
                         output += "\t}\n"; // single package entry finished
                     } // if (proceed_line)
                 } // for (item:tokens)
-
-                output += "\t]\n"; // "packages" closing bracket
             } // if (proceed_loop)
+
+
+            if (!dpkg_error_printed
+//               && some_config_flag // FIXME?
+            ) {
+                if (first) {
+                    first = false;
+                    output += "\t{\n";
+                }
+                else {
+                    output += ",\t{\n";
+                }
+
+                output += "\t\t\"dpkg-errored\": true\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-return-code", rv_dpkg);
+                output += "\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-stdout", dpkg_output);
+                output += "\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-stderr", dpkg_error);
+                output += "\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-skipped-lines", skipped_dpkg_lines);
+                output += "\n";
+
+                output += "\t}\n"; // single package entry finished
+            } // flush details of dpkg run which failed into JSON, so we can see it in CI
+
+            output += "\t]\n"; // "packages" closing bracket
         } // end of 'packages' json listing
 
         try {
