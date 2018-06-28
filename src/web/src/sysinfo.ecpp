@@ -430,6 +430,7 @@ sysinfo_detail (
             }
 
             output += ",\t\"packages\" : [\n";
+            bool first = true;
             if (proceed_loop) {
                 skipped_dpkg_lines = 0;
 
@@ -438,7 +439,6 @@ sysinfo_detail (
                     tokens.erase (tokens.begin ());
                 }
 
-                bool first = true;
                 for (const auto& item : tokens) {
                     request.touch(); // Reset the deadman timer while in a loop WTF?!
                     if (item.empty ())
