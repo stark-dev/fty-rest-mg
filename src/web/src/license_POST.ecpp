@@ -117,7 +117,46 @@ bool database_ready;
                 http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
             // Negative return means killed by signal, typically by our
             // subprocess timeout handling - fall through to try using DB
-            // TODO: Check the status of fty-db-init and fty-db-engine units?
+
+            {
+                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-engine"};
+                // This should get our "systemctl" wrapper via PATH
+                std::string proc_out, proc_err;
+
+                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+
+                if (rv != 0) {
+                    std::string message;
+                    message = "`sudo systemctl list-ipm-units --active fty-db-engine`"
+                        " failed (service is not currently active). Return value = '"
+                        + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
+                    log_error ("%s", message.c_str ());
+                    http_die ("internal-error", "Database software service is not running");
+                } else {
+                    // Not quite an error, but we want this message at the same logging level
+                    log_error ("NOTE: Although start-db-services script was killed, the fty-db-engine service is okay");
+                }
+            }
+
+            {
+                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-init"};
+                // This should get our "systemctl" wrapper via PATH
+                std::string proc_out, proc_err;
+
+                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+
+                if (rv != 0) {
+                    std::string message;
+                    message = "`sudo systemctl list-ipm-units --active fty-db-init`"
+                        " failed (service is not currently active). Return value = '"
+                        + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
+                    log_error ("%s", message.c_str ());
+                    http_die ("internal-error", "Database schema was not installed or verified successfully");
+                } else {
+                    // Not quite an error, but we want this message at the same logging level
+                    log_error ("NOTE: Although start-db-services script was killed, the fty-db-init service is okay");
+                }
+            }
         }
 
         // once done, check environment files for accessing the database
