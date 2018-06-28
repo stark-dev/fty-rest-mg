@@ -124,11 +124,14 @@ bool database_ready;
         log_info("db services were started, re-reading password ...");
         int rv_dbcred = dbreadcredentials();
         if (!rv_dbcred) {
+            std::string message;
             if (rv_svc != 0) {
-                http_die ("internal-error", "Database password file is missing AND failed to start start-db-services. Consult system logs");
+                message = "Database password file is missing AND failed to start start-db-services. Consult system logs";
             } else {
-                http_die ("internal-error", "Database password file is missing");
+                message = "Database password file is missing";
             }
+            log_error ("%s", message.c_str ());
+            http_die ("internal-error", message.c_str());
         }
     } else {
         // enforce reload of credentials, e.g. if timely service startup
