@@ -522,7 +522,7 @@ sysinfo_detail (
                 output += "\t\t\"dpkg-errored\": true\n";
 
                 output += ",\t\t";
-                output += utils::json::jsonify ("dpkg-return-code", rv_dpkg);
+                output += utils::json::jsonify ("dpkg-return-code", std::to_string(rv_dpkg) );
                 output += "\n";
 
                 output += ",\t\t";
@@ -534,7 +534,7 @@ sysinfo_detail (
                 output += "\n";
 
                 output += ",\t\t";
-                output += utils::json::jsonify ("dpkg-skipped-lines", skipped_dpkg_lines);
+                output += utils::json::jsonify ("dpkg-skipped-lines", std::to_string(skipped_dpkg_lines) );
                 output += "\n";
 
                 output += "\t}\n"; // single package entry finished
