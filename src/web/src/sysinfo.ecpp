@@ -396,7 +396,7 @@ sysinfo_detail (
         {
             log_debug ("shared::output (args = '{\"dpkg\", \"--list\"}') starting");
             rv_dpkg = shared::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
-            log_debug ("shared::output () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("shared::output () finished with return value == '%" PRIi32"'", rv_dpkg);
             if (rv_dpkg != 0) {
                 log_error (
                     "shared::output (args = '{\"dpkg\", \"--list\"}') failed; "
@@ -445,7 +445,6 @@ sysinfo_detail (
                         continue;
 
                     std::string pkgname, version, commit;
-                    bool proceed_line = true;
                     try {
                         std::vector <std::string> line_tokens;
                         cxxtools::split (cxxtools::Regex("[ \t]+"), item, std::back_inserter (line_tokens));
@@ -465,25 +464,7 @@ sysinfo_detail (
                         else {
                             version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION);
                         }
-                    } catch (const std::exception& e) {
-                        log_error (
-                            "Could not split a line from the output of dpkg "
-                            "because the following error happened: '%s'", e.what ());
-                        log_error (
-                            "Failed line: '%s'", std::string(item).c_str() );
-                        if (!dpkg_error_printed) {
-                            log_error (
-                                "shared::output (args = '{\"dpkg\", \"--list\"}') "
-                                "earlier returned code == '%" PRIi32"'\n"
-                                "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                                rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
-                            dpkg_error_printed = true;
-                        }
-                        proceed_line = false;
-                        skipped_dpkg_lines++;
-                    }
 
-                    if (proceed_line) {
                         if (first) {
                             first = false;
                             output += "\t{\n";
@@ -507,7 +488,22 @@ sysinfo_detail (
                         }
 
                         output += "\t}\n"; // single package entry finished
-                    } // if (proceed_line)
+                    } catch (const std::exception& e) {
+                        log_error (
+                            "Could not split a line from the output of dpkg "
+                            "because the following error happened: '%s'", e.what ());
+                        log_error (
+                            "Failed line: '%s'", std::string(item).c_str() );
+                        if (!dpkg_error_printed) {
+                            log_error (
+                                "shared::output (args = '{\"dpkg\", \"--list\"}') "
+                                "earlier returned code == '%" PRIi32"'\n"
+                                "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                                rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                            dpkg_error_printed = true;
+                        }
+                        skipped_dpkg_lines++;
+                    }
                 } // for (item:tokens)
             } // if (proceed_loop)
 
