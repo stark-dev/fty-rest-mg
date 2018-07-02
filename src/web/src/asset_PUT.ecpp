@@ -140,7 +140,7 @@ bool database_ready;
         // we don't want to monitor it
         try {
             if (send_inactive) {
-                send_configure (row.first, persist::asset_operation::DELETE, agent_name, true);
+                send_configure (row.first, persist::asset_operation::DELETE, agent_name);
                 return HTTP_OK;
             }
         }
