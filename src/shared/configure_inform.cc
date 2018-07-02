@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2014-2018 Eaton
+Copyright (C) 2014-2015 Eaton
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ void
     tntdb::Connection conn = tntdb::connectCached (url);
     for ( const  auto &oneRow : rows ) {
 
-        //        if (oneRow.first.status == "active") {
         std::string s_priority = std::to_string (oneRow.first.priority);
         std::string s_parent = std::to_string (oneRow.first.parent_id);
         std::string s_asset_name = oneRow.first.name;
@@ -111,52 +110,51 @@ void
 
         zhash_t *ext = s_map2zhash (oneRow.first.ext);
 
-        if (oneRow.first.status == "active") {
-            zmsg_t *msg = fty_proto_encode_asset (
+        zmsg_t *msg = fty_proto_encode_asset (
                 aux,
                 oneRow.first.name.c_str(),
                 operation2str (oneRow.second).c_str (),
                 ext);
 
-            r = mlm_client_send (client, subject.c_str (), &msg);
-            if ( r != 0 ) {
-                mlm_client_destroy (&client);
-                throw std::runtime_error("mlm_client_send () failed.");
-            }
+        r = mlm_client_send (client, subject.c_str (), &msg);
+        if ( r != 0 ) {
+            mlm_client_destroy (&client);
+            throw std::runtime_error("mlm_client_send () failed.");
+        }
 
-            zhash_destroy (&aux);
-            zhash_destroy (&ext);
+        zhash_destroy (&aux);
+        zhash_destroy (&ext);
 
-            //data for uptime
-            if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
-                zhash_t *aux = zhash_new ();
-                bool rv = insert_upses_to_aux (aux, oneRow.first.name);
-                if (!rv)
-                    throw std::runtime_error("database error, cannot find UPSs");
-                zhash_update (aux, "type", (void*) "datacenter");
-                zmsg_t *msg = fty_proto_encode_asset (
+        // ask fty-asset to republish so we would get UUID
+        if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) ||
+            streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
+            zmsg_t *republish = zmsg_new ();
+            zmsg_addstr (republish, s_asset_name.c_str ());
+            mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
+        }
+
+        //data for uptime
+        if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
+            zhash_t *aux = zhash_new ();
+            bool rv = insert_upses_to_aux (aux, oneRow.first.name);
+            if (!rv)
+                throw std::runtime_error("database error, cannot find UPSs");
+            zhash_update (aux, "type", (void*) "datacenter");
+            zmsg_t *msg = fty_proto_encode_asset (
                     aux,
                     dc_name.c_str (),
                     "inventory",
                     NULL);
-                std::string subject = "datacenter.unknown@";
-                subject.append (dc_name);
-                r = mlm_client_send (client, subject.c_str (), &msg);
-                zhash_destroy (&aux);
-                if ( r != 0 ) {
-                    mlm_client_destroy (&client);
-                    throw std::runtime_error("mlm_client_send () failed.");
-                }
+            std::string subject = "datacenter.unknown@";
+            subject.append (dc_name);
+            r = mlm_client_send (client, subject.c_str (), &msg);
+            zhash_destroy (&aux);
+            if ( r != 0 ) {
+                mlm_client_destroy (&client);
+                throw std::runtime_error("mlm_client_send () failed.");
             }
-            if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) ||
-                streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
-                zmsg_t *republish = zmsg_new ();
-                zmsg_addstr (republish, s_asset_name.c_str ());
-                mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
-            }
-
-        } // if status-active
-    } // for row:rows
+        }
+    }
 
     zclock_sleep (500); // ensure that everything was send before we destroy the client
     mlm_client_destroy (&client);
