@@ -15,7 +15,12 @@
     <target name = "jenkins" >
         <option name = "agent_label" value = "devel-image &amp;&amp; x86_64" />
         <option name = "triggers_pollSCM" value = "H/2 * * * *" />
-        <option name = "use_test_timeout" value = "60" />
+
+        <!-- Alas, the fty-rest builds are so big, they sometimes
+          queue up (e.g. "merge" rebuilds of several open PRs) and
+          time out. So bigger timeout helps pass those builds and
+          not just waste lots of time. -->
+        <option name = "use_test_timeout" value = "240" />
         <option name = "test_cppcheck" value = "1" />
         <option name = "test_check" value = "0" />
         <option name = "test_memcheck" value = "0" />
