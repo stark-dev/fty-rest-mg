@@ -41,7 +41,7 @@ s_map2zhash (const std::map<std::string, std::string>& m)
 void
     send_configure (
         const std::vector <std::pair<db_a_elmnt_t,persist::asset_operation>> &rows,
-        const std::string &agent_name, bool tag_no_not_really)
+        const std::string &agent_name)
 {
     mlm_client_t *client = mlm_client_new();
 
@@ -60,7 +60,6 @@ void
         throw std::runtime_error(" mlm_client_set_producer () failed.");
     }
     tntdb::Connection conn = tntdb::connectCached (url);
-
     for ( const  auto &oneRow : rows ) {
         std::string s_priority = std::to_string (oneRow.first.priority);
         std::string s_parent = std::to_string (oneRow.first.parent_id);
@@ -81,11 +80,6 @@ void
         zhash_insert (aux, "subtype", (void*) persist::subtypeid_to_subtype (oneRow.first.subtype_id).c_str());
         zhash_insert (aux, "parent", (void*) s_parent.c_str ());
         zhash_insert (aux, "status", (void*) oneRow.first.status.c_str());
-        if (tag_no_not_really) {
-            // FIXME: Inform covertly the SSE that this is not a real DELETE
-            // Remove hack once all agents properly handle the status attribute
-            zhash_insert (aux, "_no_not_really", (void*) "don't delete me");
-        }
 
         // this is a bit hack, but we now that our topology ends with datacenter (hopefully)
         std::string dc_name;
@@ -106,6 +100,7 @@ void
                 }
             }
         };
+
         int r = persist::select_asset_element_super_parent (conn, oneRow.first.id, cb);
         if (r == -1) {
             zhash_destroy (&aux);
@@ -115,54 +110,52 @@ void
 
         zhash_t *ext = s_map2zhash (oneRow.first.ext);
 
-        if (oneRow.first.status == "active" ||
-            oneRow.second == persist::asset_operation::DELETE) {
-            zmsg_t *msg = fty_proto_encode_asset (
+        zmsg_t *msg = fty_proto_encode_asset (
                 aux,
                 oneRow.first.name.c_str(),
                 operation2str (oneRow.second).c_str (),
                 ext);
 
-            r = mlm_client_send (client, subject.c_str (), &msg);
-            if ( r != 0 ) {
-                mlm_client_destroy (&client);
-                throw std::runtime_error ("mlm_client_send () failed.");
-            }
+        r = mlm_client_send (client, subject.c_str (), &msg);
+        if ( r != 0 ) {
+            mlm_client_destroy (&client);
+            throw std::runtime_error("mlm_client_send () failed.");
+        }
+        
+        zhash_destroy (&aux);
+        zhash_destroy (&ext);
 
-            zhash_destroy (&aux);
-            zhash_destroy (&ext);
+        // ask fty-asset to republish so we would get UUID
+        if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) ||
+            streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
+            zmsg_t *republish = zmsg_new ();
+            zmsg_addstr (republish, s_asset_name.c_str ());
+            mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
+        }
 
-            //data for uptime
-            if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
-                zhash_t *aux = zhash_new ();
-                bool rv = insert_upses_to_aux (aux, oneRow.first.name);
-                if (!rv)
-                    throw std::runtime_error("database error, cannot find UPSs");
-                zhash_update (aux, "type", (void*) "datacenter");
-                zmsg_t *msg = fty_proto_encode_asset (
+        //data for uptime
+        if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
+            zhash_t *aux = zhash_new ();
+            bool rv = insert_upses_to_aux (aux, oneRow.first.name);
+            if (!rv)
+                throw std::runtime_error("database error, cannot find UPSs");
+            zhash_update (aux, "type", (void*) "datacenter");
+            zmsg_t *msg = fty_proto_encode_asset (
                     aux,
                     dc_name.c_str (),
                     "inventory",
                     NULL);
-                std::string subject = "datacenter.unknown@";
-                subject.append (dc_name);
-                r = mlm_client_send (client, subject.c_str (), &msg);
-                zhash_destroy (&aux);
-                if ( r != 0 ) {
-                    mlm_client_destroy (&client);
-                    throw std::runtime_error("mlm_client_send () failed.");
-                }
+            std::string subject = "datacenter.unknown@";
+            subject.append (dc_name);
+            r = mlm_client_send (client, subject.c_str (), &msg);
+            zhash_destroy (&aux);
+            if ( r != 0 ) {
+                mlm_client_destroy (&client);
+                throw std::runtime_error("mlm_client_send () failed.");
             }
-            if (streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_CREATE) ||
-                streq (operation2str (oneRow.second).c_str (), FTY_PROTO_ASSET_OP_UPDATE)) {
-                zmsg_t *republish = zmsg_new ();
-                zmsg_addstr (republish, s_asset_name.c_str ());
-                mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
-            }
-
-        } // if status-active
-    } // for row:rows
-
+        }
+    }
+    
     zclock_sleep (500); // ensure that everything was send before we destroy the client
     mlm_client_destroy (&client);
 }
@@ -171,10 +164,9 @@ void
     send_configure (
         db_a_elmnt_t row,
         persist::asset_operation action_type,
-        const std::string &agent_name,
-        bool tag_no_not_really)
+        const std::string &agent_name)
 {
-    send_configure(std::vector<std::pair<db_a_elmnt_t,persist::asset_operation>>{std::make_pair(row, action_type)}, agent_name, tag_no_not_really);
+    send_configure(std::vector<std::pair<db_a_elmnt_t,persist::asset_operation>>{std::make_pair(row, action_type)}, agent_name);
 }
 
 void
