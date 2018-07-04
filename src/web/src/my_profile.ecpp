@@ -157,7 +157,7 @@
 </%cpp>
 {
 "login" : "<$ user.login() $>",
-"must_change_pwd" : "<$ change_pwd $>",
+"must_change_pwd" : <$ change_pwd $>,
 "timeout" : "<$ timeout $>",
 "profile" : "<$ user.toString() $>",
 <$$preferences$>

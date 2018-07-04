@@ -1,6 +1,6 @@
 <#
  #
- # Copyright (C) 2015 Eaton
+ # Copyright (C) 2015-2018 Eaton
  #
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * \author Michal Hrusecky <MichalHrusecky@Eaton.com>
  * \author Jim Klimov <EvgenyKlimov@Eaton.com>
  * \author Alena Chernikava <alenachernikava@Eaton.com>
- * \brief Accept license
+ * \brief Accept license (EULA)
  */
  #><%pre>
 #include <unistd.h>
@@ -104,20 +104,77 @@ bool database_ready;
         shared::Argv proc_cmd {"/usr/libexec/fty/start-db-services"};
         std::string proc_out, proc_err;
 
-        int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
-        if (rv != 0) {
+        // due to some OS circumstances, the script can sometimes block
+        // while calling the /bin/systemctl and is eventually killed,
+        // even though the actual services of our product have started
+        // long before this; so even if it failed - try to use the DB...
+        int rv_svc = shared::simple_output (proc_cmd, proc_out, proc_err);
+        if (rv_svc != 0) {
             log_error("Starting of start-db-services have failed. Consult system logs");
             log_error("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                "/usr/libexec/fty/start-db-services", rv, proc_out.c_str(), proc_err.c_str());
-            http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
+                "/usr/libexec/fty/start-db-services", rv_svc, proc_out.c_str(), proc_err.c_str());
+            if (rv_svc > 0)
+                http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
+            // Negative return means killed by signal, typically by our
+            // subprocess timeout handling - fall through to try using DB
+
+            {
+                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-engine"};
+                // This should get our "systemctl" wrapper via PATH
+                std::string proc_out, proc_err;
+
+                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+
+                if (rv != 0) {
+                    std::string message;
+                    message = "`sudo systemctl list-ipm-units --active fty-db-engine`"
+                        " failed (service is not currently active). Return value = '"
+                        + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
+                    log_error ("%s", message.c_str ());
+                    http_die ("internal-error", "Database software service is not running");
+                } else {
+                    // Not quite an error, but we want this message at the same logging level
+                    log_error ("NOTE: Although start-db-services script was killed, the fty-db-engine service is okay");
+                }
+            }
+
+            {
+                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-init"};
+                // This should get our "systemctl" wrapper via PATH
+                std::string proc_out, proc_err;
+
+                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+
+                if (rv != 0) {
+                    std::string message;
+                    message = "`sudo systemctl list-ipm-units --active fty-db-init`"
+                        " failed (service is not currently active). Return value = '"
+                        + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
+                    log_error ("%s", message.c_str ());
+                    http_die ("internal-error", "Database schema was not installed or verified successfully");
+                } else {
+                    // Not quite an error, but we want this message at the same logging level
+                    log_error ("NOTE: Although start-db-services script was killed, the fty-db-init service is okay");
+                }
+            }
         }
 
         // once done, check environment files for accessing the database
         log_info("db services were started, re-reading password ...");
-        if (!dbreadcredentials())
-            http_die ("internal-error", "Database password file is missing");
-    }else{
-        //enforce reload credential
+        int rv_dbcred = dbreadcredentials();
+        if (!rv_dbcred) {
+            std::string message;
+            if (rv_svc != 0) {
+                message = "Database password file is missing AND failed to start start-db-services. Consult system logs";
+            } else {
+                message = "Database password file is missing";
+            }
+            log_error ("%s", message.c_str ());
+            http_die ("internal-error", message.c_str());
+        }
+    } else {
+        // enforce reload of credentials, e.g. if timely service startup
+        // had failed previously but the system has caught up by now
         log_info("db services were already started and set up, re-reading password just in case ...");
         if (!dbreadcredentials())
             http_die ("internal-error", "Database password file is missing");
@@ -129,6 +186,12 @@ bool database_ready;
     log_debug("Current DB URL is: %s", url.c_str());
 
     log_info("Making sure webserver can already connect to database...");
+    // Note: if we earlier failed to dbreadcredentials() and have no envvars
+    // set in the tntnet process now (DB_USER, DB_PASSWD), the mysql/mariadb
+    // client library will fall back to reading $HOME/.my.cnf and normally
+    // would not find it (we don't create one), but even if it did - the
+    // default database URL we hardcode refers to logging in as the "root"
+    // account of the DBMS, so credentials from .my.cnf are not used in fact.
 
     try {
         tntdb::Connection conn;
@@ -147,6 +210,8 @@ bool database_ready;
         }
         database_ready = true;
     } catch (std::exception &e) {
+        // TODO: Check/evaluate accessibility of /run namespace and
+        // restart myself like `kill(getpid())` if there are issues?
         log_error("Database connection test failed: %s", e.what());
         database_ready = false;
         http_die ("internal-error", "Database connection test failed");
