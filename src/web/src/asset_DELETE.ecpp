@@ -83,7 +83,7 @@ bool database_ready;
             http_die("element-not-found", checked_id.c_str ());
         }
         else {
-            http_die("data-conflict",  checked_id.c_str (), "Asset has elements inside, DELETE them first!");
+            http_die("data-conflict",  checked_id.c_str (), "Asset is in use, remove children/power source links first.");
         }
     }
     // here we are -> delete was successful
