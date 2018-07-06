@@ -615,7 +615,7 @@ db_reply_t
         return reply_delete2;
     }
 
-    auto reply_delete3 = delete_asset_links_all (conn, element_id);
+    auto reply_delete3 = delete_asset_links_to (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
         trans.rollback();
