@@ -103,15 +103,6 @@ UserInfo user;
     if (request.isMethodPOST ()) {
 
         if (!checked_time.empty ()) {
-            // Run command with arguments.  Wait for complete and return the return value.
-            shared::Argv proc_cmd_dateset {"sudo", "date", "-s", checked_time};
-            if ( shared::call(proc_cmd_dateset) != 0 ) {
-                http_die ("internal-error", "Can't set requested OS time.");
-            }
-            shared::Argv proc_cmd_hwclock {"sudo", "hwclock", "--systohc"};
-            if ( shared::call(proc_cmd_hwclock) != 0 ) {
-                http_die ("internal-error", "Can't set requested HW time.");
-            }
             shared::Argv proc_cmd_ntp1 {"sudo", "systemctl", "stop", "ntp"};
             if ( shared::call(proc_cmd_ntp1) != 0 ) {
                 http_die ("internal-error", "Cannot stop ntp service");
@@ -123,6 +114,15 @@ UserInfo user;
             shared::Argv proc_cmd_ntp3 {"sudo", "systemctl", "mask", "ntp"};
             if ( shared::call(proc_cmd_ntp3) != 0 ) {
                 http_die ("internal-error", "Cannot mask away ntp service");
+            }
+            // Run command with arguments.  Wait for complete and return the return value.
+            shared::Argv proc_cmd_dateset {"sudo", "date", "-s", checked_time};
+            if ( shared::call(proc_cmd_dateset) != 0 ) {
+                http_die ("internal-error", "Can't set requested OS time.");
+            }
+            shared::Argv proc_cmd_hwclock {"sudo", "hwclock", "--systohc"};
+            if ( shared::call(proc_cmd_hwclock) != 0 ) {
+                http_die ("internal-error", "Can't set requested HW time.");
             }
         }
 
