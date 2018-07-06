@@ -522,6 +522,25 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
+    // Don't allow deleting the last datacenter
+    unsigned numDatacentersAfterDelete = conn.prepareCached(
+            " SELECT COUNT(id_asset_element)"
+            " FROM"
+            "   t_bios_asset_element"
+            " WHERE"
+            "   id_type = (select id_asset_element_type from t_bios_asset_element_type where name = 'datacenter') AND"
+            "   id_asset_element != :element"
+        ).set("element", element_id).selectValue().getUnsigned();
+    if (numDatacentersAfterDelete == 0)
+    {
+        db_reply_t ret = db_reply_new();
+        ret.status     = 0;
+        ret.errtype    = DB_ERR;
+        ret.errsubtype = DB_ERROR_DELETEFAIL;
+        ret.msg        = "will not allow last datacenter to be deleted";
+        return ret;
+    }
+
     auto reply_delete2 = delete_asset_element_from_asset_groups
                                                         (conn, element_id);
     if ( reply_delete2.status == 0 )
