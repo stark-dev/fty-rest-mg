@@ -256,9 +256,9 @@ bool
     for (auto& item : dc_upses)
     {
         int i = 0;
-        char key[10];
         for (auto& ups_it : item.second)
         {
+            char key[14]; // "ups" + 10 digits + NUL
             sprintf (key,"ups%d", i);
             char *ups_name = strdup (ups_it.c_str ());
             zhash_insert (aux, key, (void*) ups_name);
