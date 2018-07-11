@@ -142,10 +142,11 @@ std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)
   std::string json = "";
 
   char buff[64];
-  int rv = calendar_to_datetime(fty_proto_time(alert), buff, 64);
+  uint64_t timestamp = fty_proto_aux_number(alert, "ctime", fty_proto_time(alert));
+  int rv = calendar_to_datetime(timestamp, buff, 64);
   if (rv == -1)
   {
-    log_error("can't convert %" PRIu64 "to calendar time, skipping element '%s'", fty_proto_time(alert), fty_proto_rule(alert));
+    log_error("can't convert %" PRIu64 "to calendar time, skipping element '%s'", timestamp, fty_proto_rule(alert));
     return json;
   }
 
