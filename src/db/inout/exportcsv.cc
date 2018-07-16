@@ -28,6 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <cxxtools/csvserializer.h>
 #include <cxxtools/jsonserializer.h>
+#include <cxxtools/regex.h>
 #include <tntdb/row.h>
 #include <tntdb/transaction.h>
 

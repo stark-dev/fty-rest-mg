@@ -444,7 +444,7 @@ UserInfo user;
                 std::ostringstream omessage;
                 std::ostringstream ozsize;
                 ozsize << compressor.zsize();
-                omessage << "gzipped '" << logname_base << "' body " << body.size() << " bytes to " << ozsize << " bytes";
+                omessage << "gzipped '" << logname_base << "' body " << body.size() << " bytes to " << ozsize.str() << " bytes";
                 log_debug("%s", omessage.str().c_str() );
 
                 reply.out() << compressor.str();
