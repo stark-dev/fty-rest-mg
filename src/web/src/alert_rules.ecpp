@@ -53,13 +53,14 @@ std::string checked_name;
     }
 
     std::string name = request.getArg ("name");
+    if(request.getMethod () == "PUT")
     {
         http_errors_t errors;
         if (! check_alert_rule_name ("name", name, errors)) {
             http_die_error (errors);
         }
-        checked_name = name;
     }
+    checked_name = name;
 
     if (request.getMethod () == "PUT" && name.empty() ) {
         http_die ("request-param-bad", "name", "<empty>", "<non_empty_name>");
