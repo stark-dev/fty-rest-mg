@@ -37,6 +37,7 @@ Build-Depends: debhelper (>= 9),
     libfty-proto-dev,
     libsasl2-dev,
     liblog4cplus-dev,
+    libfty-common-logging-dev,
     libfty-common-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
@@ -65,6 +66,7 @@ Depends:
     libfty-proto-dev,
     libsasl2-dev,
     liblog4cplus-dev,
+    libfty-common-logging-dev,
     libfty-common-dev,
     libfty-rest1 (= ${binary:Version})
 Description: fty-rest development tools
