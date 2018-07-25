@@ -111,6 +111,7 @@ magic/
 fty-proto/
 log4cplus/
 fty-common/
+fty-common-logging/
 
 # Travis build area
 tmp/
