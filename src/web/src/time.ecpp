@@ -91,6 +91,10 @@ UserInfo user;
             }
         }
 
+        if(!ntp.empty() && !time.empty()) {
+            log_warning ("Received both an 'ntp'='%s' and a 'time'='%s' argument, the effects may surprise you!", ntp.c_str(), time.c_str());
+        }
+
         checked_time = time;
         checked_ntp = ntp;
     }
