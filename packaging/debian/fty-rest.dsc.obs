@@ -15,11 +15,11 @@ Build-Depends: debhelper (>= 9),
     libtntnet-dev,
     libtntdb-dev,
     libmagic-dev,
-    libfty-proto-dev,
-    libsasl2-dev,
     liblog4cplus-dev,
     libfty-common-logging-dev,
     libfty-common-dev,
+    libfty-proto-dev,
+    libsasl2-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
