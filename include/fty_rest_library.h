@@ -39,9 +39,10 @@
 #if defined (HAVE_LIBMAGIC)
 #include <magic.h>
 #endif
+#include <fty_log.h>
+#include <fty_common.h>
 #include <ftyproto.h>
 #include <sasl/sasl.h>
-#include <fty_common.h>
 
 //  FTY_REST version macros for compile-time API detection
 #define FTY_REST_VERSION_MAJOR 1

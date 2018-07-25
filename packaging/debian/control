@@ -34,10 +34,11 @@ Build-Depends: debhelper (>= 9),
     libtntnet-dev,
     libtntdb-dev,
     libmagic-dev,
+    liblog4cplus-dev,
+    libfty-common-logging-dev,
+    libfty-common-dev,
     libfty-proto-dev,
     libsasl2-dev,
-    liblog4cplus-dev,
-    libfty-common-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
@@ -62,10 +63,11 @@ Depends:
     libtntnet-dev,
     libtntdb-dev,
     libmagic-dev,
+    liblog4cplus-dev,
+    libfty-common-logging-dev,
+    libfty-common-dev,
     libfty-proto-dev,
     libsasl2-dev,
-    liblog4cplus-dev,
-    libfty-common-dev,
     libfty-rest1 (= ${binary:Version})
 Description: fty-rest development tools
  This package contains development files for fty-rest:
