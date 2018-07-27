@@ -25,7 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 //Initilialize the logger for tntnet process
 int setFtylog()
 {
-  ManageFtyLog::setInstanceFtylog("tntnet","/etc/fty/ftylog.cfg");
+  ManageFtyLog::setInstanceFtylog("tntnet","/etc/fty/wwwlog.cfg");
   return 1;
 }
 
