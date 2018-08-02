@@ -26,10 +26,9 @@
  * \brief Not yet documented file
  */
 #include "web/src/location_helpers.h"
-
+#include <fty_common_rest.h>
 #include <list>
 #include <tnt/http.h>
-#include <fty_common.h>
 
 #include "shared/asset_types.h"
 #include "cleanup.h"

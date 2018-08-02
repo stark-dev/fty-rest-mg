@@ -69,8 +69,8 @@
         />
 
     <use project = "cxxtools" test="cxxtools::Utf8Codec::Utf8Codec" header="cxxtools/allocator.h"
-        repository = "https://github.com/42ity/cxxtools.git"
-        release = "2.2-FTY-master"
+	 repository = "https://github.com/42ity/cxxtools.git"
+         release = "2.2-FTY-master"
         />
 
     <use project = "tntnet"
@@ -84,6 +84,7 @@
         repository = "https://github.com/42ity/tntdb.git"
         release = "1.3-FTY-master"
         builddir = "tntdb" />
+
     <!-- use project = "tntdb" test="tntdb::connectCached" header="tntdb/connect.h" / -->
     <!-- use project = "tntdb" test="tntdb::Date::gmtime" header="tntdb/connect.h" / -->
 
@@ -109,17 +110,29 @@
         test = "fty_commmon_selftest" >
     </use>
 
-    <use project = "fty-proto" libname = "libfty_proto" header="ftyproto.h" prefix="fty_proto"
-        min_major = "1" min_minor = "0" min_patch = "0"
-        repository = "https://github.com/42ity/fty-proto.git"
-        test = "fty_proto_test" >
-        <use project = "malamute" />
+    <use project = "fty-common-db" libname = "libfty_common_db" header="fty_common_db.h"
+        repository = "https://github.com/42ity/fty-common-db.git"
+        test = "fty_commmon_selftest" >
+    </use>
+
+    <use project = "fty-common-rest" libname = "libfty_common_rest" header="fty_common_rest.h"
+        repository = "https://github.com/42ity/fty-common-rest.git"
+        test = "fty_commmon_rest_selftest" >
     </use>
 
     <use project = "libsasl2" header = "sasl/sasl.h"
-        debian_name="libsasl2-dev"
-        redhat_name="cyrus-sasl-devel"
+         debian_name="libsasl2-dev"
+         redhat_name="cyrus-sasl-devel"
     />
+
+    <use project = "fty-proto" libname = "libfty_proto" header="ftyproto.h" prefix="fty_proto"
+         min_major = "1" min_minor = "0" min_patch = "0"
+         repository = "https://github.com/42ity/fty-proto.git"
+         test = "fty_proto_test" >
+        <use project = "malamute" />
+    </use>
+
+
 <!--        redhat_name="(libsasl2-devel or cyrus-sasl-devel)" -->
 
     <header name = "app"  />

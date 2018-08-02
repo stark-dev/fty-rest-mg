@@ -18,6 +18,8 @@ git clone --quiet --depth 1 -b 1.3-FTY-master https://github.com/42ity/tntdb.git
 git clone --quiet --depth 1 -b 1.1.2-FTY-master https://github.com/42ity/log4cplus.git log4cplus
 git clone --quiet --depth 1 -b master https://github.com/42ity/fty-common-logging.git fty-common-logging
 git clone --quiet --depth 1 https://github.com/42ity/fty-common.git fty-common
+git clone --quiet --depth 1 https://github.com/42ity/fty-common-db.git fty-common-db
+git clone --quiet --depth 1 https://github.com/42ity/fty-common-rest.git fty-common-rest
 git clone --quiet --depth 1 https://github.com/42ity/fty-proto.git fty-proto
 cd -
 

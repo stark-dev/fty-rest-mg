@@ -41,8 +41,10 @@
 #endif
 #include <fty_log.h>
 #include <fty_common.h>
-#include <ftyproto.h>
+#include <fty_common_db.h>
+#include <fty_common_rest.h>
 #include <sasl/sasl.h>
+#include <ftyproto.h>
 
 //  FTY_REST version macros for compile-time API detection
 #define FTY_REST_VERSION_MAJOR 1

@@ -64,8 +64,10 @@ BuildRequires:  file-devel
 BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
-BuildRequires:  fty-proto-devel
+BuildRequires:  fty-common-db-devel
+BuildRequires:  fty-common-rest-devel
 BuildRequires:  cyrus-sasl-devel
+BuildRequires:  fty-proto-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -104,8 +106,10 @@ Requires:       file-devel
 Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
-Requires:       fty-proto-devel
+Requires:       fty-common-db-devel
+Requires:       fty-common-rest-devel
 Requires:       cyrus-sasl-devel
+Requires:       fty-proto-devel
 
 %description devel
 common core rest api for 42ity project development tools
