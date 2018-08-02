@@ -34,6 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_proto.h>
 #include <fty_common_rest.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 
 #include "../../persist/assetcrud.h"
 #include "cleanup.h"
@@ -540,7 +541,7 @@ std::map <std::string, std::string>sanitize_row_ext_names (
                     if (it == result.end ()) break;
 
                     std::string name;
-                    int rv = extname_to_asset_name (it->second, name);
+                    int rv = DBAssets::extname_to_asset_name (it->second, name);
                     if (rv != 0) { name = it->second; }
                     log_debug ("sanitized %s '%s' -> '%s'", title.c_str(), it->second.c_str(), name.c_str ());
                     result [title] = name;
@@ -550,7 +551,7 @@ std::map <std::string, std::string>sanitize_row_ext_names (
                 auto it = result.find (item);
                 if (it != result.end ()) {
                     std::string name;
-                    int rv = extname_to_asset_name (it->second, name);
+                    int rv = DBAssets::extname_to_asset_name (it->second, name);
                     if (rv != 0) { name = it->second; }
                     log_debug ("sanitized %s '%s' -> '%s'", it->first.c_str (), it->second.c_str(), name.c_str ());
                     result [item] = name;
@@ -693,7 +694,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     int64_t id = 0;
     if ( !id_str.empty() )
     {
-        id = name_to_asset_id (id_str);
+        id = DBAssets::name_to_asset_id (id_str);
         if (id == -1) {
             bios_throw("element-not-found", id_str.c_str ());
         }
@@ -714,7 +715,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     if (ename.empty ())
         bios_throw("request-param-bad", "name", "<empty>", "<unique, non empty value>");
     std::string iname;
-    int rv = extname_to_asset_name (ename, iname);
+    int rv = DBAssets::extname_to_asset_name (ename, iname);
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
     if (rv == -2) {
         bios_throw("internal-error", "Database failure");
@@ -1224,7 +1225,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             m.id = ret.rowid;
         }
     }
-    rv = extname_to_asset_name (ename, m.name);
+    rv = DBAssets::extname_to_asset_name (ename, m.name);
     if (rv != 0)
          bios_throw("internal-error", "Database failure");
     m.status = status;

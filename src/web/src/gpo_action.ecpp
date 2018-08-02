@@ -27,7 +27,7 @@
 #include "shared/tntmlm.h"
 #include <fty_common_rest_helpers.h>
 #include "db/assets.h"
-
+#include <fty_common_db_asset.h>
 // request GPO interaction
 static zmsg_t *
 req_gpo_interaction (zuuid_t *uuid, std::string sensor, std::string action)
@@ -128,7 +128,7 @@ UserInfo user;
         // check asset existence by getting iname
         if (!sensor.empty ()) {
             std::string iname;
-            int rv = persist::extname_to_asset_name (sensor, iname);
+            int rv = DBAssets::extname_to_asset_name (sensor, iname);
             if (rv == -1)
                 http_die ("not-found", sensor.c_str ());
             if (rv == -2)

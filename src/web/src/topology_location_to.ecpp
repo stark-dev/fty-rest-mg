@@ -31,6 +31,7 @@
 #include <czmq.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 
 #include "defs.h"
 #include "shared/data.h"
@@ -95,7 +96,7 @@ bool database_ready;
         checked_to = to;
     }
     // Sanity check end
-    int64_t checked_to_num = persist::name_to_asset_id (checked_to);
+    int64_t checked_to_num = DBAssets::name_to_asset_id (checked_to);
     if (checked_to_num == -1) {
             http_die ("request-param-bad", "to", checked_to.c_str (), "existing asset name");
     }
@@ -239,7 +240,7 @@ bool database_ready;
                 // <checked_to_num, type, contains, name, type_name>
                 std::tuple<int, int, std::string, std::string, std::string> row = stack.top();
                 stack.pop();
-                std::pair <std::string,std::string> asset_names = persist::id_to_name_ext_name (std::get<0>(row));
+                std::pair <std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (std::get<0>(row));
                 if (asset_names.first.empty () && asset_names.second.empty ())
                     http_die ("internal-error", "Database failure");
                 ext_name = asset_names.second;

@@ -29,6 +29,7 @@
 #include <cxxtools/split.h>
 #include <tntdb/error.h>
 #include <fty_common_rest_helpers.h>
+#include <fty_common_db_asset.h>
 #include <fty_common.h>
 #include "shared/data.h"
 #include "db/assets.h"
@@ -79,7 +80,7 @@ bool database_ready;
         }
 
         for (auto const& item : DCNames) {
-            int rv = persist::name_to_extname (item, ExtName);
+            int rv = DBAssets::name_to_extname (item, ExtName);
 
             if (rv == -1)
                 http_die ("not-found", item.c_str ());

@@ -30,7 +30,7 @@
 #include "shared/configure_inform.h"
 #include "defs.h"
 #include <fty_common_rest_helpers.h>
-
+#include <fty_common_db_asset.h>
 </%pre>
 <%thread scope="global">
 asset_manager     asset_mgr;
@@ -68,7 +68,7 @@ bool database_ready;
     // end sanity checks
 
     // get id by name
-    int64_t dbid = persist::name_to_asset_id (checked_id);
+    int64_t dbid = DBAssets::name_to_asset_id (checked_id);
     if (dbid == -1) {
         http_die ("element-not-found", checked_id.c_str ());
     }

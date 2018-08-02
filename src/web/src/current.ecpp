@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
@@ -310,7 +311,7 @@ std::vector<uint32_t> asset_ids;
             http_die("internal-error", "");
         }
 
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (asset_id);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (asset_id);
         if (asset_names.first.empty () && asset_names.second.empty ())
             http_die ("internal-error", "Database failure");
 
