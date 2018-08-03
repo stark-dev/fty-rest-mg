@@ -76,28 +76,6 @@ struct db_web_element_t{
 
 namespace persist{
 
-// returns asset id from database for given asset name
-// In case of an error it returns -1
-int64_t
-    name_to_asset_id (std::string asset_name);
-
-// <name, ext_name>
-std::pair <std::string, std::string>
-    id_to_name_ext_name (uint32_t asset_id);
-
-// returns asset db id by the name in ext
-// in case of error it returns -1
-int64_t
-    extname_to_asset_id (std::string asset_ext_name);
-
-// returns asset name by the name in ext
-int
-    extname_to_asset_name (std::string asset_ext_name, std::string &asset_name);
-
-// returns asset ext name based on asset name
-int
-    name_to_extname (std::string asset_name, std::string &ext_name);
-
 db_reply <db_web_basic_element_t>
     select_asset_element_web_byId
         (tntdb::Connection &conn,
@@ -263,7 +241,7 @@ unique_keytag(
         const std::string &value,
         a_elmnt_id_t       element_id);
 
-/** \brief how many times is gived a couple keytag/value 
+/** \brief how many times is gived a couple keytag/value
  *          in t_bios_asset_ext_attributes
  *
  *  \param[in] conn is tntdb connection
@@ -319,7 +297,7 @@ int
  *
  * \return 0 on success (even if nothing was found)
  */
-int 
+int
     select_assets_without_container
         (tntdb::Connection &conn,
          std::vector<a_elmnt_tp_id_t> types,

@@ -336,7 +336,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     }
 
     //get id of this element
-    int64_t elemId = persist::name_to_asset_id(nameElement);
+    int64_t elemId = DBAssets::name_to_asset_id(nameElement);
     if (elemId == -1)
     {
       log_warning("Asset id not found");

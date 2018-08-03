@@ -31,8 +31,8 @@
 #include <cxxtools/serializationinfo.h>
 #include "shared/configure_inform.h"
 #include "src/db/inout.h"
-#include "db/assets.h"
 #include <fty_common_rest_helpers.h>
+#include <fty_common_db_asset.h>
 
 </%pre>
 <%request scope="global">
@@ -114,7 +114,7 @@ bool database_ready;
         }
         // no unexpected errors was detected
         // process results
-        std::pair<std::string,std::string> foo =  persist::id_to_name_ext_name (row.first.id);
+        std::pair<std::string,std::string> foo =  DBAssets::id_to_name_ext_name (row.first.id);
         if (foo.first.empty () && foo.second.empty ())
             http_die ("internal-error", "Database failure");
 </%cpp>

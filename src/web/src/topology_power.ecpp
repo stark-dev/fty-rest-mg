@@ -33,12 +33,12 @@
 #include <czmq.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 
 #include "defs.h"
 #include "shared/asset_types.h"
 #include "src/persist/assettopology.h"
 #include "cleanup.h"
-#include "db/assets/assetr.h"
 #include "shared/utilspp.h"
 </%pre>
 <%request scope="global">
@@ -118,7 +118,7 @@ bool database_ready;
 
         if (!is_ok_name (asset_id.c_str ()) )
             http_die ("request-param-bad", "id", asset_id.c_str (), "valid asset name");
-        checked_id = persist::name_to_asset_id (asset_id);
+        checked_id = DBAssets::name_to_asset_id (asset_id);
         if (checked_id == -1)
             http_die ("request-param-bad", "id", asset_id.c_str (), "existing asset name");
         if (checked_id == -2) {
@@ -223,7 +223,7 @@ bool database_ready;
                     } else {
                         first = false;
                     }
-                    std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (asset_msg_element_id (item));
+                    std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (asset_msg_element_id (item));
                     if (asset_names.first.empty () && asset_names.second.empty ())
                         http_die ("internal-error", "Database failure");
 
@@ -259,7 +259,7 @@ bool database_ready;
                     while (getline(f, tmp, ':')) {
                         tokens.push_back(tmp);
                     }
-                    std::pair<std::string,std::string> src_names = persist::id_to_name_ext_name (std::stoi (tokens[1]));
+                    std::pair<std::string,std::string> src_names = DBAssets::id_to_name_ext_name (std::stoi (tokens[1]));
                     if (src_names.first.empty () && src_names.second.empty ())
                         http_die ("internal-error", "Database failure");
                     json.append("\"src-id\" : \"").append(src_names.first).append("\",");
@@ -267,7 +267,7 @@ bool database_ready;
                     if (!tokens[0].empty() && tokens[0] != "999") {
                         json.append("\"src-socket\" : \"").append(tokens[0]).append("\",");
                     }
-                    std::pair<std::string,std::string> dst_names = persist::id_to_name_ext_name (std::stoi (tokens[3]));
+                    std::pair<std::string,std::string> dst_names = DBAssets::id_to_name_ext_name (std::stoi (tokens[3]));
                     if (dst_names.first.empty () && dst_names.second.empty ())
                         http_die ("internal-error", "Database failure");
                     json.append("\"dst-id\" : \"").append(dst_names.first).append("\"");

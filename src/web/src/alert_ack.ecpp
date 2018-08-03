@@ -33,7 +33,7 @@
 #include "db/assets.h"
 #include <fty_common_rest_helpers.h>
 #include <fty_common.h>
-
+#include <fty_common_db_asset.h>
 static
 int state_valid (const char *state) {
     assert (state);
@@ -144,7 +144,7 @@ if (!send_msg) {
     http_die ("internal-error", "zmsg_new() failed.");
 }
 std::string asset_id;
-rv = persist::extname_to_asset_name (checked_element_name, asset_id);
+rv = DBAssets::extname_to_asset_name (checked_element_name, asset_id);
 if (rv == -1)
     http_die ("not-found", "Cannot get asset_id for ", checked_element_name.c_str ());
 if (rv == -2)

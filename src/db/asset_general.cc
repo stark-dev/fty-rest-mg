@@ -22,6 +22,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <locale.h>
 
 #include <fty_common.h>
+#include <fty_common_db_asset.h>
 #include "shared/asset_types.h"
 #include "defs.h"
 #include "shared/ic.h"
@@ -268,7 +269,7 @@ db_reply_t
      zhash_t         *extattributesRO)
 {
     LOG_START;
-    if (extname_to_asset_id(element_name) != -1) {
+    if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -392,7 +393,7 @@ db_reply_t
         zhash_t       *extattributesRO)
 {
     LOG_START;
-    if (extname_to_asset_id(element_name) != -1) {
+    if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         ret.status     = 0;
         ret.errtype    = DB_ERR;

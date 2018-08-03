@@ -35,6 +35,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "db/assets.h"
 #include <fty_common.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 #include "shared/utilspp.h"
 
 namespace persist {
@@ -213,7 +214,7 @@ void
         a_elmnt_id_t id_num = 0;
         std::string id;
         r["id"].get(id_num);
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (id_num);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (id_num);
         if (asset_names.first.empty () && asset_names.second.empty ())
             throw std::runtime_error(msg.c_str());
         id = asset_names.first;
@@ -221,7 +222,7 @@ void
         a_elmnt_id_t id_parent_num = 0;
         std::string location;
         r["id_parent"].get(id_parent_num);
-        location = persist::id_to_name_ext_name (id_parent_num).second;
+        location = DBAssets::id_to_name_ext_name (id_parent_num).second;
 
         // 2.1      select all extended attributes
         std::map <std::string, std::pair<std::string, bool> > ext_attrs;
@@ -290,7 +291,7 @@ void
                 //nothing here, exists only for consistency reasons
             }
             else {
-                int rv = persist::name_to_extname (std::get<0>(power_links[i]), source);
+                int rv = DBAssets::name_to_extname (std::get<0>(power_links[i]), source);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 plug_src = std::get<1>(power_links[i]);
@@ -306,7 +307,7 @@ void
             auto it = ext_attrs.find ("logical_asset");
             if (it != ext_attrs.end ()) {
                 std::string extname;
-                int rv = persist::name_to_extname (it->second.first, extname);
+                int rv = DBAssets::name_to_extname (it->second.first, extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 ext_attrs ["logical_asset"] = make_pair (extname, it->second.second);
@@ -328,7 +329,7 @@ void
                 lcs.add("");
             else {
                 std::string extname;
-                int rv = persist::name_to_extname (groups[i], extname);
+                int rv = DBAssets::name_to_extname (groups[i], extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 lcs.add(extname);
@@ -396,7 +397,7 @@ void
         a_elmnt_id_t id_num = 0;
         std::string id;
         r["id"].get(id_num);
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (id_num);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (id_num);
         if (asset_names.first.empty () && asset_names.second.empty ())
             throw std::runtime_error(msg.c_str());
         id = asset_names.first;
@@ -407,7 +408,7 @@ void
         a_elmnt_id_t id_parent_num = 0;
         std::string location;
         r["id_parent"].get(id_parent_num);
-        std::pair<std::string,std::string> location_names = persist::id_to_name_ext_name (id_parent_num);
+        std::pair<std::string,std::string> location_names = DBAssets::id_to_name_ext_name (id_parent_num);
         location = location_names.second;
         std::string location_id = location_names.first;
 
@@ -465,7 +466,7 @@ void
                 lcs.add("");
             else {
                 std::string extname;
-                int rv = persist::name_to_extname (groups[i], extname);
+                int rv = DBAssets::name_to_extname (groups[i], extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 lcs.add(extname);
@@ -506,7 +507,7 @@ void
                 //nothing here, exists only for consistency reasons
             }
             else {
-                int rv = persist::name_to_extname (std::get<0>(power_links[i]), source);
+                int rv = DBAssets::name_to_extname (std::get<0>(power_links[i]), source);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 plug_src = std::get<1>(power_links[i]);
@@ -523,7 +524,7 @@ void
             auto it = ext_attrs.find ("logical_asset");
             if (it != ext_attrs.end ()) {
                 std::string extname;
-                int rv = persist::name_to_extname (it->second.first, extname);
+                int rv = DBAssets::name_to_extname (it->second.first, extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 ext_attrs ["logical_asset"] = make_pair (extname, it->second.second);
