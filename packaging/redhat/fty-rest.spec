@@ -66,6 +66,7 @@ BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-db-devel
 BuildRequires:  fty-common-rest-devel
+BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  fty-proto-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -108,6 +109,7 @@ Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
 Requires:       fty-common-db-devel
 Requires:       fty-common-rest-devel
+Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
 Requires:       fty-proto-devel
 

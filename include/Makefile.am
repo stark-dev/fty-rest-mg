@@ -38,7 +38,6 @@ nobase_pkginclude_HEADERS += \
     shared/fty_asset_uptime_configurator.h \
     shared/ic.h \
     shared/subprocess.h \
-    shared/tntmlm.h \
     shared/topic_cache.h \
     shared/upsstatus.h \
     shared/utils.h \

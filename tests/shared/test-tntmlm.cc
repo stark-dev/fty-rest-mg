@@ -21,7 +21,7 @@
 #include <string>
 #include <limits.h>
 
-#include "shared/tntmlm.h"
+#include <fty_common_mlm_tntmlm.h>
 
 TEST_CASE ("tntmlm1", "[tntmlm]")
 {
@@ -29,29 +29,29 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
     ref = "inproc://tntmlm-catch-1";
     CHECK (MlmClient::ENDPOINT == "inproc://tntmlm-catch-1");
 
-    zactor_t *server = zactor_new (mlm_server, (void*) "Malamute");    
+    zactor_t *server = zactor_new (mlm_server, (void*) "Malamute");
     zstr_sendx (server, "BIND", MlmClient::ENDPOINT.c_str () , NULL);
- 
+
     { // Invariant: malamute MUST be destroyed last
 
-        // tntmlm.h already has one pool but we can't use that one 
+        // tntmlm.h already has one pool but we can't use that one
         // for this test because valgrind will detect memory leak
         // which occurs because malamute server is destroyed only
         // after clients allocated in the pool of the header file
-        MlmClientPool mlm_pool_test {3};   
+        MlmClientPool mlm_pool_test {3};
 
         mlm_client_t *agent1 = mlm_client_new ();
         mlm_client_connect (agent1, MlmClient::ENDPOINT.c_str (), 1000, "AGENT1");
 
-        mlm_client_t *agent2 = mlm_client_new ();    
+        mlm_client_t *agent2 = mlm_client_new ();
         mlm_client_connect (agent2, MlmClient::ENDPOINT.c_str (), 1000, "AGENT2");
 
 
         printf ("\n ---- max pool ----\n");
-        {   
+        {
             CHECK (mlm_pool_test.getMaximumSize () == 3);
             MlmClientPool::Ptr ui_client = mlm_pool_test.get ();
-            CHECK (ui_client.getPointer () != NULL); 
+            CHECK (ui_client.getPointer () != NULL);
 
             MlmClientPool::Ptr ui_client2 = mlm_pool_test.get ();
             CHECK (ui_client2.getPointer ()!= NULL);
@@ -61,7 +61,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
 
             MlmClientPool::Ptr ui_client4 = mlm_pool_test.get ();
             CHECK (ui_client4.getPointer () != NULL);
- 
+
             MlmClientPool::Ptr ui_client5 = mlm_pool_test.get ();
             CHECK (ui_client5.getPointer () != NULL);
         }
@@ -70,7 +70,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         printf ("OK");
 
         printf ("\n ---- no reply ----\n");
-        {   
+        {
             MlmClientPool::Ptr ui_client = mlm_pool_test.get ();
             CHECK (ui_client.getPointer () != NULL);
 
@@ -83,7 +83,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         printf ("OK\n");
 
         printf ("\n ---- send - correct reply ----\n");
-        {   
+        {
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, "uuid1");
 
@@ -119,7 +119,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         printf ("OK\n");
 
         printf ("\n ---- send - reply with bad uuid ----\n");
-        {   
+        {
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, "uuid1");
 
@@ -142,7 +142,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         printf ("OK");
 
         printf ("\n ---- send - correct reply - expect bad uuid ----\n");
-        {   
+        {
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, "uuid1");
 
@@ -165,7 +165,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         printf ("OK");
 
         printf ("\n ---- send - reply 3x with bad uuid first - then correct reply ----\n");
-        {   
+        {
             zmsg_t *msg = zmsg_new ();
             zmsg_addstr (msg, "uuid34");
 
@@ -214,7 +214,7 @@ TEST_CASE ("tntmlm1", "[tntmlm]")
         }
         printf ("OK");
         printf ("\n ---- Simulate thread switch ----\n");
-        {   
+        {
             MlmClientPool::Ptr ui_client = mlm_pool_test.get ();
 
             zmsg_t *msg = zmsg_new ();

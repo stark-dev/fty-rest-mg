@@ -120,6 +120,11 @@
         test = "fty_commmon_rest_selftest" >
     </use>
 
+    <use project = "fty-common-mlm" libname = "libfty_common_mlm" header="fty_common_mlm.h"
+        repository = "https://github.com/42ity/fty-common-mlm.git"
+        test = "fty_commmon_mlm_selftest" >
+    </use>
+
     <use project = "libsasl2" header = "sasl/sasl.h"
          debian_name="libsasl2-dev"
          redhat_name="cyrus-sasl-devel"
@@ -186,7 +191,6 @@
     <class name = "shared/ic" private = "0" selftest = "0" />
     <class name = "shared/magic" private = "1" selftest = "0" />
     <class name = "shared/subprocess" private = "0" selftest = "0" />
-    <class name = "shared/tntmlm" private = "0" selftest = "0" />
     <class name = "shared/topic_cache" private = "0" selftest = "0" />
     <class name = "shared/upsstatus" private = "0" selftest = "0" />
     <class name = "shared/utils" private = "0" selftest = "0" />
