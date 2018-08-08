@@ -113,6 +113,7 @@ fty-common-logging/
 fty-common/
 fty-common-db/
 fty-common-rest/
+fty-common-mlm/
 fty-proto/
 
 # Travis build area
