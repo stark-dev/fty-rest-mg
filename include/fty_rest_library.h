@@ -31,7 +31,6 @@
 
 //  External dependencies
 #include <czmq.h>
-#include <malamute.h>
 #include <libcidr.h>
 #include <cxxtools/allocator.h>
 #include <tnt/tntnet.h>
@@ -56,6 +55,7 @@
     ((major) * 10000 + (minor) * 100 + (patch))
 #define FTY_REST_VERSION \
     FTY_REST_MAKE_VERSION(FTY_REST_VERSION_MAJOR, FTY_REST_VERSION_MINOR, FTY_REST_VERSION_PATCH)
+
 
 #if defined (__WINDOWS__)
 #   if defined FTY_REST_STATIC

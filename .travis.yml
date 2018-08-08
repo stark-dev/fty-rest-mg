@@ -69,7 +69,6 @@ pkg_deps_prereqs_source: &pkg_deps_prereqs_source
     - libsodium-dev
     - libzmq3-dev
     - libczmq-dev
-    - libmlm-dev
     - libcidr0-dev
     - cxxtools-dev
     - tntnet-dev
@@ -80,6 +79,7 @@ pkg_deps_prereqs_source: &pkg_deps_prereqs_source
     - libfty-common-dev
     - libfty-common-db-dev
     - libfty-common-rest-dev
+    - libmlm-dev
     - libfty-common-mlm-dev
     - libfty-proto-dev
 
