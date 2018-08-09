@@ -580,7 +580,7 @@ zmsg_t* select_group_elements(
     }
     catch (const std::exception &e) {
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
 }
@@ -933,13 +933,13 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
         catch (const tntdb::NotFound &e) {
             // element with specified id was not found
             log_warning ("abort select element with err = '%s'", e.what());
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_NOTFOUND,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_NOTFOUND,
                                                         e.what(), NULL);
         }
         catch (const std::exception &e) {
             // internal error in database
             log_warning ("abort select element with err = '%s'", e.what());
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
         }
 
@@ -968,13 +968,13 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
                 // but it is a mandatory
                 log_warning ("abort type for the group was not specified"
                                 " err = '%s'\n", e.what());
-                return common_msg_encode_fail (BIOS_ERROR_DB,
+                return common_msg_encode_fail (DB_ERR,
                         DB_ERROR_DBCORRUPTED, e.what(), NULL);
             }
             catch (const std::exception &e) {
                 // internal error in database
                 log_warning ("abort select element with err = '%s'", e.what());
-                return common_msg_encode_fail (BIOS_ERROR_DB,
+                return common_msg_encode_fail (DB_ERR,
                         DB_ERROR_INTERNAL, e.what(), NULL);
             }
 
@@ -1003,7 +1003,7 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
         {
             zframe_destroy (&dcs);
             log_warning ("end abnormal");
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     "rooms error", NULL);
         }
         log_info ("end select_rooms");
@@ -1024,7 +1024,7 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
             zframe_destroy (&dcs);
             zframe_destroy (&rooms);
             log_warning("end abnormal");
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     "rows error", NULL);
         }
         log_info ("end select_rows");
@@ -1047,7 +1047,7 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
             zframe_destroy (&rooms);
             zframe_destroy (&rows);
             log_warning ("end abnormal");
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     "racks error", NULL);
         }
         log_info ("end select_racks");
@@ -1072,7 +1072,7 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
             zframe_destroy (&rows);
             zframe_destroy (&racks);
             log_warning ("end abnormal");
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     "devices error", NULL);
         }
         log_info ("end select_devices");
@@ -1110,7 +1110,7 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
             zframe_destroy (&racks);
             zframe_destroy (&devices);
             log_warning ("end abnormal");
-            return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+            return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     "groups error", NULL);
         }
         log_info ("end select_grps");
@@ -1342,7 +1342,7 @@ zmsg_t* select_parents (const char* url, a_elmnt_id_t element_id,
             else if ( is_common_msg (parent) )
                 return zmsg_dup (parent);
             else
-                return common_msg_encode_fail (BIOS_ERROR_DB,
+                return common_msg_encode_fail (DB_ERR,
                         DB_ERROR_INTERNAL, "UNSUPPORTED RETURN MESSAGE TYPE",
                         NULL);
         }
@@ -1357,13 +1357,13 @@ zmsg_t* select_parents (const char* url, a_elmnt_id_t element_id,
     catch (const tntdb::NotFound &e) {
         // element with specified type was not found
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_NOTFOUND,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_NOTFOUND,
                                                         e.what(), NULL);
     }
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
 }
@@ -1397,13 +1397,13 @@ zmsg_t* get_return_topology_to(const char* url, asset_msg_t* getmsg)
     catch (const tntdb::NotFound &e) {
         // element with specified id was not found
         log_warning ("abort select element with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_NOTFOUND,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_NOTFOUND,
                                                     e.what(), NULL);
     }
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort select element with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                     e.what(), NULL);
     }
 
@@ -1527,13 +1527,13 @@ zmsg_t* get_return_power_topology_from(const char* url, asset_msg_t* getmsg)
     catch (const tntdb::NotFound &e) {
         // device with specified id was not found
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_NOTFOUND,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_NOTFOUND,
                                                         e.what(), NULL);
     }
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
 
@@ -1543,7 +1543,7 @@ zmsg_t* get_return_power_topology_from(const char* url, asset_msg_t* getmsg)
         log_warning ("abort with err = '%s %" PRIu32 " %s'",
                         "specified element id =", element_id,
                         " is not a device");
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_BADINPUT,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_BADINPUT,
                                         "specified element is not a device",
                                         NULL);
     }
@@ -1629,7 +1629,7 @@ zmsg_t* get_return_power_topology_from(const char* url, asset_msg_t* getmsg)
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
 
@@ -1835,26 +1835,26 @@ zmsg_t* get_return_power_topology_to (const char* url, asset_msg_t* getmsg)
     catch (const bios::NotFound &e) {
         // device with specified id was not found
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_NOTFOUND,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_NOTFOUND,
                                                         e.what(), NULL);
     }
     catch (const bios::InternalDBError &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
     catch (const bios::ElementIsNotDevice &e) {
         // specified element is not a device
         log_warning ("abort with err = '%s %" PRIu32 " %s'",
                 "specified element id =", element_id, " is not a device");
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_BADINPUT,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_BADINPUT,
                                                         e.what(), NULL);
     }
     catch (const std::exception &e) {
         // unexpected error
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
 
@@ -1945,7 +1945,7 @@ zmsg_t* get_return_power_topology_group(const char* url, asset_msg_t* getmsg)
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
     log_info ("end select powers");
@@ -2011,7 +2011,7 @@ zmsg_t* get_return_power_topology_group(const char* url, asset_msg_t* getmsg)
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
     log_info("end select devices");
@@ -2085,7 +2085,7 @@ zmsg_t* get_return_power_topology_datacenter(const char* url,
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
     log_info("end select devices");
@@ -2161,7 +2161,7 @@ zmsg_t* get_return_power_topology_datacenter(const char* url,
     catch (const std::exception &e) {
         // internal error in database
         log_warning ("abort with err = '%s'", e.what());
-        return common_msg_encode_fail (BIOS_ERROR_DB, DB_ERROR_INTERNAL,
+        return common_msg_encode_fail (DB_ERR, DB_ERROR_INTERNAL,
                                                         e.what(), NULL);
     }
     log_info ("end select powers");
