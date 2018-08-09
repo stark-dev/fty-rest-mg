@@ -38,13 +38,13 @@
 #include <sys/types.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_mlm_tntmlm.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
 #include "cleanup.h"
 #include <tntdb.h>
 #include "db/assets.h"
-#include "shared/tntmlm.h"
 #include "defs.h"
 
 // Check if value of parameter 'relative' is supported:

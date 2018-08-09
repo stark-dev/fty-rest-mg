@@ -35,16 +35,6 @@
 #define UI_PROPERTIES_CLIENT_ID 5
 #define DUMMY_DEVICE_ID 1
 
-/**
- * \brief Backward compatibility macro
- *
- * BIOS_ERROR_DB is long and contains BIOS which is temporal name and should be
- * replaced with something better, but to get stuff working in the meantime,
- * let's use compatibility macro.
- *
- */
-#define BIOS_ERROR_DB DB_ERR
-
 //! Possible error types
 enum errtypes {
     //! First error should be UNKNOWN as it maps to zero and zero is weird
@@ -91,7 +81,7 @@ enum internal_err {
 #define NUT_POLLING_INTERVAL            5000    //!< (check with upsd ever 5s)
 
 // Note !!! If you change this value you have to change the following tests as well: TODO
-#define AGENT_NUT_REPEAT_INTERVAL_SEC       NUT_MEASUREMENT_REPEAT_AFTER     //<! TODO 
+#define AGENT_NUT_REPEAT_INTERVAL_SEC       NUT_MEASUREMENT_REPEAT_AFTER     //<! TODO
 #define AGENT_NUT_SAMPLING_INTERVAL_SEC     5   //!< TODO: We might not need this anymore
 
 #define KEY_REPEAT "repeat"

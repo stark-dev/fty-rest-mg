@@ -31,7 +31,6 @@
 
 //  External dependencies
 #include <czmq.h>
-#include <malamute.h>
 #include <libcidr.h>
 #include <cxxtools/allocator.h>
 #include <tnt/tntnet.h>
@@ -43,6 +42,7 @@
 #include <fty_common.h>
 #include <fty_common_db.h>
 #include <fty_common_rest.h>
+#include <fty_common_mlm.h>
 #include <sasl/sasl.h>
 #include <ftyproto.h>
 
@@ -55,6 +55,7 @@
     ((major) * 10000 + (minor) * 100 + (patch))
 #define FTY_REST_VERSION \
     FTY_REST_MAKE_VERSION(FTY_REST_VERSION_MAJOR, FTY_REST_VERSION_MINOR, FTY_REST_VERSION_PATCH)
+
 
 #if defined (__WINDOWS__)
 #   if defined FTY_REST_STATIC
@@ -124,8 +125,6 @@ typedef struct _shared_ic_t shared_ic_t;
 #define SHARED_IC_T_DEFINED
 typedef struct _shared_subprocess_t shared_subprocess_t;
 #define SHARED_SUBPROCESS_T_DEFINED
-typedef struct _shared_tntmlm_t shared_tntmlm_t;
-#define SHARED_TNTMLM_T_DEFINED
 typedef struct _shared_topic_cache_t shared_topic_cache_t;
 #define SHARED_TOPIC_CACHE_T_DEFINED
 typedef struct _shared_upsstatus_t shared_upsstatus_t;
@@ -179,7 +178,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "shared/fty_asset_uptime_configurator.h"
 #include "shared/ic.h"
 #include "shared/subprocess.h"
-#include "shared/tntmlm.h"
 #include "shared/topic_cache.h"
 #include "shared/upsstatus.h"
 #include "shared/utils.h"
