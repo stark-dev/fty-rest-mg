@@ -99,8 +99,6 @@ typedef struct _db_assets_assetcr_t db_assets_assetcr_t;
 #define DB_ASSETS_ASSETCR_T_DEFINED
 typedef struct _db_assets_assetd_t db_assets_assetd_t;
 #define DB_ASSETS_ASSETD_T_DEFINED
-typedef struct _db_assets_assetr_t db_assets_assetr_t;
-#define DB_ASSETS_ASSETR_T_DEFINED
 typedef struct _db_assets_assetu_t db_assets_assetu_t;
 #define DB_ASSETS_ASSETU_T_DEFINED
 typedef struct _msg_asset_msg_t msg_asset_msg_t;
@@ -165,7 +163,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "db/topology2.h"
 #include "db/assets/assetcr.h"
 #include "db/assets/assetd.h"
-#include "db/assets/assetr.h"
 #include "db/assets/assetu.h"
 #include "msg/asset_msg.h"
 #include "msg/common_msg.h"

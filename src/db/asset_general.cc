@@ -479,7 +479,7 @@ db_reply_t
     }
 
     // BIOS-1962: we do not use this classification. So ignore it.
-    auto reply_select = select_monitor_device_type_id (conn, "not_classified");
+    auto reply_select = DBAssets::select_monitor_device_type_id (conn, "not_classified");
     if ( reply_select.status == 1 )
     {
         auto reply_insert6 = insert_into_monitor_device
@@ -557,7 +557,7 @@ db_reply_t
     m_dvc_id_t monitor_element_id = 0;
     {
         // find monitor counterpart
-        int rv = convert_asset_to_monitor(conn, element_id, monitor_element_id);
+        int rv = DBAssets::convert_asset_to_monitor(conn, element_id, monitor_element_id);
         if ( rv != 0 )
         {
             db_reply_t ret = db_reply_new();

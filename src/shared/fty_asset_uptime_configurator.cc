@@ -27,6 +27,7 @@
 */
 #include <fty_common.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db.h>
 #include "db/dbhelpers.h"
 #include "defs.h"
 #include <tntdb/connect.h>

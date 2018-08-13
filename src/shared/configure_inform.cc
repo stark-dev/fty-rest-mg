@@ -103,7 +103,7 @@ void
                 }
             }
         };
-        int r = persist::select_asset_element_super_parent (conn, oneRow.first.id, cb);
+        int r = DBAssets::select_asset_element_super_parent (conn, oneRow.first.id, cb);
         if (r == -1) {
             zhash_destroy (&aux);
             mlm_client_destroy (&client);

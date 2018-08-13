@@ -152,7 +152,7 @@ std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)
     return json;
   }
 
-  auto asset_element = persist::select_asset_element_web_byName(connection, fty_proto_name(alert));
+  auto asset_element = DBAssets::select_asset_element_web_byName(connection, fty_proto_name(alert));
   if (asset_element.status != 1)
   {
     log_error("%s", asset_element.msg.c_str());

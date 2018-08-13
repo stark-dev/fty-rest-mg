@@ -30,7 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "defs.h"
 #include "shared/asset_types.h"
-#include "db/assets/assetr.h"
+#include <fty_common_db_asset.h>
 
 namespace persist {
 

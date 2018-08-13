@@ -82,9 +82,9 @@ Assets
     };
     int rv;
     if (container)
-        rv = persist::select_assets_by_container(connection, container, types, subtypes, without, status, func);
+        rv = DBAssets::select_assets_by_container(connection, container, types, subtypes, without, status, func);
     else
-        rv = persist::select_assets_all_container(connection, types, subtypes, without, status, func);
+        rv = DBAssets::select_assets_all_container(connection, types, subtypes, without, status, func);
 
     if (rv != 0)
         throw std::runtime_error("Database failure");

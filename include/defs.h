@@ -35,7 +35,7 @@
 #define UI_PROPERTIES_CLIENT_ID 5
 #define DUMMY_DEVICE_ID 1
 
-//! Possible error types
+/*//! Possible error types
 enum errtypes {
     //! First error should be UNKNOWN as it maps to zero and zero is weird
     UNKNOWN_ERR,
@@ -72,7 +72,7 @@ enum internal_err {
     //! First error should be UNKNOWN as it maps to zero and zero is weird
     INTERNAL_UNKNOWN,
     INTERNAL_NOT_IMPLEMENTED
-};
+};*/
 
 
 // TODO: Make the following 5 values configurable

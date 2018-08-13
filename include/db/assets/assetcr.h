@@ -30,6 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "db/dbhelpers.h"
 
 #include "db/assetdef.h"
+#include <fty_common_db_asset.h>
 
 namespace persist {
 

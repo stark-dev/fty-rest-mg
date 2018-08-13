@@ -25,7 +25,6 @@ nobase_pkginclude_HEADERS += \
     db/topology2.h \
     db/assets/assetcr.h \
     db/assets/assetd.h \
-    db/assets/assetr.h \
     db/assets/assetu.h \
     msg/asset_msg.h \
     msg/common_msg.h \

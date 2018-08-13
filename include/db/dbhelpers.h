@@ -49,7 +49,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define MAX_DESCRIPTION_LENGTH  255
 
-typedef std::function<void(const tntdb::Row&)> row_cb_f ;
+/*typedef std::function<void(const tntdb::Row&)> row_cb_f ;
 
 template <typename T>
 struct db_reply{
@@ -91,7 +91,7 @@ inline db_reply<T> db_reply_new(T& item) {
     val.addinfo = NULL;
     val.item = item;
     return val;
-}
+}*/
 
 /**
  * \brief helper structure for results of v_bios_measurement

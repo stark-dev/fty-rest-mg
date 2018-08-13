@@ -21,7 +21,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // Then for every succesfull delete statement
 // 0 would be return as rowid
 
-#include "db/assets/assetr.h"
+#include <fty_common_db.h> 
 #include "shared/asset_types.h"
 
 #include <exception>
@@ -36,7 +36,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 namespace persist{
 
-db_reply <db_web_basic_element_t>
+/*db_reply <db_web_basic_element_t>
     select_asset_element_web_byId
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id)
@@ -100,9 +100,9 @@ db_reply <db_web_basic_element_t>
         LOG_END_ABNORMAL(e);
         return ret;
     }
-}
+}*/
 
-db_reply <db_web_basic_element_t>
+/*db_reply <db_web_basic_element_t>
     select_asset_element_web_byName
         (tntdb::Connection &conn,
          const char *element_name) {
@@ -156,9 +156,9 @@ db_reply <db_web_basic_element_t>
         ret.msg           = std::string ("Expcetion caught: '").append (e.what()).append ("'.");
         return ret;
     }
-}
+}*/
 
-db_reply <std::map <std::string, std::pair<std::string, bool> >>
+/*db_reply <std::map <std::string, std::pair<std::string, bool> >>
     select_ext_attributes
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id)
@@ -209,9 +209,9 @@ db_reply <std::map <std::string, std::pair<std::string, bool> >>
         LOG_END_ABNORMAL(e);
         return ret;
     }
-}
+}*/
 
-int
+/*int
 select_ext_attributes(
         tntdb::Connection &conn,
         a_elmnt_id_t element_id,
@@ -222,9 +222,9 @@ select_ext_attributes(
         return -1;
     out = dbreply.item;
     return 0;
-}
+}*/
 
-db_reply <std::vector <db_tmp_link_t>>
+/*db_reply <std::vector <db_tmp_link_t>>
     select_asset_device_links_to
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id,
@@ -279,10 +279,10 @@ db_reply <std::vector <db_tmp_link_t>>
         LOG_END_ABNORMAL(e);
         return ret;
     }
-}
+}*/
 
 
-db_reply <std::map <a_elmnt_id_t, std::string> >
+/*db_reply <std::map <a_elmnt_id_t, std::string> >
     select_asset_element_groups
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id)
@@ -335,9 +335,9 @@ db_reply <std::map <a_elmnt_id_t, std::string> >
         LOG_END_ABNORMAL(e);
         return ret;
     }
-}
+}*/
 
-db_reply <std::map <uint32_t, std::string> >
+/*db_reply <std::map <uint32_t, std::string> >
     select_short_elements
         (tntdb::Connection &conn,
          a_elmnt_tp_id_t type_id,
@@ -405,9 +405,10 @@ db_reply <std::map <uint32_t, std::string> >
         LOG_END_ABNORMAL(e);
         return ret;
     }
-}
+}*/
 
-reply_t
+// TODO: unused, remove
+/*reply_t
     select_dc_of_asset_element
         (tntdb::Connection &conn,
          a_elmnt_id_t  element_id,
@@ -488,9 +489,9 @@ reply_t
         dc_id = 0;
         return rep;
     }
-}
+}*/
 
-int
+/*int
     select_asset_element_all(
             tntdb::Connection& conn,
             std::function<void(
@@ -522,9 +523,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
     select_ext_rw_attributes_keytags(
             tntdb::Connection& conn,
             std::function<void(
@@ -555,9 +556,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 select_group_names(
         tntdb::Connection& conn,
         a_elmnt_id_t id,
@@ -587,9 +588,9 @@ select_group_names(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 select_group_names(
         tntdb::Connection& conn,
         a_elmnt_id_t id,
@@ -603,9 +604,9 @@ select_group_names(
             out.push_back(name);
         };
     return select_group_names(conn, id, func);
-}
+}*/
 
-int
+/*int
 select_v_web_asset_power_link_src_byId(
         tntdb::Connection& conn,
         a_elmnt_id_t id,
@@ -640,9 +641,9 @@ select_v_web_asset_power_link_src_byId(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 max_number_of_asset_groups(
         tntdb::Connection& conn)
 {
@@ -668,9 +669,9 @@ max_number_of_asset_groups(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 max_number_of_power_links(
         tntdb::Connection& conn)
 {
@@ -696,9 +697,9 @@ max_number_of_power_links(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 count_of_link_src(
         tntdb::Connection& conn,
         a_elmnt_id_t id)
@@ -727,9 +728,9 @@ count_of_link_src(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 unique_keytag(
         tntdb::Connection &conn,
         const std::string &keytag,
@@ -769,9 +770,9 @@ unique_keytag(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
 count_keytag(
         tntdb::Connection& conn,
         const std::string &keytag,
@@ -799,9 +800,9 @@ count_keytag(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-db_reply_t
+/*db_reply_t
     select_monitor_device_type_id
         (tntdb::Connection &conn,
          const char *device_type_name)
@@ -846,9 +847,9 @@ db_reply_t
         LOG_END_ABNORMAL (e);
         return ret;
     }
-}
+}*/
 
-int
+/*int
     convert_asset_to_monitor(
         tntdb::Connection &conn,
         a_elmnt_id_t       asset_element_id,
@@ -880,10 +881,10 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
 
-int
+/*int
     select_assets_all_container
         (tntdb::Connection &conn,
          std::vector<a_elmnt_tp_id_t> types,
@@ -972,9 +973,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
     select_assets_by_container
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id,
@@ -982,9 +983,9 @@ int
          )
 {
     return select_assets_by_container(conn, element_id, {}, {},"","", cb);
-}
+}*/
 
-int
+/*int
     select_assets_without_container
         (tntdb::Connection &conn,
          std::vector<a_elmnt_tp_id_t> types,
@@ -1031,9 +1032,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
     select_assets_by_container
         (tntdb::Connection &conn,
          a_elmnt_id_t element_id,
@@ -1118,9 +1119,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int select_asset_ext_attribute_by_keytag(
+/*int select_asset_ext_attribute_by_keytag(
     tntdb::Connection &conn,
     const std::string &keytag,
     const std::set<a_elmnt_id_t> &element_ids,
@@ -1151,9 +1152,9 @@ int select_asset_ext_attribute_by_keytag(
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
     select_asset_element_all_with_warranty_end(
             tntdb::Connection& conn,
             std::function<void(
@@ -1186,9 +1187,9 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
-int
+/*int
     select_asset_element_super_parent (
             tntdb::Connection& conn,
             a_elmnt_id_t id,
@@ -1266,6 +1267,6 @@ int
         LOG_END_ABNORMAL(e);
         return -1;
     }
-}
+}*/
 
 } // namespace end

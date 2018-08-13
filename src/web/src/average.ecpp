@@ -201,7 +201,7 @@ bool database_ready;
     try{
         tntdb::Connection conn = tntdb::connectCached(DBConn::url);
 
-        auto basic_ret = persist::select_asset_element_web_byId(conn, checked_element_id);
+        auto basic_ret = DBAssets::select_asset_element_web_byId(conn, checked_element_id);
         if ( basic_ret.status == 0 && basic_ret.errsubtype == DB_ERROR_NOTFOUND) {
             http_die ("element-not-found", "");
         }

@@ -23,7 +23,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #ifndef SRC_DB_ASSETS_H
 #define SRC_DB_ASSETS_H
 
-#include "assets/assetr.h"
+#include <fty_common_db.h>
 #include "assets/assetu.h"
 #include "assets/assetd.h"
 #include "assets/assetcr.h"
