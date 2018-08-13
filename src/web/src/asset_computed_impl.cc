@@ -27,7 +27,6 @@
 
 #include "shared/utils.h"
 #include "db/assets.h"
-#include "shared/asset_types.h"
 
 static int
 s_get_devices_usize(

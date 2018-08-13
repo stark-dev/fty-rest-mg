@@ -172,15 +172,12 @@
     <class name = "msg/asset_msg" private = "0" selftest = "0" />
     <class name = "msg/common_msg" private = "0" selftest = "0" />
 
-
     <class name = "persist/assetcrud" private = "1" selftest = "0" />
     <class name = "persist/assettopology" private = "1" selftest = "0" />
     <class name = "persist/dbhelpers" private = "1" selftest = "0" />
     <class name = "persist/monitor" private = "1" selftest = "0" />
     <class name = "persist/persist_error" private = "1" selftest = "0" />
 
-
-    <class name = "shared/asset_types" private = "0" selftest = "0" />
     <class name = "shared/augtool" private = "0" selftest = "0" />
     <class name = "shared/cidr" private = "0" selftest = "0" />
     <class name = "shared/configure_inform" private = "0" selftest = "0" />
