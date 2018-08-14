@@ -34,12 +34,12 @@
 #include <czmq.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common.h>
 
 #include "defs.h"
 #include "shared/data.h"
 #include "msg/common_msg.h"
 #include "web/src/location_helpers.h"
-#include "shared/asset_types.h"
 #include "src/persist/assettopology.h"
 #include "cleanup.h"
 </%pre>

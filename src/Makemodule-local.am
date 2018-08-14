@@ -55,8 +55,6 @@ src_db_bios_csv_SOURCES += \
 	 include/db/dbhelpers.h \
 	 src/db/agentstate/agentstate.cc \
 	 src/db/agentstate/agentstate.h \
-	 src/shared/asset_types.cc \
-	 include/shared/asset_types.h \
 	 include/dbtypes.h \
 	 src/shared/topic_cache.cc \
 	 include/shared/topic_cache.h \
@@ -479,8 +477,6 @@ libpriv_utils_la_SOURCES = 	\
 				include/db/dbhelpers.h \
 				src/db/agentstate/agentstate.cc \
 				src/db/agentstate/agentstate.h \
-				src/shared/asset_types.cc \
-				include/shared/asset_types.h \
 				include/dbtypes.h \
 				src/shared/topic_cache.cc \
 				include/shared/topic_cache.h \

@@ -31,9 +31,9 @@
 #include <algorithm>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_rest.h>
-#include "shared/data.h"
+#include <fty_common.h>
 
-#include "shared/asset_types.h"
+#include "shared/data.h"
 #include "defs.h"
 
 #include "../db/asset_general.h"

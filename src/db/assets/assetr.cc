@@ -22,7 +22,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 // 0 would be return as rowid
 
 #include "db/assets/assetr.h"
-#include "shared/asset_types.h"
 
 #include <exception>
 #include <assert.h>
@@ -31,6 +30,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/result.h>
 #include <tntdb/error.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common.h>
 #include "defs.h"
 
 

@@ -107,8 +107,6 @@ typedef struct _msg_asset_msg_t msg_asset_msg_t;
 #define MSG_ASSET_MSG_T_DEFINED
 typedef struct _msg_common_msg_t msg_common_msg_t;
 #define MSG_COMMON_MSG_T_DEFINED
-typedef struct _shared_asset_types_t shared_asset_types_t;
-#define SHARED_ASSET_TYPES_T_DEFINED
 typedef struct _shared_augtool_t shared_augtool_t;
 #define SHARED_AUGTOOL_T_DEFINED
 typedef struct _shared_cidr_t shared_cidr_t;
@@ -169,7 +167,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "db/assets/assetu.h"
 #include "msg/asset_msg.h"
 #include "msg/common_msg.h"
-#include "shared/asset_types.h"
 #include "shared/augtool.h"
 #include "shared/cidr.h"
 #include "shared/configure_inform.h"

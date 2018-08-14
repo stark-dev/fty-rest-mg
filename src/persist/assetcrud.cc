@@ -36,7 +36,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "assetcrud.h"
 #include "monitor.h"
 #include "persist_error.h"
-#include "shared/asset_types.h"
 #include "cleanup.h"
 #include "db/assets.h"
 

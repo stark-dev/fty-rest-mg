@@ -27,9 +27,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 #include <fty_common_rest.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common.h>
 
 #include "defs.h"
-#include "shared/asset_types.h"
 #include "db/assets/assetr.h"
 
 namespace persist {
