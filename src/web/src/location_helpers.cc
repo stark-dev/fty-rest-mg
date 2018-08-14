@@ -30,8 +30,8 @@
 #include <list>
 #include <tnt/http.h>
 #include <fty_common_db_asset.h>
+#include <fty_common.h>
 
-#include "shared/asset_types.h"
 #include "cleanup.h"
 #include "shared/utilspp.h"
 

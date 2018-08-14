@@ -26,9 +26,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/error.h>
 
 #include <fty_common_db_dbpath.h>
+#include <fty_common.h>
 #include <fty_log.h>
 #include "persist_error.h"
-#include "shared/asset_types.h"
 
 int convert_asset_to_monitor_safe(const char* url,
                 a_elmnt_id_t asset_element_id, m_dvc_id_t *device_id)

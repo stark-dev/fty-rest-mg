@@ -28,7 +28,6 @@ nobase_pkginclude_HEADERS += \
     db/assets/assetu.h \
     msg/asset_msg.h \
     msg/common_msg.h \
-    shared/asset_types.h \
     shared/augtool.h \
     shared/cidr.h \
     shared/configure_inform.h \

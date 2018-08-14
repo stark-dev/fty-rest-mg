@@ -34,10 +34,10 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset.h>
 #include <fty_common_mlm_tntmlm.h>
+#include <fty_common.h>
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
-#include "shared/asset_types.h"
 #include "defs.h"
 
 static std::string
