@@ -822,7 +822,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     // if id is set, then it is right time to check what is going on in DB
     if ( !id_str.empty() )
     {
-        db_reply <db_web_basic_element_t> element_in_db = select_asset_element_web_byId
+        db_reply <db_web_basic_element_t> element_in_db = DBAssets::select_asset_element_web_byId
                                                         (conn, id);
         if ( element_in_db.status == 0 ) {
             if (element_in_db.errsubtype == DB_ERROR_NOTFOUND) {

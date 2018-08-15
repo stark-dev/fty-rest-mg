@@ -49,50 +49,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #define MAX_DESCRIPTION_LENGTH  255
 
-typedef std::function<void(const tntdb::Row&)> row_cb_f ;
-
-template <typename T>
-struct db_reply{
-    int status; // ok/fail
-    int errtype;
-    int errsubtype;
-    uint64_t rowid;  // insert/update or http error code if status == 0
-    uint64_t affected_rows; // for update/insert/delete
-    std::string msg;
-    zhash_t *addinfo;
-    T item;
-};
-
-typedef db_reply<uint64_t> db_reply_t;
-
-inline db_reply_t db_reply_new() {
-    db_reply_t val;
-    val.status = 1;
-    val.errtype = 0;
-    val.errsubtype = 0;
-    val.rowid = 0;
-    val.affected_rows = 0;
-    val.msg = "";
-    val.addinfo = NULL;
-    val.item = 0;
-
-    return val;
-}
-
-template <typename T>
-inline db_reply<T> db_reply_new(T& item) {
-    db_reply<T> val;
-    val.status = 1;
-    val.errtype = 0;
-    val.errsubtype = 0;
-    val.rowid = 0;
-    val.affected_rows = 0;
-    val.msg = "";
-    val.addinfo = NULL;
-    val.item = item;
-    return val;
-}
-
 /**
  * \brief helper structure for results of v_bios_measurement
  */

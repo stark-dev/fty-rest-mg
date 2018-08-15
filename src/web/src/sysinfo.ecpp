@@ -81,16 +81,16 @@ get_location (
         tntdb::Connection conn = tntdb::connectCached (DBConn::url);
         log_debug ("tntdb::connectCached (url = '%s') successful", DBConn::url.c_str ());
         db_reply <std::map <uint32_t, std::string>> elements =
-            persist::select_short_elements (
+            DBAssets::select_short_elements (
                                     conn,
                                     persist::asset_type::DATACENTER,
                                     persist::asset_subtype::N_A);
-        log_debug ("persist::select_short_elements () successful");
+        log_debug ("DBAssets::select_short_elements () successful");
         bool do_break = false;
         for (auto it = elements.item.cbegin(); it != elements.item.cend(); ++it) {
             // it->first is element_id
             std::map <std::string, std::pair<std::string, bool>> ext;
-            int rv = persist::select_ext_attributes (conn, it->first, ext);
+            int rv = DBAssets::select_ext_attributes (conn, it->first, ext);
             if (rv == -1) {
                 continue;
             }

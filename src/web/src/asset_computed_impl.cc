@@ -42,7 +42,7 @@ s_get_devices_usize(
         }
     };
 
-    int rv = persist::select_asset_ext_attribute_by_keytag( conn, "u_size", elements, sumarize );
+    int rv = DBAssets::select_asset_ext_attribute_by_keytag( conn, "u_size", elements, sumarize );
     if (rv != 0)
         return rv;
     return size;
@@ -75,7 +75,7 @@ int free_u_size( a_elmnt_id_t elementId)
                     element_ids.insert (asset_id);
             };
 
-        auto rv = persist::select_assets_by_container(conn, elementId, func);
+        auto rv = DBAssets::select_assets_by_container(conn, elementId, func);
         if ( rv==-1 ) {
             log_debug( "free_u_size() rv is null");
             return -1;
@@ -103,7 +103,7 @@ s_select_outlet_count(
     static const char* KEY = "outlet.count";
 
     std::map <std::string, std::pair<std::string, bool> > res;
-    int ret = persist::select_ext_attributes(conn, id, res);
+    int ret = DBAssets::select_ext_attributes(conn, id, res);
 
     if (ret != 0 || res.count(KEY) == 0)
         return UINT32_MAX;
@@ -147,7 +147,7 @@ rack_outlets_available(
             uint32_t foo = s_select_outlet_count(conn, device_asset_id);
             int outlet_count = foo != UINT32_MAX ? foo : -1;
 
-            int outlet_used = persist::count_of_link_src(conn, device_asset_id);
+            int outlet_used = DBAssets::count_of_link_src(conn, device_asset_id);
             if (outlet_used == -1)
                 outlet_count = -1;
             else
@@ -163,7 +163,7 @@ rack_outlets_available(
     int rv;
     try {
         conn = tntdb::connectCached(DBConn::url);
-        rv = persist::select_assets_by_container(
+        rv = DBAssets::select_assets_by_container(
                 conn, elementId, cb);
 
     } catch (std::exception &e) {

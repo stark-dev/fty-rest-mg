@@ -157,7 +157,6 @@
     <class name = "db/topology2" private = "0" selftest = "0" />
     <class name = "db/assets/assetcr" private = "0" selftest = "0" />
     <class name = "db/assets/assetd" private = "0" selftest = "0" />
-    <class name = "db/assets/assetr" private = "0" selftest = "0" />
     <class name = "db/assets/assetu" private = "0" selftest = "0" />
 
     <header name = "db/assets" private = "0" />

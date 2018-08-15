@@ -29,6 +29,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "dbtypes.h"
 #include "defs.h"
 #include "db/dbhelpers.h"
+#include <fty_common_db_asset.h>
 
 // ===============================================================
 // Helper functions for direct interacting with database

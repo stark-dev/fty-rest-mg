@@ -123,7 +123,7 @@ const char * Sse::loadAssetFromDatacenter()
   std::map<std::string, int> assetsWithNoLocation;
 
   //Get all assets from the datacenter
-  auto asset_element = persist::select_asset_element_web_byId(_connection, _datacenter_id);
+  auto asset_element = DBAssets::select_asset_element_web_byId(_connection, _datacenter_id);
   if (asset_element.status != 1)
   {
     return asset_element.msg.c_str();
@@ -133,7 +133,7 @@ const char * Sse::loadAssetFromDatacenter()
 
   try
   {
-    int rv = persist::select_assets_by_container(_connection, _datacenter_id,
+    int rv = DBAssets::select_assets_by_container(_connection, _datacenter_id,
       [&assets](const tntdb::Row & row) -> void
       {
         std::string name;
@@ -142,7 +142,7 @@ const char * Sse::loadAssetFromDatacenter()
       });
     if (rv != 0)
     {
-      return "persist::select_assets_by_container () failed.";
+      return "DBAssets::select_assets_by_container () failed.";
     }
   }
   catch (const tntdb::Error& e)
@@ -166,7 +166,7 @@ const char * Sse::loadAssetFromDatacenter()
   //Get all assets without location
   try
   {
-    int rv = persist::select_assets_without_container(_connection,{persist::asset_type::DEVICE},{},
+    int rv = DBAssets::select_assets_without_container(_connection,{persist::asset_type::DEVICE},{},
       [&assetsWithNoLocation](const tntdb::Row & row) -> void
       {
         std::string name;
@@ -175,7 +175,7 @@ const char * Sse::loadAssetFromDatacenter()
       });
     if (rv != 0)
     {
-      return "persist::select_assets_by_container () failed.";
+      return "DBAssets::select_assets_by_container () failed.";
     }
   }
   catch (const tntdb::Error& e)

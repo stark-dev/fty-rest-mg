@@ -185,7 +185,7 @@ catch (const std::exception& e) {
 log_debug ("Asset element id = '%" PRIu32 "'.", element_id);
 
 if (!checked_asset.empty ()) {
-    auto asset_element = persist::select_asset_element_web_byId (connection, element_id);
+    auto asset_element = DBAssets::select_asset_element_web_byId (connection, element_id);
     if (asset_element.status != 1)
         http_die ("internal-error", asset_element.msg.c_str ());
     log_debug ("Asset element name = '%s'.", asset_element.item.name.c_str ());
@@ -193,7 +193,7 @@ if (!checked_asset.empty ()) {
 
     if (checked_recursive.compare ("true") == 0) {
         try {
-            int rv = persist::select_assets_by_container (
+            int rv = DBAssets::select_assets_by_container (
                 connection,
                 element_id,
                 [&desired_elements](const tntdb::Row& row) -> void {
@@ -201,7 +201,7 @@ if (!checked_asset.empty ()) {
                     row[0].get (name);
                     desired_elements.emplace (std::make_pair (name, 5));
                 });
-            if (rv != 0) { http_die ("internal-error", "persist::select_assets_by_container () failed."); }
+            if (rv != 0) { http_die ("internal-error", "DBAssets::select_assets_by_container () failed."); }
         }
         catch (const tntdb::Error& e) {
             http_die ("internal-error", e.what ());// TODO

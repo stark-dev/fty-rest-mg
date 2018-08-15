@@ -81,10 +81,10 @@ s_get_parents (tntdb::Connection &conn, a_elmnt_id_t id)
             }
     };
 
-    int r = persist::select_asset_element_super_parent (conn, id, cb);
+    int r = DBAssets::select_asset_element_super_parent (conn, id, cb);
     if (r == -1) {
         log_error ("select_asset_element_super_parent failed");
-        throw std::runtime_error ("persist::select_asset_element_super_parent () failed.");
+        throw std::runtime_error ("DBAssets::select_asset_element_super_parent () failed.");
     }
 
     return ret;
@@ -100,7 +100,7 @@ db_reply <db_web_element_t>
         tntdb::Connection conn = tntdb::connectCached(DBConn::url);
         log_debug ("connection was successful");
 
-        auto basic_ret = persist::select_asset_element_web_byId(conn, id);
+        auto basic_ret = DBAssets::select_asset_element_web_byId(conn, id);
         log_debug ("1/5 basic select is done");
 
         if ( basic_ret.status == 0 )
@@ -115,7 +115,7 @@ db_reply <db_web_element_t>
         log_debug ("    1/5 no errors");
         ret.item.basic = basic_ret.item;
 
-        auto ext_ret = persist::select_ext_attributes(conn, id);
+        auto ext_ret = DBAssets::select_ext_attributes(conn, id);
         log_debug ("2/5 ext select is done");
 
         if ( ext_ret.status == 0 )
@@ -130,7 +130,7 @@ db_reply <db_web_element_t>
         log_debug ("    2/5 no errors");
         ret.item.ext = ext_ret.item;
 
-        auto group_ret = persist::select_asset_element_groups(conn, id);
+        auto group_ret = DBAssets::select_asset_element_groups(conn, id);
         log_debug ("3/5 groups select is done, but next one is only for devices");
 
         if ( group_ret.status == 0 )
@@ -147,7 +147,7 @@ db_reply <db_web_element_t>
 
         if ( ret.item.basic.type_id == persist::asset_type::DEVICE )
         {
-            auto powers = persist::select_asset_device_links_to (conn, id, INPUT_POWER_CHAIN);
+            auto powers = DBAssets::select_asset_device_links_to (conn, id, INPUT_POWER_CHAIN);
             log_debug ("4/5 powers select is done");
 
             if ( powers.status == 0 )
@@ -223,7 +223,7 @@ db_reply <std::map <uint32_t, std::string> >
 
     try{
         tntdb::Connection conn = tntdb::connectCached(DBConn::url);
-        ret = persist::select_short_elements(conn, type_id, subtype_id);
+        ret = DBAssets::select_short_elements(conn, type_id, subtype_id);
         if ( ret.status == 0 )
             bios_error_idx(ret.rowid, ret.msg, "internal-error", "");
         LOG_END;
@@ -257,7 +257,7 @@ db_reply_t
         tntdb::Connection conn = tntdb::connectCached(DBConn::url);
 
         db_reply <db_web_basic_element_t> basic_info =
-            persist::select_asset_element_web_byId(conn, id);
+            DBAssets::select_asset_element_web_byId(conn, id);
 
         if ( basic_info.status == 0 )
         {
@@ -283,7 +283,7 @@ db_reply_t
         }
 
         // check if a logical_asset refer to the item we are trying to delete
-        if (persist::count_keytag(conn,"logical_asset",element_info.name) >0 ){
+        if (DBAssets::count_keytag(conn,"logical_asset",element_info.name) >0 ){
             ret.status        = 0;
             ret.errtype       = basic_info.errsubtype;
             ret.errsubtype    = DB_ERROR_DELETEFAIL;

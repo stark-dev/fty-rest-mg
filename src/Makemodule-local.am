@@ -60,12 +60,10 @@ src_db_bios_csv_SOURCES += \
 	 include/shared/topic_cache.h \
 	 include/db/assets.h \
 	 include/db/assets/assetcr.h \
-	 include/db/assets/assetr.h \
 	 include/db/assets/assetu.h \
 	 include/db/assets/assetd.h \
 	 include/db/assetdef.h \
 	 src/db/assets/assetcr.cc \
-	 src/db/assets/assetr.cc \
 	 src/db/assets/assetu.cc \
 	 src/db/assets/assetd.cc \
 	 src/db/inout.h \
@@ -482,12 +480,10 @@ libpriv_utils_la_SOURCES = 	\
 				include/shared/topic_cache.h \
 				include/db/assets.h \
 				include/db/assets/assetcr.h \
-				include/db/assets/assetr.h \
 				include/db/assets/assetu.h \
 				include/db/assets/assetd.h \
 				include/db/assetdef.h \
 				src/db/assets/assetcr.cc \
-				src/db/assets/assetr.cc \
 				src/db/assets/assetu.cc \
 				src/db/assets/assetd.cc \
 				src/db/inout.h \
