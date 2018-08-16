@@ -25,7 +25,7 @@
  #><%pre>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_mlm_tntmlm.h>
-#include "defs.h"
+#include <fty_common_agents.h>
 #include <stdlib.h>
 #include <sys/types.h>
 
@@ -90,14 +90,14 @@ UserInfo user;
     // send message
     zuuid_t *uuid = zuuid_new ();
     zmsg_t *send = s_smtp_GET_message (checked_email.c_str(), uuid);
-    int rv = client->sendto (FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL", 1000, &send);
+    int rv = client->sendto (AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL", 1000, &send);
 
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
         log_fatal (
                     "Error: client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
-                        FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL");
+                        AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL");
         http_die ("internal-error", "client->sendto () failed");
     }
 

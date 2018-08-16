@@ -56,7 +56,6 @@
 #define FTY_REST_VERSION \
     FTY_REST_MAKE_VERSION(FTY_REST_VERSION_MAJOR, FTY_REST_VERSION_MINOR, FTY_REST_VERSION_PATCH)
 
-
 #if defined (__WINDOWS__)
 #   if defined FTY_REST_STATIC
 #       define FTY_REST_EXPORT
@@ -152,7 +151,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "preproc.h"
-#include "defs.h"
 #include "db/assetdef.h"
 #include "db/assets.h"
 #include "db/dbhelpers.h"

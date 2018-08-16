@@ -32,7 +32,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 #include <fty_common.h>
 
-#include "defs.h"
 #include "assetcrud.h"
 #include "monitor.h"
 #include "persist_error.h"

@@ -1,6 +1,6 @@
-/* 
+/*
 Copyright (C) 2014 - 2015 Eaton
- 
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_common.h>
 
 #include "shared/utils.h"
-#include "defs.h"
 #include "cleanup.h"
 
 bool is_average_step_supported (const char *step) {
@@ -110,7 +109,7 @@ int calendar_to_datetime(time_t timestamp, char* buffer, size_t n) {
 }
 
 int64_t my_timegm (struct tm *tm) {
-    // set the TZ environment variable to UTC, call mktime(3) and restore the value of TZ. 
+    // set the TZ environment variable to UTC, call mktime(3) and restore the value of TZ.
     time_t ret;
     char *tz;
     tz = getenv("TZ");
@@ -150,7 +149,7 @@ int32_t string_to_int32( const char *value )
     if( errno ) return INT32_MAX;
     return result;
 }
-    
+
 uint64_t string_to_uint64( const char *value )
 {
     char *end;

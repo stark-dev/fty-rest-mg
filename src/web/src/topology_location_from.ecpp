@@ -36,7 +36,6 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common.h>
 
-#include "defs.h"
 #include "shared/data.h"
 #include "msg/common_msg.h"
 #include "web/src/location_helpers.h"
