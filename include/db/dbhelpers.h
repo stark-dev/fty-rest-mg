@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2015 Eaton
- 
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -63,54 +63,6 @@ struct db_msrmnt_t {
 };
 
 /**
- * \brief helper structure for results of v_bios_asset_element
- */
-struct db_a_elmnt_t {
-    a_elmnt_id_t     id;
-    std::string      name;
-    std::string      status;
-    a_elmnt_id_t     parent_id;
-    a_elmnt_pr_t     priority;
-    a_elmnt_tp_id_t  type_id;
-    a_elmnt_stp_id_t subtype_id;
-    std::string      asset_tag;
-    std::map <std::string, std::string> ext;
-
-    db_a_elmnt_t () :
-        id{},
-        name{},
-        status{},
-        parent_id{},
-        priority{},
-        type_id{},
-        subtype_id{},
-        asset_tag{},
-        ext{}
-    {}
-
-    db_a_elmnt_t (
-        a_elmnt_id_t     id,
-        std::string      name,
-        std::string      status,
-        a_elmnt_id_t     parent_id,
-        a_elmnt_pr_t     priority,
-        a_elmnt_tp_id_t  type_id,
-        a_elmnt_stp_id_t subtype_id,
-        std::string      asset_tag) :
-
-        id(id),
-        name(name),
-        status(status),
-        parent_id(parent_id),
-        priority(priority),
-        type_id(type_id),
-        subtype_id(subtype_id),
-        asset_tag(asset_tag),
-        ext{}
-    {}
-};
-
-/**
  * \brief A type for storing basic information about device.
  *
  * First  -- id
@@ -154,7 +106,7 @@ typedef std::tuple< a_elmnt_id_t, std::string, a_elmnt_id_t, std::string > power
 
 
 /**
- * \brief This function looks for a device_discovered in a monitor part 
+ * \brief This function looks for a device_discovered in a monitor part
  * which is connected with the specified asset_element in the asset part.
  *
  * Throws exceptions: bios::MonitorCounterpartNotFound
@@ -169,19 +121,19 @@ typedef std::tuple< a_elmnt_id_t, std::string, a_elmnt_id_t, std::string > power
  * \param url              - the connection to database.
  * \param asset_element_id - the id of the asset_element.
  *
- * \return device_discovered_id - of the device connected with the 
+ * \return device_discovered_id - of the device connected with the
  *                                asset_element.
  */
-m_dvc_id_t convert_asset_to_monitor_old(const char* url, 
+m_dvc_id_t convert_asset_to_monitor_old(const char* url,
                 a_elmnt_id_t asset_element_id);
 
 // the same as previos. but c-style error handling
-int convert_asset_to_monitor_safe_old(const char* url, 
+int convert_asset_to_monitor_safe_old(const char* url,
                 a_elmnt_id_t asset_element_id, m_dvc_id_t *device_id);
 
 
 /**
- * \brief This function looks for an asset_element in an asset part which 
+ * \brief This function looks for an asset_element in an asset part which
  * is connected with the specified device_discovered in monitor part.
  *
  * Throws exceptions: bios::NotFound
@@ -192,13 +144,13 @@ int convert_asset_to_monitor_safe_old(const char* url,
  * \param url                  - the connection to database.
  * \param device_discovered_id - the id of the device_discovered.
  *
- * \return asset_element_id - id of the asset_element connected with the 
+ * \return asset_element_id - id of the asset_element connected with the
  *                                device_discovered.
  */
-a_elmnt_id_t convert_monitor_to_asset(const char* url, 
+a_elmnt_id_t convert_monitor_to_asset(const char* url,
                     m_dvc_id_t discovered_device_id);
 
-int convert_monitor_to_asset_safe(const char* url, 
+int convert_monitor_to_asset_safe(const char* url,
                     m_dvc_id_t discovered_device_id, a_elmnt_id_t *asset_element_id);
 
 /**
@@ -214,7 +166,7 @@ int convert_monitor_to_asset_safe(const char* url,
 bool is_ok_element_type (a_elmnt_tp_id_t element_type_id);
 
 /**
- * \brief Checks if name is correct 
+ * \brief Checks if name is correct
  *
  * \param name - name to check
  *

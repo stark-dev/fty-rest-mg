@@ -31,6 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdexcept>
 
 #include <fty_common.h>
+#include <fty_common_db.h>
 #include "shared/csv.h"
 
 #include "db/dbhelpers.h"
