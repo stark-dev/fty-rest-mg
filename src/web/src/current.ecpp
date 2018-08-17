@@ -38,7 +38,6 @@
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
-#include "defs.h"
 
 static std::string
 s_os2string(

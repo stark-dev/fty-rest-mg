@@ -13,7 +13,6 @@ nobase_pkginclude_HEADERS = \
     cleanup.h \
     dbtypes.h \
     preproc.h \
-    defs.h \
     db/assetdef.h \
     db/assets.h \
     db/dbhelpers.h \

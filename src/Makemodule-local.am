@@ -27,7 +27,6 @@ if ENABLE_DB_BIOS_CSV
 src_db_bios_csv_SOURCES += \
 	 src/shared/utils.cc \
 	 include/shared/utils.h \
-	 include/defs.h \
 	 include/shared/utils_json.h \
 	 src/shared/utils_json.cc \
 	 src/shared/utilspp.cc \
@@ -446,7 +445,6 @@ noinst_LTLIBRARIES += 		libpriv-utils.la
 libpriv_utils_la_SOURCES = 	\
 				src/shared/utils.cc \
 				include/shared/utils.h \
-				include/defs.h \
 				include/shared/utils_json.h \
 				src/shared/utils_json.cc \
 				include/shared/utilspp.h \

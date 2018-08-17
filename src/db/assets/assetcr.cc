@@ -29,7 +29,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_common_db_dbpath.h>
 #include <fty_common.h>
 
-#include "defs.h"
 #include <fty_common_db_asset.h>
 
 namespace persist {

@@ -45,7 +45,6 @@
 #include "cleanup.h"
 #include <tntdb.h>
 #include "db/assets.h"
-#include "defs.h"
 
 // Check if value of parameter 'relative' is supported:
 //  * No - return false, value of unixtime is not changed

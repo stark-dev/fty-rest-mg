@@ -29,7 +29,6 @@
 #include <catch.hpp>
 #include <fty_common.h>
 
-#include "defs.h"
 #include "shared/utils.h"
 
 // Note: Tests here do bad things on purpose

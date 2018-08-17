@@ -34,7 +34,6 @@
 #include <fty_common.h>
 
 #include "shared/data.h"
-#include "defs.h"
 
 #include "../db/asset_general.h"
 

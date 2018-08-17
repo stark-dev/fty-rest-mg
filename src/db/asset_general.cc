@@ -23,7 +23,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <fty_common.h>
 #include <fty_common_db_asset.h>
-#include "defs.h"
 #include "shared/ic.h"
 #include "shared/utilspp.h"
 

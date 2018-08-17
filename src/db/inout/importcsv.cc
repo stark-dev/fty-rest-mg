@@ -49,11 +49,11 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 using namespace shared;
 
 namespace persist {
+
 typedef struct _LIMITATIONS_STRUCT
 {
     int max_active_power_devices;
     int global_configurability;
-
 } LIMITATIONS_STRUCT;
 
 int

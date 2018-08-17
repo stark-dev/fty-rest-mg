@@ -34,7 +34,6 @@
 #include <fty_common_db_asset.h>
 #include <fty_common.h>
 
-#include "defs.h"
 #include "shared/data.h"
 #include "web/src/location_helpers.h"
 #include "src/persist/assettopology.h"
