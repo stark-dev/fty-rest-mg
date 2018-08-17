@@ -34,20 +34,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "dbtypes.h"
 
 #include "preproc.h"
-// all fields called name
-#define MAX_NAME_LENGTH         50
-// t_bios_asset_ext_attributes.keytag
-#define MAX_KEYTAG_LENGTH       40
-// t_bios_asset_ext_attributes.value
-#define MAX_VALUE_LENGTH        255
-// t_bios_asset_device.mac
-#define MAX_MAC_LENGTH          17
-// t_bios_asset_device.hostname
-#define MAX_HOSTNAME_LENGTH     25
-// t_bios_asset_device.fullhostname
-#define MAX_FULLHOSTNAME_LENGTH 45
-
-#define MAX_DESCRIPTION_LENGTH  255
 
 /**
  * \brief helper structure for results of v_bios_measurement
