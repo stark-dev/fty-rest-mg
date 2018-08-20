@@ -114,8 +114,6 @@ typedef struct _shared_csv_t shared_csv_t;
 #define SHARED_CSV_T_DEFINED
 typedef struct _shared_data_t shared_data_t;
 #define SHARED_DATA_T_DEFINED
-typedef struct _shared_fty_asset_uptime_configurator_t shared_fty_asset_uptime_configurator_t;
-#define SHARED_FTY_ASSET_UPTIME_CONFIGURATOR_T_DEFINED
 typedef struct _shared_ic_t shared_ic_t;
 #define SHARED_IC_T_DEFINED
 typedef struct _shared_subprocess_t shared_subprocess_t;
@@ -167,7 +165,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "shared/configure_inform.h"
 #include "shared/csv.h"
 #include "shared/data.h"
-#include "shared/fty_asset_uptime_configurator.h"
 #include "shared/ic.h"
 #include "shared/subprocess.h"
 #include "shared/topic_cache.h"

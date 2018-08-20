@@ -98,7 +98,6 @@ src_libfty_rest_la_SOURCES += \
     src/shared/configure_inform.cc \
     src/shared/csv.cc \
     src/shared/data.cc \
-    src/shared/fty_asset_uptime_configurator.cc \
     src/shared/ic.cc \
     src/shared/subprocess.cc \
     src/shared/topic_cache.cc \

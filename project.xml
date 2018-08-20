@@ -181,7 +181,6 @@
     <class name = "shared/configure_inform" private = "0" selftest = "0" />
     <class name = "shared/csv" private = "0" selftest = "0" />
     <class name = "shared/data" private = "0" selftest = "0" />
-    <class name = "shared/fty_asset_uptime_configurator" private = "0" selftest = "0" />
     <class name = "shared/ic" private = "0" selftest = "0" />
     <class name = "shared/magic" private = "1" selftest = "0" />
     <class name = "shared/subprocess" private = "0" selftest = "0" />
