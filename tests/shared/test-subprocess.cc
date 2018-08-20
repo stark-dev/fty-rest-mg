@@ -34,9 +34,8 @@
 #include <czmq.h>       // sadly, but zclock_mono is way simpler than std::chrono ...
 #include <iostream>
 
-#include "shared/subprocess.h"
-
-using namespace shared;
+#include <fty_common_mlm_subprocess.h>
+using namespace MlmSubprocess;
 
 TEST_CASE("subprocess-wait-true", "[subprocess][wait]") {
 

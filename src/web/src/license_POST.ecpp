@@ -38,7 +38,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_filesystem.h>
-#include "shared/subprocess.h"
+#include <fty_common_mlm_subprocess.h>
 
 </%pre>
 <%request scope="global">
@@ -103,14 +103,14 @@ bool database_ready;
         // 10 minutes; if this does happen - we should add a thread
         // to report "we're alive" to the server while waiting...
         log_info("Starting db service .." );
-        shared::Argv proc_cmd {"/usr/libexec/fty/start-db-services"};
+        MlmSubprocess::Argv proc_cmd {"/usr/libexec/fty/start-db-services"};
         std::string proc_out, proc_err;
 
         // due to some OS circumstances, the script can sometimes block
         // while calling the /bin/systemctl and is eventually killed,
         // even though the actual services of our product have started
         // long before this; so even if it failed - try to use the DB...
-        int rv_svc = shared::simple_output (proc_cmd, proc_out, proc_err);
+        int rv_svc = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
         if (rv_svc != 0) {
             log_error("Starting of start-db-services have failed. Consult system logs");
             log_error("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
@@ -121,11 +121,11 @@ bool database_ready;
             // subprocess timeout handling - fall through to try using DB
 
             {
-                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-engine"};
+                MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-engine"};
                 // This should get our "systemctl" wrapper via PATH
                 std::string proc_out, proc_err;
 
-                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+                int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
 
                 if (rv != 0) {
                     std::string message;
@@ -141,11 +141,11 @@ bool database_ready;
             }
 
             {
-                shared::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-init"};
+                MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-init"};
                 // This should get our "systemctl" wrapper via PATH
                 std::string proc_out, proc_err;
 
-                int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+                int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
 
                 if (rv != 0) {
                     std::string message;

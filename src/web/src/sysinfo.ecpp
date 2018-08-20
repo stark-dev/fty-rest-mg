@@ -47,8 +47,8 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common.h>
+#include <fty_common_mlm_subprocess.h>
 
-#include "shared/subprocess.h"
 #include "db/assets.h"
 #include "shared/utils.h"
 #include "git_details_override.h"
@@ -158,9 +158,9 @@ sysinfo_detail (
 
     std::string container_info;
     {
-        log_debug ("shared::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-c\"}') starting");
-        int rv = shared::output2 ({"/usr/bin/systemd-detect-virt", "-c"}, container_info, 0, 100);
-        log_debug ("shared::output2 finished with return value == '%" PRIi32"'", rv);
+        log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-c\"}') starting");
+        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-c"}, container_info, 0, 100);
+        log_debug ("MlmSubprocess::output2 finished with return value == '%" PRIi32"'", rv);
 
         size_t output_len = container_info.length();
         if (rv != 0 && output_len<2) {
@@ -177,9 +177,9 @@ sysinfo_detail (
 
     std::string hypervisor_info;
     {
-        log_debug ("shared::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-v\"}') starting");
-        int rv = shared::output2 ({"/usr/bin/systemd-detect-virt", "-v"}, hypervisor_info, 0, 100);
-        log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+        log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-v\"}') starting");
+        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-v"}, hypervisor_info, 0, 100);
+        log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
 
         size_t output_len = hypervisor_info.length();
         if (rv != 0 && output_len<2) {
@@ -397,12 +397,12 @@ sysinfo_detail (
         int skipped_dpkg_lines = -1; // count lines that we could not parse, but expected to
 
         {
-            log_debug ("shared::output (args = '{\"dpkg\", \"--list\"}') starting");
-            rv_dpkg = shared::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
-            log_debug ("shared::output () finished with return value == '%" PRIi32"'", rv_dpkg);
+            log_debug ("MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') starting");
+            rv_dpkg = MlmSubprocess::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
+            log_debug ("MlmSubprocess::output () finished with return value == '%" PRIi32"'", rv_dpkg);
             if (rv_dpkg != 0) {
                 log_error (
-                    "shared::output (args = '{\"dpkg\", \"--list\"}') failed; "
+                    "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') failed; "
                     "return code == '%" PRIi32"'\n"
                     "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                     rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
@@ -423,7 +423,7 @@ sysinfo_detail (
                     "because the following error happened: '%s'", e.what ());
                 if (!dpkg_error_printed) {
                     log_error (
-                        "shared::output (args = '{\"dpkg\", \"--list\"}') "
+                        "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
                         "earlier returned code == '%" PRIi32"'\n"
                         "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                         rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
@@ -499,7 +499,7 @@ sysinfo_detail (
                             "Failed line: '%s'", std::string(item).c_str() );
                         if (!dpkg_error_printed) {
                             log_error (
-                                "shared::output (args = '{\"dpkg\", \"--list\"}') "
+                                "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
                                 "earlier returned code == '%" PRIi32"'\n"
                                 "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                                 rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
@@ -549,12 +549,12 @@ sysinfo_detail (
         try {
             std::string unitstate_output;
 
-            log_debug ("shared::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') starting");
-            int rv = shared::output2 ({"sudo", "systemctl", "list-json"}, unitstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') starting");
+            int rv = MlmSubprocess::output2 ({"sudo", "systemctl", "list-json"}, unitstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";
@@ -594,12 +594,12 @@ sysinfo_detail (
         try {
             std::string diskstate_output;
 
-            log_debug ("shared::output2 (args = '{\"df\", \"-k\"}') starting");
-            int rv = shared::output2 ({"df", "-k"}, diskstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') starting");
+            int rv = MlmSubprocess::output2 ({"df", "-k"}, diskstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"df\", \"-k\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";
@@ -620,12 +620,12 @@ sysinfo_detail (
         try {
             std::string diskstate_output;
 
-            log_debug ("shared::output2 (args = '{\"mount\"}') starting");
-            int rv = shared::output2 ({"mount"}, diskstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"mount\"}') starting");
+            int rv = MlmSubprocess::output2 ({"mount"}, diskstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"mount\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"mount\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";
