@@ -391,52 +391,129 @@ sysinfo_detail (
 
     if (profile == BiosProfile::Admin) {
         std::string dpkg_output;
+        std::string dpkg_error;
+        int rv_dpkg = -1;
+        bool dpkg_error_printed = false;
+        int skipped_dpkg_lines = -1; // count lines that we could not parse, but expected to
+
         {
-            log_debug ("shared::output2 (args = '{\"dpkg\", \"--list\"}') starting");
-            int rv = shared::output2 ({"dpkg", "--list"}, dpkg_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
-            if (rv != 0) {
+            log_debug ("shared::output (args = '{\"dpkg\", \"--list\"}') starting");
+            rv_dpkg = shared::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
+            log_debug ("shared::output () finished with return value == '%" PRIi32"'", rv_dpkg);
+            if (rv_dpkg != 0) {
                 log_error (
-                    "shared::output2 (args = '{\"dpkg\", \"--list\"}') failed; "
-                    "return code == '%" PRIi32"'", rv);
+                    "shared::output (args = '{\"dpkg\", \"--list\"}') failed; "
+                    "return code == '%" PRIi32"'\n"
+                    "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                    rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                dpkg_error_printed = true;
                 dpkg_output.clear ();
             }
         } // end of `dpkg` callout
+
         if (!dpkg_output.empty ()) {
-            output += ",\t\"packages\" : [\n";
+            bool proceed_loop = true;
 
             std::vector<std::string> tokens;
-            cxxtools::split ("\n", dpkg_output, std::back_inserter (tokens));
-            // Strip first DPKG__LIST__STRIP_HEADER lines
-            for (int i = 0; i < DPKG__LIST__STRIP_HEADER; i++) {
-                tokens.erase (tokens.begin ());
+            try {
+                cxxtools::split ("\n", dpkg_output, std::back_inserter (tokens));
+            } catch (const std::exception& e) {
+                log_error (
+                    "Could not split by line the output of dpkg "
+                    "because the following error happened: '%s'", e.what ());
+                if (!dpkg_error_printed) {
+                    log_error (
+                        "shared::output (args = '{\"dpkg\", \"--list\"}') "
+                        "earlier returned code == '%" PRIi32"'\n"
+                        "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                        rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                    dpkg_error_printed = true;
+                }
+                proceed_loop = false;
             }
 
+            output += ",\t\"packages\" : [\n";
             bool first = true;
-            for (const auto& item : tokens) {
-                request.touch(); // Reset the deadman timer while in a loop WTF?!
-                if (item.empty ())
-                    continue;
+            if (proceed_loop) {
+                skipped_dpkg_lines = 0;
 
-                std::vector <std::string> line_tokens;
-                cxxtools::split (cxxtools::Regex("[ \t]+"), item, std::back_inserter (line_tokens));
+                // Strip first DPKG__LIST__STRIP_HEADER lines
+                for (int i = 0; i < DPKG__LIST__STRIP_HEADER; i++) {
+                    tokens.erase (tokens.begin ());
+                }
 
-                std::string pkgname, version, commit;
-                pkgname = line_tokens.at (DPKG__LIST__COLUMN_PKGNAME);
+                for (const auto& item : tokens) {
+                    request.touch(); // Reset the deadman timer while in a loop WTF?!
+                    if (item.empty ())
+                        continue;
 
-                auto pos = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).find ("~");
-                if (pos != std::string::npos) {
-                    version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (0, pos);
-                    commit = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (pos+1);
-                    auto pos2 = commit.find ("-");
-                    if (pos2 != std::string::npos) {
-                        version += commit.substr (pos2);
-                        commit = commit.substr (0, pos2);
+                    std::string pkgname, version, commit;
+                    try {
+                        std::vector <std::string> line_tokens;
+                        cxxtools::split (cxxtools::Regex("[ \t]+"), item, std::back_inserter (line_tokens));
+
+                        pkgname = line_tokens.at (DPKG__LIST__COLUMN_PKGNAME);
+
+                        auto pos = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).find ("~");
+                        if (pos != std::string::npos) {
+                            version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (0, pos);
+                            commit = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (pos+1);
+                            auto pos2 = commit.find ("-");
+                            if (pos2 != std::string::npos) {
+                                version += commit.substr (pos2);
+                                commit = commit.substr (0, pos2);
+                            }
+                        }
+                        else {
+                            version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION);
+                        }
+
+                        if (first) {
+                            first = false;
+                            output += "\t{\n";
+                        }
+                        else {
+                            output += ",\t{\n";
+                        }
+
+                        output += "\t\t";
+                        output += utils::json::jsonify ("package-name", pkgname);
+                        output += "\n";
+
+                        output += ",\t\t";
+                        output += utils::json::jsonify ("package-version", version);
+                        output += "\n";
+
+                        if (pos != std::string::npos) {
+                            output += ",\t\t";
+                            output += utils::json::jsonify ("commit", commit);
+                            output += "\n";
+                        }
+
+                        output += "\t}\n"; // single package entry finished
+                    } catch (const std::exception& e) {
+                        log_error (
+                            "Could not split a line from the output of dpkg "
+                            "because the following error happened: '%s'", e.what ());
+                        log_error (
+                            "Failed line: '%s'", std::string(item).c_str() );
+                        if (!dpkg_error_printed) {
+                            log_error (
+                                "shared::output (args = '{\"dpkg\", \"--list\"}') "
+                                "earlier returned code == '%" PRIi32"'\n"
+                                "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                                rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                            dpkg_error_printed = true;
+                        }
+                        skipped_dpkg_lines++;
                     }
-                }
-                else {
-                    version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION);
-                }
+                } // for (item:tokens)
+            } // if (proceed_loop)
+
+
+            if (!dpkg_error_printed
+//               && some_config_flag // FIXME?
+            ) {
                 if (first) {
                     first = false;
                     output += "\t{\n";
@@ -445,21 +522,27 @@ sysinfo_detail (
                     output += ",\t{\n";
                 }
 
-                output += "\t\t";
-                output += utils::json::jsonify ("package-name", pkgname);
+                output += "\t\t\"dpkg-errored\": true\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-return-code", std::to_string(rv_dpkg) );
                 output += "\n";
 
                 output += ",\t\t";
-                output += utils::json::jsonify ("package-version", version);
+                output += utils::json::jsonify ("dpkg-stdout", dpkg_output);
                 output += "\n";
 
-                if (pos != std::string::npos) {
-                    output += ",\t\t";
-                    output += utils::json::jsonify ("commit", commit);
-                    output += "\n";
-                }
-                output += "\t}\n";
-            }
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-stderr", dpkg_error);
+                output += "\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-skipped-lines", std::to_string(skipped_dpkg_lines) );
+                output += "\n";
+
+                output += "\t}\n"; // single package entry finished
+            } // flush details of dpkg run which failed into JSON, so we can see it in CI
+
             output += "\t]\n"; // "packages" closing bracket
         } // end of 'packages' json listing
 
