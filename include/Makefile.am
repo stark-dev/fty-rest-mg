@@ -33,7 +33,6 @@ nobase_pkginclude_HEADERS += \
     shared/csv.h \
     shared/data.h \
     shared/ic.h \
-    shared/subprocess.h \
     shared/topic_cache.h \
     shared/upsstatus.h \
     shared/utils.h \

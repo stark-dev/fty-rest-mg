@@ -33,8 +33,8 @@
 #include <cxxtools/join.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_sasl.h>
+#include <fty_common_mlm_subprocess.h>
 
-#include "shared/subprocess.h"
 #include "shared/cidr.h"
 
 #define SSH_NOT_TO_BE_RUN "/etc/ssh/sshd_not_to_be_run"
@@ -71,12 +71,12 @@ s_passwd(
     const std::string& new_passwd,
     std::string& reason)
 {
-    Argv args{"/usr/bin/sudo", "@libexecdir@/@PACKAGE@/bios-passwd"};
+    MlmSubprocess::Argv args{"/usr/bin/sudo", "@libexecdir@/@PACKAGE@/bios-passwd"};
     std::string out;
 
     std::string inp = user + "\n" + old_passwd + "\n" + new_passwd + "\n";
     std::string err;
-    int ret = output(args, out, err, inp);
+    int ret = MlmSubprocess::output(args, out, err, inp);
     log_debug ("Executed %s with result %d", "/usr/bin/sudo @libexecdir@/@PACKAGE@/bios-passwd", ret);
     reason = s_reason(err);
     // expect script prints to stdout

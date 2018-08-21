@@ -116,8 +116,6 @@ typedef struct _shared_data_t shared_data_t;
 #define SHARED_DATA_T_DEFINED
 typedef struct _shared_ic_t shared_ic_t;
 #define SHARED_IC_T_DEFINED
-typedef struct _shared_subprocess_t shared_subprocess_t;
-#define SHARED_SUBPROCESS_T_DEFINED
 typedef struct _shared_topic_cache_t shared_topic_cache_t;
 #define SHARED_TOPIC_CACHE_T_DEFINED
 typedef struct _shared_upsstatus_t shared_upsstatus_t;
@@ -166,7 +164,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "shared/csv.h"
 #include "shared/data.h"
 #include "shared/ic.h"
-#include "shared/subprocess.h"
 #include "shared/topic_cache.h"
 #include "shared/upsstatus.h"
 #include "shared/utils.h"

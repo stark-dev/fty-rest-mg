@@ -31,8 +31,6 @@ src_db_bios_csv_SOURCES += \
 	 src/shared/utils_json.cc \
 	 src/shared/utilspp.cc \
 	 include/shared/utilspp.h \
-	 include/shared/subprocess.h \
-	 src/shared/subprocess.cc \
 	 include/shared/augtool.h \
 	 src/shared/augtool.cc \
 	 include/shared/ic.h \
@@ -447,8 +445,6 @@ libpriv_utils_la_SOURCES = 	\
 				src/shared/utils_json.cc \
 				include/shared/utilspp.h \
 				src/shared/utilspp.cc \
-				include/shared/subprocess.h \
-				src/shared/subprocess.cc \
 				include/shared/augtool.h \
 				src/shared/augtool.cc \
 				include/shared/ic.h \
@@ -589,20 +585,6 @@ test_utils_CPPFLAGS =	$(AM_CPPFLAGS) \
 			-I$(abs_top_srcdir)/tests/include/
 
 test_utils_LDFLAGS =	${czmq_LIBS}
-
-noinst_PROGRAMS += 			test-subprocess
-test_subprocess_SOURCES = \
-				include/shared/subprocess.h \
-				tests/shared/test-subprocess.cc
-
-test_subprocess_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_subprocess_CPPFLAGS = \
-				$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/tests/include/
-test_subprocess_LDFLAGS =		${cxxtools_LIBS} ${czmq_LIBS}
 
 check_PROGRAMS += 	test-cidr
 test_cidr_SOURCES = \

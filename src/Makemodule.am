@@ -99,7 +99,6 @@ src_libfty_rest_la_SOURCES += \
     src/shared/csv.cc \
     src/shared/data.cc \
     src/shared/ic.cc \
-    src/shared/subprocess.cc \
     src/shared/topic_cache.cc \
     src/shared/upsstatus.cc \
     src/shared/utils.cc \

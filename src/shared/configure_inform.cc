@@ -137,6 +137,7 @@ void
         //data for uptime
         if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
             zhash_t *aux = zhash_new ();
+
             if (!DBUptime::get_dc_upses (s_asset_name.c_str(), aux))
                 log_error ("Cannot read upses for dc with id = %s", s_asset_name.c_str ());
 
