@@ -61,7 +61,7 @@ bool database_ready;
 
     if (!dc.empty ())
     {
-        if (!is_ok_name (dc.c_str ()))
+        if (!persist::is_ok_name (dc.c_str ()))
         {
             http_die ("request-param-bad", dc.c_str ());
         }

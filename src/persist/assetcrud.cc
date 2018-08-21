@@ -242,7 +242,7 @@ db_reply <db_a_elmnt_t>
     db_a_elmnt_t item{0,"","",0,5,0,0,""};
     db_reply <db_a_elmnt_t> ret = db_reply_new(item);
 
-    if ( !is_ok_name (element_name) )
+    if ( !persist::is_ok_name (element_name) )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;

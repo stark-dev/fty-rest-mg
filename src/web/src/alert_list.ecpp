@@ -143,7 +143,7 @@ bool database_ready;
 
         if (!asset.empty ())
         {
-            if (!is_ok_name (asset.c_str ()))
+            if (!persist::is_ok_name (asset.c_str ()))
             {
                 http_die ("request-param-bad", asset.c_str ());
             }
