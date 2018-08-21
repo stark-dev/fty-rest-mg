@@ -91,7 +91,7 @@ static db_reply_t
                                                          "not specified");
         return ret;
     }
-    if ( !is_ok_value (value) )
+    if ( !persist::is_ok_value (value) )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -100,7 +100,7 @@ static db_reply_t
         log_error ("end: ignore insert, unexpected value '%s'", value);
         return ret;
     }
-    if ( !is_ok_keytag (keytag) )
+    if ( !persist::is_ok_keytag (keytag) )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -447,7 +447,7 @@ db_reply_t
         log_error ("end: %s, %s","ignore insert", ret.msg.c_str());
         return ret;
     }
-    if ( !is_ok_link_type (link_type_id) )
+    if ( !persist::is_ok_link_type (link_type_id) )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -698,7 +698,7 @@ db_reply_t
     db_reply_t ret = db_reply_new ();
 
     // input parameters control
-    if (!is_ok_name (element_name))
+    if (!persist::is_ok_name (element_name))
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -708,7 +708,7 @@ db_reply_t
         return ret;
     }
 
-    if (!is_ok_element_type (element_type_id))
+    if (!persist::is_ok_element_type (element_type_id))
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;

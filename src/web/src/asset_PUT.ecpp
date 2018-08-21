@@ -55,7 +55,7 @@ bool database_ready;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
     std::string id = request.getArg("id");
 
-    if (id.empty () || !is_ok_name (id.c_str ()))
+    if (id.empty () || !persist::is_ok_name (id.c_str ()))
         http_die ("request-param-bad", id.c_str ());
 
     // Read json, transform to csv, use existing functionality

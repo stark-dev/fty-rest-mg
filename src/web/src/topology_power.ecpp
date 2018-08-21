@@ -115,7 +115,7 @@ bool database_ready;
             parameter_name = "filter_group";
         }
 
-        if (!is_ok_name (asset_id.c_str ()) )
+        if (!persist::is_ok_name (asset_id.c_str ()) )
             http_die ("request-param-bad", "id", asset_id.c_str (), "valid asset name");
         checked_id = DBAssets::name_to_asset_id (asset_id);
         if (checked_id == -1)
