@@ -226,7 +226,7 @@ std::string checked_arg2;
     }
 
     for (auto const& item : racks) {
-        if ( !is_ok_name (item.c_str ()) )
+        if ( !persist::is_ok_name (item.c_str ()) )
             http_die ("request-param-bad", "arg2", item.c_str (), "valid asset name");
 
         auto dbid = DBAssets::name_to_asset_id (item);

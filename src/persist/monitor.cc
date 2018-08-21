@@ -34,7 +34,7 @@ db_reply_t
 
     db_reply_t ret = db_reply_new();
 
-    if ( !is_ok_name (device_name) )
+    if ( !persist::is_ok_name (device_name) )
     {
         ret.status     = 0;
         log_info ("end: too long device name");

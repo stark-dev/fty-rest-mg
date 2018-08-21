@@ -89,7 +89,7 @@ bool database_ready;
             http_die("parameter-conflict", "Parameter 'feed_by' can not be specified with parameter 'to'.");
         }
 
-        if (!is_ok_name (to.c_str ())) {
+        if (!persist::is_ok_name (to.c_str ())) {
             http_die ("request-param-required", to.c_str() ,"to");
         }
         checked_to = to;

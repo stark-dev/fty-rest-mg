@@ -243,7 +243,7 @@ bool database_ready;
         std::string arg1 = qparam.param ("arg1");
         std::string arg2 = qparam.param ("arg2");
 
-        if (arg1.empty () || !is_ok_name (arg1.c_str ())) {
+        if (arg1.empty () || !persist::is_ok_name (arg1.c_str ())) {
             http_die ("request-param-required", "arg1");
         }
 
