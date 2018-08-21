@@ -559,23 +559,6 @@ test_web_helpers_CPPFLAGS =\
 test_web_helpers_LDFLAGS =	${tntnet_LIBS} ${tntdb_LIBS} ${cxxtools_LIBS} ${czmq_LIBS}
 
 ###
-check_PROGRAMS +=	test-utils-web
-
-test_utils_web_SOURCES = \
-				tests/shared/test-utils-web.cc
-#fty-common#	src/include/utils_web.h
-
-test_utils_web_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_utils_web_CPPFLAGS = \
-				$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/tests/include/
-
-test_utils_web_LDFLAGS =	${cxxtools_LIBS} ${czmq_LIBS}
-
-###
 check_PROGRAMS +=	test-utils-plusplus
 
 test_utils_plusplus_SOURCES = \
