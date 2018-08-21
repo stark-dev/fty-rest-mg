@@ -24,7 +24,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_proto.h>
 #include <fty_common_db_dbpath.h>
 #include "db/assets.h"
-#include "shared/fty_asset_uptime_configurator.h"
 #include "db/assets/assetcr.h"
 #include <fty_common.h>
 
@@ -138,9 +137,9 @@ void
         //data for uptime
         if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
             zhash_t *aux = zhash_new ();
-            bool rv = insert_upses_to_aux (aux, oneRow.first.name);
-            if (!rv)
-                throw std::runtime_error("database error, cannot find UPSs");
+            if (!DBUptime::get_dc_upses (s_asset_name.c_str(), aux))
+                log_error ("Cannot read upses for dc with id = %s", s_asset_name.c_str ());
+
             zhash_update (aux, "type", (void*) "datacenter");
             zmsg_t *msg = fty_proto_encode_asset (
                     aux,

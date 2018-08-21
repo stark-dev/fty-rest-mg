@@ -32,7 +32,6 @@ nobase_pkginclude_HEADERS += \
     shared/configure_inform.h \
     shared/csv.h \
     shared/data.h \
-    shared/fty_asset_uptime_configurator.h \
     shared/ic.h \
     shared/subprocess.h \
     shared/topic_cache.h \

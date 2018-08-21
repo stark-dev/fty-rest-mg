@@ -73,8 +73,6 @@ src_db_bios_csv_SOURCES += \
 	 src/db/asset_general.h \
 	 src/shared/configure_inform.cc \
 	 include/shared/configure_inform.h \
-	 include/shared/fty_asset_uptime_configurator.h \
-	 src/shared/fty_asset_uptime_configurator.cc \
 	 src/shared/magic.cc \
 	 include/bios_magic.h \
 	 src/msg/asset_msg.cc \
@@ -491,8 +489,6 @@ libpriv_utils_la_SOURCES = 	\
 				src/db/asset_general.h \
 				src/shared/configure_inform.cc \
 				include/shared/configure_inform.h \
-				include/shared/fty_asset_uptime_configurator.h \
-				src/shared/fty_asset_uptime_configurator.cc \
 				src/shared/magic.cc \
 				include/bios_magic.h \
 				src/msg/asset_msg.cc \
