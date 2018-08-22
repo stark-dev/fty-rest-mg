@@ -31,6 +31,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_log.h>
 #include "persist_error.h"
 
+
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 int convert_asset_to_monitor_safe(const char* url,
                 a_elmnt_id_t asset_element_id, m_dvc_id_t *device_id)
 {
@@ -56,6 +58,7 @@ int convert_asset_to_monitor_safe(const char* url,
 }
 
 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 m_dvc_id_t convert_asset_to_monitor_old(const char* url,
                 a_elmnt_id_t asset_element_id)
 {
@@ -107,6 +110,7 @@ m_dvc_id_t convert_asset_to_monitor_old(const char* url,
     return device_discovered_id;
 }
 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 int convert_monitor_to_asset_safe(const char* url,
                     m_dvc_id_t discovered_device_id, a_elmnt_id_t *asset_element_id)
 {
@@ -126,6 +130,7 @@ int convert_monitor_to_asset_safe(const char* url,
 }
 
 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 a_elmnt_id_t convert_monitor_to_asset(const char* url,
                     m_dvc_id_t discovered_device_id)
 {
@@ -160,53 +165,3 @@ a_elmnt_id_t convert_monitor_to_asset(const char* url,
     log_info("end: monitor device %" PRIu32 " converted to %" PRIu32, discovered_device_id, asset_element_id);
     return asset_element_id;
 }
-
-std::string
-sql_plac(
-        size_t i,
-        size_t j)
-{
-    return "item" + std::to_string(i) + "_" + std::to_string(j);
-}
-
-// for backward compatibility
-std::string
-    multi_insert_string(
-        const std::string& sql_header,
-        size_t tuple_len,
-        size_t items_len
-)
-{
-    return multi_insert_string(sql_header,tuple_len,items_len, "");
-}
-
-
-std::string
-    multi_insert_string(
-        const std::string& sql_header,
-        size_t tuple_len,
-        size_t items_len,
-        const std::string& sql_postfix
-)
-{
-    std::stringstream s{};
-
-    s << sql_header;
-    s << "\nVALUES ";
-    for (size_t i = 0; i != items_len; i++) {
-        s << "(";
-        for (size_t j = 0; j != tuple_len; j++) {
-            s << ":" << sql_plac(i, j);
-            if (j < tuple_len -1)
-                s << ", ";
-        }
-        if (i < items_len -1)
-            s << "),\n";
-        else
-            s << ")\n";
-    }
-    s << sql_postfix;
-    return s.str();
-}
-
-

@@ -200,7 +200,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     a_dvc_tp_id_t subtype_id = persist::asset_subtype::N_A;
 
     // first insert
-    auto reply_insert = persist::insert_into_asset_element (conn, element_name, element_type_id,
+    auto reply_insert = DBAssetsInsert::insert_into_asset_element (conn, element_name, element_type_id,
                                                             parent_id, status, priority, subtype_id, UGLY_ASSET_TAG, false);
     REQUIRE ( reply_insert.status == 1 );
     uint64_t rowid = reply_insert.rowid;
@@ -221,7 +221,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     REQUIRE (item.subtype_id == subtype_id);
 
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_into_asset_element (conn, element_name, element_type_id,
+    reply_insert = DBAssetsInsert::insert_into_asset_element (conn, element_name, element_type_id,
                                                        parent_id, status, priority, persist::asset_subtype::N_A, UGLY_ASSET_TAG, true);
     REQUIRE ( reply_insert.status == 0 );
     REQUIRE ( reply_insert.affected_rows == 0 );
@@ -255,7 +255,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     a_elmnt_id_t asset_group_id = 3; // it is written in crud_test.sql file
 
     // first insert
-    auto reply_insert = persist::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
+    auto reply_insert = DBAssetsInsert::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
     uint64_t rowid = reply_insert.rowid;
     REQUIRE ( reply_insert.affected_rows == 1 );
     REQUIRE ( reply_insert.status == 1 );
@@ -267,7 +267,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     REQUIRE ( reply_select.count(asset_element_id) == 1 );
 
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
+    reply_insert = DBAssetsInsert::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_insert.affected_rows == 0 );
     REQUIRE ( reply_insert.status == 1 );
 
@@ -301,7 +301,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     const a_lnk_src_out_t src_out = SRCOUT_DESTIN_IS_NULL;
     const a_lnk_dest_in_t dest_in = SRCOUT_DESTIN_IS_NULL;
     // first insert
-    auto reply_insert = persist::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
+    auto reply_insert = DBAssetsInsert::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
                                        src_out, dest_in);
     uint64_t rowid = reply_insert.rowid;
     REQUIRE ( reply_insert.status == 1 );
@@ -316,7 +316,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
 
 
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
+    reply_insert = DBAssetsInsert::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
                                        src_out, dest_in);
     REQUIRE ( reply_insert.affected_rows == 0 );
     REQUIRE ( reply_insert.status == 1 );
@@ -423,7 +423,7 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
     REQUIRE ( reply_delete.status == 1 );
 }
 
-TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockated][room][crud_test.sql]")
+TEST_CASE("room unlocated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockated][room][crud_test.sql]")
 {
     log_info ("=============== room INSERT/DELETE #8 ==================");
 
@@ -723,7 +723,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
 }
 
 
-TEST_CASE("device unlockated INSERT/DELETE #12","[db][CRUD][insert][delete][unlockated][device][crud_test.sql]")
+TEST_CASE("device unlocated INSERT/DELETE #12","[db][CRUD][insert][delete][unlockated][device][crud_test.sql]")
 {
     log_info ("=============== device INSERT/DELETE #12 ==================");
 
