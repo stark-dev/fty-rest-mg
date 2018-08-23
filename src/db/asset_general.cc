@@ -83,9 +83,9 @@ int
         return 2;
     }
 
-    auto ret3 = insert_into_asset_ext_attributes
+    auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -93,9 +93,9 @@ int
     }
 
     if(extattributesRO != NULL) {
-        auto ret31 = insert_into_asset_ext_attributes
+        auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -113,7 +113,7 @@ int
         return 4;
     }
 
-    auto ret5 = insert_element_into_groups
+    auto ret5 = DBAssetsInsert::insert_element_into_groups
         (conn, groups, element_id);
     if ( ( ret5.status == 0 ) && ( ret5.affected_rows != groups.size() ) )
     {
@@ -181,9 +181,9 @@ int
         return 2;
     }
 
-    auto ret3 = insert_into_asset_ext_attributes
+    auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -191,9 +191,9 @@ int
     }
 
     if(extattributesRO != NULL) {
-        auto ret31 = insert_into_asset_ext_attributes
+        auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributesRO, true, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -211,7 +211,7 @@ int
         return 4;
     }
 
-    auto ret5 = insert_element_into_groups
+    auto ret5 = DBAssetsInsert::insert_element_into_groups
         (conn, groups, element_id);
     if ( ret5.affected_rows != groups.size() )
     {
@@ -236,7 +236,7 @@ int
         return 6;
     }
 
-    auto ret7 = insert_into_asset_links
+    auto ret7 = DBAssetsInsert::insert_into_asset_links
            (conn, links);
     if ( ret7.affected_rows != links.size() )
     {
@@ -291,7 +291,7 @@ db_reply_t
     }
 
     tntdb::Transaction trans(conn);
-    auto reply_insert1 = insert_into_asset_element
+    auto reply_insert1 = DBAssetsInsert::insert_into_asset_element
                         (conn, iname.c_str (), element_type_id, parent_id,
                          status, priority, 0, asset_tag.c_str(), false);
     if ( reply_insert1.status == 0 )
@@ -304,43 +304,29 @@ db_reply_t
 
     std::string err = "";
 
-    int reply_insert2 = insert_into_asset_ext_attributes
+    auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
         err = "";
 
-        int reply_insert21 = insert_into_asset_ext_attributes
+        auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 
-    auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
+    auto reply_insert3 = DBAssetsInsert::insert_element_into_groups (conn, groups, element_id);
     if ( ( reply_insert3.status == 0 ) && ( reply_insert3.affected_rows != groups.size() ) )
     {
         trans.rollback();
@@ -351,7 +337,7 @@ db_reply_t
     if ( ( element_type_id == asset_type::DATACENTER ) ||
          ( element_type_id == asset_type::RACK) )
     {
-        auto reply_insert4 = insert_into_monitor_device
+        auto reply_insert4 = DBAssetsInsert::insert_into_monitor_device
             (conn, 1, element_name);
         if ( reply_insert4.status == 0 )
         {
@@ -359,7 +345,7 @@ db_reply_t
             log_info ("end: \"device\" was not inserted (fail monitor_device)");
             return reply_insert4;
         }
-        auto reply_insert5 = insert_into_monitor_asset_relation
+        auto reply_insert5 = DBAssetsInsert::insert_into_monitor_asset_relation
             (conn, reply_insert4.rowid, reply_insert1.rowid);
         if ( reply_insert5.status == 0 )
         {
@@ -406,7 +392,7 @@ db_reply_t
 
     tntdb::Transaction trans(conn);
 
-    auto reply_insert1 = insert_into_asset_element
+    auto reply_insert1 = DBAssetsInsert::insert_into_asset_element
                         (conn, iname.c_str (), asset_type::DEVICE, parent_id,
                          status, priority, asset_device_type_id, asset_tag.c_str(), false);
     if ( reply_insert1.status == 0 )
@@ -418,42 +404,28 @@ db_reply_t
     auto element_id = reply_insert1.rowid;
     std::string err = "";
 
-    int reply_insert2 = insert_into_asset_ext_attributes
+    auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
         err = "";
-        int reply_insert21 = insert_into_asset_ext_attributes
+        auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 
-    auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
+    auto reply_insert3 = DBAssetsInsert::insert_element_into_groups (conn, groups, element_id);
     if ( ( reply_insert3.status == 0 ) && ( reply_insert3.affected_rows != groups.size() ) )
     {
         trans.rollback();
@@ -467,7 +439,7 @@ db_reply_t
         one_link.dest = element_id;
     }
 
-    auto reply_insert5 = insert_into_asset_links
+    auto reply_insert5 = DBAssetsInsert::insert_into_asset_links
            (conn, links);
     if ( reply_insert5.affected_rows != links.size() )
     {
@@ -480,7 +452,7 @@ db_reply_t
     auto reply_select = DBAssets::select_monitor_device_type_id (conn, "not_classified");
     if ( reply_select.status == 1 )
     {
-        auto reply_insert6 = insert_into_monitor_device
+        auto reply_insert6 = DBAssetsInsert::insert_into_monitor_device
             (conn, reply_select.item, element_name);
         if ( reply_insert6.status == 0 )
         {
@@ -489,7 +461,7 @@ db_reply_t
             return reply_insert6;
         }
 
-        auto reply_insert7 = insert_into_monitor_asset_relation
+        auto reply_insert7 = DBAssetsInsert::insert_into_monitor_asset_relation
             (conn, reply_insert6.rowid, reply_insert1.rowid);
         if ( reply_insert7.status == 0 )
         {

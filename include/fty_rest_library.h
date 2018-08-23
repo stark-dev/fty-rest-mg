@@ -94,8 +94,6 @@
 #ifdef FTY_REST_BUILD_DRAFT_API
 typedef struct _db_topology2_t db_topology2_t;
 #define DB_TOPOLOGY2_T_DEFINED
-typedef struct _db_assets_assetcr_t db_assets_assetcr_t;
-#define DB_ASSETS_ASSETCR_T_DEFINED
 typedef struct _db_assets_assetd_t db_assets_assetd_t;
 #define DB_ASSETS_ASSETD_T_DEFINED
 typedef struct _db_assets_assetu_t db_assets_assetu_t;
@@ -147,13 +145,11 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "preproc.h"
-#include "db/assetdef.h"
 #include "db/assets.h"
 #include "db/dbhelpers.h"
 #include "db/types.h"
 #ifdef FTY_REST_BUILD_DRAFT_API
 #include "db/topology2.h"
-#include "db/assets/assetcr.h"
 #include "db/assets/assetd.h"
 #include "db/assets/assetu.h"
 #include "msg/asset_msg.h"

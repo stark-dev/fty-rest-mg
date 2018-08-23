@@ -34,7 +34,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_proto.h>
 #include <fty_common_rest.h>
 #include <fty_common_db_dbpath.h>
-#include <fty_common_db_asset.h>
+#include <fty_common_db.h>
 #include <fty_common_mlm_tntmlm.h>
 
 #include "../../persist/assetcrud.h"
@@ -1209,7 +1209,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                 (conn, ename.c_str(), type_id, parent_id,
                  extattributes, status.c_str(), priority, groups, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
-                throw BiosError(ret.rowid, ret.msg);
+                throw BiosError(ret.errtype, ret.msg);
             }
             m.id = ret.rowid;
         }
@@ -1220,7 +1220,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     parent_id, extattributes, subtype_id, subtype.c_str(), status.c_str(),
                     priority, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
-                throw BiosError(ret.rowid, ret.msg);
+                throw BiosError(ret.errtype, ret.msg);
             }
             m.id = ret.rowid;
         }

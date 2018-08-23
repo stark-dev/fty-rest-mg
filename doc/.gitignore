@@ -13,8 +13,6 @@
 # Ignore the source doc texts generated from program sources
 db_topology2.txt
 db_topology2.doc
-db_assets_assetcr.txt
-db_assets_assetcr.doc
 db_assets_assetd.txt
 db_assets_assetd.doc
 db_assets_assetu.txt
