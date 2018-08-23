@@ -61,7 +61,7 @@ int
     }
 
 
-    int ret1 = update_asset_element
+    int ret1 = DBAssetsUpdate::update_asset_element
         (conn, element_id, element_name, parent_id, status, priority,
          asset_tag.c_str(), affected_rows);
 
@@ -159,7 +159,7 @@ int
         return 1;
     }
 
-    int ret1 = update_asset_element
+    int ret1 = DBAssetsUpdate::update_asset_element
         (conn, element_id, element_name, parent_id, status, priority,
          asset_tag.c_str(), affected_rows);
 
