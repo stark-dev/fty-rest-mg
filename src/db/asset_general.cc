@@ -85,7 +85,7 @@ int
 
     auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -95,7 +95,7 @@ int
     if(extattributesRO != NULL) {
         auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -183,7 +183,7 @@ int
 
     auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -193,7 +193,7 @@ int
     if(extattributesRO != NULL) {
         auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributesRO, true, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -306,18 +306,11 @@ db_reply_t
 
     auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
@@ -325,18 +318,11 @@ db_reply_t
 
         auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 
@@ -420,36 +406,22 @@ db_reply_t
 
     auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
         err = "";
         auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 

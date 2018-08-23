@@ -26,6 +26,5 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_common_db.h>
 #include "assets/assetu.h"
 #include "assets/assetd.h"
-#include "assets/assetcr.h"
 
 #endif // SRC_DB_ASSETS_H

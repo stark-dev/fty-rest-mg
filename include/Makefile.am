@@ -13,7 +13,6 @@ nobase_pkginclude_HEADERS = \
     cleanup.h \
     dbtypes.h \
     preproc.h \
-    db/assetdef.h \
     db/assets.h \
     db/dbhelpers.h \
     db/types.h \
@@ -22,7 +21,6 @@ nobase_pkginclude_HEADERS = \
 if ENABLE_DRAFTS
 nobase_pkginclude_HEADERS += \
     db/topology2.h \
-    db/assets/assetcr.h \
     db/assets/assetd.h \
     db/assets/assetu.h \
     msg/asset_msg.h \
