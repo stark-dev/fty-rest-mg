@@ -24,7 +24,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_proto.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset_insert.h>
-#include "db/assets.h"
 #include <fty_common.h>
 
 

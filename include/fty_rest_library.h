@@ -141,7 +141,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "preproc.h"
-#include "db/assets.h"
 #include "db/dbhelpers.h"
 #include "db/types.h"
 #ifdef FTY_REST_BUILD_DRAFT_API

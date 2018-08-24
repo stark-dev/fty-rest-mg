@@ -55,7 +55,6 @@ src_db_bios_csv_SOURCES += \
 	 include/dbtypes.h \
 	 src/shared/topic_cache.cc \
 	 include/shared/topic_cache.h \
-	 include/db/assets.h \
 	 src/db/inout.h \
 	 src/db/inout.cc \
 	 src/db/inout/importcsv.cc \
@@ -463,7 +462,6 @@ libpriv_utils_la_SOURCES = 	\
 				include/dbtypes.h \
 				src/shared/topic_cache.cc \
 				include/shared/topic_cache.h \
-				include/db/assets.h \
 				src/db/inout.h \
 				src/db/inout/importcsv.cc \
 				src/db/inout/exportcsv.cc \

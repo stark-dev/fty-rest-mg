@@ -40,7 +40,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "../../persist/assetcrud.h"
 #include "cleanup.h"
 #include "../asset_general.h"
-#include "db/assets.h"
 #include "db/dbhelpers.h"
 #include "../inout.h"
 #include "shared/utils.h"

@@ -29,9 +29,9 @@
  */
 #include <catch.hpp>
 #include <fty_common.h>
+#include <fty_common_db.h>
 
 #include "assetcrud.h"
-#include "db/assets.h"
 #include "db/asset_general.h"
 #include "common_msg.h"
 
