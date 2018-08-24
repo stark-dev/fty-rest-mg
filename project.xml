@@ -153,7 +153,6 @@
     <class name = "db/agentstate/agentstate" private = "1" selftest = "0" />
     <class name = "db/asset_general" private = "1" selftest = "0" />
     <class name = "db/topology2" private = "0" selftest = "0" />
-    <class name = "db/assets/assetd" private = "0" selftest = "0" />
 
     <header name = "db/assets" private = "0" />
     <header name = "db/dbhelpers" private = "0" />

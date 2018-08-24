@@ -88,7 +88,6 @@ src_libfty_rest_la_SOURCES = \
 if ENABLE_DRAFTS
 src_libfty_rest_la_SOURCES += \
     src/db/topology2.cc \
-    src/db/assets/assetd.cc \
     src/msg/asset_msg.cc \
     src/msg/common_msg.cc \
     src/shared/augtool.cc \

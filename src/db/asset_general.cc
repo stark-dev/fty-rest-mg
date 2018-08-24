@@ -16,13 +16,12 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "db/assets.h"
-
 #include <tntdb/transaction.h>
 #include <locale.h>
 
 #include <fty_common.h>
-#include <fty_common_db_asset.h>
+#include <fty_common_db.h>
+#include "dbtypes.h"
 #include "shared/ic.h"
 #include "shared/utilspp.h"
 
@@ -73,7 +72,7 @@ int
         return 1;
     }
 
-    auto ret2 = delete_asset_ext_attributes_with_ro
+    auto ret2 = DBAssetsDelete::delete_asset_ext_attributes_with_ro
         (conn, element_id, false);
     if ( ret2.status == 0 )
     {
@@ -103,7 +102,7 @@ int
         }
     }
 
-    auto ret4 = delete_asset_element_from_asset_groups
+    auto ret4 = DBAssetsDelete::delete_asset_element_from_asset_groups
         (conn, element_id);
     if ( ret4.status == 0 )
     {
@@ -171,7 +170,7 @@ int
         return 1;
     }
 
-    auto ret2 = delete_asset_ext_attributes_with_ro
+    auto ret2 = DBAssetsDelete::delete_asset_ext_attributes_with_ro
         (conn, element_id, false);
     if ( ret2.status == 0 )
     {
@@ -201,7 +200,7 @@ int
         }
     }
 
-    auto ret4 = delete_asset_element_from_asset_groups
+    auto ret4 = DBAssetsDelete::delete_asset_element_from_asset_groups
         (conn, element_id);
     if ( ret4.status == 0 )
     {
@@ -226,7 +225,7 @@ int
     {
         one_link.dest = element_id;
     }
-    auto ret6 = delete_asset_links_to
+    auto ret6 = DBAssetsDelete::delete_asset_links_to
         (conn, element_id);
     if ( ret6.status == 0 )
     {
@@ -515,7 +514,7 @@ db_reply_t
         }
     }
 
-    auto reply_delete2 = delete_asset_element_from_asset_groups
+    auto reply_delete2 = DBAssetsDelete::delete_asset_element_from_asset_groups
                                                         (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
@@ -539,7 +538,7 @@ db_reply_t
         }
     }
 
-    auto reply_delete3 = delete_monitor_asset_relation_by_a
+    auto reply_delete3 = DBAssetsDelete::delete_monitor_asset_relation_by_a
                                                 (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
@@ -548,7 +547,7 @@ db_reply_t
         return reply_delete3;
     }
 
-    auto reply_delete4 = delete_asset_element (conn, element_id);
+    auto reply_delete4 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete4.status == 0 )
     {
         trans.rollback();
@@ -570,7 +569,7 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    auto reply_delete2 = delete_asset_group_links (conn, element_id);
+    auto reply_delete2 = DBAssetsDelete::delete_asset_group_links (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
         trans.rollback();
@@ -578,7 +577,7 @@ db_reply_t
         return reply_delete2;
     }
 
-    auto reply_delete3 = delete_asset_element (conn, element_id);
+    auto reply_delete3 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
         trans.rollback();
@@ -600,7 +599,7 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    auto reply_delete2 = delete_asset_element_from_asset_groups (conn, element_id);
+    auto reply_delete2 = DBAssetsDelete::delete_asset_element_from_asset_groups (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
         trans.rollback();
@@ -608,7 +607,7 @@ db_reply_t
         return reply_delete2;
     }
 
-    auto reply_delete3 = delete_asset_links_to (conn, element_id);
+    auto reply_delete3 = DBAssetsDelete::delete_asset_links_to (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
         trans.rollback();
@@ -616,7 +615,7 @@ db_reply_t
         return reply_delete3;
     }
 
-    auto reply_delete5 = delete_monitor_asset_relation_by_a
+    auto reply_delete5 = DBAssetsDelete::delete_monitor_asset_relation_by_a
                                                 (conn, element_id);
     if ( reply_delete5.status == 0 )
     {
@@ -625,7 +624,7 @@ db_reply_t
         return reply_delete5;
     }
 
-    auto reply_delete6 = delete_asset_element (conn, element_id);
+    auto reply_delete6 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete6.status == 0 )
     {
         trans.rollback();
