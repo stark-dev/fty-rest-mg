@@ -56,9 +56,7 @@ src_db_bios_csv_SOURCES += \
 	 src/shared/topic_cache.cc \
 	 include/shared/topic_cache.h \
 	 include/db/assets.h \
-	 include/db/assets/assetu.h \
 	 include/db/assets/assetd.h \
-	 src/db/assets/assetu.cc \
 	 src/db/assets/assetd.cc \
 	 src/db/inout.h \
 	 src/db/inout.cc \
@@ -468,9 +466,7 @@ libpriv_utils_la_SOURCES = 	\
 				src/shared/topic_cache.cc \
 				include/shared/topic_cache.h \
 				include/db/assets.h \
-				include/db/assets/assetu.h \
 				include/db/assets/assetd.h \
-				src/db/assets/assetu.cc \
 				src/db/assets/assetd.cc \
 				src/db/inout.h \
 				src/db/inout/importcsv.cc \
