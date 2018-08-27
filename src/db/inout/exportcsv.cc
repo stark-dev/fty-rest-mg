@@ -32,10 +32,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/transaction.h>
 
-#include "db/assets.h"
 #include <fty_common.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset.h>
+#include "dbtypes.h"
 #include "shared/utilspp.h"
 
 namespace persist {

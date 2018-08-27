@@ -29,9 +29,9 @@
  */
 #include <catch.hpp>
 #include <fty_common.h>
+#include <fty_common_db.h>
 
 #include "assetcrud.h"
-#include "db/assets.h"
 #include "db/asset_general.h"
 #include "common_msg.h"
 
@@ -88,7 +88,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_insert.affected_rows == 0 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 1 );
 
@@ -98,7 +98,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_select.item.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 0 );
 }
@@ -153,7 +153,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     REQUIRE ( rowid == rowid1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 );        // 0 fail, 1 ok
     REQUIRE ( reply_delete.affected_rows == 1 );
 
@@ -162,7 +162,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_select.item.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 0 );
 
@@ -177,7 +177,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     rowid1 = reply_insert.rowid;
     REQUIRE ( rowid == rowid1 );
 
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
 }
 
 
@@ -227,7 +227,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     REQUIRE ( reply_insert.affected_rows == 0 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_element (conn, rowid);
+    auto reply_delete = DBAssetsInsert::delete_asset_element (conn, rowid);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
@@ -237,7 +237,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_element (conn, rowid);
+    reply_delete = DBAssetsInsert::delete_asset_element (conn, rowid);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
 }
@@ -272,7 +272,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     REQUIRE ( reply_insert.status == 1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
@@ -282,7 +282,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     REQUIRE ( reply_select.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
 }
@@ -322,7 +322,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     REQUIRE ( reply_insert.status == 1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_link (conn, asset_element_id_src, asset_element_id_dest);
+    auto reply_delete = DBAssetsDelete::delete_asset_link (conn, asset_element_id_src, asset_element_id_dest);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
@@ -332,7 +332,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     zlist_purge (reply_select);
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_link  (conn, asset_element_id_src, asset_element_id_dest);
+    reply_delete = DBAssetsDelete::delete_asset_link  (conn, asset_element_id_src, asset_element_id_dest);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
 

@@ -36,15 +36,16 @@
 #include <cxxtools/split.h>
 #include <cxxtools/csvserializer.h>
 #include <sys/types.h>
+#include <fty_common.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 #include <fty_common_mlm_tntmlm.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
 #include "cleanup.h"
 #include <tntdb.h>
-#include "db/assets.h"
 
 // Check if value of parameter 'relative' is supported:
 //  * No - return false, value of unixtime is not changed

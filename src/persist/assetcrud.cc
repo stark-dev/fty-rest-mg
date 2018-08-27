@@ -36,9 +36,6 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include "monitor.h"
 #include "persist_error.h"
 #include "cleanup.h"
-#include "db/assets.h"
-
-
 
 zlist_t* select_asset_device_links_all(tntdb::Connection &conn,
                 a_elmnt_id_t device_id, a_lnk_tp_id_t link_type_id)

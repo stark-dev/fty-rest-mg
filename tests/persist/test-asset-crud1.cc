@@ -27,7 +27,6 @@
 #include <fty_common.h>
 
 #include "assetcrud.h"
-#include "db/assets.h"
 #include <fty_common_db.h>
 
 TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test.sql][999]")
