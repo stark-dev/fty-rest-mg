@@ -1219,7 +1219,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     parent_id, extattributes, subtype_id, subtype.c_str(), status.c_str(),
                     priority, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
-                throw BiosError(ret.errtype, ret.msg);
+                throw BiosError(ret.rowid, ret.msg);
             }
             m.id = ret.rowid;
         }
