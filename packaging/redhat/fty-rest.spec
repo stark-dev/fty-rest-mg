@@ -55,7 +55,6 @@ BuildRequires:  gcc-c++
 BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel
-BuildRequires:  malamute-devel
 BuildRequires:  libcidr-devel
 BuildRequires:  cxxtools-devel
 BuildRequires:  tntnet-devel
@@ -64,8 +63,12 @@ BuildRequires:  file-devel
 BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
-BuildRequires:  fty-proto-devel
+BuildRequires:  fty-common-db-devel
+BuildRequires:  fty-common-rest-devel
+BuildRequires:  malamute-devel
+BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
+BuildRequires:  fty-proto-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -95,7 +98,6 @@ Requires:       libfty_rest1 = %{version}
 Requires:       libsodium-devel
 Requires:       zeromq-devel
 Requires:       czmq-devel
-Requires:       malamute-devel
 Requires:       libcidr-devel
 Requires:       cxxtools-devel
 Requires:       tntnet-devel
@@ -104,8 +106,12 @@ Requires:       file-devel
 Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
-Requires:       fty-proto-devel
+Requires:       fty-common-db-devel
+Requires:       fty-common-rest-devel
+Requires:       malamute-devel
+Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
+Requires:       fty-proto-devel
 
 %description devel
 common core rest api for 42ity project development tools

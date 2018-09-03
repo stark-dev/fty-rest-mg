@@ -16,20 +16,19 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-#include "db/assets.h"
-
 #include <tntdb/transaction.h>
 #include <locale.h>
 
 #include <fty_common.h>
-#include "shared/asset_types.h"
-#include "defs.h"
+#include <fty_common_db.h>
+#include "dbtypes.h"
 #include "shared/ic.h"
 #include "shared/utilspp.h"
 
 
 namespace persist {
 
+static const char *ENV_OVERRIDE_LAST_DC_DELETION_CHECK = "FTY_OVERRIDE_LAST_DC_DELETION_CHECK";
 
 //=============================================================================
 // transaction is used
@@ -61,7 +60,7 @@ int
     }
 
 
-    int ret1 = update_asset_element
+    int ret1 = DBAssetsUpdate::update_asset_element
         (conn, element_id, element_name, parent_id, status, priority,
          asset_tag.c_str(), affected_rows);
 
@@ -73,7 +72,7 @@ int
         return 1;
     }
 
-    auto ret2 = delete_asset_ext_attributes_with_ro
+    auto ret2 = DBAssetsDelete::delete_asset_ext_attributes_with_ro
         (conn, element_id, false);
     if ( ret2.status == 0 )
     {
@@ -83,9 +82,9 @@ int
         return 2;
     }
 
-    auto ret3 = insert_into_asset_ext_attributes
+    auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -93,9 +92,9 @@ int
     }
 
     if(extattributesRO != NULL) {
-        auto ret31 = insert_into_asset_ext_attributes
+        auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -103,7 +102,7 @@ int
         }
     }
 
-    auto ret4 = delete_asset_element_from_asset_groups
+    auto ret4 = DBAssetsDelete::delete_asset_element_from_asset_groups
         (conn, element_id);
     if ( ret4.status == 0 )
     {
@@ -113,7 +112,7 @@ int
         return 4;
     }
 
-    auto ret5 = insert_element_into_groups
+    auto ret5 = DBAssetsInsert::insert_element_into_groups
         (conn, groups, element_id);
     if ( ( ret5.status == 0 ) && ( ret5.affected_rows != groups.size() ) )
     {
@@ -159,7 +158,7 @@ int
         return 1;
     }
 
-    int ret1 = update_asset_element
+    int ret1 = DBAssetsUpdate::update_asset_element
         (conn, element_id, element_name, parent_id, status, priority,
          asset_tag.c_str(), affected_rows);
 
@@ -171,7 +170,7 @@ int
         return 1;
     }
 
-    auto ret2 = delete_asset_ext_attributes_with_ro
+    auto ret2 = DBAssetsDelete::delete_asset_ext_attributes_with_ro
         (conn, element_id, false);
     if ( ret2.status == 0 )
     {
@@ -181,9 +180,9 @@ int
         return 2;
     }
 
-    auto ret3 = insert_into_asset_ext_attributes
+    auto ret3 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, errmsg);
-    if ( ret3 != 0 )
+    if ( ret3.status == 0 )
     {
         trans.rollback();
         log_error ("end: %s", errmsg.c_str());
@@ -191,9 +190,9 @@ int
     }
 
     if(extattributesRO != NULL) {
-        auto ret31 = insert_into_asset_ext_attributes
+        auto ret31 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributesRO, true, errmsg);
-        if ( ret31 != 0 )
+        if ( ret31.status == 0 )
         {
             trans.rollback();
             log_error ("end: %s", errmsg.c_str());
@@ -201,7 +200,7 @@ int
         }
     }
 
-    auto ret4 = delete_asset_element_from_asset_groups
+    auto ret4 = DBAssetsDelete::delete_asset_element_from_asset_groups
         (conn, element_id);
     if ( ret4.status == 0 )
     {
@@ -211,7 +210,7 @@ int
         return 4;
     }
 
-    auto ret5 = insert_element_into_groups
+    auto ret5 = DBAssetsInsert::insert_element_into_groups
         (conn, groups, element_id);
     if ( ret5.affected_rows != groups.size() )
     {
@@ -226,7 +225,7 @@ int
     {
         one_link.dest = element_id;
     }
-    auto ret6 = delete_asset_links_to
+    auto ret6 = DBAssetsDelete::delete_asset_links_to
         (conn, element_id);
     if ( ret6.status == 0 )
     {
@@ -236,7 +235,7 @@ int
         return 6;
     }
 
-    auto ret7 = insert_into_asset_links
+    auto ret7 = DBAssetsInsert::insert_into_asset_links
            (conn, links);
     if ( ret7.affected_rows != links.size() )
     {
@@ -267,7 +266,7 @@ db_reply_t
      zhash_t         *extattributesRO)
 {
     LOG_START;
-    if (extname_to_asset_id(element_name) != -1) {
+    if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -291,7 +290,7 @@ db_reply_t
     }
 
     tntdb::Transaction trans(conn);
-    auto reply_insert1 = insert_into_asset_element
+    auto reply_insert1 = DBAssetsInsert::insert_into_asset_element
                         (conn, iname.c_str (), element_type_id, parent_id,
                          status, priority, 0, asset_tag.c_str(), false);
     if ( reply_insert1.status == 0 )
@@ -304,43 +303,29 @@ db_reply_t
 
     std::string err = "";
 
-    int reply_insert2 = insert_into_asset_ext_attributes
+    auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
         err = "";
 
-        int reply_insert21 = insert_into_asset_ext_attributes
+        auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 
-    auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
+    auto reply_insert3 = DBAssetsInsert::insert_element_into_groups (conn, groups, element_id);
     if ( ( reply_insert3.status == 0 ) && ( reply_insert3.affected_rows != groups.size() ) )
     {
         trans.rollback();
@@ -351,7 +336,7 @@ db_reply_t
     if ( ( element_type_id == asset_type::DATACENTER ) ||
          ( element_type_id == asset_type::RACK) )
     {
-        auto reply_insert4 = insert_into_monitor_device
+        auto reply_insert4 = DBAssetsInsert::insert_into_monitor_device
             (conn, 1, element_name);
         if ( reply_insert4.status == 0 )
         {
@@ -359,7 +344,7 @@ db_reply_t
             log_info ("end: \"device\" was not inserted (fail monitor_device)");
             return reply_insert4;
         }
-        auto reply_insert5 = insert_into_monitor_asset_relation
+        auto reply_insert5 = DBAssetsInsert::insert_into_monitor_asset_relation
             (conn, reply_insert4.rowid, reply_insert1.rowid);
         if ( reply_insert5.status == 0 )
         {
@@ -391,7 +376,7 @@ db_reply_t
         zhash_t       *extattributesRO)
 {
     LOG_START;
-    if (extname_to_asset_id(element_name) != -1) {
+    if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         ret.status     = 0;
         ret.errtype    = DB_ERR;
@@ -406,7 +391,7 @@ db_reply_t
 
     tntdb::Transaction trans(conn);
 
-    auto reply_insert1 = insert_into_asset_element
+    auto reply_insert1 = DBAssetsInsert::insert_into_asset_element
                         (conn, iname.c_str (), asset_type::DEVICE, parent_id,
                          status, priority, asset_device_type_id, asset_tag.c_str(), false);
     if ( reply_insert1.status == 0 )
@@ -418,42 +403,28 @@ db_reply_t
     auto element_id = reply_insert1.rowid;
     std::string err = "";
 
-    int reply_insert2 = insert_into_asset_ext_attributes
+    auto reply_insert2 = DBAssetsInsert::insert_into_asset_ext_attributes
         (conn, element_id, extattributes, false, err);
-    if ( reply_insert2 != 0 )
+    if ( reply_insert2.status == 0 )
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        db_reply_t ret;
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_BADINPUT;
-        // too complicated, to transform from one format to onother
-        ret.rowid      = -reply_insert2;
-        ret.msg        = err;
-        return ret;
+        return reply_insert2;
     }
 
     if(extattributesRO != NULL) {
         err = "";
-        int reply_insert21 = insert_into_asset_ext_attributes
+        auto reply_insert21 = DBAssetsInsert::insert_into_asset_ext_attributes
             (conn, element_id, extattributesRO, true, err);
-        if ( reply_insert21 != 0 )
+        if ( reply_insert21.status == 0 )
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            db_reply_t ret;
-            ret.status     = 0;
-            ret.errtype    = DB_ERR;
-            ret.errsubtype = DB_ERROR_BADINPUT;
-            // too complicated, to transform from one format to onother
-            ret.rowid      = -reply_insert21;
-            ret.msg        = err;
-            return ret;
+            return reply_insert21;
         }
     }
 
-    auto reply_insert3 = insert_element_into_groups (conn, groups, element_id);
+    auto reply_insert3 = DBAssetsInsert::insert_element_into_groups (conn, groups, element_id);
     if ( ( reply_insert3.status == 0 ) && ( reply_insert3.affected_rows != groups.size() ) )
     {
         trans.rollback();
@@ -467,7 +438,7 @@ db_reply_t
         one_link.dest = element_id;
     }
 
-    auto reply_insert5 = insert_into_asset_links
+    auto reply_insert5 = DBAssetsInsert::insert_into_asset_links
            (conn, links);
     if ( reply_insert5.affected_rows != links.size() )
     {
@@ -477,10 +448,10 @@ db_reply_t
     }
 
     // BIOS-1962: we do not use this classification. So ignore it.
-    auto reply_select = select_monitor_device_type_id (conn, "not_classified");
+    auto reply_select = DBAssets::select_monitor_device_type_id (conn, "not_classified");
     if ( reply_select.status == 1 )
     {
-        auto reply_insert6 = insert_into_monitor_device
+        auto reply_insert6 = DBAssetsInsert::insert_into_monitor_device
             (conn, reply_select.item, element_name);
         if ( reply_insert6.status == 0 )
         {
@@ -489,7 +460,7 @@ db_reply_t
             return reply_insert6;
         }
 
-        auto reply_insert7 = insert_into_monitor_asset_relation
+        auto reply_insert7 = DBAssetsInsert::insert_into_monitor_asset_relation
             (conn, reply_insert6.rowid, reply_insert1.rowid);
         if ( reply_insert7.status == 0 )
         {
@@ -522,26 +493,28 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    // Don't allow deleting the last datacenter
-    unsigned numDatacentersAfterDelete = conn.prepareCached(
-            " SELECT COUNT(id_asset_element)"
-            " FROM"
-            "   t_bios_asset_element"
-            " WHERE"
-            "   id_type = (select id_asset_element_type from t_bios_asset_element_type where name = 'datacenter') AND"
-            "   id_asset_element != :element"
-        ).set("element", element_id).selectValue().getUnsigned();
-    if (numDatacentersAfterDelete == 0)
-    {
-        db_reply_t ret = db_reply_new();
-        ret.status     = 0;
-        ret.errtype    = DB_ERR;
-        ret.errsubtype = DB_ERROR_DELETEFAIL;
-        ret.msg        = "will not allow last datacenter to be deleted";
-        return ret;
+    // Don't allow the deletion of the last datacenter (unless overriden)
+    if (getenv(ENV_OVERRIDE_LAST_DC_DELETION_CHECK) == nullptr) {
+        unsigned numDatacentersAfterDelete = conn.prepareCached(
+                " SELECT COUNT(id_asset_element)"
+                " FROM"
+                "   t_bios_asset_element"
+                " WHERE"
+                "   id_type = (select id_asset_element_type from t_bios_asset_element_type where name = 'datacenter') AND"
+                "   id_asset_element != :element"
+            ).set("element", element_id).selectValue().getUnsigned();
+        if (numDatacentersAfterDelete == 0)
+        {
+            db_reply_t ret = db_reply_new();
+            ret.status     = 0;
+            ret.errtype    = DB_ERR;
+            ret.errsubtype = DB_ERROR_DELETEFAIL;
+            ret.msg        = "will not allow last datacenter to be deleted";
+            return ret;
+        }
     }
 
-    auto reply_delete2 = delete_asset_element_from_asset_groups
+    auto reply_delete2 = DBAssetsDelete::delete_asset_element_from_asset_groups
                                                         (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
@@ -553,7 +526,7 @@ db_reply_t
     m_dvc_id_t monitor_element_id = 0;
     {
         // find monitor counterpart
-        int rv = convert_asset_to_monitor(conn, element_id, monitor_element_id);
+        int rv = DBAssets::convert_asset_to_monitor(conn, element_id, monitor_element_id);
         if ( rv != 0 )
         {
             db_reply_t ret = db_reply_new();
@@ -565,7 +538,7 @@ db_reply_t
         }
     }
 
-    auto reply_delete3 = delete_monitor_asset_relation_by_a
+    auto reply_delete3 = DBAssetsDelete::delete_monitor_asset_relation_by_a
                                                 (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
@@ -574,7 +547,7 @@ db_reply_t
         return reply_delete3;
     }
 
-    auto reply_delete4 = delete_asset_element (conn, element_id);
+    auto reply_delete4 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete4.status == 0 )
     {
         trans.rollback();
@@ -596,7 +569,7 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    auto reply_delete2 = delete_asset_group_links (conn, element_id);
+    auto reply_delete2 = DBAssetsDelete::delete_asset_group_links (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
         trans.rollback();
@@ -604,7 +577,7 @@ db_reply_t
         return reply_delete2;
     }
 
-    auto reply_delete3 = delete_asset_element (conn, element_id);
+    auto reply_delete3 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
         trans.rollback();
@@ -626,7 +599,7 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    auto reply_delete2 = delete_asset_element_from_asset_groups (conn, element_id);
+    auto reply_delete2 = DBAssetsDelete::delete_asset_element_from_asset_groups (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
         trans.rollback();
@@ -634,7 +607,7 @@ db_reply_t
         return reply_delete2;
     }
 
-    auto reply_delete3 = delete_asset_links_to (conn, element_id);
+    auto reply_delete3 = DBAssetsDelete::delete_asset_links_to (conn, element_id);
     if ( reply_delete3.status == 0 )
     {
         trans.rollback();
@@ -642,7 +615,7 @@ db_reply_t
         return reply_delete3;
     }
 
-    auto reply_delete5 = delete_monitor_asset_relation_by_a
+    auto reply_delete5 = DBAssetsDelete::delete_monitor_asset_relation_by_a
                                                 (conn, element_id);
     if ( reply_delete5.status == 0 )
     {
@@ -651,7 +624,7 @@ db_reply_t
         return reply_delete5;
     }
 
-    auto reply_delete6 = delete_asset_element (conn, element_id);
+    auto reply_delete6 = DBAssetsDelete::delete_asset_element (conn, element_id);
     if ( reply_delete6.status == 0 )
     {
         trans.rollback();

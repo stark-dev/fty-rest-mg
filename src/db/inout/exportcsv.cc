@@ -32,8 +32,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/transaction.h>
 
-#include "db/assets.h"
 #include <fty_common.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
+#include "dbtypes.h"
 #include "shared/utilspp.h"
 
 namespace persist {
@@ -62,7 +64,7 @@ s_update_keytags(
                 s.push_back(keytag);
         };
 
-    int rv = select_ext_rw_attributes_keytags(
+    int rv = DBAssets::select_ext_rw_attributes_keytags(
             conn,
             foo);
     return rv;
@@ -94,7 +96,7 @@ s_power_links(
                 dest_in
             ));
         };
-    return select_v_web_asset_power_link_src_byId(
+    return DBAssets::select_v_web_asset_power_link_src_byId(
             conn,
             id,
             foo);
@@ -138,7 +140,7 @@ void
     tntdb::Connection conn;
     std::string msg{"no connection to database"};
     try{
-        conn = tntdb::connectCached(url);
+        conn = tntdb::connectCached(DBConn::url);
     }
     catch(...)
     {
@@ -162,10 +164,10 @@ void
         "location_u_pos", "location_w_pos", "end_warranty_date", "hostname.1", "http_link.1"
     };
 
-    uint32_t max_power_links = max_number_of_power_links(conn);
+    uint32_t max_power_links = DBAssets::max_number_of_power_links(conn);
     if (max_power_links <= 0)
         max_power_links = 1;
-    uint32_t max_groups = max_number_of_asset_groups(conn);
+    uint32_t max_groups = DBAssets::max_number_of_asset_groups(conn);
     if (max_groups <= 0)
         max_groups = 1;
 
@@ -212,7 +214,7 @@ void
         a_elmnt_id_t id_num = 0;
         std::string id;
         r["id"].get(id_num);
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (id_num);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (id_num);
         if (asset_names.first.empty () && asset_names.second.empty ())
             throw std::runtime_error(msg.c_str());
         id = asset_names.first;
@@ -220,11 +222,11 @@ void
         a_elmnt_id_t id_parent_num = 0;
         std::string location;
         r["id_parent"].get(id_parent_num);
-        location = persist::id_to_name_ext_name (id_parent_num).second;
+        location = DBAssets::id_to_name_ext_name (id_parent_num).second;
 
         // 2.1      select all extended attributes
         std::map <std::string, std::pair<std::string, bool> > ext_attrs;
-        int rv = select_ext_attributes(conn, id_num, ext_attrs);
+        int rv = DBAssets::select_ext_attributes(conn, id_num, ext_attrs);
         if (rv != 0)
             throw std::runtime_error(msg.c_str());
 
@@ -235,7 +237,7 @@ void
             throw std::runtime_error(msg.c_str());
         // 3.4 groups
         std::vector<std::string> groups;
-        rv = select_group_names(conn, id_num, groups);
+        rv = DBAssets::select_group_names(conn, id_num, groups);
         if (rv != 0)
             throw std::runtime_error(msg.c_str());
 
@@ -289,7 +291,7 @@ void
                 //nothing here, exists only for consistency reasons
             }
             else {
-                int rv = persist::name_to_extname (std::get<0>(power_links[i]), source);
+                int rv = DBAssets::name_to_extname (std::get<0>(power_links[i]), source);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 plug_src = std::get<1>(power_links[i]);
@@ -305,7 +307,7 @@ void
             auto it = ext_attrs.find ("logical_asset");
             if (it != ext_attrs.end ()) {
                 std::string extname;
-                int rv = persist::name_to_extname (it->second.first, extname);
+                int rv = DBAssets::name_to_extname (it->second.first, extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 ext_attrs ["logical_asset"] = make_pair (extname, it->second.second);
@@ -327,7 +329,7 @@ void
                 lcs.add("");
             else {
                 std::string extname;
-                int rv = persist::name_to_extname (groups[i], extname);
+                int rv = DBAssets::name_to_extname (groups[i], extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 lcs.add(extname);
@@ -339,7 +341,7 @@ void
 
     };
 
-    rv = select_asset_element_all(
+    rv = DBAssets::select_asset_element_all(
             conn,
             process_v_web_asset_element_row);
     if (rv != 0)
@@ -373,7 +375,7 @@ void
     tntdb::Connection conn;
     std::string msg{"no connection to database"};
     try{
-        conn = tntdb::connectCached(url);
+        conn = tntdb::connectCached(DBConn::url);
     }
     catch(...)
     {
@@ -395,7 +397,7 @@ void
         a_elmnt_id_t id_num = 0;
         std::string id;
         r["id"].get(id_num);
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (id_num);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (id_num);
         if (asset_names.first.empty () && asset_names.second.empty ())
             throw std::runtime_error(msg.c_str());
         id = asset_names.first;
@@ -406,13 +408,13 @@ void
         a_elmnt_id_t id_parent_num = 0;
         std::string location;
         r["id_parent"].get(id_parent_num);
-        std::pair<std::string,std::string> location_names = persist::id_to_name_ext_name (id_parent_num);
+        std::pair<std::string,std::string> location_names = DBAssets::id_to_name_ext_name (id_parent_num);
         location = location_names.second;
         std::string location_id = location_names.first;
 
         // 2.1      select all extended attributes
         std::map <std::string, std::pair<std::string, bool> > ext_attrs;
-        int rv = select_ext_attributes(conn, id_num, ext_attrs);
+        int rv = DBAssets::select_ext_attributes(conn, id_num, ext_attrs);
         if (rv != 0)
             throw std::runtime_error(msg.c_str());
 
@@ -423,7 +425,7 @@ void
             throw std::runtime_error(msg.c_str());
         // 3.4 groups
         std::vector<std::string> groups;
-        rv = select_group_names(conn, id_num, groups);
+        rv = DBAssets::select_group_names(conn, id_num, groups);
         if (rv != 0)
             throw std::runtime_error(msg.c_str());
 
@@ -464,7 +466,7 @@ void
                 lcs.add("");
             else {
                 std::string extname;
-                int rv = persist::name_to_extname (groups[i], extname);
+                int rv = DBAssets::name_to_extname (groups[i], extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 lcs.add(extname);
@@ -505,7 +507,7 @@ void
                 //nothing here, exists only for consistency reasons
             }
             else {
-                int rv = persist::name_to_extname (std::get<0>(power_links[i]), source);
+                int rv = DBAssets::name_to_extname (std::get<0>(power_links[i]), source);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 plug_src = std::get<1>(power_links[i]);
@@ -522,7 +524,7 @@ void
             auto it = ext_attrs.find ("logical_asset");
             if (it != ext_attrs.end ()) {
                 std::string extname;
-                int rv = persist::name_to_extname (it->second.first, extname);
+                int rv = DBAssets::name_to_extname (it->second.first, extname);
                 if (rv != 0)
                     throw std::runtime_error(msg.c_str());
                 ext_attrs ["logical_asset"] = make_pair (extname, it->second.second);
@@ -636,7 +638,7 @@ void
         }
     };
 
-    int rv = select_asset_element_all(
+    int rv = DBAssets::select_asset_element_all(
             conn,
             process_v_web_asset_element_row_json);
     if (rv != 0)

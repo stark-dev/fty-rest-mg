@@ -35,14 +35,15 @@
 
 #include <sys/types.h>
 
-#include <fty_common.h>
-
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_asset.h>
+#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_asset_types.h>
 #include "src/persist/assetcrud.h"
 #include "shared/data.h"
 #include "cleanup.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "shared/tntmlm.h"
 
 static const std::map<std::string, const std::string> PARAM_TO_SRC = {
     {"total_power", "realpower.default"},
@@ -226,10 +227,10 @@ std::string checked_arg2;
     }
 
     for (auto const& item : racks) {
-        if ( !is_ok_name (item.c_str ()) )
+        if ( !persist::is_ok_name (item.c_str ()) )
             http_die ("request-param-bad", "arg2", item.c_str (), "valid asset name");
 
-        auto dbid = persist::name_to_asset_id (item);
+        auto dbid = DBAssets::name_to_asset_id (item);
         if (dbid == -1) {
             http_die ("element-not-found", item.c_str ());
         }
@@ -240,7 +241,7 @@ std::string checked_arg2;
         if (it == allRacksShort.item.end()) {
             http_die ("element-not-found", item.c_str ());
         }
-       std::pair <std::string,std::string> asset_names = persist::id_to_name_ext_name (dbid);
+       std::pair <std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (dbid);
        if (asset_names.first.empty () && asset_names.second.empty ())
             http_die ("internal-error", "Database failure");
        rackNames.push_back (asset_names.second);

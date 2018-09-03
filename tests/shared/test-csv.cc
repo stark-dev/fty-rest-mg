@@ -37,10 +37,10 @@
 #include <stdexcept>
 
 #include <fty_proto.h>
+#include <fty_common_mlm_tntmlm.h>
 
 #include "shared/csv.h"
 #include "src/db/inout.h"
-#include "shared/tntmlm.h"
 using namespace shared;
 
 TEST_CASE("CSV map basic get test", "[csv]") {
@@ -270,13 +270,13 @@ TEST_CASE("CSV map apostrof2", "[csv]") {
 
 class MlmClientTest: public MlmClient {
     public:
-        MlmClientTest(int sendto_retval) : MlmClient(NULL) {
+        MlmClientTest(int sendto_retval) : MlmClient() {
             sendto_rv = sendto_retval;
             reply_no = 0;
             reply.clear();
         };
         ~MlmClientTest() = default;
-        virtual zmsg_t* recv (const std::string& uuid, uint32_t timeout) {
+        zmsg_t* recv (const std::string& uuid, uint32_t timeout) override {
             zsys_debug("Running mocked recv with uuid '%s' and timeout '%" PRIu32 "'", uuid.c_str(), timeout);
             if (reply_no-1 < reply.size()) {
             } else {
@@ -288,7 +288,7 @@ class MlmClientTest: public MlmClient {
                 throw std::bad_alloc();
             return rv;
         }
-        virtual int sendto (const std::string& address, const std::string& subject, uint32_t timeout, zmsg_t **content_p) {
+        int sendto (const std::string& address, const std::string& subject, uint32_t timeout, zmsg_t **content_p) override {
             zsys_debug("Running mocked sendto with address '%s', subject '%s' and timeout '%" PRIu32 "'",
                     address.c_str(), subject.c_str(), timeout);
             zmsg_destroy(content_p);
@@ -384,7 +384,7 @@ TEST_CASE("test for rackcontroller-0 detection", "[csv]") {
     zmsg_addstr (reply_asset_detail_rackcontroller0_error, "ERROR");
     zmsg_addstr (reply_asset_detail_rackcontroller0_error, "BAD_COMMAND");
     // initialization finished
-    
+
     zsys_debug("\tTesting: empty database, 0 RCs in csv - detect none");
     // empty database, 0 RCs in csv - detect none
     row_number = -1;

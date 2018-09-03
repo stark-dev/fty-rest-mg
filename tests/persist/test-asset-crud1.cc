@@ -27,7 +27,7 @@
 #include <fty_common.h>
 
 #include "assetcrud.h"
-#include "db/assets.h"
+#include <fty_common_db.h>
 
 TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test.sql][999]")
 {
@@ -46,7 +46,7 @@ TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test
     const char   *asset_tag ="1234567890";
 
     int32_t n = 0;
-    int r = persist::update_asset_element
+    int r = DBAssetsUpdate::update_asset_element
         (conn, asset_element_id, element_name, parent_id, status, priority, asset_tag, n);
     REQUIRE ( r == 0 );
     REQUIRE ( n == 1 );
@@ -66,7 +66,7 @@ TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test
     const char   *status_new = "retired";
     a_elmnt_pr_t  priority_new = 1;
 
-    r = persist::update_asset_element
+    r = DBAssetsUpdate::update_asset_element
         (conn, asset_element_id, element_name_new, parent_id_new, status_new,
          priority_new, asset_tag, n);
     REQUIRE ( r == 0 );
@@ -83,7 +83,7 @@ TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test
     REQUIRE ( item.parent_id == parent_id_new );
 
     // return to the starting point
-    r = persist::update_asset_element
+    r = DBAssetsUpdate::update_asset_element
         (conn, asset_element_id, element_name, parent_id, status, priority, asset_tag, n);
     REQUIRE ( r == 0 );
 }

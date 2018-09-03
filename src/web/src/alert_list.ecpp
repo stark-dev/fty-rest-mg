@@ -36,10 +36,11 @@
 #include <fty_proto.h>
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "db/assets.h"
 #include "cleanup.h"
 #include "shared/utils_json.h"
-
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
 #include <fty_common.h>
 
 #define RFC_ALERTS_LIST "rfc-alerts-list"
@@ -108,6 +109,7 @@ bool database_ready;
     std::string checked_asset;
     std::string checked_recursive;
     uint32_t element_id = 0;
+    std::string url = DBConn::url;
 
     {
         std::string state = qparam.param("state");
@@ -140,7 +142,7 @@ bool database_ready;
 
         if (!asset.empty ())
         {
-            if (!is_ok_name (asset.c_str ()))
+            if (!persist::is_ok_name (asset.c_str ()))
             {
                 http_die ("request-param-bad", asset.c_str ());
             }
@@ -156,7 +158,7 @@ bool database_ready;
     }
 
     {
-        int64_t dbid =  persist::name_to_asset_id (checked_asset);
+        int64_t dbid =  DBAssets::name_to_asset_id (checked_asset);
         if (!checked_asset.empty() && dbid == -1) {
                 http_die ("element-not-found", checked_asset.c_str ());
         }
@@ -182,7 +184,7 @@ catch (const std::exception& e) {
 log_debug ("Asset element id = '%" PRIu32 "'.", element_id);
 
 if (!checked_asset.empty ()) {
-    auto asset_element = persist::select_asset_element_web_byId (connection, element_id);
+    auto asset_element = DBAssets::select_asset_element_web_byId (connection, element_id);
     if (asset_element.status != 1)
         http_die ("internal-error", asset_element.msg.c_str ());
     log_debug ("Asset element name = '%s'.", asset_element.item.name.c_str ());
@@ -190,7 +192,7 @@ if (!checked_asset.empty ()) {
 
     if (checked_recursive.compare ("true") == 0) {
         try {
-            int rv = persist::select_assets_by_container (
+            int rv = DBAssets::select_assets_by_container (
                 connection,
                 element_id,
                 [&desired_elements](const tntdb::Row& row) -> void {
@@ -198,7 +200,7 @@ if (!checked_asset.empty ()) {
                     row[0].get (name);
                     desired_elements.emplace (std::make_pair (name, 5));
                 });
-            if (rv != 0) { http_die ("internal-error", "persist::select_assets_by_container () failed."); }
+            if (rv != 0) { http_die ("internal-error", "DBAssets::select_assets_by_container () failed."); }
         }
         catch (const tntdb::Error& e) {
             http_die ("internal-error", e.what ());// TODO

@@ -27,7 +27,8 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <vector>
 
 #include "db/dbhelpers.h"
-#include "asset_types.h"
+#include <fty_common.h>
+#include <fty_common_db.h>
 
 void
     send_configure (

@@ -26,6 +26,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <tntdb/connect.h>
 #include "dbhelpers.h"
+#include <fty_common_db.h>
 
 // ===============================================================
 // DEVICE

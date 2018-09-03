@@ -31,7 +31,6 @@
 
 //  External dependencies
 #include <czmq.h>
-#include <malamute.h>
 #include <libcidr.h>
 #include <cxxtools/allocator.h>
 #include <tnt/tntnet.h>
@@ -41,8 +40,11 @@
 #endif
 #include <fty_log.h>
 #include <fty_common.h>
-#include <ftyproto.h>
+#include <fty_common_db.h>
+#include <fty_common_rest.h>
+#include <fty_common_mlm.h>
 #include <sasl/sasl.h>
+#include <ftyproto.h>
 
 //  FTY_REST version macros for compile-time API detection
 #define FTY_REST_VERSION_MAJOR 1
@@ -92,20 +94,10 @@
 #ifdef FTY_REST_BUILD_DRAFT_API
 typedef struct _db_topology2_t db_topology2_t;
 #define DB_TOPOLOGY2_T_DEFINED
-typedef struct _db_assets_assetcr_t db_assets_assetcr_t;
-#define DB_ASSETS_ASSETCR_T_DEFINED
-typedef struct _db_assets_assetd_t db_assets_assetd_t;
-#define DB_ASSETS_ASSETD_T_DEFINED
-typedef struct _db_assets_assetr_t db_assets_assetr_t;
-#define DB_ASSETS_ASSETR_T_DEFINED
-typedef struct _db_assets_assetu_t db_assets_assetu_t;
-#define DB_ASSETS_ASSETU_T_DEFINED
 typedef struct _msg_asset_msg_t msg_asset_msg_t;
 #define MSG_ASSET_MSG_T_DEFINED
 typedef struct _msg_common_msg_t msg_common_msg_t;
 #define MSG_COMMON_MSG_T_DEFINED
-typedef struct _shared_asset_types_t shared_asset_types_t;
-#define SHARED_ASSET_TYPES_T_DEFINED
 typedef struct _shared_augtool_t shared_augtool_t;
 #define SHARED_AUGTOOL_T_DEFINED
 typedef struct _shared_cidr_t shared_cidr_t;
@@ -116,14 +108,8 @@ typedef struct _shared_csv_t shared_csv_t;
 #define SHARED_CSV_T_DEFINED
 typedef struct _shared_data_t shared_data_t;
 #define SHARED_DATA_T_DEFINED
-typedef struct _shared_fty_asset_uptime_configurator_t shared_fty_asset_uptime_configurator_t;
-#define SHARED_FTY_ASSET_UPTIME_CONFIGURATOR_T_DEFINED
 typedef struct _shared_ic_t shared_ic_t;
 #define SHARED_IC_T_DEFINED
-typedef struct _shared_subprocess_t shared_subprocess_t;
-#define SHARED_SUBPROCESS_T_DEFINED
-typedef struct _shared_tntmlm_t shared_tntmlm_t;
-#define SHARED_TNTMLM_T_DEFINED
 typedef struct _shared_topic_cache_t shared_topic_cache_t;
 #define SHARED_TOPIC_CACHE_T_DEFINED
 typedef struct _shared_upsstatus_t shared_upsstatus_t;
@@ -155,29 +141,18 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "cleanup.h"
 #include "dbtypes.h"
 #include "preproc.h"
-#include "defs.h"
-#include "db/assetdef.h"
-#include "db/assets.h"
 #include "db/dbhelpers.h"
 #include "db/types.h"
 #ifdef FTY_REST_BUILD_DRAFT_API
 #include "db/topology2.h"
-#include "db/assets/assetcr.h"
-#include "db/assets/assetd.h"
-#include "db/assets/assetr.h"
-#include "db/assets/assetu.h"
 #include "msg/asset_msg.h"
 #include "msg/common_msg.h"
-#include "shared/asset_types.h"
 #include "shared/augtool.h"
 #include "shared/cidr.h"
 #include "shared/configure_inform.h"
 #include "shared/csv.h"
 #include "shared/data.h"
-#include "shared/fty_asset_uptime_configurator.h"
 #include "shared/ic.h"
-#include "shared/subprocess.h"
-#include "shared/tntmlm.h"
 #include "shared/topic_cache.h"
 #include "shared/upsstatus.h"
 #include "shared/utils.h"

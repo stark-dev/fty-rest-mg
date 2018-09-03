@@ -28,12 +28,14 @@
 #include <unistd.h>
 
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common_db_asset.h>
 #include <fty_common.h>
+#include <fty_common_rest_helpers.h>
+
 #include "shared/configure_inform.h"
-#include "include/shared/asset_types.h"
 #include "src/db/inout.h"
-#include "db/assets.h"
-</%pre>
+
+ </%pre>
 <%request scope="global">
 UserInfo user;
 bool database_ready;
@@ -53,7 +55,7 @@ bool database_ready;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
     std::string id = request.getArg("id");
 
-    if (id.empty () || !is_ok_name (id.c_str ()))
+    if (id.empty () || !persist::is_ok_name (id.c_str ()))
         http_die ("request-param-bad", id.c_str ());
 
     // Read json, transform to csv, use existing functionality
@@ -141,7 +143,7 @@ bool database_ready;
         }
         // no unexpected errors was detected
         // process results
-        std::pair<std::string, std::string> asset_names = persist::id_to_name_ext_name (row.first.id);
+        std::pair<std::string, std::string> asset_names = DBAssets::id_to_name_ext_name (row.first.id);
         if (asset_names.first.empty () && asset_names.second.empty ())
             http_die ("internal-error", "Database failure");
 

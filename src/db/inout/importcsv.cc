@@ -32,27 +32,27 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cxxtools/join.h>
 
 #include <fty_proto.h>
-
-#include <fty_common.h>
+#include <fty_common_rest.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db.h>
+#include <fty_common_mlm_tntmlm.h>
 
 #include "../../persist/assetcrud.h"
 #include "cleanup.h"
 #include "../asset_general.h"
-#include "db/assets.h"
 #include "db/dbhelpers.h"
 #include "../inout.h"
 #include "shared/utils.h"
 #include "shared/utilspp.h"
-#include "shared/tntmlm.h"
 
 using namespace shared;
 
 namespace persist {
+
 typedef struct _LIMITATIONS_STRUCT
 {
     int max_active_power_devices;
     int global_configurability;
-
 } LIMITATIONS_STRUCT;
 
 int
@@ -540,7 +540,7 @@ std::map <std::string, std::string>sanitize_row_ext_names (
                     if (it == result.end ()) break;
 
                     std::string name;
-                    int rv = extname_to_asset_name (it->second, name);
+                    int rv = DBAssets::extname_to_asset_name (it->second, name);
                     if (rv != 0) { name = it->second; }
                     log_debug ("sanitized %s '%s' -> '%s'", title.c_str(), it->second.c_str(), name.c_str ());
                     result [title] = name;
@@ -550,7 +550,7 @@ std::map <std::string, std::string>sanitize_row_ext_names (
                 auto it = result.find (item);
                 if (it != result.end ()) {
                     std::string name;
-                    int rv = extname_to_asset_name (it->second, name);
+                    int rv = DBAssets::extname_to_asset_name (it->second, name);
                     if (rv != 0) { name = it->second; }
                     log_debug ("sanitized %s '%s' -> '%s'", it->first.c_str (), it->second.c_str(), name.c_str ());
                     result [item] = name;
@@ -693,7 +693,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     int64_t id = 0;
     if ( !id_str.empty() )
     {
-        id = name_to_asset_id (id_str);
+        id = DBAssets::name_to_asset_id (id_str);
         if (id == -1) {
             bios_throw("element-not-found", id_str.c_str ());
         }
@@ -714,7 +714,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     if (ename.empty ())
         bios_throw("request-param-bad", "name", "<empty>", "<unique, non empty value>");
     std::string iname;
-    int rv = extname_to_asset_name (ename, iname);
+    int rv = DBAssets::extname_to_asset_name (ename, iname);
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
     if (rv == -2) {
         bios_throw("internal-error", "Database failure");
@@ -802,7 +802,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     // since we have all the data about the asset, licensing check could be done now
     if (-1 != limitations.max_active_power_devices && "active" == status && TYPES.find("device")->second == type_id) {
-        std::string db_status = get_status_from_db (id_str);
+        std::string db_status = DBAssets::get_status_from_db (conn, id_str);
         // limit applies only to assets that are attempted to be activated, but are disabled in database
         // or to new assets, also may trigger in case of DB failure, but that's fine
         if (db_status != "active") {
@@ -811,7 +811,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     || SUBTYPES.find("ups")->second == subtype_id
                     || SUBTYPES.find("genset")->second == subtype_id
                     || SUBTYPES.find("pdu")->second == subtype_id
-                    ) && get_active_power_devices() + 1 > limitations.max_active_power_devices) {
+                    ) && DBAssets::get_active_power_devices (conn) + 1 > limitations.max_active_power_devices) {
                 bios_throw("action-forbidden", "Asset handling", "Licensing maximum amount of active power devices limit reached");
             }
         }
@@ -821,7 +821,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     // if id is set, then it is right time to check what is going on in DB
     if ( !id_str.empty() )
     {
-        db_reply <db_web_basic_element_t> element_in_db = select_asset_element_web_byId
+        db_reply <db_web_basic_element_t> element_in_db = DBAssets::select_asset_element_web_byId
                                                         (conn, id);
         if ( element_in_db.status == 0 ) {
             if (element_in_db.errsubtype == DB_ERROR_NOTFOUND) {
@@ -1224,7 +1224,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             m.id = ret.rowid;
         }
     }
-    rv = extname_to_asset_name (ename, m.name);
+    rv = DBAssets::extname_to_asset_name (ename, m.name);
     if (rv != 0)
          bios_throw("internal-error", "Database failure");
     m.status = status;
@@ -1331,7 +1331,7 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
     tntdb::Connection conn;
     std::string msg{"No connection to database"};
     try{
-        conn = tntdb::connectCached(url);
+        conn = tntdb::connectCached(DBConn::url);
     }
     catch(...)
     {
@@ -1392,7 +1392,7 @@ void
     tntdb::Connection conn;
     std::string msg{"No connection to database"};
     try{
-        conn = tntdb::connectCached(url);
+        conn = tntdb::connectCached(DBConn::url);
     }
     catch(...)
     {

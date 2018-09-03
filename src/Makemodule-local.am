@@ -1,4 +1,4 @@
-# Custom targets, not managed via zproject
+# Custom targets, not managed via  zproject
 
 ### No-arch pathnames wanted
 clientdir ?= $(libexecdir)/$(PACKAGE)
@@ -17,7 +17,7 @@ cibin_programs =
 #     defined in condition ENABLE_DB_BIOS_CSV, which is included in
 #     condition TRUE ...
 #   src/Makemodule.am:146: ... 'src_db_bios_csv_LDADD' previously defined here
-override src_db_bios_csv_LDADD := ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS} ${libsasl2_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS}
+override src_db_bios_csv_LDADD := ${libzmq_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_proto_LIBS} ${libsasl2_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS} ${fty_common_db_LIBS} ${fty_common_rest_LIBS} ${fty_common_mlm_LIBS}
 
 # Statically link bios-csv with everything needed
 if ENABLE_DB_BIOS_CSV
@@ -27,13 +27,10 @@ if ENABLE_DB_BIOS_CSV
 src_db_bios_csv_SOURCES += \
 	 src/shared/utils.cc \
 	 include/shared/utils.h \
-	 include/defs.h \
 	 include/shared/utils_json.h \
 	 src/shared/utils_json.cc \
 	 src/shared/utilspp.cc \
 	 include/shared/utilspp.h \
-	 include/shared/subprocess.h \
-	 src/shared/subprocess.cc \
 	 include/shared/augtool.h \
 	 src/shared/augtool.cc \
 	 include/shared/ic.h \
@@ -55,33 +52,17 @@ src_db_bios_csv_SOURCES += \
 	 include/db/dbhelpers.h \
 	 src/db/agentstate/agentstate.cc \
 	 src/db/agentstate/agentstate.h \
-	 src/shared/asset_types.cc \
-	 include/shared/asset_types.h \
 	 include/dbtypes.h \
 	 src/shared/topic_cache.cc \
 	 include/shared/topic_cache.h \
-	 include/db/assets.h \
-	 include/db/assets/assetcr.h \
-	 include/db/assets/assetr.h \
-	 include/db/assets/assetu.h \
-	 include/db/assets/assetd.h \
-	 include/db/assetdef.h \
-	 src/db/assets/assetcr.cc \
-	 src/db/assets/assetr.cc \
-	 src/db/assets/assetu.cc \
-	 src/db/assets/assetd.cc \
 	 src/db/inout.h \
 	 src/db/inout.cc \
 	 src/db/inout/importcsv.cc \
 	 src/db/inout/exportcsv.cc \
 	 src/db/asset_general.cc \
 	 src/db/asset_general.h \
-	 include/shared/tntmlm.h \
-	 src/shared/tntmlm.cc \
 	 src/shared/configure_inform.cc \
 	 include/shared/configure_inform.h \
-	 include/shared/fty_asset_uptime_configurator.h \
-	 src/shared/fty_asset_uptime_configurator.cc \
 	 src/shared/magic.cc \
 	 include/bios_magic.h \
 	 src/msg/asset_msg.cc \
@@ -452,13 +433,10 @@ noinst_LTLIBRARIES += 		libpriv-utils.la
 libpriv_utils_la_SOURCES = 	\
 				src/shared/utils.cc \
 				include/shared/utils.h \
-				include/defs.h \
 				include/shared/utils_json.h \
 				src/shared/utils_json.cc \
 				include/shared/utilspp.h \
 				src/shared/utilspp.cc \
-				include/shared/subprocess.h \
-				src/shared/subprocess.cc \
 				include/shared/augtool.h \
 				src/shared/augtool.cc \
 				include/shared/ic.h \
@@ -481,32 +459,16 @@ libpriv_utils_la_SOURCES = 	\
 				include/db/dbhelpers.h \
 				src/db/agentstate/agentstate.cc \
 				src/db/agentstate/agentstate.h \
-				src/shared/asset_types.cc \
-				include/shared/asset_types.h \
 				include/dbtypes.h \
 				src/shared/topic_cache.cc \
 				include/shared/topic_cache.h \
-				include/db/assets.h \
-				include/db/assets/assetcr.h \
-				include/db/assets/assetr.h \
-				include/db/assets/assetu.h \
-				include/db/assets/assetd.h \
-				include/db/assetdef.h \
-				src/db/assets/assetcr.cc \
-				src/db/assets/assetr.cc \
-				src/db/assets/assetu.cc \
-				src/db/assets/assetd.cc \
 				src/db/inout.h \
 				src/db/inout/importcsv.cc \
 				src/db/inout/exportcsv.cc \
 				src/db/asset_general.cc \
 				src/db/asset_general.h \
-				include/shared/tntmlm.h \
-				src/shared/tntmlm.cc \
 				src/shared/configure_inform.cc \
 				include/shared/configure_inform.h \
-				include/shared/fty_asset_uptime_configurator.h \
-				src/shared/fty_asset_uptime_configurator.cc \
 				src/shared/magic.cc \
 				include/bios_magic.h \
 				src/msg/asset_msg.cc \
@@ -516,7 +478,7 @@ libpriv_utils_la_SOURCES = 	\
 				include/db/topology2.h \
 				src/db/topology2.cc
 
-libpriv_utils_la_LDFLAGS = ${cxxtools_LIBS} ${tntdb_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS}
+libpriv_utils_la_LDFLAGS = ${cxxtools_LIBS} ${tntdb_LIBS} ${czmq_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${log4cplus_LIBS} ${fty_common_LIBS} ${fty_common_db_LIBS} ${fty_common_rest_LIBS}
 
 libpriv_utils_la_CPPFLAGS =$(AM_CPPFLAGS) \
 				-I$(abs_top_srcdir)/src/persist \
@@ -577,40 +539,6 @@ test_web_helpers_CPPFLAGS =\
 test_web_helpers_LDFLAGS =	${tntnet_LIBS} ${tntdb_LIBS} ${cxxtools_LIBS} ${czmq_LIBS}
 
 ###
-check_PROGRAMS +=	test-utils-web
-
-test_utils_web_SOURCES = \
-				tests/shared/test-utils-web.cc
-#fty-common#	src/include/utils_web.h
-
-test_utils_web_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_utils_web_CPPFLAGS = \
-				$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/tests/include/
-
-test_utils_web_LDFLAGS =	${cxxtools_LIBS} ${czmq_LIBS}
-
-###
-check_PROGRAMS +=	test-tntmlm
-
-test_tntmlm_SOURCES = \
-				include/shared/tntmlm.h \
-				src/shared/tntmlm.cc \
-				tests/shared/test-tntmlm.cc
-
-test_tntmlm_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_tntmlm_CPPFLAGS = \
-				$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/tests/include/
-
-test_tntmlm_LDFLAGS =	${czmq_LIBS} ${malamute_LIBS} ${cxxtools_LIBS}
-
 check_PROGRAMS +=	test-utils-plusplus
 
 test_utils_plusplus_SOURCES = \
@@ -642,20 +570,6 @@ test_utils_CPPFLAGS =	$(AM_CPPFLAGS) \
 
 test_utils_LDFLAGS =	${czmq_LIBS}
 
-noinst_PROGRAMS += 			test-subprocess
-test_subprocess_SOURCES = \
-				include/shared/subprocess.h \
-				tests/shared/test-subprocess.cc
-
-test_subprocess_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_subprocess_CPPFLAGS = \
-				$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/tests/include/
-test_subprocess_LDFLAGS =		${cxxtools_LIBS} ${czmq_LIBS}
-
 check_PROGRAMS += 	test-cidr
 test_cidr_SOURCES = \
 				src/shared/cidr.cc \
@@ -685,7 +599,7 @@ test_csv_CPPFLAGS =		$(AM_CPPFLAGS) \
 				-I$(abs_top_srcdir)/src/msg \
 				-I$(abs_top_srcdir)/tests/include
 
-test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS}
+test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${fty_common_mlm_LIBS}
 
 EXTRA_DIST +=	$(srcdir)/tests/shared/*.csv
 

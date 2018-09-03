@@ -22,12 +22,13 @@
 #include <fty_proto.h>
 
 #include <fty_common.h>
+#include <fty_common_rest.h>
+#include <fty_common_db_asset.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
 #include "web/src/asset_computed_impl.h"
 #include "shared/data.h"
-#include "defs.h"
 #include "shared/utils_json.h"
 
 struct Outlet
@@ -150,15 +151,15 @@ std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)
     return json;
   }
 
-  auto asset_element = persist::select_asset_element_web_byName(connection, fty_proto_name(alert));
+  auto asset_element = DBAssets::select_asset_element_web_byName(connection, fty_proto_name(alert));
   if (asset_element.status != 1)
   {
     log_error("%s", asset_element.msg.c_str());
     return json;
   }
 
-  log_debug("persist::id_to_name_ext_name ('%d')", asset_element.item.id);
-  std::pair<std::string, std::string> asset_element_names = persist::id_to_name_ext_name(asset_element.item.id);
+  log_debug("DBAssets::id_to_name_ext_name ('%d')", asset_element.item.id);
+  std::pair<std::string, std::string> asset_element_names = DBAssets::id_to_name_ext_name(asset_element.item.id);
   if (asset_element_names.first.empty() && asset_element_names.second.empty())
   {
     log_error("internal-error : Database error");
@@ -201,11 +202,11 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
     return json;
   }
 
-  std::pair<std::string, std::string> parent_names = persist::id_to_name_ext_name(tmp.item.basic.parent_id);
+  std::pair<std::string, std::string> parent_names = DBAssets::id_to_name_ext_name(tmp.item.basic.parent_id);
   std::string parent_name = parent_names.first;
   std::string ext_parent_name = parent_names.second;
 
-  std::pair<std::string, std::string> asset_names = persist::id_to_name_ext_name(tmp.item.basic.id);
+  std::pair<std::string, std::string> asset_names = DBAssets::id_to_name_ext_name(tmp.item.basic.id);
   if (asset_names.first.empty() && asset_names.second.empty())
   {
     log_error("Database failure");
@@ -245,7 +246,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
     std::string ext_name = "";
     for (auto &oneGroup : tmp.item.groups)
     {
-      std::pair<std::string, std::string> group_names = persist::id_to_name_ext_name(oneGroup.first);
+      std::pair<std::string, std::string> group_names = DBAssets::id_to_name_ext_name(oneGroup.first);
       if (group_names.first.empty() && group_names.second.empty())
       {
         log_error("Database failure");
@@ -278,7 +279,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       uint32_t i = 1;
       for (auto &oneLink : tmp.item.powers)
       {
-        std::pair<std::string, std::string> link_names = persist::id_to_name_ext_name(oneLink.src_id);
+        std::pair<std::string, std::string> link_names = DBAssets::id_to_name_ext_name(oneLink.src_id);
         if (link_names.first.empty() && link_names.second.empty())
         {
           log_error("Database failure");
@@ -331,7 +332,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
     for (const auto& it : tmp.item.parents)
     {
       char comma = i != tmp.item.parents.size() ? ',' : ' ';
-      std::pair<std::string, std::string> it_names = persist::id_to_name_ext_name(std::get<0> (it));
+      std::pair<std::string, std::string> it_names = DBAssets::id_to_name_ext_name(std::get<0> (it));
       if (it_names.first.empty() && it_names.second.empty())
       {
         log_error("Database failure");

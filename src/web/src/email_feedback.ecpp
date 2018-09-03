@@ -24,10 +24,11 @@
  * \brief Sends feedback email.
  */
  #><%pre>
-#include <fty_common.h>
-#include "shared/tntmlm.h"
-#include "shared/subprocess.h"
-#include "defs.h"
+#include <fty_common_rest_helpers.h>
+#include <fty_common_rest_utils_web.h>
+#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_subprocess.h>
+#include <fty_common_agents.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fstream>
@@ -249,14 +250,14 @@ UserInfo user;
             uuid);
     for (const std::string& path: paths)
         zmsg_addstr (send, path.c_str ());
-    int rv = client->sendto (FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL", 1000, &send);
+    int rv = client->sendto (AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL", 1000, &send);
 
     if (rv == -1)
     {
         zuuid_destroy (&uuid);
         log_fatal (
                     "Error: client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
-                        FTY_EMAIL_ADDRESS_SENDMAIL_ONLY, "SENDMAIL");
+                        AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL");
         s_rm_rf (paths, &temp_dir);
         http_die ("internal-error", "client->sendto () failed");
     }
@@ -309,5 +310,3 @@ UserInfo user;
     zstr_free(&err_code);
     zstr_free(&err_message);
 </%cpp>
-
-

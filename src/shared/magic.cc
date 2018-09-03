@@ -33,7 +33,7 @@
 #include <fty_common.h>
 
 #include "bios_magic.h"
-#include "shared/subprocess.h"
+#include <fty_common_mlm_subprocess.h>
 
 namespace shared {
 
@@ -124,8 +124,8 @@ convert_file(
         ::close(r2);
 
         // iconv -f utf-16le -t utf-8 Book1.txt > Book1.utf8.txt
-        shared::Argv args = {"/usr/bin/iconv", "-f", encoding, "-t", "utf-8", path, "-o", new_path};
-        int res = shared::call(args);
+        MlmSubprocess::Argv args = {"/usr/bin/iconv", "-f", encoding, "-t", "utf-8", path, "-o", new_path};
+        int res = MlmSubprocess::call(args);
         ::unlink(path);
         if (res != 0) {
             ::unlink(new_path);

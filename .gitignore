@@ -3,7 +3,6 @@
 ### Note: Customized after generation; take care upon regens
 
 save.xml
-
 # Object files
 *.o
 *.so
@@ -102,16 +101,19 @@ CMake*
 libsodium/
 libzmq/
 czmq/
-malamute/
 cidr/
 cxxtools/
 tntnet/
 tntdb/
 magic/
-fty-proto/
 log4cplus/
-fty-common/
 fty-common-logging/
+fty-common/
+fty-common-db/
+fty-common-rest/
+malamute/
+fty-common-mlm/
+fty-proto/
 
 # Travis build area
 tmp/

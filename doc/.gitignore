@@ -13,20 +13,10 @@
 # Ignore the source doc texts generated from program sources
 db_topology2.txt
 db_topology2.doc
-db_assets_assetcr.txt
-db_assets_assetcr.doc
-db_assets_assetd.txt
-db_assets_assetd.doc
-db_assets_assetr.txt
-db_assets_assetr.doc
-db_assets_assetu.txt
-db_assets_assetu.doc
 msg_asset_msg.txt
 msg_asset_msg.doc
 msg_common_msg.txt
 msg_common_msg.doc
-shared_asset_types.txt
-shared_asset_types.doc
 shared_augtool.txt
 shared_augtool.doc
 shared_cidr.txt
@@ -37,14 +27,8 @@ shared_csv.txt
 shared_csv.doc
 shared_data.txt
 shared_data.doc
-shared_fty_asset_uptime_configurator.txt
-shared_fty_asset_uptime_configurator.doc
 shared_ic.txt
 shared_ic.doc
-shared_subprocess.txt
-shared_subprocess.doc
-shared_tntmlm.txt
-shared_tntmlm.doc
 shared_topic_cache.txt
 shared_topic_cache.doc
 shared_upsstatus.txt

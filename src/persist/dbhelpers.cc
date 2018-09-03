@@ -25,10 +25,14 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/row.h>
 #include <tntdb/error.h>
 
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db.h>
 #include <fty_common.h>
+#include <fty_log.h>
 #include "persist_error.h"
-#include "shared/asset_types.h"
 
+
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 int convert_asset_to_monitor_safe(const char* url,
                 a_elmnt_id_t asset_element_id, m_dvc_id_t *device_id)
 {
@@ -54,6 +58,7 @@ int convert_asset_to_monitor_safe(const char* url,
 }
 
 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
 m_dvc_id_t convert_asset_to_monitor_old(const char* url,
                 a_elmnt_id_t asset_element_id)
 {
@@ -97,7 +102,7 @@ m_dvc_id_t convert_asset_to_monitor_old(const char* url,
     }
     else if ( device_discovered_id == 0 )
     {
-        log_warning("end: monitor counterpart for the %" PRIu32 " was not found", 
+        log_warning("end: monitor counterpart for the %" PRIu32 " was not found",
                                                 asset_element_id);
         throw bios::MonitorCounterpartNotFound ();
     }
@@ -105,7 +110,8 @@ m_dvc_id_t convert_asset_to_monitor_old(const char* url,
     return device_discovered_id;
 }
 
-int convert_monitor_to_asset_safe(const char* url, 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
+int convert_monitor_to_asset_safe(const char* url,
                     m_dvc_id_t discovered_device_id, a_elmnt_id_t *asset_element_id)
 {
     if ( asset_element_id == NULL )
@@ -124,7 +130,8 @@ int convert_monitor_to_asset_safe(const char* url,
 }
 
 
-a_elmnt_id_t convert_monitor_to_asset(const char* url, 
+//TODO: used only in tests for legacy autodiscovery - should proably be removed
+a_elmnt_id_t convert_monitor_to_asset(const char* url,
                     m_dvc_id_t discovered_device_id)
 {
     log_info("start");
@@ -147,7 +154,7 @@ a_elmnt_id_t convert_monitor_to_asset(const char* url,
     }
     catch (const tntdb::NotFound &e){
         // apropriate asset element was not found
-        log_warning("end: asset counterpart for the %" PRIu32 " was not found", 
+        log_warning("end: asset counterpart for the %" PRIu32 " was not found",
                                                 discovered_device_id);
         throw bios::NotFound();
     }
@@ -157,178 +164,4 @@ a_elmnt_id_t convert_monitor_to_asset(const char* url,
     }
     log_info("end: monitor device %" PRIu32 " converted to %" PRIu32, discovered_device_id, asset_element_id);
     return asset_element_id;
-}
-
-bool is_ok_element_type (a_elmnt_tp_id_t element_type_id)
-{
-    switch(element_type_id) {
-        case persist::asset_type::DATACENTER:
-        case persist::asset_type::ROOM:
-        case persist::asset_type::ROW:
-        case persist::asset_type::RACK:
-        case persist::asset_type::GROUP:
-        case persist::asset_type::DEVICE:
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool is_ok_name (const char* name)
-{
-    size_t length = strlen (name);
-    if ( length == 0)
-        return false;
-
-    // Bad characters _ % @
-    if (strchr (name, '_') != NULL ||
-        strchr (name, '%') != NULL ||
-        strchr (name, '@') != NULL)
-       return false; 
-
-    return true;
-}
-
-bool is_ok_keytag (const char *keytag)
-{
-    auto length = strlen(keytag);
-    if ( ( length > 0 ) && ( length <= MAX_KEYTAG_LENGTH ) )
-        return true;
-    else
-        return false;
-}
-
-bool is_ok_value (const char *value)
-{
-    auto length = strlen(value);
-    if ( ( length > 0 ) && ( length <= MAX_VALUE_LENGTH ) )
-        return true;
-    else
-        return false;
-}
-
-bool is_ok_link_type (a_lnk_tp_id_t link_type_id)
-{
-    // TODO: manage link types
-    if ( link_type_id > 0 )
-        return true;
-    else
-        return false;
-}
-
-
-std::string
-sql_plac(
-        size_t i,
-        size_t j)
-{
-    return "item" + std::to_string(i) + "_" + std::to_string(j);
-}
-
-// for backward compatibility
-std::string
-    multi_insert_string(
-        const std::string& sql_header,
-        size_t tuple_len,
-        size_t items_len
-)
-{
-    return multi_insert_string(sql_header,tuple_len,items_len, "");
-}
-
-
-std::string
-    multi_insert_string(
-        const std::string& sql_header,
-        size_t tuple_len,
-        size_t items_len,
-        const std::string& sql_postfix
-)
-{
-    std::stringstream s{};
-
-    s << sql_header;
-    s << "\nVALUES ";
-    for (size_t i = 0; i != items_len; i++) {
-        s << "(";
-        for (size_t j = 0; j != tuple_len; j++) {
-            s << ":" << sql_plac(i, j);
-            if (j < tuple_len -1)
-                s << ", ";
-        }
-        if (i < items_len -1)
-            s << "),\n";
-        else
-            s << ")\n";
-    }
-    s << sql_postfix;
-    return s.str();
-}
-
-
-int
-get_active_power_devices ()
-{
-    int count = 0;
-    try
-    {
-        tntdb::Connection conn = tntdb::connectCached (url);
-        tntdb::Statement st = conn.prepareCached (
-            "SELECT COUNT(*) AS CNT FROM t_bios_asset_element "
-            "WHERE id_subtype IN "
-                "(SELECT id_asset_device_type FROM t_bios_asset_device_type "
-                "WHERE name IN ('epdu', 'sts', 'ups', 'pdu', 'genset')) "
-            "AND status = 'active';"
-        );
-
-        tntdb::Row row = st.selectRow ();
-        zsys_debug ("[get_active_power_devices]: were selected %" PRIu32 " rows", 1);
-
-        row [0].get (count);
-    }
-    catch (const std::exception &e)
-    {
-        zsys_error ("exception caught %s when getting count of active power devices", e.what ());
-        return 0;
-    }
-
-    return count;
-}
-
-
-std::string get_status_from_db (std::string &element_name) {
-    tntdb::Connection conn;
-    try {
-        conn = tntdb::connectCached (url);
-    }
-    catch ( const std::exception &e) {
-        zsys_error ("DB: cannot connect, %s", e.what());
-        return "unknown";
-    }
-    try{
-        zsys_debug("get_status_from_db: getting status for asset %s", element_name.c_str());
-        tntdb::Statement st = conn.prepareCached(
-            " SELECT v.status "
-            " FROM v_bios_asset_element v "
-            " WHERE v.name=:vname ;"
-            );
-
-        tntdb::Row row = st.set ("vname", element_name).selectRow ();
-        zsys_debug("get_status_from_db: [v_bios_asset_element]: were selected %zu rows", row.size());
-        if (row.size() == 1) {
-            std::string ret;
-            row [0].get (ret);
-            return ret;
-        } else {
-            return "unknown";
-        }
-    }
-    catch (const tntdb::NotFound &e) {
-        zsys_debug("get_status_from_db: [v_bios_asset_element]: %s asset not found", element_name.c_str ());
-        return "unknown";
-    }
-    catch (const std::exception &e) {
-        zsys_error ("get_status_from_db: [v_bios_asset_element]: error '%s'", e.what());
-        return "unknown";
-    }
 }
