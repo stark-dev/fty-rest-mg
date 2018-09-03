@@ -1208,7 +1208,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                 (conn, ename.c_str(), type_id, parent_id,
                  extattributes, status.c_str(), priority, groups, asset_tag, extattributesRO);
             if ( ret.status != 1 ) {
-                throw BiosError(ret.errtype, ret.msg);
+                throw BiosError(ret.rowid, ret.msg);
             }
             m.id = ret.rowid;
         }
