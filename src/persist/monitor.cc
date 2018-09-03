@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2015 Eaton
- 
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -21,7 +21,9 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "monitor.h"
 #include <fty_common.h>
-#include "defs.h"
+
+// all fields called name
+#define MAX_NAME_LENGTH         50
 
 ////////////////////////////////////////////////////////////////////////
 /////////////////           DEVICE                   ///////////////////
@@ -35,7 +37,7 @@ db_reply_t
 
     db_reply_t ret = db_reply_new();
 
-    if ( !is_ok_name (device_name) )
+    if ( !persist::is_ok_name (device_name) )
     {
         ret.status     = 0;
         log_info ("end: too long device name");

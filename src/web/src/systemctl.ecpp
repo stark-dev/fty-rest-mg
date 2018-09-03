@@ -34,10 +34,8 @@
 #include <cstring>
 #include <algorithm>
 
-#include "shared/subprocess.h"
-#include <fty_common.h>
-
-using namespace shared;
+#include <fty_common_mlm_subprocess.h>
+#include <fty_common_rest_helpers.h>
 
 bool
 is_GET_operation (const std::string& operation)
@@ -67,11 +65,11 @@ is_POST_operation (const std::string& operation)
 bool
 systemctl_service_status (const std::string& service_name, std::string& load, std::string& active, std::string& unit_file, std::string& sub)
 {
-    shared::Argv proc_cmd {"sudo", "/bin/systemctl", "show", service_name,
+    MlmSubprocess::Argv proc_cmd {"sudo", "/bin/systemctl", "show", service_name,
                            "-p", "LoadState", "-p", "ActiveState", "-p", "UnitFileState", "-p", "SubState"};
     std::string proc_out, proc_err;
 
-    int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+    int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
 
     if (rv != 0) {
         std::string message;
@@ -252,10 +250,10 @@ UserInfo user;
     }
 
     {
-        shared::Argv proc_cmd {"sudo", "/bin/systemctl", checked_operation, checked_service_name};
+        MlmSubprocess::Argv proc_cmd {"sudo", "/bin/systemctl", checked_operation, checked_service_name};
         std::string proc_out, proc_err;
 
-        int rv = shared::simple_output (proc_cmd, proc_out, proc_err);
+        int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
 
         if (rv != 0) {
             std::string message;

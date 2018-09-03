@@ -31,10 +31,11 @@
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/split.h>
-#include <fty_common.h>
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
+
 #include "shared/utilspp.h"
-#include "shared/asset_types.h"
-#include "db/assets.h"
 #include "src/db/inout.h"
 
 class Asset {
@@ -73,16 +74,16 @@ Assets
     auto func = [&result](const tntdb::Row& row) {
         result.emplace_back(
             row.getValue("name").getString(),
-            persist::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
+            DBAssets::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
             persist::typeid_to_type (row.getValue("type_id").getInt()),
             utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() ))
         );
     };
     int rv;
     if (container)
-        rv = persist::select_assets_by_container(connection, container, types, subtypes, without, status, func);
+        rv = DBAssets::select_assets_by_container(connection, container, types, subtypes, without, status, func);
     else
-        rv = persist::select_assets_all_container(connection, types, subtypes, without, status, func);
+        rv = DBAssets::select_assets_all_container(connection, types, subtypes, without, status, func);
 
     if (rv != 0)
         throw std::runtime_error("Database failure");
@@ -174,10 +175,10 @@ bool database_ready;
     // create a database connection
     tntdb::Connection connection;
     try {
-        connection = tntdb::connectCached (url);
+        connection = tntdb::connectCached (DBConn::url);
     }
     catch (const tntdb::Error& e) {
-        log_error ("tntdb::connectCached (url = '%s') failed: %s.", url.c_str (), e.what ());
+        log_error ("tntdb::connectCached (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
         http_die ("internal-error", "Connecting to database failed.");
     }
     catch (const std::exception& e) {

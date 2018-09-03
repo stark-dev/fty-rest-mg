@@ -28,7 +28,7 @@
 #define SRC_INCLUDE_TOPOLOGY2
 #include <cxxtools/serializationinfo.h>
 #include <algorithm>
-#include "shared/asset_types.h"
+#include <fty_common.h>
 
 namespace persist {
 

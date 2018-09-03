@@ -25,9 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #define SRC_DB_ASSETS_GENERAL_H
 
 #include <tntdb/connect.h>
-#include "db/assetdef.h"
 #include "db/dbhelpers.h"
-#include "shared/asset_types.h"
 
 #define RC0_INAME "rackcontroller-0"
 

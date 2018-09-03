@@ -13,9 +13,6 @@ nobase_pkginclude_HEADERS = \
     cleanup.h \
     dbtypes.h \
     preproc.h \
-    defs.h \
-    db/assetdef.h \
-    db/assets.h \
     db/dbhelpers.h \
     db/types.h \
     fty_rest_library.h
@@ -23,22 +20,14 @@ nobase_pkginclude_HEADERS = \
 if ENABLE_DRAFTS
 nobase_pkginclude_HEADERS += \
     db/topology2.h \
-    db/assets/assetcr.h \
-    db/assets/assetd.h \
-    db/assets/assetr.h \
-    db/assets/assetu.h \
     msg/asset_msg.h \
     msg/common_msg.h \
-    shared/asset_types.h \
     shared/augtool.h \
     shared/cidr.h \
     shared/configure_inform.h \
     shared/csv.h \
     shared/data.h \
-    shared/fty_asset_uptime_configurator.h \
     shared/ic.h \
-    shared/subprocess.h \
-    shared/tntmlm.h \
     shared/topic_cache.h \
     shared/upsstatus.h \
     shared/utils.h \

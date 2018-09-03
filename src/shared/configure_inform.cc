@@ -22,10 +22,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <stdexcept>
 
 #include <fty_proto.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset_insert.h>
 #include <fty_common.h>
-#include "db/assets.h"
-#include "shared/fty_asset_uptime_configurator.h"
-#include "db/assets/assetcr.h"
+
 
 static zhash_t*
 s_map2zhash (const std::map<std::string, std::string>& m)
@@ -59,7 +59,7 @@ void
         mlm_client_destroy (&client);
         throw std::runtime_error(" mlm_client_set_producer () failed.");
     }
-    tntdb::Connection conn = tntdb::connectCached (url);
+    tntdb::Connection conn = tntdb::connectCached (DBConn::url);
     for ( const  auto &oneRow : rows ) {
 
         std::string s_priority = std::to_string (oneRow.first.priority);
@@ -101,7 +101,7 @@ void
                 }
             }
         };
-        int r = persist::select_asset_element_super_parent (conn, oneRow.first.id, cb);
+        int r = DBAssets::select_asset_element_super_parent (conn, oneRow.first.id, cb);
         if (r == -1) {
             zhash_destroy (&aux);
             mlm_client_destroy (&client);
@@ -136,9 +136,10 @@ void
         //data for uptime
         if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
             zhash_t *aux = zhash_new ();
-            bool rv = insert_upses_to_aux (aux, oneRow.first.name);
-            if (!rv)
-                throw std::runtime_error("database error, cannot find UPSs");
+
+            if (!DBUptime::get_dc_upses (s_asset_name.c_str(), aux))
+                log_error ("Cannot read upses for dc with id = %s", s_asset_name.c_str ());
+
             zhash_update (aux, "type", (void*) "datacenter");
             zmsg_t *msg = fty_proto_encode_asset (
                     aux,

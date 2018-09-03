@@ -31,8 +31,8 @@
 #include <sys/utsname.h>
 #include <time.h>
 #include <tnt/mimedb.h>
-#include <fty_common.h>
-#include "shared/subprocess.h"
+#include <fty_common_rest_helpers.h>
+#include <fty_common_mlm_subprocess.h>
 #include "shared/utils.h"
 
 // For debugging server credentials in error-reports below

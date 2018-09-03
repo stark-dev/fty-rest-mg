@@ -30,13 +30,14 @@
 #include <fty_proto.h>
 
 #include <sys/types.h>
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
+#include <fty_common_mlm_tntmlm.h>
 #include <fty_common.h>
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
-#include "shared/asset_types.h"
-#include "shared/tntmlm.h"
-#include "defs.h"
 
 static std::string
 s_os2string(
@@ -187,7 +188,7 @@ std::vector<uint32_t> asset_ids;
     // Temporary add connection here
     tntdb::Connection conn;
     try{
-        conn = tntdb::connectCached(url);
+        conn = tntdb::connectCached(DBConn::url);
     }
     catch (const std::exception &e)
     {
@@ -212,7 +213,7 @@ std::vector<uint32_t> asset_ids;
     {
 
         // check if the element really exists, read its name
-        auto asset = persist::select_asset_element_web_byId (conn, asset_id);
+        auto asset = DBAssets::select_asset_element_web_byId (conn, asset_id);
         if ( asset.status == 0 && asset.errsubtype == DB_ERROR_NOTFOUND)
         {
             log_warning("Element id '%" PRIu32 "' is not in DB, skipping", asset_id);
@@ -309,7 +310,7 @@ std::vector<uint32_t> asset_ids;
             http_die("internal-error", "");
         }
 
-        std::pair<std::string,std::string> asset_names = persist::id_to_name_ext_name (asset_id);
+        std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (asset_id);
         if (asset_names.first.empty () && asset_names.second.empty ())
             http_die ("internal-error", "Database failure");
 

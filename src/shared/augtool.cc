@@ -30,7 +30,7 @@
 
 #include "shared/augtool.h"
 
-using namespace shared;
+//using namespace shared;
 
 std::string augtool::get_cmd_out(std::string cmd, bool key_value,
                                  std::string sep,
@@ -75,9 +75,9 @@ std::string augtool::get_cmd_out_raw(std::string command) {
     mux.lock();
     if(command.empty() || command.back() != '\n')
         command += "\n";
-    if(write(prc->getStdin(), command.c_str(), command.length()) < 1)
+    if(::write(prc->getStdin(), command.c_str(), command.length()) < 1)
         err = true;
-    ret = wait_read_all(prc->getStdout());
+    ret = MlmSubprocess::wait_read_all(prc->getStdout());
     mux.unlock();
     return err ? "" : ret;
 }
@@ -102,9 +102,10 @@ augtool* augtool::get_instance() {
     // Initialization of augtool subprocess if needed
     in_mux.lock();
     if(inst.prc == NULL) {
-        Argv exe = { "sudo", "augtool", "-S", "-I/usr/share/fty/lenses", "-e" };
-        inst.prc = new shared::SubProcess(exe,
-                          SubProcess::STDOUT_PIPE | SubProcess::STDIN_PIPE);
+        MlmSubprocess::Argv exe = { "sudo", "augtool", "-S", "-I/usr/share/fty/lenses", "-e" };
+        inst.prc = new MlmSubprocess::SubProcess(exe,
+                                                 MlmSubprocess::SubProcess::STDOUT_PIPE |
+                                                 MlmSubprocess::SubProcess::STDIN_PIPE);
     }
     if(!inst.prc->isRunning()) {
         inst.prc->run();
@@ -119,4 +120,3 @@ augtool* augtool::get_instance() {
     inst.clear();
     return &inst;
 }
-

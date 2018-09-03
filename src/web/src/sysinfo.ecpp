@@ -42,14 +42,18 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/jsonserializer.h>
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common_rest_helpers.h>
+#include <fty_common_rest_utils_web.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_defs.h>
+#include <fty_common_db_asset.h>
+#include <fty_common_mlm_tntmlm.h>
 #include <fty_common.h>
-#include "shared/subprocess.h"
-#include "db/assets.h"
-#include "shared/asset_types.h"
+#include <fty_common_mlm_subprocess.h>
+
 #include "shared/utils.h"
 #include "git_details_override.h"
 #include "platform.h"
-#include "shared/tntmlm.h"
 
 // Magic numbers - dpkg fancy formatting du-jour
 #ifndef DPKG__LIST__STRIP_HEADER
@@ -75,19 +79,19 @@ get_location (
     /* NOTE ASSUMPTION: this returns the first DC with an address,
      * assuming it is the only one available */
     try {
-        tntdb::Connection conn = tntdb::connectCached (url);
-        log_debug ("tntdb::connectCached (url = '%s') successful", url.c_str ());
+        tntdb::Connection conn = tntdb::connectCached (DBConn::url);
+        log_debug ("tntdb::connectCached (url = '%s') successful", DBConn::url.c_str ());
         db_reply <std::map <uint32_t, std::string>> elements =
-            persist::select_short_elements (
+            DBAssets::select_short_elements (
                                     conn,
                                     persist::asset_type::DATACENTER,
                                     persist::asset_subtype::N_A);
-        log_debug ("persist::select_short_elements () successful");
+        log_debug ("DBAssets::select_short_elements () successful");
         bool do_break = false;
         for (auto it = elements.item.cbegin(); it != elements.item.cend(); ++it) {
             // it->first is element_id
             std::map <std::string, std::pair<std::string, bool>> ext;
-            int rv = persist::select_ext_attributes (conn, it->first, ext);
+            int rv = DBAssets::select_ext_attributes (conn, it->first, ext);
             if (rv == -1) {
                 continue;
             }
@@ -155,9 +159,9 @@ sysinfo_detail (
 
     std::string container_info;
     {
-        log_debug ("shared::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-c\"}') starting");
-        int rv = shared::output2 ({"/usr/bin/systemd-detect-virt", "-c"}, container_info, 0, 100);
-        log_debug ("shared::output2 finished with return value == '%" PRIi32"'", rv);
+        log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-c\"}') starting");
+        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-c"}, container_info, 0, 100);
+        log_debug ("MlmSubprocess::output2 finished with return value == '%" PRIi32"'", rv);
 
         size_t output_len = container_info.length();
         if (rv != 0 && output_len<2) {
@@ -174,9 +178,9 @@ sysinfo_detail (
 
     std::string hypervisor_info;
     {
-        log_debug ("shared::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-v\"}') starting");
-        int rv = shared::output2 ({"/usr/bin/systemd-detect-virt", "-v"}, hypervisor_info, 0, 100);
-        log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+        log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-v\"}') starting");
+        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-v"}, hypervisor_info, 0, 100);
+        log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
 
         size_t output_len = hypervisor_info.length();
         if (rv != 0 && output_len<2) {
@@ -388,52 +392,129 @@ sysinfo_detail (
 
     if (profile == BiosProfile::Admin) {
         std::string dpkg_output;
+        std::string dpkg_error;
+        int rv_dpkg = -1;
+        bool dpkg_error_printed = false;
+        int skipped_dpkg_lines = -1; // count lines that we could not parse, but expected to
+
         {
-            log_debug ("shared::output2 (args = '{\"dpkg\", \"--list\"}') starting");
-            int rv = shared::output2 ({"dpkg", "--list"}, dpkg_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
-            if (rv != 0) {
+            log_debug ("MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') starting");
+            rv_dpkg = MlmSubprocess::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
+            log_debug ("MlmSubprocess::output () finished with return value == '%" PRIi32"'", rv_dpkg);
+            if (rv_dpkg != 0) {
                 log_error (
-                    "shared::output2 (args = '{\"dpkg\", \"--list\"}') failed; "
-                    "return code == '%" PRIi32"'", rv);
+                    "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') failed; "
+                    "return code == '%" PRIi32"'\n"
+                    "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                    rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                dpkg_error_printed = true;
                 dpkg_output.clear ();
             }
         } // end of `dpkg` callout
+
         if (!dpkg_output.empty ()) {
-            output += ",\t\"packages\" : [\n";
+            bool proceed_loop = true;
 
             std::vector<std::string> tokens;
-            cxxtools::split ("\n", dpkg_output, std::back_inserter (tokens));
-            // Strip first DPKG__LIST__STRIP_HEADER lines
-            for (int i = 0; i < DPKG__LIST__STRIP_HEADER; i++) {
-                tokens.erase (tokens.begin ());
+            try {
+                cxxtools::split ("\n", dpkg_output, std::back_inserter (tokens));
+            } catch (const std::exception& e) {
+                log_error (
+                    "Could not split by line the output of dpkg "
+                    "because the following error happened: '%s'", e.what ());
+                if (!dpkg_error_printed) {
+                    log_error (
+                        "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
+                        "earlier returned code == '%" PRIi32"'\n"
+                        "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                        rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                    dpkg_error_printed = true;
+                }
+                proceed_loop = false;
             }
 
+            output += ",\t\"packages\" : [\n";
             bool first = true;
-            for (const auto& item : tokens) {
-                request.touch(); // Reset the deadman timer while in a loop WTF?!
-                if (item.empty ())
-                    continue;
+            if (proceed_loop) {
+                skipped_dpkg_lines = 0;
 
-                std::vector <std::string> line_tokens;
-                cxxtools::split (cxxtools::Regex("[ \t]+"), item, std::back_inserter (line_tokens));
+                // Strip first DPKG__LIST__STRIP_HEADER lines
+                for (int i = 0; i < DPKG__LIST__STRIP_HEADER; i++) {
+                    tokens.erase (tokens.begin ());
+                }
 
-                std::string pkgname, version, commit;
-                pkgname = line_tokens.at (DPKG__LIST__COLUMN_PKGNAME);
+                for (const auto& item : tokens) {
+                    request.touch(); // Reset the deadman timer while in a loop WTF?!
+                    if (item.empty ())
+                        continue;
 
-                auto pos = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).find ("~");
-                if (pos != std::string::npos) {
-                    version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (0, pos);
-                    commit = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (pos+1);
-                    auto pos2 = commit.find ("-");
-                    if (pos2 != std::string::npos) {
-                        version += commit.substr (pos2);
-                        commit = commit.substr (0, pos2);
+                    std::string pkgname, version, commit;
+                    try {
+                        std::vector <std::string> line_tokens;
+                        cxxtools::split (cxxtools::Regex("[ \t]+"), item, std::back_inserter (line_tokens));
+
+                        pkgname = line_tokens.at (DPKG__LIST__COLUMN_PKGNAME);
+
+                        auto pos = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).find ("~");
+                        if (pos != std::string::npos) {
+                            version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (0, pos);
+                            commit = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION).substr (pos+1);
+                            auto pos2 = commit.find ("-");
+                            if (pos2 != std::string::npos) {
+                                version += commit.substr (pos2);
+                                commit = commit.substr (0, pos2);
+                            }
+                        }
+                        else {
+                            version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION);
+                        }
+
+                        if (first) {
+                            first = false;
+                            output += "\t{\n";
+                        }
+                        else {
+                            output += ",\t{\n";
+                        }
+
+                        output += "\t\t";
+                        output += utils::json::jsonify ("package-name", pkgname);
+                        output += "\n";
+
+                        output += ",\t\t";
+                        output += utils::json::jsonify ("package-version", version);
+                        output += "\n";
+
+                        if (pos != std::string::npos) {
+                            output += ",\t\t";
+                            output += utils::json::jsonify ("commit", commit);
+                            output += "\n";
+                        }
+
+                        output += "\t}\n"; // single package entry finished
+                    } catch (const std::exception& e) {
+                        log_error (
+                            "Could not split a line from the output of dpkg "
+                            "because the following error happened: '%s'", e.what ());
+                        log_error (
+                            "Failed line: '%s'", std::string(item).c_str() );
+                        if (!dpkg_error_printed) {
+                            log_error (
+                                "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
+                                "earlier returned code == '%" PRIi32"'\n"
+                                "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                                rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                            dpkg_error_printed = true;
+                        }
+                        skipped_dpkg_lines++;
                     }
-                }
-                else {
-                    version = line_tokens.at (DPKG__LIST__COLUMN_PKGVERSION);
-                }
+                } // for (item:tokens)
+            } // if (proceed_loop)
+
+
+            if (!dpkg_error_printed
+//               && some_config_flag // FIXME?
+            ) {
                 if (first) {
                     first = false;
                     output += "\t{\n";
@@ -442,33 +523,39 @@ sysinfo_detail (
                     output += ",\t{\n";
                 }
 
-                output += "\t\t";
-                output += utils::json::jsonify ("package-name", pkgname);
+                output += "\t\t\"dpkg-errored\": true\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-return-code", std::to_string(rv_dpkg) );
                 output += "\n";
 
                 output += ",\t\t";
-                output += utils::json::jsonify ("package-version", version);
+                output += utils::json::jsonify ("dpkg-stdout", dpkg_output);
                 output += "\n";
 
-                if (pos != std::string::npos) {
-                    output += ",\t\t";
-                    output += utils::json::jsonify ("commit", commit);
-                    output += "\n";
-                }
-                output += "\t}\n";
-            }
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-stderr", dpkg_error);
+                output += "\n";
+
+                output += ",\t\t";
+                output += utils::json::jsonify ("dpkg-skipped-lines", std::to_string(skipped_dpkg_lines) );
+                output += "\n";
+
+                output += "\t}\n"; // single package entry finished
+            } // flush details of dpkg run which failed into JSON, so we can see it in CI
+
             output += "\t]\n"; // "packages" closing bracket
         } // end of 'packages' json listing
 
         try {
             std::string unitstate_output;
 
-            log_debug ("shared::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') starting");
-            int rv = shared::output2 ({"sudo", "systemctl", "list-json"}, unitstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') starting");
+            int rv = MlmSubprocess::output2 ({"sudo", "systemctl", "list-json"}, unitstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";
@@ -508,12 +595,12 @@ sysinfo_detail (
         try {
             std::string diskstate_output;
 
-            log_debug ("shared::output2 (args = '{\"df\", \"-k\"}') starting");
-            int rv = shared::output2 ({"df", "-k"}, diskstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') starting");
+            int rv = MlmSubprocess::output2 ({"df", "-k"}, diskstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"df\", \"-k\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";
@@ -534,12 +621,12 @@ sysinfo_detail (
         try {
             std::string diskstate_output;
 
-            log_debug ("shared::output2 (args = '{\"mount\"}') starting");
-            int rv = shared::output2 ({"mount"}, diskstate_output, 0, 100);
-            log_debug ("shared::output2 () finished with return value == '%" PRIi32"'", rv);
+            log_debug ("MlmSubprocess::output2 (args = '{\"mount\"}') starting");
+            int rv = MlmSubprocess::output2 ({"mount"}, diskstate_output, 0, 100);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
             if (rv != 0) {
                 std::string message =
-                    "shared::output2 (args = '{\"mount\"}') failed; ";
+                    "MlmSubprocess::output2 (args = '{\"mount\"}') failed; ";
                 message += "return code == '";
                 message += rv;
                 message += "'";

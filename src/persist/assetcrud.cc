@@ -32,15 +32,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <tntdb/transaction.h>
 #include <fty_common.h>
 
-#include "defs.h"
 #include "assetcrud.h"
 #include "monitor.h"
 #include "persist_error.h"
-#include "shared/asset_types.h"
 #include "cleanup.h"
-#include "db/assets.h"
-
-
 
 zlist_t* select_asset_device_links_all(tntdb::Connection &conn,
                 a_elmnt_id_t device_id, a_lnk_tp_id_t link_type_id)
@@ -244,7 +239,7 @@ db_reply <db_a_elmnt_t>
     db_a_elmnt_t item{0,"","",0,5,0,0,""};
     db_reply <db_a_elmnt_t> ret = db_reply_new(item);
 
-    if ( !is_ok_name (element_name) )
+    if ( !persist::is_ok_name (element_name) )
     {
         ret.status     = 0;
         ret.errtype    = DB_ERR;

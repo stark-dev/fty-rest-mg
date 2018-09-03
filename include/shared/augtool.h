@@ -18,7 +18,7 @@
  *
  */
 
-#ifndef SRC_SHARED_AUGTOOL_H
+#ifndef SRC_SHARE_AUGTOOL_H
 //! Guard
 #define SRC_SHARED_AUGTOOL_H
 
@@ -31,7 +31,7 @@
 #include <mutex>
 #include <functional>
 
-#include "subprocess.h"
+#include <fty_common_mlm_subprocess.h>
 
 //! Simple class abstraction over augtool
 class augtool {
@@ -39,7 +39,7 @@ protected:
     //! Shared mutex
     std::mutex mux;
     //! Subprocess itself
-    shared::SubProcess *prc;
+    MlmSubprocess::SubProcess *prc;
     //! Ensures we are in reasonably clean state
     void clear();
 public:

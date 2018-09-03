@@ -32,7 +32,7 @@
 #include <map>
 
 #include "db/dbhelpers.h"
-#include "db/assets.h"
+#include <fty_common_db_asset.h>
 
 class asset_manager {
     public:

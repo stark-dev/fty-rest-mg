@@ -56,7 +56,7 @@ TEST_CASE("Location topology from #1","[db][topology][location][location_topolog
     _scoped_common_msg_t* cretTopology = common_msg_decode (&retTopology);
     assert ( cretTopology );
 //    common_msg_print (cretTopology);
-    REQUIRE ( common_msg_errtype (cretTopology) == BIOS_ERROR_DB );
+    REQUIRE ( common_msg_errtype (cretTopology) == DB_ERR );
     REQUIRE ( common_msg_errorno (cretTopology) == DB_ERROR_NOTFOUND );
 
     asset_msg_destroy (&getmsg);
@@ -117,7 +117,7 @@ TEST_CASE("Location topology from #3","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -142,7 +142,7 @@ TEST_CASE("Location topology from #3","[db][topology][location][location_topolog
 
      // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -153,7 +153,7 @@ TEST_CASE("Location topology from #3","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -182,7 +182,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #4 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -195,7 +195,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     expected.insert (std::make_tuple(7016, id_device, "feed_LOC_1"  , "feed"  , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7017, id_device, "genset_LOC_1", "genset", start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1"   , "ups"   , start_id, id_dc  , start_name    , "N_A"));
@@ -233,7 +233,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1"   , "ups"   , 7025, id_group, "inputpowergroup DC_LOC_01"  , "happynewyear"));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -242,7 +242,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -267,7 +267,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -278,7 +278,7 @@ TEST_CASE("Location topology from #4","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -306,7 +306,7 @@ TEST_CASE("Location topology from #5","[db][topology][location][location_topolog
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #5 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -332,7 +332,7 @@ TEST_CASE("Location topology from #5","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -364,7 +364,7 @@ TEST_CASE("Location topology from #5","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -375,7 +375,7 @@ TEST_CASE("Location topology from #5","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -403,7 +403,7 @@ TEST_CASE("Location topology from #5.1","[db][topology][location][location_topol
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #5.1 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -454,7 +454,7 @@ TEST_CASE("Location topology from #5.1","[db][topology][location][location_topol
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -465,7 +465,7 @@ TEST_CASE("Location topology from #5.1","[db][topology][location][location_topol
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -493,7 +493,7 @@ TEST_CASE("Location topology from #6","[db][topology][location][location_topolog
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #6 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -513,9 +513,9 @@ TEST_CASE("Location topology from #6","[db][topology][location][location_topolog
     expected.insert (std::make_tuple(7022, id_device, "ups_LOC_010" , "ups"   , 7009    , id_rack, "RACK_LOC_010", "N_A"));
 
     expected.insert (std::make_tuple(7021, id_device, "srv_LOC_11"  , "server", 7010    , id_rack, "RACK_LOC_011", "N_A"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -523,7 +523,7 @@ TEST_CASE("Location topology from #6","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -548,7 +548,7 @@ TEST_CASE("Location topology from #6","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -559,7 +559,7 @@ TEST_CASE("Location topology from #6","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -587,7 +587,7 @@ TEST_CASE("Location topology from #6.1","[db][topology][location][location_topol
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #6.1 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -600,9 +600,9 @@ TEST_CASE("Location topology from #6.1","[db][topology][location][location_topol
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-    
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -610,7 +610,7 @@ TEST_CASE("Location topology from #6.1","[db][topology][location][location_topol
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -633,7 +633,7 @@ TEST_CASE("Location topology from #6.1","[db][topology][location][location_topol
     r1.insert(r2.begin(), r2.end());
     r2.clear();
 
-    REQUIRE ( (int)r1.size() == 0 );    
+    REQUIRE ( (int)r1.size() == 0 );
     REQUIRE ( (int)expected.size() == 0 );
 
     r1.clear();
@@ -660,7 +660,7 @@ TEST_CASE("Location topology from #7","[db][topology][location][location_topolog
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #7 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -673,11 +673,11 @@ TEST_CASE("Location topology from #7","[db][topology][location][location_topolog
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-    
+
     expected.insert (std::make_tuple(7007, id_row   , "ROW_LOC_30"  , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -685,7 +685,7 @@ TEST_CASE("Location topology from #7","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -710,7 +710,7 @@ TEST_CASE("Location topology from #7","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -721,7 +721,7 @@ TEST_CASE("Location topology from #7","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -749,7 +749,7 @@ TEST_CASE("Location topology from #8","[db][topology][location][location_topolog
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #8 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -762,12 +762,12 @@ TEST_CASE("Location topology from #8","[db][topology][location][location_topolog
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-  
+
     expected.insert (std::make_tuple(7005, id_row   , "ROW_LOC_20"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
     expected.insert (std::make_tuple(7006, id_row   , "ROW_LOC_21"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -775,7 +775,7 @@ TEST_CASE("Location topology from #8","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -800,7 +800,7 @@ TEST_CASE("Location topology from #8","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -811,7 +811,7 @@ TEST_CASE("Location topology from #8","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -839,7 +839,7 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #9 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -852,14 +852,14 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7013, id_rack  , "RACK_LOC_30" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7001, id_room  , "ROOM_LOC_01" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7002, id_room  , "ROOM_LOC_02" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
-    
+
     expected.insert (std::make_tuple(7004, id_row   , "ROW_LOC_01"  , "N_A"      , 7001    , id_room, "ROOM_LOC_01" , "N_A"));
     expected.insert (std::make_tuple(7014, id_rack  , "RACK_LOC_1"  , "N_A"      , 7001    , id_room, "ROOM_LOC_01" , "N_A"));
-    
+
     expected.insert (std::make_tuple(7005, id_row   , "ROW_LOC_20"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
     expected.insert (std::make_tuple(7006, id_row   , "ROW_LOC_21"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
 
@@ -867,11 +867,11 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
     expected.insert (std::make_tuple(7010, id_rack  , "RACK_LOC_011", "N_A"      , 7004    , id_row , "ROW_LOC_01"  , "N_A"));
 
     expected.insert (std::make_tuple(7011, id_rack  , "RACK_LOC_20" , "N_A"      , 7005    , id_row , "ROW_LOC_20"  , "N_A"));
-    
+
     expected.insert (std::make_tuple(7012, id_rack  , "RACK_LOC_21" , "N_A"      , 7006    , id_row , "ROW_LOC_21"  , "N_A"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -879,7 +879,7 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -904,7 +904,7 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -915,7 +915,7 @@ TEST_CASE("Location topology from #9","[db][topology][location][location_topolog
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -944,7 +944,7 @@ TEST_CASE("Location topology from #10","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #10 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -957,11 +957,11 @@ TEST_CASE("Location topology from #10","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7025, id_group, "inputpowergroup DC_LOC_01","happynewyear", start_id, id_dc, start_name    , "N_A"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -969,7 +969,7 @@ TEST_CASE("Location topology from #10","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -994,7 +994,7 @@ TEST_CASE("Location topology from #10","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -1005,7 +1005,7 @@ TEST_CASE("Location topology from #10","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -1033,7 +1033,7 @@ TEST_CASE("Location topology from #11","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #11 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1046,14 +1046,14 @@ TEST_CASE("Location topology from #11","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7016, id_device, "feed_LOC_1"  , "feed"  , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7017, id_device, "genset_LOC_1", "genset", start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1"   , "ups"   , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7019, id_device, "srv_LOC_40"  , "server", start_id, id_dc  , start_name    , "N_A"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1061,7 +1061,7 @@ TEST_CASE("Location topology from #11","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1086,7 +1086,7 @@ TEST_CASE("Location topology from #11","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -1097,7 +1097,7 @@ TEST_CASE("Location topology from #11","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -1125,7 +1125,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #12 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1138,7 +1138,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7016, id_device, "feed_LOC_1"  , "feed"  , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7017, id_device, "genset_LOC_1", "genset", start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1"   , "ups"   , start_id, id_dc  , start_name    , "N_A"));
@@ -1152,7 +1152,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
     expected.insert (std::make_tuple(7021, id_device, "srv_LOC_11"  , "server", 7010    , id_rack, "RACK_LOC_011", "N_A"));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1160,7 +1160,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1185,7 +1185,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -1196,7 +1196,7 @@ TEST_CASE("Location topology from #12","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -1225,7 +1225,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #13 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1238,7 +1238,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     expected.insert (std::make_tuple(7023, id_device, "srv_LOC_50"  , "server", 0, 0,"", ""));
     expected.insert (std::make_tuple(7024, id_device, "srv_LOC_51"  , "server", 0, 0,"", ""));
 
@@ -1247,7 +1247,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
     expected.insert (std::make_tuple(7003, id_room, "ROOM_LOC_50"  , "N_A", 0, 0,"", ""));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1256,7 +1256,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
     asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1282,7 +1282,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
     REQUIRE ( r1.size() == expected.size() );
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -1293,7 +1293,7 @@ TEST_CASE("Location topology from #13","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -1322,7 +1322,7 @@ TEST_CASE("Location topology from #14","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #14 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1335,12 +1335,12 @@ TEST_CASE("Location topology from #14","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     expected.insert (std::make_tuple(7023, id_device, "srv_LOC_50"  , "server", 0, 0,"", ""));
     expected.insert (std::make_tuple(7024, id_device, "srv_LOC_51"  , "server", 0, 0,"", ""));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1349,7 +1349,7 @@ TEST_CASE("Location topology from #14","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1374,7 +1374,7 @@ TEST_CASE("Location topology from #14","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -1385,7 +1385,7 @@ TEST_CASE("Location topology from #14","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -1414,7 +1414,7 @@ TEST_CASE("Location topology from #15","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #15 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1427,9 +1427,9 @@ TEST_CASE("Location topology from #15","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1438,7 +1438,7 @@ TEST_CASE("Location topology from #15","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1488,7 +1488,7 @@ TEST_CASE("Location topology from #16","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #16 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1501,9 +1501,9 @@ TEST_CASE("Location topology from #16","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1512,7 +1512,7 @@ TEST_CASE("Location topology from #16","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1563,7 +1563,7 @@ TEST_CASE("Location topology from #17","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #17 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1576,9 +1576,9 @@ TEST_CASE("Location topology from #17","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1587,7 +1587,7 @@ TEST_CASE("Location topology from #17","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1638,7 +1638,7 @@ TEST_CASE("Location topology from #18","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #18 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1651,9 +1651,9 @@ TEST_CASE("Location topology from #18","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1662,7 +1662,7 @@ TEST_CASE("Location topology from #18","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1713,7 +1713,7 @@ TEST_CASE("Location topology from #19","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #19 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1726,9 +1726,9 @@ TEST_CASE("Location topology from #19","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1737,7 +1737,7 @@ TEST_CASE("Location topology from #19","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1789,7 +1789,7 @@ TEST_CASE("Location topology from #20","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #20 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1802,9 +1802,9 @@ TEST_CASE("Location topology from #20","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1813,7 +1813,7 @@ TEST_CASE("Location topology from #20","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1864,7 +1864,7 @@ TEST_CASE("Location topology from #21","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #21 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1877,9 +1877,9 @@ TEST_CASE("Location topology from #21","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1888,7 +1888,7 @@ TEST_CASE("Location topology from #21","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -1939,7 +1939,7 @@ TEST_CASE("Location topology from #22","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #22 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -1952,9 +1952,9 @@ TEST_CASE("Location topology from #22","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -1963,7 +1963,7 @@ TEST_CASE("Location topology from #22","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2013,7 +2013,7 @@ TEST_CASE("Location topology from #23","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #23 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -2026,11 +2026,11 @@ TEST_CASE("Location topology from #23","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     expected.insert (std::make_tuple(7013, id_rack  , "RACK_LOC_30" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -2038,7 +2038,7 @@ TEST_CASE("Location topology from #23","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2063,7 +2063,7 @@ TEST_CASE("Location topology from #23","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -2074,7 +2074,7 @@ TEST_CASE("Location topology from #23","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -2102,7 +2102,7 @@ TEST_CASE("Location topology from #24","[db][topology][location][location_topolo
     bool        start_recursive         = false;
 
     log_info ("=============== LOCATION FROM #24 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -2115,9 +2115,9 @@ TEST_CASE("Location topology from #24","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-    
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -2125,7 +2125,7 @@ TEST_CASE("Location topology from #24","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2173,7 +2173,7 @@ TEST_CASE("Location topology from #25","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #25 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -2186,18 +2186,18 @@ TEST_CASE("Location topology from #25","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
- 
+
     expected.insert (std::make_tuple(7007, id_row   , "ROW_LOC_30"  , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7001, id_room  , "ROOM_LOC_01" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
     expected.insert (std::make_tuple(7002, id_room  , "ROOM_LOC_02" , "N_A"      , start_id, id_dc  , start_name    , "N_A"));
-    
+
     expected.insert (std::make_tuple(7004, id_row   , "ROW_LOC_01"  , "N_A"      , 7001    , id_room, "ROOM_LOC_01" , "N_A"));
-    
+
     expected.insert (std::make_tuple(7005, id_row   , "ROW_LOC_20"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
     expected.insert (std::make_tuple(7006, id_row   , "ROW_LOC_21"  , "N_A"      , 7002    , id_room, "ROOM_LOC_02" , "N_A"));
 
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -2205,7 +2205,7 @@ TEST_CASE("Location topology from #25","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2230,7 +2230,7 @@ TEST_CASE("Location topology from #25","[db][topology][location][location_topolo
 
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -2241,7 +2241,7 @@ TEST_CASE("Location topology from #25","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -2271,7 +2271,7 @@ TEST_CASE("Location topology from #26","[db][topology][location][location_topolo
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #26 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -2284,14 +2284,14 @@ TEST_CASE("Location topology from #26","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7025, id_group, "inputpowergroup DC_LOC_01","happynewyear", start_id, id_dc, start_name    , "N_A"));
     expected.insert (std::make_tuple(7016, id_device, "feed_LOC_1","feed",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
     expected.insert (std::make_tuple(7017, id_device, "genset_LOC_1","genset",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1","ups",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -2299,7 +2299,7 @@ TEST_CASE("Location topology from #26","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2321,10 +2321,10 @@ TEST_CASE("Location topology from #26","[db][topology][location][location_topolo
     r2 = print_frame_to_edges (asset_msg_grps    (cretTopology),start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     r1.insert(r2.begin(), r2.end());
     r2.clear();
-    
+
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -2335,7 +2335,7 @@ TEST_CASE("Location topology from #26","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );
@@ -2360,12 +2360,12 @@ TEST_CASE("Location topology from #27","[db][topology][location][location_topolo
     uint32_t    start_id                = 7025;
     uint8_t     start_type_id           = id_group;
     const char* start_name              = "inputpowergroup DC_LOC_01";
-    const char* start_device_type_name  = "happynewyear"; 
+    const char* start_device_type_name  = "happynewyear";
     uint8_t     start_filter_type_id    = 7;
     bool        start_recursive         = true;
 
     log_info ("=============== LOCATION FROM #27 ==================");
-    
+
     _scoped_asset_msg_t* getmsg = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
     assert ( getmsg );
     asset_msg_set_element_id  (getmsg, start_id);
@@ -2378,13 +2378,13 @@ TEST_CASE("Location topology from #27","[db][topology][location][location_topolo
     // (child, parent)
     // id, id_type, name, device_type_name
     edge_lf expected;
-   
+
     expected.insert (std::make_tuple(7016, id_device, "feed_LOC_1","feed",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
     expected.insert (std::make_tuple(7017, id_device, "genset_LOC_1","genset",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
     expected.insert (std::make_tuple(7018, id_device, "ups_LOC_1","ups",7025, id_group, "inputpowergroup DC_LOC_01","happynewyear"));
- 
+
     _scoped_zmsg_t* retTopology = get_return_topology_from (url.c_str(), getmsg);
-    assert ( retTopology );   
+    assert ( retTopology );
     REQUIRE ( is_asset_msg (retTopology) );
 
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
@@ -2392,7 +2392,7 @@ TEST_CASE("Location topology from #27","[db][topology][location][location_topolo
 //    asset_msg_print (cretTopology);
     // check if the root is ok
     REQUIRE ( compare_start_element (cretTopology, start_id, start_type_id, start_name, start_device_type_name) );
-   
+
     // take edges from each group, and union step by step into r1
     auto r1 = print_frame_to_edges (asset_msg_dcs (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     auto r2 = print_frame_to_edges (asset_msg_rooms (cretTopology), start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
@@ -2414,10 +2414,10 @@ TEST_CASE("Location topology from #27","[db][topology][location][location_topolo
     r2 = print_frame_to_edges (asset_msg_grps    (cretTopology),start_id, start_type_id, std::string(start_name), std::string(start_device_type_name));
     r1.insert(r2.begin(), r2.end());
     r2.clear();
-    
+
     // check if edges are ok
     for (auto  it = r1.begin(); it != r1.end(); ++it )
-    {   
+    {
         auto itr = expected.find ( *it );
         INFO(std::get<0>(*it));
         INFO(std::get<1>(*it));
@@ -2428,7 +2428,7 @@ TEST_CASE("Location topology from #27","[db][topology][location][location_topolo
         INFO(std::get<6>(*it));
         INFO(std::get<7>(*it));
         REQUIRE ( itr != expected.end() );
-        expected.erase (itr); 
+        expected.erase (itr);
     }
 
     REQUIRE ( (int)expected.size() == 0 );

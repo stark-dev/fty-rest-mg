@@ -66,7 +66,7 @@ TEST_CASE("Location topology to #1","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
     INFO("expected values");
@@ -79,7 +79,7 @@ TEST_CASE("Location topology to #1","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -102,7 +102,7 @@ TEST_CASE("Location topology to #1","[db][topology][location][location_topology.
         INFO(asset_msg_type_name(cretTopology));
 
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         //asset_msg_print (parent);
         submsg = asset_msg_get_msg (parent);
@@ -137,7 +137,7 @@ TEST_CASE("Location topology to #2","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
 
@@ -151,7 +151,7 @@ TEST_CASE("Location topology to #2","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -174,7 +174,7 @@ TEST_CASE("Location topology to #2","[db][topology][location][location_topology.
         INFO(asset_msg_type_name(cretTopology));
 
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         //asset_msg_print (parent);
         submsg = asset_msg_get_msg (parent);
@@ -207,7 +207,7 @@ TEST_CASE("Location topology to #3","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
 
@@ -221,7 +221,7 @@ TEST_CASE("Location topology to #3","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -243,7 +243,7 @@ TEST_CASE("Location topology to #3","[db][topology][location][location_topology.
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         //asset_msg_print (parent);
         submsg = asset_msg_get_msg (parent);
@@ -274,7 +274,7 @@ TEST_CASE("Location topology to #4","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
 
@@ -288,7 +288,7 @@ TEST_CASE("Location topology to #4","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -310,7 +310,7 @@ TEST_CASE("Location topology to #4","[db][topology][location][location_topology.
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         //asset_msg_print (parent);
         submsg = asset_msg_get_msg (parent);
@@ -342,7 +342,7 @@ TEST_CASE("Location topology to #5","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
 
@@ -356,7 +356,7 @@ TEST_CASE("Location topology to #5","[db][topology][location][location_topology.
         INFO((int)asset_msg_type(cretTopology));
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -378,7 +378,7 @@ TEST_CASE("Location topology to #5","[db][topology][location][location_topology.
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         submsg = asset_msg_get_msg (parent);
         asset_msg_destroy (&parent);
@@ -409,7 +409,7 @@ TEST_CASE("Location topology to #6","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
     INFO("expected values");
@@ -422,7 +422,7 @@ TEST_CASE("Location topology to #6","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -444,7 +444,7 @@ TEST_CASE("Location topology to #6","[db][topology][location][location_topology.
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         submsg = asset_msg_get_msg (parent);
         asset_msg_destroy (&parent);
@@ -474,7 +474,7 @@ TEST_CASE("Location topology to #7","[db][topology][location][location_topology.
     _scoped_asset_msg_t* cretTopology = asset_msg_decode (&retTopology);
     assert ( cretTopology );
 //    asset_msg_print (cretTopology);
-    
+
     auto el = expected.front();
     expected.pop();
     INFO("expected values");
@@ -487,7 +487,7 @@ TEST_CASE("Location topology to #7","[db][topology][location][location_topology.
     INFO((int)asset_msg_type(cretTopology));
     INFO(asset_msg_name(cretTopology));
     INFO(asset_msg_type_name(cretTopology));
-    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el), 
+    REQUIRE ( compare_start_element (cretTopology, std::get<0>(el), std::get<1>(el),
                     std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
 
     _scoped_zmsg_t* submsg = asset_msg_get_msg (cretTopology);
@@ -509,7 +509,7 @@ TEST_CASE("Location topology to #7","[db][topology][location][location_topology.
         INFO(asset_msg_name(cretTopology));
         INFO(asset_msg_type_name(cretTopology));
 //        asset_msg_print (parent);
-        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el), 
+        REQUIRE ( compare_start_element (parent, std::get<0>(el), std::get<1>(el),
                         std::get<2>(el).c_str(), std::get<3>(el).c_str() ));
         submsg = asset_msg_get_msg (parent);
         asset_msg_destroy (&parent);
@@ -535,7 +535,7 @@ TEST_CASE("Location topology to #8","[db][topology][location][location_topology.
     common_msg_t* cretTopology = common_msg_decode (&retTopology);
     assert ( cretTopology );
 //    common_msg_print (cretTopology);
-    REQUIRE ( common_msg_errtype (cretTopology) == BIOS_ERROR_DB );
+    REQUIRE ( common_msg_errtype (cretTopology) == DB_ERR );
     REQUIRE ( common_msg_errorno (cretTopology) == DB_ERROR_NOTFOUND );
 
     asset_msg_destroy (&getmsg);

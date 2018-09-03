@@ -29,9 +29,9 @@
  */
 #include <catch.hpp>
 #include <fty_common.h>
+#include <fty_common_db.h>
 
 #include "assetcrud.h"
-#include "db/assets.h"
 #include "db/asset_general.h"
 #include "common_msg.h"
 
@@ -66,7 +66,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     REQUIRE (ext[keytag].first == value);
     REQUIRE (ext[keytag].second == read_only);
 
-    // true -> true 
+    // true -> true
     // must handle duplicate insert with the same value
     reply_insert = persist::insert_into_asset_ext_attribute (conn, value, keytag, asset_element_id, read_only);
     REQUIRE ( reply_insert.status == 1 ); // 0 fail  , 1 ok
@@ -88,7 +88,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_insert.affected_rows == 0 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 1 );
 
@@ -98,7 +98,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_select.item.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 0 );
 }
@@ -108,10 +108,10 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
 {
 
     log_info ("=============== ASSET EXT ATTRIBUTE DELETE/INSERT #2 NULL -> false, false->false ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
-    
+
     a_elmnt_id_t  asset_element_id = 1;  // it is written in crud_test.sql file
     const char   *value            = "What is this life if, full of care, we have no time to stand and stare";
     const char   *value1            = "111";
@@ -145,7 +145,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_insert.affected_rows == 0 );
 
     // ------------------------------- false -> true , same
-    // must handle duplicate insert with the same value 
+    // must handle duplicate insert with the same value
     reply_insert = persist::insert_into_asset_ext_attribute (conn, value, keytag, asset_element_id, !read_only);
     REQUIRE ( reply_insert.status == 1 );        // 0 fail, 1 ok
     uint64_t rowid1 = reply_insert.rowid;
@@ -153,7 +153,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     REQUIRE ( rowid == rowid1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 );        // 0 fail, 1 ok
     REQUIRE ( reply_delete.affected_rows == 1 );
 
@@ -162,7 +162,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     REQUIRE ( reply_select.item.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
     REQUIRE ( reply_delete.status == 1 ); // 0 fail  , 1 ok
     REQUIRE ( reply_delete.affected_rows == 0 );
 
@@ -177,7 +177,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     rowid1 = reply_insert.rowid;
     REQUIRE ( rowid == rowid1 );
 
-    reply_delete = persist::delete_asset_ext_attribute (conn, keytag, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_ext_attribute (conn, keytag, asset_element_id);
 }
 
 
@@ -188,10 +188,10 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
 {
 
     log_info ("=============== ASSET ELEMENT DELETE/INSERT #3 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
-    
+
     a_elmnt_id_t     parent_id       = 1;  // it is written in crud_test.sql file
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::ROOM;
     const char      *element_name    = "Room_insert_test";
@@ -200,7 +200,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     a_dvc_tp_id_t subtype_id = persist::asset_subtype::N_A;
 
     // first insert
-    auto reply_insert = persist::insert_into_asset_element (conn, element_name, element_type_id,
+    auto reply_insert = DBAssetsInsert::insert_into_asset_element (conn, element_name, element_type_id,
                                                             parent_id, status, priority, subtype_id, UGLY_ASSET_TAG, false);
     REQUIRE ( reply_insert.status == 1 );
     uint64_t rowid = reply_insert.rowid;
@@ -221,23 +221,23 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     REQUIRE (item.subtype_id == subtype_id);
 
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_into_asset_element (conn, element_name, element_type_id,
+    reply_insert = DBAssetsInsert::insert_into_asset_element (conn, element_name, element_type_id,
                                                        parent_id, status, priority, persist::asset_subtype::N_A, UGLY_ASSET_TAG, true);
     REQUIRE ( reply_insert.status == 0 );
     REQUIRE ( reply_insert.affected_rows == 0 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_element (conn, rowid);
+    auto reply_delete = DBAssetsInsert::delete_asset_element (conn, rowid);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_element (conn, rowid);
+    reply_delete = DBAssetsInsert::delete_asset_element (conn, rowid);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
 }
@@ -247,7 +247,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
 {
 
     log_info ("=============== ASSET ELEMENT INTO GROUP INSERT/DELETE #5 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
 
@@ -255,7 +255,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     a_elmnt_id_t asset_group_id = 3; // it is written in crud_test.sql file
 
     // first insert
-    auto reply_insert = persist::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
+    auto reply_insert = DBAssetsInsert::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
     uint64_t rowid = reply_insert.rowid;
     REQUIRE ( reply_insert.affected_rows == 1 );
     REQUIRE ( reply_insert.status == 1 );
@@ -265,14 +265,14 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     REQUIRE_NOTHROW ( reply_select = select_asset_group_elements (conn, asset_group_id) );
     REQUIRE ( reply_select.size() == 1 );
     REQUIRE ( reply_select.count(asset_element_id) == 1 );
-       
+
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
+    reply_insert = DBAssetsInsert::insert_asset_element_into_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_insert.affected_rows == 0 );
     REQUIRE ( reply_insert.status == 1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
+    auto reply_delete = DBAssetsDelete::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
@@ -282,7 +282,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     REQUIRE ( reply_select.size() == 0 );
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
+    reply_delete = DBAssetsDelete::delete_asset_element_from_asset_group (conn, asset_group_id, asset_element_id);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
 }
@@ -291,17 +291,17 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
 TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_link][crud_test.sql][66]")
 {
     log_info ("=============== ASSET LINK INSERT/DELETE #6 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
 
     a_elmnt_id_t asset_element_id_src  = 4; // it is written in crud_test.sql file
     a_elmnt_id_t asset_element_id_dest = 5; // it is written in crud_test.sql file
-    
+
     const a_lnk_src_out_t src_out = SRCOUT_DESTIN_IS_NULL;
     const a_lnk_dest_in_t dest_in = SRCOUT_DESTIN_IS_NULL;
     // first insert
-    auto reply_insert = persist::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
+    auto reply_insert = DBAssetsInsert::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
                                        src_out, dest_in);
     uint64_t rowid = reply_insert.rowid;
     REQUIRE ( reply_insert.status == 1 );
@@ -313,16 +313,16 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     REQUIRE ( zlist_size (reply_select) == 1 );
     REQUIRE ( !strcmp ( (char*)zlist_first (reply_select),"999:4:999:5"));// ATTENTION: string depends on input parameters;
     zlist_purge (reply_select);
-    
-       
+
+
     // must handle duplicate insert without insert
-    reply_insert = persist::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
+    reply_insert = DBAssetsInsert::insert_into_asset_link (conn, asset_element_id_src, asset_element_id_dest, INPUT_POWER_CHAIN,
                                        src_out, dest_in);
     REQUIRE ( reply_insert.affected_rows == 0 );
     REQUIRE ( reply_insert.status == 1 );
 
     // first delete
-    auto reply_delete = persist::delete_asset_link (conn, asset_element_id_src, asset_element_id_dest);
+    auto reply_delete = DBAssetsDelete::delete_asset_link (conn, asset_element_id_src, asset_element_id_dest);
     REQUIRE ( reply_delete.affected_rows == 1 );
     REQUIRE ( reply_delete.status == 1 );
 
@@ -332,10 +332,10 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     zlist_purge (reply_select);
 
     // must handle second delete without crash
-    reply_delete = persist::delete_asset_link  (conn, asset_element_id_src, asset_element_id_dest);
+    reply_delete = DBAssetsDelete::delete_asset_link  (conn, asset_element_id_src, asset_element_id_dest);
     REQUIRE ( reply_delete.affected_rows == 0 );
     REQUIRE ( reply_delete.status == 1 );
-    
+
     zlist_destroy (&reply_select);
 }
 
@@ -343,7 +343,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
 TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unlockated][crud_test.sql]")
 {
     log_info ("=============== dc INSERT/DELETE #7 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
 
@@ -365,7 +365,7 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
     expected_ext_attributes.insert (std::make_pair ("country", "Czech Republic"));
     expected_ext_attributes.insert (std::make_pair ("address", "some nice place in Czech Republic"));
     expected_ext_attributes.insert (std::make_pair ("contact_name", "thisisanemailaddress@gmail.com"));
-    
+
     for ( auto &ea : expected_ext_attributes )
         zhash_insert (ext_attributes, ea.first.c_str(), (void *)ea.second.c_str());
 
@@ -415,7 +415,7 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
 
     reply_delete = persist::delete_dc_room_row_rack (conn, rowid);
@@ -423,10 +423,10 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
     REQUIRE ( reply_delete.status == 1 );
 }
 
-TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockated][room][crud_test.sql]")
+TEST_CASE("room unlocated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockated][room][crud_test.sql]")
 {
     log_info ("=============== room INSERT/DELETE #8 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
 
@@ -442,7 +442,7 @@ TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlocka
     std::set<std::pair<std::string, std::string>> expected_ext_attributes;
     expected_ext_attributes.insert (std::make_pair ("description", "Hello people"));
     expected_ext_attributes.insert (std::make_pair ("contact_name", "thisisanemailaddress@gmail.com"));
-    
+
     for ( auto &ea : expected_ext_attributes )
         zhash_insert (ext_attributes, ea.first.c_str(), (void *)ea.second.c_str());
 
@@ -486,7 +486,7 @@ TEST_CASE("room unlockated INSERT/DELETE #8","[db][CRUD][insert][delete][unlocka
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
     // second delete
     reply_delete = persist::delete_dc_room_row_rack (conn, rowid);
@@ -558,7 +558,7 @@ TEST_CASE("row unlockated INSERT/DELETE #9","[db][CRUD][insert][delete][unlockat
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
     // second delete
     reply_delete = persist::delete_dc_room_row_rack (conn, rowid);
@@ -612,7 +612,7 @@ TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRU
     REQUIRE (item.type_name == "rack");
     REQUIRE (item.parent_id == parent_id);
     REQUIRE (item.parent_type_id == 0);     // in crud_test.sql
-    REQUIRE (item.subtype_id == persist::asset_subtype::N_A); 
+    REQUIRE (item.subtype_id == persist::asset_subtype::N_A);
 
     auto reply_ext = persist::select_ext_attributes(conn, rowid);
     REQUIRE (reply_ext.status == 1);
@@ -642,7 +642,7 @@ TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRU
     // check select element
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
     // second delete
     reply_delete = persist::delete_dc_room_row_rack (conn, rowid);
@@ -653,7 +653,7 @@ TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRU
 TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unlockated][group][crud_test.sql]")
 {
     log_info ("=============== group INSERT/DELETE #11 ==================");
-    
+
     tntdb::Connection conn;
     REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
 
@@ -669,7 +669,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
     std::set<std::pair<std::string, std::string>> expected_ext_attributes;
     expected_ext_attributes.insert (std::make_pair ("description", "Hello people, do we have any problems with % and %% characters"));
     expected_ext_attributes.insert (std::make_pair ("contact_name", "thisisanemailaddress@gmail.com"));
-    
+
     for ( auto &ea : expected_ext_attributes )
         zhash_insert (ext_attributes, ea.first.c_str(), (void *)ea.second.c_str());
 
@@ -692,7 +692,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
     REQUIRE (item.type_name == "group");
     REQUIRE (item.parent_id == parent_id);
     REQUIRE (item.parent_type_id == 0);     // in crud_test.sql
-    REQUIRE (item.subtype_id == persist::asset_subtype::N_A); 
+    REQUIRE (item.subtype_id == persist::asset_subtype::N_A);
 
     auto reply_ext = persist::select_ext_attributes(conn, rowid);
     REQUIRE (reply_ext.status == 1);
@@ -714,7 +714,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
     // second delete
     reply_delete = persist::delete_dc_room_row_rack (conn, rowid);
@@ -723,7 +723,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
 }
 
 
-TEST_CASE("device unlockated INSERT/DELETE #12","[db][CRUD][insert][delete][unlockated][device][crud_test.sql]")
+TEST_CASE("device unlocated INSERT/DELETE #12","[db][CRUD][insert][delete][unlockated][device][crud_test.sql]")
 {
     log_info ("=============== device INSERT/DELETE #12 ==================");
 
@@ -802,7 +802,7 @@ TEST_CASE("device unlockated INSERT/DELETE #12","[db][CRUD][insert][delete][unlo
 
     reply_select = persist::select_asset_element_web_byId(conn, rowid);
     REQUIRE (reply_select.status == 0);
-    REQUIRE (reply_select.errtype == BIOS_ERROR_DB);
+    REQUIRE (reply_select.errtype == DB_ERR);
     REQUIRE (reply_select.errsubtype == DB_ERROR_NOTFOUND);
     // second delete
     reply_delete = persist::delete_device (conn, rowid);
