@@ -32,6 +32,7 @@
 #include "shared/utils.h"
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_utils_web.h>
+#include <time.h>
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -49,6 +50,12 @@ UserInfo user;
     // input argument sanitization
     std::string checked_time;
     std::string checked_ntp;
+
+    // non-trivial time can pass between start of processing
+    // of this REST API call and actually setting the manual
+    // time value - which *was* valid at the instant when
+    // the user clicked the submission button in Web-GUI...
+    time_t entry_time = time(NULL);
 
     if(!request.isMethodGET()) {
         std::stringstream input(request.getBody(), std::ios_base::in);
@@ -120,6 +127,19 @@ UserInfo user;
             if ( MlmSubprocess::call(proc_cmd_ntp3) != 0 ) {
                 http_die ("internal-error", "Cannot mask away ntp service");
             }
+
+            // Absorb the time it might take to sanity-check inputs
+            // and manipulate services
+            time_t setting_time = time(NULL);
+            int64_t delta_time = (int64_t)difftime(setting_time, entry_time);
+
+            if ( delta_time > 0 ) {
+                log_warning ("It took " PRIi64 " seconds to get from start of call processing to setting the clock", delta_time);
+                checked_time += " + ";
+                checked_time += delta_time;
+                checked_time += " sec";
+            }
+
             // Run command with arguments.  Wait for complete and return the return value.
             MlmSubprocess::Argv proc_cmd_dateset {"sudo", "date", "-s", checked_time};
             if ( MlmSubprocess::call(proc_cmd_dateset) != 0 ) {
