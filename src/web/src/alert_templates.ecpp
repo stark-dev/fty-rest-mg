@@ -115,7 +115,7 @@ char* asset_list = zmsg_popstr (msg);
 while(template_name){
 </%cpp>
 {
-    "name" : "<$$ template_name $>,"
+    "name" : "<$$ template_name $>",
     "template" : <$$ templat $> ,
     "asset_list" : "<$$ asset_list $>"    
 }
