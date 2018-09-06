@@ -270,6 +270,7 @@ src/web/src/admin_iface.cc
 src/web/src/admin_ifaces.cc
 src/web/src/systemctl.cc
 src/web/src/alert_rules_list.cc
+src/web/src/alert_templates.cc
 src/web/src/alert_rules_detail.cc
 src/web/src/alert_rules.cc
 src/web/src/alert_ack.cc
