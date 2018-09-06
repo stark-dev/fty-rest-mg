@@ -41,6 +41,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset.h>
+#include <fty_common_mlm_utils.h>
 #include <fty_common.h>
 
 #define RFC_ALERTS_LIST "rfc-alerts-list"
@@ -245,9 +246,9 @@ zmsg_addstr (send_msg, "LIST");
 zmsg_addstr (send_msg, checked_state.c_str ());
 
 // send it
-if (mlm_client_sendto (client, FTY_ALERT_LIST, RFC_ALERTS_LIST, NULL, 1000, &send_msg) != 0) {
+if (mlm_client_sendto (client, AGENT_FTY_ALERT_LIST, RFC_ALERTS_LIST, NULL, 1000, &send_msg) != 0) {
     log_debug ("mlm_client_sendto (address = '%s', subject = '%s', tracker = NULL, timeout = '%" PRIu32"') failed.",
-        BIOS_AGENT_NAME_ALERT_AGENT, RFC_ALERTS_LIST, 1000);
+        AGENT_FTY_ALERT_LIST, RFC_ALERTS_LIST, 1000);
     zmsg_destroy (&send_msg);
     mlm_client_destroy (&client);
     http_die ("internal-error", "mlm_client_sendto() failed.");
@@ -285,7 +286,7 @@ while (true) {
         mlm_client_destroy (&client);
         http_die ("internal-error", "mlm_client_recv() failed.");
     }
-    if (streq (mlm_client_sender (client), FTY_ALERT_LIST))
+    if (streq (mlm_client_sender (client), AGENT_FTY_ALERT_LIST))
         break;
     zmsg_destroy (&recv_msg);
 }
