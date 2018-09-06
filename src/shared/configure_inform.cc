@@ -25,7 +25,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset_insert.h>
 #include <fty_common.h>
-
+#include <fty_common_mlm_utils.h>
 
 static zhash_t*
 s_map2zhash (const std::map<std::string, std::string>& m)
