@@ -33,6 +33,7 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common.h>
 #include <fty_common_rest.h>
+#include <fty_common_mlm_utils.h>
 
 </%pre>
 <%request scope="global">
@@ -99,7 +100,7 @@ zmsg_addstr (send_msg, "LIST");
 zmsg_addstr (send_msg, checked_type.c_str ());
 zmsg_addstr (send_msg, checked_rule_class.c_str ());
 
-const char *dest = BIOS_AGENT_NAME_ALERT_AGENT;
+const char *dest = "fty-alert-engine";
 if (checked_type == "flexible") dest = "fty-alert-flexible";
 
 // send it
