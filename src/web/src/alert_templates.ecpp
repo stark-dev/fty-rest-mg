@@ -27,6 +27,7 @@
 #include <malamute.h>
 #include <fty_common_mlm_tntmlm.h>  
 #include <fty_common_rest.h>
+#include <cxxtools/split.h>
 
 // encode metric GET request
 static zmsg_t*
@@ -47,6 +48,7 @@ s_request_LIST ( zuuid_t *uuid, const char* type)
 </%request>
 <%cpp>
 // check user permissions
+
 static const std::map <BiosProfile, std::string> PERMISSIONS = {
         {BiosProfile::Dashboard, "R"},
         {BiosProfile::Admin,     "R"}
@@ -105,33 +107,36 @@ if (!result || !streq (result, type.c_str())) {
     http_die ("internal-error", "LIST template bad response");
 }
 zstr_free (&result);
-
+std::string json ="[";
 char* template_name = zmsg_popstr (msg);
 char* templat = zmsg_popstr (msg);
 char* asset_list = zmsg_popstr (msg);
-</%cpp>
-[
-<%cpp>        
 while(template_name){
-</%cpp>
-{
-    "name" : "<$$ template_name $>",
-    "template" : <$$ templat $> ,
-    "asset_list" : "<$$ asset_list $>"    
-}
-<%cpp>
+    json += "{"; 
+    json += "\"name\": \"" + std::string(template_name) + "\",";
+    json += "\"template\": "+ std::string(templat) + ",";
+    json += "\"assets_id\" : [";
+    if (asset_list && strlen(asset_list)>0){
+       std::vector<std::string> asset_array;
+       cxxtools::split(",", std::string(asset_list), std::back_inserter(asset_array));
+       std::vector<std::string>::iterator it=asset_array.begin();
+       while ( it != asset_array.end()) {
+           json += "\"" + *it + "\"";
+           it++;
+           if(it != asset_array.end())
+                json += ",";  
+       }
+    }
+    json += "]}";
     zstr_free (&template_name);
     zstr_free (&templat);
     zstr_free (&asset_list);
     template_name = zmsg_popstr (msg);
     templat = zmsg_popstr (msg);
     asset_list = zmsg_popstr (msg);
-    if(!template_name){
-</%cpp>
-,
-<%cpp>
-    }
+    if(template_name)
+        json += ",";
 }
-
+json += "]";
 </%cpp>
-]   
+<$$ json $>
