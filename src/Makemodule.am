@@ -33,6 +33,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/alert_rules_detail.cc \
     src/web/src/alert_rules.cc \
     src/web/src/alert_rules_list.cc \
+    src/web/src/alert_templates.cc \
     src/web/src/asset_DELETE.cc \
     src/web/src/asset_export.cc \
     src/web/src/asset_GET.cc \

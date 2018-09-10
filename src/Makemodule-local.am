@@ -164,6 +164,7 @@ ECPPFILES= \
   web/src/alert_rules_detail.ecpp \
   web/src/alert_rules.ecpp \
   web/src/alert_rules_list.ecpp \
+  web/src/alert_templates.ecpp \
   web/src/asset_DELETE.ecpp \
   web/src/asset_export.ecpp \
   web/src/asset_GET.ecpp \

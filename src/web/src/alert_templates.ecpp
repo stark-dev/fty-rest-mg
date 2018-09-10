@@ -1,0 +1,142 @@
+<#
+ #
+ # Copyright (C) 2018 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ \file alert_templates.ecpp
+ \author Gerald Guillaume <GeraldGuillaume@Eaton.com>
+ \brief  return alert rule templates  known in /usr/share/bios/fty-autoconfig
+*/
+#>
+<%pre>
+#include <malamute.h>
+#include <fty_common_mlm_tntmlm.h>  
+#include <fty_common_rest.h>
+#include <cxxtools/split.h>
+
+// encode metric GET request
+static zmsg_t*
+s_request_LIST ( zuuid_t *uuid, const char* type)
+{
+    assert (uuid);
+    static const char* method = "LIST";
+    zmsg_t *msg = zmsg_new ();
+    zmsg_addstr (msg, method);
+    zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zmsg_addstr (msg, type);
+    return msg;
+}
+</%pre>
+
+<%request scope="global">
+    UserInfo user;
+</%request>
+<%cpp>
+// check user permissions
+
+static const std::map <BiosProfile, std::string> PERMISSIONS = {
+        {BiosProfile::Dashboard, "R"},
+        {BiosProfile::Admin,     "R"}
+        };
+CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+std::string type = qparam.param("type");
+// type
+if (type.empty ()) {
+    type = "all";
+}
+// connect to malamute
+MlmClientPool::Ptr client = mlm_pool.get ();
+if (!client.getPointer ()) {
+    log_fatal ("mlm_pool.get () failed.");
+    http_die ("internal-error", "mlm_pool.get () failed.");
+}
+if (!client.getPointer ()) {
+    log_fatal ("mlm_pool.get () failed.");
+    http_die ("internal-error", "mlm_pool.get () failed.");
+}
+
+zuuid_t *uuid = zuuid_new ();
+zmsg_t *req_list = s_request_LIST (uuid,type.c_str());
+
+int rv = client->sendto ("fty-autoconfig", "rfc-evaluator-rules", 1000, &req_list);
+if (rv == -1) {
+    zuuid_destroy (&uuid);
+    log_fatal (
+            "client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
+            "fty-metric-cache", "latest-rt-data");
+    http_die ("internal-error", "client->sendto () failed");
+}
+
+zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
+zuuid_destroy (&uuid);
+if (!msg) {
+    log_fatal ("client->recv (timeout = '5') returned NULL");
+    http_die ("internal-error", "client->recv () returned NULL");
+}
+
+char *result = zmsg_popstr (msg);
+if (!result || !streq (result, "LIST")) {
+    log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result);
+    zstr_free (&result);
+    zmsg_destroy (&msg);
+    http_die ("internal-error", "LIST template bad response");
+}
+zstr_free (&result);
+
+result = zmsg_popstr (msg);
+if (!result || !streq (result, type.c_str())) {
+    log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result);
+    zstr_free (&result);
+    zmsg_destroy (&msg);
+    http_die ("internal-error", "LIST template bad response");
+}
+zstr_free (&result);
+std::string json ="[";
+char* template_name = zmsg_popstr (msg);
+char* templat = zmsg_popstr (msg);
+char* asset_list = zmsg_popstr (msg);
+while(template_name){
+    json += "{"; 
+    json += "\"name\": \"" + std::string(template_name) + "\",";
+    json += "\"template\": "+ std::string(templat) + ",";
+    json += "\"assets_id\" : [";
+    if (asset_list && strlen(asset_list)>0){
+       std::vector<std::string> asset_array;
+       cxxtools::split(",", std::string(asset_list), std::back_inserter(asset_array));
+       std::vector<std::string>::iterator it=asset_array.begin();
+       while ( it != asset_array.end()) {
+           json += "\"" + *it + "\"";
+           it++;
+           if(it != asset_array.end())
+                json += ",";  
+       }
+    }
+    json += "]}";
+    zstr_free (&template_name);
+    zstr_free (&templat);
+    zstr_free (&asset_list);
+    template_name = zmsg_popstr (msg);
+    templat = zmsg_popstr (msg);
+    asset_list = zmsg_popstr (msg);
+    if(template_name)
+        json += ",";
+}
+json += "]";
+</%cpp>
+<$$ json $>

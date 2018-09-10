@@ -151,6 +151,13 @@
         </args>
     </mapping>
 
+    <!-- alerts/templates -->
+    <mapping>
+        <target>alert_templates@libfty_rest</target>
+        <method>GET</method>
+        <url>^/api/v1/alerts/templates([^/]*)$</url>
+    </mapping>
+
     <!-- admin/systemctl GET -->
     <mapping>
         <target>systemctl@libfty_rest</target>
