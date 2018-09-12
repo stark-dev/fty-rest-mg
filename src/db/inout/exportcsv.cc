@@ -645,7 +645,6 @@ void
         throw std::runtime_error(msg.c_str());
 
     serializer.inputUtf8(true);
-    serializer.beautify(true);
     serializer.serialize(si).finish();
     transaction.commit();
 }
