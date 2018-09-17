@@ -110,8 +110,8 @@ bool database_ready;
         }
         catch (const std::runtime_error &e) {
             log_error ("%s", e.what());
-            std::string msg = "Error during configuration sending of asset change notification. Consult system log.";
-            http_die ("internal-error", TRANSLATE_ME (msg.c_str()));
+            std::string msg = TRANSLATE_ME ("Error during configuration sending of asset change notification. Consult system log.");
+            http_die ("internal-error", msg.c_str());
         }
         // no unexpected errors was detected
         // process results
