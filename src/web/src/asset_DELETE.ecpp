@@ -57,11 +57,11 @@ bool database_ready;
     {
         std::string id = request.getArg("id");
         if ( id.empty() ) {
-            http_die("request-param-required", TRANSLATE_ME ("id"));
+            http_die("request-param-required", "id");
         }
 
         if ( !persist::is_ok_name (id.c_str ()) )
-            http_die ("request-param-bad", TRANSLATE_ME ("id"), id.c_str (), TRANSLATE_ME ("valid asset name"));
+            http_die ("request-param-bad", "id", id.c_str (), TRANSLATE_ME ("valid asset name"));
         checked_id = id;
     }
     // end sanity checks
