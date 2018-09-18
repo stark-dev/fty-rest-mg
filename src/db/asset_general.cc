@@ -266,7 +266,6 @@ db_reply_t
      zhash_t         *extattributesRO)
 {
     LOG_START;
-    const char* msg1 = TRANSLATE_ME ("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.");
     if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         char* msg1 = zsys_sprintf (TRANSLATE_ME ("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name));
@@ -282,7 +281,6 @@ db_reply_t
     std::string iname = utils::strip (persist::typeid_to_type (element_type_id));
     log_debug ("  element_name = '%s/%s'", element_name, iname.c_str ());
 
-    const char *msg2 = TRANSLATE_ME ("Element '%s' cannot be inactivated. Change status to 'active'.");
     if (streq (status, "nonactive")) {
         db_reply_t ret;
         char *msg2 = zsys_sprintf (TRANSLATE_ME ("Element '%s' cannot be inactivated. Change status to 'active'.", element_name));
@@ -382,7 +380,6 @@ db_reply_t
         zhash_t       *extattributesRO)
 {
     LOG_START;
-    const char* msg1 = TRANSLATE_ME ("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.");
     if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
         char* msg1 = zsys_sprintf (TRANSLATE_ME("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name));
