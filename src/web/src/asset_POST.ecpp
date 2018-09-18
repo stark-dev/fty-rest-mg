@@ -74,7 +74,7 @@ bool database_ready;
     }
     catch (const std::invalid_argument &e) {
         log_error ("%s", e.what());
-        http_die ("bad-request-document", TRANSLATE_ME (e.what()));
+        http_die ("bad-request-document", e.what());
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL(e);
