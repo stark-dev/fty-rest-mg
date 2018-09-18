@@ -137,7 +137,7 @@ bool database_ready;
             // possible compinations:
             //      ( relative != "" ) XOR ( start_ts != "" AND end_ts != "" )
             if (csv != "yes") { // for non-csv we parse "relative", for csv by BIOS-3225 we do not yet
-                http_die ("request-param-required", sprintf ((char *)"%s %s %s","start_ts", TRANSLATE_ME ("or"), "relative"));
+                http_die ("request-param-required", zsys_sprintf ((char *) "%s %s %s", "start_ts", TRANSLATE_ME ("or"), "relative"));
             } else {
                 http_die ("request-param-required", "start_ts");
             }
