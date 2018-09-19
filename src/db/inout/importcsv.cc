@@ -1382,10 +1382,10 @@ void
         log_error("%s", msg.c_str());
         LOG_END;
         char *msg_received = zsys_sprintf (TRANSLATE_ME ("<missing column '%s'>", m.c_str ()));
-        std::string msg_received_str(msg);
+        std::string msg_received_str(msg_received);
         zstr_free (&msg_received);
         char* msg_expected = zsys_sprintf (TRANSLATE_ME ("<column '%s' is present in csv>", m.c_str ()));
-        std::string msg_expected_str(msg);
+        std::string msg_expected_str(msg_expected);
         zstr_free (&msg_expected);
         bios_throw("request-param-bad", m.c_str(), msg_received_str.c_str(), msg_expected_str.c_str());
     }
