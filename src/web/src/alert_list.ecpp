@@ -128,8 +128,13 @@ bool database_ready;
         else
             if (!is_requeststate (state.c_str ())) {
                 log_error ("state = '%s' is not a valid alert state.", state.c_str ());
-                http_die ("request-param-bad", "state", std::string (TRANSLATE_ME ("value '")).append (state).append ("'").c_str (),
-                          (std::string (TRANSLATE_ME ("one of the following values")).append(std::string(" [ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]"))).c_str ());
+                char *msg1 = zsys_sprintf (TRANSLATE_ME ("value '%s'"), state.c_str ());
+                std::string str1 = msg1;
+                zstr_free (&msg1);
+                msg1 = zsys_sprintf (TRANSLATE_ME ("one of the following values %s"), "[ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]");
+                std::string str2 = msg1;
+                zstr_free (&msg1);
+                http_die ("request-param-bad", "state", str1.c_str(), str2.c_str ());
             }
 
         // Check 'recursive' parameter
@@ -139,8 +144,14 @@ bool database_ready;
         else
             if (recursive.compare ("true") != 0 && recursive.compare ("false") != 0) {
                 log_error ("recursive = '%s' is not a valid value.", recursive.c_str ());
-                http_die ("request-param-bad", "recursive", std::string (TRANSLATE_ME ("value '")).append (state).append ("'").c_str (),
-                          std::string (TRANSLATE_ME ("one of the following values")).append(" [ true | false ]").c_str ());
+                char *msg1 = zsys_sprintf (TRANSLATE_ME ("value '%s'"), state.c_str ());
+                std::string str1 = msg1;
+                zstr_free (&msg1);
+                msg1 = zsys_sprintf (TRANSLATE_ME ("one of the following values %s"), "[true | false]");
+                std::string str2 = msg1;
+                zstr_free (&msg1);
+
+                http_die ("request-param-bad", "recursive", str1.c_str (), str2.c_str ());
             }
 
         if (!asset.empty ())
@@ -409,7 +420,11 @@ if (streq (part, "ERROR")) {
         log_error ("State = '%s' does not exist.", checked_state.c_str ());
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        http_die ("not-found", std::string (TRANSLATE_ME ("State '")).append (checked_state).append ("'").c_str ());
+        char *msg = zsys_sprintf (TRANSLATE_ME ("State '%s'"), checked_state.c_str ());
+        std::string str = msg;
+        zstr_free (&msg);
+
+        http_die ("not-found", str.c_str ());
     }
     log_error ("%s", part);
     std::string reason = part;
