@@ -264,7 +264,7 @@ bool database_ready;
                 if (frame) {
                     if (streq (frame, "BAD_REQUEST")) {
                         zstr_free (&frame);
-                        std::string die = TRANSLATE_ME ("Data for type = '") + checked_type + "', step = '" + checked_step +
+                        std::string die = std::string (TRANSLATE_ME ("Data for")) + " type = '" + checked_type + "', step = '" + checked_step +
                                                         "', source = '" + checked_source + "', element_name = " + " '" + element_name + "'.";
                         http_die ("element-not-found", die.c_str ());
                     }
