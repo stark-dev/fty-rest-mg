@@ -128,8 +128,8 @@ bool database_ready;
         else
             if (!is_requeststate (state.c_str ())) {
                 log_error ("state = '%s' is not a valid alert state.", state.c_str ());
-                http_die ("request-param-bad", "state", TRANSLATE_ME (std::string ("value '")).append (state).append ("'").c_str (),
-                          (TRANSLATE_ME (std::string ("one of the following values")).append(std::string(" [ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]"))).c_str ());
+                http_die ("request-param-bad", "state", std::string (TRANSLATE_ME ("value '")).append (state).append ("'").c_str (),
+                          (std::string (TRANSLATE_ME ("one of the following values")).append(std::string(" [ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]"))).c_str ());
             }
 
         // Check 'recursive' parameter
