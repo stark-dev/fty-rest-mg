@@ -27,6 +27,7 @@
 #include <fstream>
 #include <cxxtools/regex.h>
 #include <fty_common_rest.h>
+#include <fty_common_macros.h>
 #include "web/src/iface.h"
 
 </%pre>
@@ -53,15 +54,17 @@ UserInfo user;
 
     auto dta = get_iface(checked_iface);
     if(dta.mac.empty()) {
-        http_die ("request-param-bad", "iface_name",
-                std::string ("value that does not exist '").append (checked_iface).append ("'").c_str (),
-                "one of valid interface names that can be obtained using GET 'admin/ifaces'.");
+        char *msg = zsys_sprintf (TRANSLATE_ME ("value that does not exist '%s'"), checked_iface.c_str ());
+        std::string str = msg;
+        zstr_free (&msg);
+        http_die ("request-param-bad", "iface_name", str.c_str (), TRANSLATE_ME ("one of valid interface names that can be obtained using GET 'admin/ifaces'."));
     }
 
     if (dta.ip.size () != dta.netmask.size ()) {
-        http_die ("internal-error",
-                std::string ("Number of ip addresses '").append (std::to_string (dta.ip.size ())).append ("' do not match number of netmasks '").
-                append (std::to_string (dta.netmask.size ())).append ("'.").c_str ());
+        char *msg = zsys_sprintf (TRANSLATE_ME ("Number of ip addresses '%d' %s '%d'."), dta.ip.size (), "do not match number of netmasks", dta.netmask.size ());
+        std::string str = msg;
+        zstr_free (&msg);
+        http_die ("internal-error", str.c_str ());
     }
 
     bool first = true;
@@ -116,7 +119,7 @@ UserInfo user;
         }
     } catch (const std::exception& e) {
         log_error ("Exception caught: %s", e.what ());
-        http_die ("internal-error", "Exception caught." );
+        http_die ("internal-error", TRANSLATE_ME ("Exception caught." ));
     }
 
 // Print out the result
