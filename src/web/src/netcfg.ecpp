@@ -35,6 +35,7 @@
 
 #include "shared/augtool.h"
 #include "shared/cidr.h"
+#include <fty_common_macros.h>
 #include <fty_common_mlm_subprocess.h>
 #include <fty_common_rest_helpers.h>
 
@@ -53,17 +54,17 @@ UserInfo user;
 
 augtool* augeas = augtool::get_instance();
 if (!augeas)
-    http_die ("internal-error", "Cannot communicate with augtool. Is it installed or properly configured?");
+    http_die ("internal-error", TRANSLATE_ME ("Cannot communicate with augtool. Is it installed or properly configured?"));
 std::string nil;
 
 // Make sure we have data that works
 nil = augeas->get_cmd_out("ls /augeas/files/etc/network/interfaces/error");
 if(!nil.empty()) {
-    http_die ("internal-error", "Syntax error in /etc/network/interfaces config file");
+    http_die ("internal-error", TRANSLATE_ME ("Syntax error in /etc/network/interfaces config file"));
 }
 nil = augeas->get_cmd_out("ls /augeas/files/etc/resolv.conf/error");
 if(!nil.empty()) {
-    http_die ("internal-error", "Syntax error in /etc/resolv.conf config file");
+    http_die ("internal-error", TRANSLATE_ME ("Syntax error in /etc/resolv.conf config file"));
 }
 
 // Are we asked to just list possible configurations?
@@ -77,7 +78,7 @@ if(rex_ncfg.match(request.getUrl())) {
 							 }
 							);
     if(in.empty()) {
-        http_die ("internal-error", "No configurable interfaces found");
+        http_die ("internal-error", TRANSLATE_ME ("No configurable interfaces found"));
     }
 
 </%cpp>
@@ -121,13 +122,19 @@ if(request.getMethod() == "PUT") {
     try {
         deserializer.deserialize(si);
     } catch(const std::exception& e) {
-        http_die ("bad-request-document",  std::string("Expecting valid json document: ").append (e.what ()).c_str ());
+        char *msg = zsys_sprintf (TRANSLATE_ME ("Expected valid json document: %s"), JSONIFY (e.what ()));
+        std::string msg_str (msg);
+        zstr_free (&msg);
+        http_die ("bad-request-document",  msg_str.c_str ());
     }
 
     try {
         rsi = si.getMember(checked_iface);
     } catch(const std::exception& e) {
-        http_die ("bad-request-document", std::string ("No configuration for interface '").append (checked_iface).append ("'provided.").c_str ());
+        char *msg = zsys_sprintf (TRANSLATE_ME ("No configuration for interface '%s' provided"), checked_iface.c_str ());
+        std::string msg_str (msg);
+        zstr_free (&msg);
+        http_die ("bad-request-document", msg_str.c_str ());
     }
 
 
@@ -136,7 +143,10 @@ if(request.getMethod() == "PUT") {
     if(it.name() == NAME) { \
         it.getValue(val); \
         if(! CHECK ) { \
-            http_die ("parameter-conflict", std::string ("Wrong value for '").append (NAME).append ("' setting or setting not expected for method ").append (method).append (".").c_str ()); \
+            char *msg = zsys_sprintf (TRANSLATE_ME ("Wrong value for '%s' setting or setting not expected for method %s.", NAME, method.c_str ())); \
+            std::string msg_str (msg); \
+            zstr_free (&msg); \
+            http_die ("parameter-conflict", msg_str.c_str ()); \
         } \
         augeas->run_cmd("set " + address + "/" NAME " " + val); \
         handled = true; \
@@ -164,7 +174,10 @@ if(request.getMethod() == "PUT") {
                 augeas->run_cmd("rm " + address + "/gateway");
             }else{
                 if(! CIDRAddress(val).valid() ) {
-                    http_die ("parameter-conflict", std::string ("Wrong value for 'gateway' setting or setting not expected for method ").append (method).append (".").c_str ());
+                    char *msg = zsys_sprintf (TRANSLATE_ME ("Wrong value for 'gateway' setting or setting not expected for method %s."), method.c_str ());
+                    std::string msg_str(msg);
+                    zstr_free (&msg);
+                    http_die ("parameter-conflict", msg_str.c_str ());
                 }
                 augeas->run_cmd("set " + address + "/gateway " + val);
             }
@@ -174,7 +187,7 @@ if(request.getMethod() == "PUT") {
         //DNS is array, handle differently
         if(it.name() == "nameservers") {
             if(it.category() != cxxtools::SerializationInfo::Category::Array) {
-                http_die ("bad-request-document", "Wrong value for DNS setting - array expected");
+                http_die ("bad-request-document", TRANSLATE_ME ("Wrong value for DNS setting - array expected"));
             }
             // get all interface from /etc/network/interfaces
             std::vector<std::string> interfaces;
@@ -186,7 +199,7 @@ if(request.getMethod() == "PUT") {
             for(auto i : it) {
                 i.getValue(val);
                 if(!CIDRAddress(val).valid()) {
-                    http_die ("bad-request-document", "Wrong value for DNS setting - array of IPs expected" );
+                    http_die ("bad-request-document", TRANSLATE_ME ("Wrong value for DNS setting - array of IPs expected") );
                 }
                 if(ns_list.length()>0){
                     ns_list += " " + val;
@@ -221,7 +234,10 @@ if(request.getMethod() == "PUT") {
             handled = true;
         }
         if(!handled) {
-            http_die ("bad-request-document", std::string ("Invalid option '").append (it.name ()).append ("'").c_str ());
+            char *msg = zsys_sprintf (TRANSLATE_ME ("Invalid option '%s'", it.name ().c_str ()));
+            std::string msg_str (msg);
+            zstr_free (&msg);
+            http_die ("bad-request-document", msg_str.c_str ());
         }
     }
 
@@ -231,11 +247,11 @@ if(request.getMethod() == "PUT") {
     // Make sure we have data that works
 	nil = augeas->get_cmd_out("ls /augeas/files/etc/network/interfaces/error");
     if(!nil.empty()) {
-        http_die ("internal-error", "Syntax error in /etc/network/interfaces config file");
+        http_die ("internal-error", TRANSLATE_ME ("Syntax error in /etc/network/interfaces config file"));
     }
 	nil = augeas->get_cmd_out("ls /augeas/files/etc/resolv.conf/error");
     if(!nil.empty()) {
-        http_die ("internal-error", "Syntax error in /etc/resolv.conf config file");
+        http_die ("internal-error", TRANSLATE_ME ("Syntax error in /etc/resolv.conf config file"));
     }
 
 }
