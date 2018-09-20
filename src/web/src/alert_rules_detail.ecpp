@@ -30,7 +30,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fty_common_rest_helpers.h>
-#include <fty_common.h>
+#include <fty_common_macros.h>
 #include <fty_common_mlm_utils.h>
 </%pre>
 <%request scope="global">
@@ -75,14 +75,14 @@ int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
 if (rv == -1) {
     log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
-    http_die ("internal-error", "mlm_client_connect() failed.");
+    http_die ("internal-error", TRANSLATE_ME ("mlm_client_connect() failed."));
 }
 
 // prepare rfc-evaluator-rules GET message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
     log_fatal ("zmsg_new() failed.");
-    http_die ("internal-error", "zmsg_new() failed.");
+    http_die ("internal-error", TRANSLATE_ME ("zmsg_new() failed."));
 }
 zmsg_addstr (send_msg, "GET");
 zmsg_addstr (send_msg, checked_name.c_str ());
@@ -93,19 +93,19 @@ if (mlm_client_sendto (client, "fty-alert-engine", "rfc-evaluator-rules", NULL, 
         "fty-alert-engine", "rfc-evaluator-rules", 1000);
     zmsg_destroy (&send_msg);
     mlm_client_destroy (&client);
-    http_die ("internal-error", "mlm_client_sendto() failed.");
+    http_die ("internal-error", TRANSLATE_ME ("mlm_client_sendto() failed."));
 }
 
 zmsg_t *recv_msg = NULL;
 zsock_t *pipe = mlm_client_msgpipe (client);
 if (!pipe) {
     log_fatal ("mlm_client_msgpipe() failed.");
-    http_die ("internal-error", "mlm_client_msgpipe() failed.");
+    http_die ("internal-error", TRANSLATE_ME ("mlm_client_msgpipe() failed."));
 }
 zpoller_t *poller = zpoller_new (pipe, NULL);
 if (!poller) {
     log_fatal ("zpoller_new() failed.");
-    http_die ("internal-error", "zpoller_new() failed.");
+    http_die ("internal-error", TRANSLATE_ME ("zpoller_new() failed."));
 }
 while (true) {
     zsock_t *which = (zsock_t *) zpoller_wait (poller, 5000);
@@ -117,12 +117,12 @@ while (true) {
             log_error ("zpoller_wait(timeout = 5000) timed out waiting for message.");
             mlm_client_destroy (&client);
             zpoller_destroy (&poller);
-            http_die ("internal-error", "Timed out waiting for message.");
+            http_die ("internal-error", TRANSLATE_ME ("Timed out waiting for message."));
         }
         log_error ("mlm_client_recv() failed.");
         zpoller_destroy (&poller);
         mlm_client_destroy (&client);
-        http_die ("internal-error", "mlm_client_recv() failed.");
+        http_die ("internal-error", TRANSLATE_ME ("mlm_client_recv() failed."));
     }
     if (streq (mlm_client_sender (client), "fty-alert-engine"))
         break;
@@ -135,7 +135,7 @@ if (!streq (mlm_client_subject (client), "rfc-evaluator-rules")) {
         mlm_client_sender (client), "rfc-evaluator-rules", mlm_client_subject (client));
     zmsg_destroy (&recv_msg);
     mlm_client_destroy (&client);
-    http_die ("internal-error", "Bad message.");
+    http_die ("internal-error", TRANSLATE_ME ("Bad message."));
 }
 // Check command. Can be OK or ERROR
 char *part = zmsg_popstr (recv_msg);
@@ -146,7 +146,7 @@ if (streq (part, "OK")) {
         log_error ("Unexpected reply from '%s'. Expected OK/json. Got OK/(null).", mlm_client_sender (client));
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        http_die ("internal-error", "Bad message.");
+        http_die ("internal-error", TRANSLATE_ME ("Bad message."));
     }
 // Note: Assumption: EVALUATOR returns valid json
 </%cpp>
@@ -164,14 +164,14 @@ if (streq (part, "ERROR")) {
         log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        http_die ("internal-error", "Bad message.");
+        http_die ("internal-error", TRANSLATE_ME ("Bad message."));
     }
     if (streq (part, "NOT_FOUND")) {
         free (part);
         log_error ("Rule name '%s' does not exist.", checked_name.c_str ());
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        http_die ("not-found", std::string ("Rule name '").append (checked_name).append ("'").c_str ());
+        http_die ("not-found", std::string (TRANSLATE_ME ("Rule name '")).append (checked_name).append ("'").c_str ());
     }
     log_error ("%s", part);
     std::string reason = part;
@@ -179,8 +179,8 @@ if (streq (part, "ERROR")) {
     zmsg_destroy (&recv_msg);
     mlm_client_destroy (&client);
     http_die ("internal-error",
-        std::string ("Error while retrieving details of rule name = '").append (checked_name).append ("': ").
-        append (reason).append(".").c_str ());
+              std::string (TRANSLATE_ME ("Error while retrieving details of rule name = '")).append (checked_name).append ("': ").
+              append (reason).append(".").c_str ());
 }
 // Message does not conform to protocol
 free (part);
@@ -188,5 +188,5 @@ log_error ("Unexptected reply from  '%s'. Does not conform to rfc-evaluator-rule
     mlm_client_sender (client));
 zmsg_destroy (&recv_msg);
 mlm_client_destroy (&client);
-http_die ("internal-error", "Bad message.");
+    http_die ("internal-error", TRANSLATE_ME ("Bad message."));
 </%cpp>
