@@ -28,6 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 #include <fty_common.h>
+#include <fty_common_macros.h>
 
 #include "db/topology2.h"
 

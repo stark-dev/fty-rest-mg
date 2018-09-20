@@ -30,9 +30,10 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <fty_common.h>
 #include <fty_common_db.h>
+#include <fty_common_macros.h>
+
 #include "assetcrud.h"
 #include "msg/common_msg.h"
-
 #include "assettopology.h"
 #include "persist_error.h"
 #include "cleanup.h"
