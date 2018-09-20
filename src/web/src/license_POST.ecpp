@@ -35,6 +35,7 @@
 
 #include "shared/utils.h"
 #include "cleanup.h"
+#include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_filesystem.h>
@@ -57,19 +58,19 @@ bool database_ready;
 
     char *license_file = get_current_license_file ();
     if ( license_file == NULL ) {
-        http_die ("internal-error", "Cannot get the path to the text of the current license");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot get the path to the text of the current license"));
     }
     char *current_license_version = get_current_license_version (license_file);
     if ( current_license_version == NULL ) {
         free (license_file); license_file = NULL;
-        http_die ("internal-error", "Cannot get version of the text of the current license");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot get version of the text of the current license"));
     }
 
     char *accepted_license_file = get_accepted_license_file ();
     if ( accepted_license_file == NULL ) {
         free (current_license_version); current_license_version = NULL;
         free (license_file); license_file = NULL;
-        http_die ("internal-error", "Cannot get the path to the actual status of the accepted license");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot get the path to the actual status of the accepted license"));
     }
     log_debug ("variable accepted_license_file == '%s'", accepted_license_file);
     FILE *f = fopen (accepted_license_file, "w");
@@ -77,7 +78,7 @@ bool database_ready;
         free (accepted_license_file); accepted_license_file = NULL;
         free (current_license_version); current_license_version = NULL;
         free (license_file); license_file = NULL;
-        http_die ("internal-error", "Cannot open file with actual information about accepted license");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot open file with actual information about accepted license"));
     }
     uint64_t tme = ::time(NULL);
     fprintf (f, "%s\n%" PRIu64 "\n%s\n", current_license_version, tme, user.login().c_str());
@@ -116,7 +117,7 @@ bool database_ready;
             log_error("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                 "/usr/libexec/fty/start-db-services", rv_svc, proc_out.c_str(), proc_err.c_str());
             if (rv_svc > 0)
-                http_die ("internal-error", "Starting of start-db-services have failed. Consult system logs");
+                http_die ("internal-error", TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs"));
             // Negative return means killed by signal, typically by our
             // subprocess timeout handling - fall through to try using DB
 
@@ -133,7 +134,7 @@ bool database_ready;
                         " failed (service is not currently active). Return value = '"
                         + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
                     log_error ("%s", message.c_str ());
-                    http_die ("internal-error", "Database software service is not running");
+                    http_die ("internal-error", TRANSLATE_ME ("Database software service is not running"));
                 } else {
                     // Not quite an error, but we want this message at the same logging level
                     log_error ("NOTE: Although start-db-services script was killed, the fty-db-engine service is okay");
@@ -153,7 +154,7 @@ bool database_ready;
                         " failed (service is not currently active). Return value = '"
                         + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
                     log_error ("%s", message.c_str ());
-                    http_die ("internal-error", "Database schema was not installed or verified successfully");
+                    http_die ("internal-error", TRANSLATE_ME ("Database schema was not installed or verified successfully"));
                 } else {
                     // Not quite an error, but we want this message at the same logging level
                     log_error ("NOTE: Although start-db-services script was killed, the fty-db-init service is okay");
@@ -167,9 +168,9 @@ bool database_ready;
         if (!rv_dbcred) {
             std::string message;
             if (rv_svc != 0) {
-                message = "Database password file is missing AND failed to start start-db-services. Consult system logs";
+                message = TRANSLATE_ME ("Database password file is missing AND failed to start start-db-services. Consult system logs");
             } else {
-                message = "Database password file is missing";
+                message = TRANSLATE_ME ("Database password file is missing");
             }
             log_error ("%s", message.c_str ());
             http_die ("internal-error", message.c_str());
@@ -179,7 +180,7 @@ bool database_ready;
         // had failed previously but the system has caught up by now
         log_info("db services were already started and set up, re-reading password just in case ...");
         if (!DBConn::dbreadcredentials())
-            http_die ("internal-error", "Database password file is missing");
+            http_die ("internal-error", TRANSLATE_ME ("Database password file is missing"));
     }
 </%cpp>
 { "success" : "License version <$ clv $> accepted." }
@@ -216,7 +217,7 @@ bool database_ready;
         // restart myself like `kill(getpid())` if there are issues?
         log_error("Database connection test failed: %s", e.what());
         database_ready = false;
-        http_die ("internal-error", "Database connection test failed");
+        http_die ("internal-error", TRANSLATE_ME ("Database connection test failed"));
     }
 }
 </%cpp>
