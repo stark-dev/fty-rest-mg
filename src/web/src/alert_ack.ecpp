@@ -277,7 +277,7 @@ if (streq (part, "ERROR")) {
             checked_rule_name.c_str (), checked_element_name.c_str (), checked_state.c_str ());
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        char *msg_param_conflict = zsys_sprintf (TRANSLATE_ME ("Alert identified by rule name = '%s' and element name = '%s' can not change state to '%s'", checked_rule_name.c_str (), checked_element_name.c_str (), checked_state.c_str ()));
+        char *msg_param_conflict = zsys_sprintf (TRANSLATE_ME ("Alert identified by rule name = '%s', element name = '%s' can not change state to '%s'.", checked_rule_name.c_str (), checked_element_name.c_str (), checked_state.c_str ()));
         std::string msg_param_conflict_str (msg_param_conflict);
         zstr_free (&msg_param_conflict);
         http_die ("parameter-conflict", msg_param_conflict_str.c_str ());
