@@ -88,7 +88,7 @@ class NodeMap {
                 std::string msg("Power source loop detected:");
                 for (auto a : seen)
                     msg += " " + a;
-                zsys_error("%s", msg.c_str());
+                log_error("%s", msg.c_str());
                 return;
             }
             for (const auto& kid: _map [name]) {
@@ -288,7 +288,7 @@ is_power_device (tntdb::Connection &conn, std::string &asset_name)
     }
     catch (const std::exception &e)
     {
-        zsys_error ("Exception caught: is_power_device %s", e.what ());
+        log_error ("Exception caught: is_power_device %s", e.what ());
         return false;
     }
 }

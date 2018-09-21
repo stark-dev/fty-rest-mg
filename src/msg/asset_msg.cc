@@ -12,19 +12,19 @@
      * The XML model used for this code generation: asset_msg.xml, or
      * The code generation script that built this file: zproto_codec_c_v1
     ************************************************************************
-                                                                        
-    Copyright (C) 2014 Eaton                                            
-                                                                        
+
+    Copyright (C) 2014 Eaton
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or   
-    (at your option) any later version.                                 
-                                                                        
-    This program is distributed in the hope that it will be useful,     
-    but WITHOUT ANY WARRANTY; without even the implied warranty of      
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
-    GNU General Public License for more details.                        
-                                                                        
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -39,6 +39,7 @@
 */
 
 #include "msg/asset_msg.h"
+#include <fty_log.h>
 
 //  Structure of our class
 
@@ -329,7 +330,7 @@ is_asset_msg (zmsg_t *msg)
 
 //  --------------------------------------------------------------------------
 //  Parse a asset_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. Destroys msg and 
+//  the message could not be parsed, or was NULL. Destroys msg and
 //  nullifies the msg reference.
 
 asset_msg_t *
@@ -339,11 +340,11 @@ asset_msg_decode (zmsg_t **msg_p)
     zmsg_t *msg = *msg_p;
     if (msg == NULL)
         return NULL;
-        
+
     asset_msg_t *self = asset_msg_new (0);
     //  Read and parse command in frame
     zframe_t *frame = zmsg_pop (msg);
-    if (!frame) 
+    if (!frame)
         goto empty;             //  Malformed or empty
 
     //  Get and check protocol signature
@@ -606,7 +607,7 @@ asset_msg_decode (zmsg_t **msg_p)
 
     //  Error returns
     malformed:
-        zsys_error ("malformed message '%d'\n", self->id);
+        log_error ("malformed message '%d'\n", self->id);
     empty:
         zframe_destroy (&frame);
         zmsg_destroy (msg_p);
@@ -624,7 +625,7 @@ asset_msg_encode (asset_msg_t **self_p)
 {
     assert (self_p);
     assert (*self_p);
-    
+
     asset_msg_t *self = *self_p;
     zmsg_t *msg = zmsg_new ();
 
@@ -655,7 +656,7 @@ asset_msg_encode (asset_msg_t **self_p)
             }
             frame_size += self->ext_bytes;
             break;
-            
+
         case ASSET_MSG_DEVICE:
             //  device_type is a string with 1-byte length
             frame_size++;       //  Size is one octet
@@ -698,49 +699,49 @@ asset_msg_encode (asset_msg_t **self_p)
             if (self->mac)
                 frame_size += strlen (self->mac);
             break;
-            
+
         case ASSET_MSG_GET_ELEMENT:
             //  element_id is a 4-byte integer
             frame_size += 4;
             //  type is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case ASSET_MSG_RETURN_ELEMENT:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_UPDATE_ELEMENT:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_INSERT_ELEMENT:
             break;
-            
+
         case ASSET_MSG_DELETE_ELEMENT:
             //  element_id is a 4-byte integer
             frame_size += 4;
             //  type is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case ASSET_MSG_OK:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_FAIL:
             //  error_id is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case ASSET_MSG_GET_ELEMENTS:
             //  type is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case ASSET_MSG_RETURN_ELEMENTS:
             //  element_ids is an array of key=value strings
             frame_size += 4;    //  Size is 4 octets
@@ -756,7 +757,7 @@ asset_msg_encode (asset_msg_t **self_p)
             }
             frame_size += self->element_ids_bytes;
             break;
-            
+
         case ASSET_MSG_GET_LOCATION_FROM:
             //  element_id is a 4-byte integer
             frame_size += 4;
@@ -765,12 +766,12 @@ asset_msg_encode (asset_msg_t **self_p)
             //  filter_type is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case ASSET_MSG_GET_LOCATION_TO:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_RETURN_LOCATION_TO:
             //  element_id is a 4-byte integer
             frame_size += 4;
@@ -785,7 +786,7 @@ asset_msg_encode (asset_msg_t **self_p)
             if (self->type_name)
                 frame_size += strlen (self->type_name);
             break;
-            
+
         case ASSET_MSG_RETURN_LOCATION_FROM:
             //  element_id is a 4-byte integer
             frame_size += 4;
@@ -800,12 +801,12 @@ asset_msg_encode (asset_msg_t **self_p)
             if (self->type_name)
                 frame_size += strlen (self->type_name);
             break;
-            
+
         case ASSET_MSG_GET_POWER_FROM:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_POWERCHAIN_DEVICE:
             //  element_id is a 4-byte integer
             frame_size += 4;
@@ -818,7 +819,7 @@ asset_msg_encode (asset_msg_t **self_p)
             if (self->name)
                 frame_size += strlen (self->name);
             break;
-            
+
         case ASSET_MSG_RETURN_POWER:
             //  powers is an array of strings
             frame_size += 4;    //  Size is 4 octets
@@ -831,24 +832,24 @@ asset_msg_encode (asset_msg_t **self_p)
                 }
             }
             break;
-            
+
         case ASSET_MSG_GET_POWER_TO:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_GET_POWER_GROUP:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case ASSET_MSG_GET_POWER_DATACENTER:
             //  element_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         default:
-            zsys_error ("bad message type '%d', not sent\n", self->id);
+            log_error ("bad message type '%d', not sent\n", self->id);
             //  No recovery, this is a fatal application error
             assert (false);
     }
@@ -1276,7 +1277,7 @@ asset_msg_send (asset_msg_t **self_p, void *output)
 
     //  Encode asset_msg message to a single zmsg
     zmsg_t *msg = asset_msg_encode (self_p);
-    
+
     //  If we're sending to a ROUTER, send the routing_id first
     if (zsocket_type (zsock_resolve (output)) == ZMQ_ROUTER) {
         assert (routing_id);
@@ -1284,7 +1285,7 @@ asset_msg_send (asset_msg_t **self_p, void *output)
     }
     else
         zframe_destroy (&routing_id);
-        
+
     if (msg && zmsg_send (&msg, output) == 0)
         return 0;
     else
@@ -1308,7 +1309,7 @@ asset_msg_send_again (asset_msg_t *self, void *output)
 //  --------------------------------------------------------------------------
 //  Encode ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_element (
     const char *name,
     uint32_t location,
@@ -1330,7 +1331,7 @@ asset_msg_encode_element (
 //  --------------------------------------------------------------------------
 //  Encode DEVICE message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_device (
     const char *device_type,
     zlist_t *groups,
@@ -1360,7 +1361,7 @@ asset_msg_encode_device (
 //  --------------------------------------------------------------------------
 //  Encode GET_ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_element (
     uint32_t element_id,
     byte type)
@@ -1375,7 +1376,7 @@ asset_msg_encode_get_element (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_return_element (
     uint32_t element_id,
     zmsg_t *msg)
@@ -1391,7 +1392,7 @@ asset_msg_encode_return_element (
 //  --------------------------------------------------------------------------
 //  Encode UPDATE_ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_update_element (
     uint32_t element_id,
     zmsg_t *msg)
@@ -1407,7 +1408,7 @@ asset_msg_encode_update_element (
 //  --------------------------------------------------------------------------
 //  Encode INSERT_ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_insert_element (
     zmsg_t *msg)
 {
@@ -1421,7 +1422,7 @@ asset_msg_encode_insert_element (
 //  --------------------------------------------------------------------------
 //  Encode DELETE_ELEMENT message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_delete_element (
     uint32_t element_id,
     byte type)
@@ -1436,7 +1437,7 @@ asset_msg_encode_delete_element (
 //  --------------------------------------------------------------------------
 //  Encode OK message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_ok (
     uint32_t element_id)
 {
@@ -1449,7 +1450,7 @@ asset_msg_encode_ok (
 //  --------------------------------------------------------------------------
 //  Encode FAIL message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_fail (
     byte error_id)
 {
@@ -1462,7 +1463,7 @@ asset_msg_encode_fail (
 //  --------------------------------------------------------------------------
 //  Encode GET_ELEMENTS message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_elements (
     byte type)
 {
@@ -1475,7 +1476,7 @@ asset_msg_encode_get_elements (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_ELEMENTS message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_return_elements (
     zhash_t *element_ids)
 {
@@ -1489,7 +1490,7 @@ asset_msg_encode_return_elements (
 //  --------------------------------------------------------------------------
 //  Encode GET_LOCATION_FROM message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_location_from (
     uint32_t element_id,
     byte recursive,
@@ -1506,7 +1507,7 @@ asset_msg_encode_get_location_from (
 //  --------------------------------------------------------------------------
 //  Encode GET_LOCATION_TO message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_location_to (
     uint32_t element_id)
 {
@@ -1519,7 +1520,7 @@ asset_msg_encode_get_location_to (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_LOCATION_TO message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_return_location_to (
     uint32_t element_id,
     byte type,
@@ -1541,7 +1542,7 @@ asset_msg_encode_return_location_to (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_LOCATION_FROM message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_return_location_from (
     uint32_t element_id,
     byte type,
@@ -1578,7 +1579,7 @@ asset_msg_encode_return_location_from (
 //  --------------------------------------------------------------------------
 //  Encode GET_POWER_FROM message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_power_from (
     uint32_t element_id)
 {
@@ -1591,7 +1592,7 @@ asset_msg_encode_get_power_from (
 //  --------------------------------------------------------------------------
 //  Encode POWERCHAIN_DEVICE message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_powerchain_device (
     uint32_t element_id,
     const char *type_name,
@@ -1608,7 +1609,7 @@ asset_msg_encode_powerchain_device (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_POWER message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_return_power (
     zframe_t *devices,
     zlist_t *powers)
@@ -1625,7 +1626,7 @@ asset_msg_encode_return_power (
 //  --------------------------------------------------------------------------
 //  Encode GET_POWER_TO message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_power_to (
     uint32_t element_id)
 {
@@ -1638,7 +1639,7 @@ asset_msg_encode_get_power_to (
 //  --------------------------------------------------------------------------
 //  Encode GET_POWER_GROUP message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_power_group (
     uint32_t element_id)
 {
@@ -1651,7 +1652,7 @@ asset_msg_encode_get_power_group (
 //  --------------------------------------------------------------------------
 //  Encode GET_POWER_DATACENTER message
 
-zmsg_t * 
+zmsg_t *
 asset_msg_encode_get_power_datacenter (
     uint32_t element_id)
 {
@@ -2046,7 +2047,7 @@ asset_msg_dup (asset_msg_t *self)
 {
     if (!self)
         return NULL;
-        
+
     asset_msg_t *copy = asset_msg_new (self->id);
     if (self->routing_id)
         copy->routing_id = zframe_dup (self->routing_id);
@@ -2182,266 +2183,266 @@ asset_msg_print (asset_msg_t *self)
     assert (self);
     switch (self->id) {
         case ASSET_MSG_ELEMENT:
-            zsys_debug ("ASSET_MSG_ELEMENT:");
+            log_debug ("ASSET_MSG_ELEMENT:");
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
-            zsys_debug ("    location=%ld", (long) self->location);
-            zsys_debug ("    location_type=%ld", (long) self->location_type);
-            zsys_debug ("    type=%ld", (long) self->type);
-            zsys_debug ("    ext=");
+                log_debug ("    name=");
+            log_debug ("    location=%ld", (long) self->location);
+            log_debug ("    location_type=%ld", (long) self->location_type);
+            log_debug ("    type=%ld", (long) self->type);
+            log_debug ("    ext=");
             if (self->ext) {
                 char *item = (char *) zhash_first (self->ext);
                 while (item) {
-                    zsys_debug ("        %s=%s", zhash_cursor (self->ext), item);
+                    log_debug ("        %s=%s", zhash_cursor (self->ext), item);
                     item = (char *) zhash_next (self->ext);
                 }
             }
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_DEVICE:
-            zsys_debug ("ASSET_MSG_DEVICE:");
+            log_debug ("ASSET_MSG_DEVICE:");
             if (self->device_type)
-                zsys_debug ("    device_type='%s'", self->device_type);
+                log_debug ("    device_type='%s'", self->device_type);
             else
-                zsys_debug ("    device_type=");
-            zsys_debug ("    groups=");
+                log_debug ("    device_type=");
+            log_debug ("    groups=");
             if (self->groups) {
                 char *groups = (char *) zlist_first (self->groups);
                 while (groups) {
-                    zsys_debug ("        '%s'", groups);
+                    log_debug ("        '%s'", groups);
                     groups = (char *) zlist_next (self->groups);
                 }
             }
-            zsys_debug ("    powers=");
+            log_debug ("    powers=");
             if (self->powers) {
                 char *powers = (char *) zlist_first (self->powers);
                 while (powers) {
-                    zsys_debug ("        '%s'", powers);
+                    log_debug ("        '%s'", powers);
                     powers = (char *) zlist_next (self->powers);
                 }
             }
             if (self->ip)
-                zsys_debug ("    ip='%s'", self->ip);
+                log_debug ("    ip='%s'", self->ip);
             else
-                zsys_debug ("    ip=");
+                log_debug ("    ip=");
             if (self->hostname)
-                zsys_debug ("    hostname='%s'", self->hostname);
+                log_debug ("    hostname='%s'", self->hostname);
             else
-                zsys_debug ("    hostname=");
+                log_debug ("    hostname=");
             if (self->fqdn)
-                zsys_debug ("    fqdn='%s'", self->fqdn);
+                log_debug ("    fqdn='%s'", self->fqdn);
             else
-                zsys_debug ("    fqdn=");
+                log_debug ("    fqdn=");
             if (self->mac)
-                zsys_debug ("    mac='%s'", self->mac);
+                log_debug ("    mac='%s'", self->mac);
             else
-                zsys_debug ("    mac=");
-            zsys_debug ("    msg=");
+                log_debug ("    mac=");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_GET_ELEMENT:
-            zsys_debug ("ASSET_MSG_GET_ELEMENT:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    type=%ld", (long) self->type);
+            log_debug ("ASSET_MSG_GET_ELEMENT:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    type=%ld", (long) self->type);
             break;
-            
+
         case ASSET_MSG_RETURN_ELEMENT:
-            zsys_debug ("ASSET_MSG_RETURN_ELEMENT:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    msg=");
+            log_debug ("ASSET_MSG_RETURN_ELEMENT:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_UPDATE_ELEMENT:
-            zsys_debug ("ASSET_MSG_UPDATE_ELEMENT:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    msg=");
+            log_debug ("ASSET_MSG_UPDATE_ELEMENT:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_INSERT_ELEMENT:
-            zsys_debug ("ASSET_MSG_INSERT_ELEMENT:");
-            zsys_debug ("    msg=");
+            log_debug ("ASSET_MSG_INSERT_ELEMENT:");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_DELETE_ELEMENT:
-            zsys_debug ("ASSET_MSG_DELETE_ELEMENT:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    type=%ld", (long) self->type);
+            log_debug ("ASSET_MSG_DELETE_ELEMENT:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    type=%ld", (long) self->type);
             break;
-            
+
         case ASSET_MSG_OK:
-            zsys_debug ("ASSET_MSG_OK:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_OK:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
         case ASSET_MSG_FAIL:
-            zsys_debug ("ASSET_MSG_FAIL:");
-            zsys_debug ("    error_id=%ld", (long) self->error_id);
+            log_debug ("ASSET_MSG_FAIL:");
+            log_debug ("    error_id=%ld", (long) self->error_id);
             break;
-            
+
         case ASSET_MSG_GET_ELEMENTS:
-            zsys_debug ("ASSET_MSG_GET_ELEMENTS:");
-            zsys_debug ("    type=%ld", (long) self->type);
+            log_debug ("ASSET_MSG_GET_ELEMENTS:");
+            log_debug ("    type=%ld", (long) self->type);
             break;
-            
+
         case ASSET_MSG_RETURN_ELEMENTS:
-            zsys_debug ("ASSET_MSG_RETURN_ELEMENTS:");
-            zsys_debug ("    element_ids=");
+            log_debug ("ASSET_MSG_RETURN_ELEMENTS:");
+            log_debug ("    element_ids=");
             if (self->element_ids) {
                 char *item = (char *) zhash_first (self->element_ids);
                 while (item) {
-                    zsys_debug ("        %s=%s", zhash_cursor (self->element_ids), item);
+                    log_debug ("        %s=%s", zhash_cursor (self->element_ids), item);
                     item = (char *) zhash_next (self->element_ids);
                 }
             }
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_GET_LOCATION_FROM:
-            zsys_debug ("ASSET_MSG_GET_LOCATION_FROM:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    recursive=%ld", (long) self->recursive);
-            zsys_debug ("    filter_type=%ld", (long) self->filter_type);
+            log_debug ("ASSET_MSG_GET_LOCATION_FROM:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    recursive=%ld", (long) self->recursive);
+            log_debug ("    filter_type=%ld", (long) self->filter_type);
             break;
-            
+
         case ASSET_MSG_GET_LOCATION_TO:
-            zsys_debug ("ASSET_MSG_GET_LOCATION_TO:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_GET_LOCATION_TO:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
         case ASSET_MSG_RETURN_LOCATION_TO:
-            zsys_debug ("ASSET_MSG_RETURN_LOCATION_TO:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    type=%ld", (long) self->type);
+            log_debug ("ASSET_MSG_RETURN_LOCATION_TO:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    type=%ld", (long) self->type);
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             if (self->type_name)
-                zsys_debug ("    type_name='%s'", self->type_name);
+                log_debug ("    type_name='%s'", self->type_name);
             else
-                zsys_debug ("    type_name=");
-            zsys_debug ("    msg=");
+                log_debug ("    type_name=");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_RETURN_LOCATION_FROM:
-            zsys_debug ("ASSET_MSG_RETURN_LOCATION_FROM:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
-            zsys_debug ("    type=%ld", (long) self->type);
+            log_debug ("ASSET_MSG_RETURN_LOCATION_FROM:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("    type=%ld", (long) self->type);
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             if (self->type_name)
-                zsys_debug ("    type_name='%s'", self->type_name);
+                log_debug ("    type_name='%s'", self->type_name);
             else
-                zsys_debug ("    type_name=");
-            zsys_debug ("    dcs=");
+                log_debug ("    type_name=");
+            log_debug ("    dcs=");
             if (self->dcs)
                 zframe_print (self->dcs, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    rooms=");
+                log_debug ("(NULL)");
+            log_debug ("    rooms=");
             if (self->rooms)
                 zframe_print (self->rooms, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    rows=");
+                log_debug ("(NULL)");
+            log_debug ("    rows=");
             if (self->rows)
                 zframe_print (self->rows, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    racks=");
+                log_debug ("(NULL)");
+            log_debug ("    racks=");
             if (self->racks)
                 zframe_print (self->racks, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    devices=");
+                log_debug ("(NULL)");
+            log_debug ("    devices=");
             if (self->devices)
                 zframe_print (self->devices, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    grps=");
+                log_debug ("(NULL)");
+            log_debug ("    grps=");
             if (self->grps)
                 zframe_print (self->grps, NULL);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case ASSET_MSG_GET_POWER_FROM:
-            zsys_debug ("ASSET_MSG_GET_POWER_FROM:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_GET_POWER_FROM:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
         case ASSET_MSG_POWERCHAIN_DEVICE:
-            zsys_debug ("ASSET_MSG_POWERCHAIN_DEVICE:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_POWERCHAIN_DEVICE:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             if (self->type_name)
-                zsys_debug ("    type_name='%s'", self->type_name);
+                log_debug ("    type_name='%s'", self->type_name);
             else
-                zsys_debug ("    type_name=");
+                log_debug ("    type_name=");
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             break;
-            
+
         case ASSET_MSG_RETURN_POWER:
-            zsys_debug ("ASSET_MSG_RETURN_POWER:");
-            zsys_debug ("    devices=");
+            log_debug ("ASSET_MSG_RETURN_POWER:");
+            log_debug ("    devices=");
             if (self->devices)
                 zframe_print (self->devices, NULL);
             else
-                zsys_debug ("(NULL)");
-            zsys_debug ("    powers=");
+                log_debug ("(NULL)");
+            log_debug ("    powers=");
             if (self->powers) {
                 char *powers = (char *) zlist_first (self->powers);
                 while (powers) {
-                    zsys_debug ("        '%s'", powers);
+                    log_debug ("        '%s'", powers);
                     powers = (char *) zlist_next (self->powers);
                 }
             }
             break;
-            
+
         case ASSET_MSG_GET_POWER_TO:
-            zsys_debug ("ASSET_MSG_GET_POWER_TO:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_GET_POWER_TO:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
         case ASSET_MSG_GET_POWER_GROUP:
-            zsys_debug ("ASSET_MSG_GET_POWER_GROUP:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_GET_POWER_GROUP:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
         case ASSET_MSG_GET_POWER_DATACENTER:
-            zsys_debug ("ASSET_MSG_GET_POWER_DATACENTER:");
-            zsys_debug ("    element_id=%ld", (long) self->element_id);
+            log_debug ("ASSET_MSG_GET_POWER_DATACENTER:");
+            log_debug ("    element_id=%ld", (long) self->element_id);
             break;
-            
+
     }
 }
 
@@ -3445,7 +3446,7 @@ asset_msg_test (bool verbose)
     int instance;
     asset_msg_t *copy;
     self = asset_msg_new (ASSET_MSG_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3465,7 +3466,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
         assert (asset_msg_location (self) == 123);
         assert (asset_msg_location_type (self) == 123);
@@ -3476,7 +3477,7 @@ asset_msg_test (bool verbose)
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3502,7 +3503,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (streq (asset_msg_device_type (self), "Life is short but Now lasts for ever"));
         assert (asset_msg_groups_size (self) == 2);
         assert (streq (asset_msg_groups_first (self), "Name: Brutus"));
@@ -3518,7 +3519,7 @@ asset_msg_test (bool verbose)
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3534,13 +3535,13 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (asset_msg_type (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_RETURN_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3558,13 +3559,13 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (zmsg_size (asset_msg_msg (self)) == 1);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_UPDATE_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3582,13 +3583,13 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (zmsg_size (asset_msg_msg (self)) == 1);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_INSERT_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3605,12 +3606,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (zmsg_size (asset_msg_msg (self)) == 1);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_DELETE_ELEMENT);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3626,13 +3627,13 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (asset_msg_type (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_OK);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3647,12 +3648,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_FAIL);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3667,12 +3668,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_error_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_ELEMENTS);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3687,12 +3688,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_type (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_RETURN_ELEMENTS);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3708,14 +3709,14 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_ids_size (self) == 2);
         assert (streq (asset_msg_element_ids_string (self, "Name", "?"), "Brutus"));
         assert (asset_msg_element_ids_number (self, "Age", 0) == 43);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3732,14 +3733,14 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (asset_msg_recursive (self) == 123);
         assert (asset_msg_filter_type (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3754,12 +3755,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_RETURN_LOCATION_TO);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3780,7 +3781,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (asset_msg_type (self) == 123);
         assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
@@ -3789,7 +3790,7 @@ asset_msg_test (bool verbose)
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_RETURN_LOCATION_FROM);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3819,7 +3820,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (asset_msg_type (self) == 123);
         assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
@@ -3833,7 +3834,7 @@ asset_msg_test (bool verbose)
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_POWER_FROM);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3848,12 +3849,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_POWERCHAIN_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3870,14 +3871,14 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         assert (streq (asset_msg_type_name (self), "Life is short but Now lasts for ever"));
         assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_RETURN_POWER);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3895,7 +3896,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (zframe_streq (asset_msg_devices (self), "Captcha Diem"));
         assert (asset_msg_powers_size (self) == 2);
         assert (streq (asset_msg_powers_first (self), "Name: Brutus"));
@@ -3903,7 +3904,7 @@ asset_msg_test (bool verbose)
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_POWER_TO);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3918,12 +3919,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_POWER_GROUP);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3938,12 +3939,12 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }
     self = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
-    
+
     //  Check that _dup works on empty message
     copy = asset_msg_dup (self);
     assert (copy);
@@ -3958,7 +3959,7 @@ asset_msg_test (bool verbose)
         self = asset_msg_recv (input);
         assert (self);
         assert (asset_msg_routing_id (self));
-        
+
         assert (asset_msg_element_id (self) == 123);
         asset_msg_destroy (&self);
     }

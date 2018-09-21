@@ -98,7 +98,7 @@ s_max_attachment_size () {
         char *endptr;
         off_t foo = strtoll (zconfig_get (smtp, "max_size", NULL), &endptr, 10);
         if (errno != 0)
-            zsys_warning ("smtp/max_size %s it not a number", zconfig_get (smtp, "max_size", NULL));
+            log_warning ("smtp/max_size %s it not a number", zconfig_get (smtp, "max_size", NULL));
         else
             ret = foo;
     }

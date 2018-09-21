@@ -189,14 +189,14 @@ int check_column_match(
                     //optimized for find
                     auto found = to_check.find(verify);
                     if (found != to_check.end()) {
-                        zsys_debug("Picked by %s matching '%s'='%s'", column_name.c_str(), verify.c_str(), found->c_str());
+                        log_debug("Picked by %s matching '%s'='%s'", column_name.c_str(), verify.c_str(), found->c_str());
                         return row_i;
                     }
                 } else {
                     //less optimal for iteration
                     for (auto to_check_element : to_check) {
                         if (findStringIC(verify, to_check_element)) {
-                            zsys_debug("Picked by %s partial match", column_name.c_str());
+                            log_debug("Picked by %s partial match", column_name.c_str());
                             return row_i;
                         }
                     }
@@ -207,7 +207,7 @@ int check_column_match(
             }
         }
         if (check && fail_on_not_found) {
-            zsys_debug("Failed to pick by %s", column_name.c_str());
+            log_debug("Failed to pick by %s", column_name.c_str());
             return -1;
         }
     }
@@ -257,7 +257,7 @@ promote_rc0(
     std::vector<char *> rcs_in_db;
     std::vector<size_t> rcs_in_csv;
 
-    zsys_debug("Function called: promote_rc0");
+    log_debug("Function called: promote_rc0");
     touch_fn(); // renew request watchdog timer
     // first find all rows with rcs_in_db
     auto unused_columns = cm.getTitles();
@@ -269,16 +269,16 @@ promote_rc0(
         std::string type = unused_columns.count("type") ? cm.get(row_i, "type") : "notype";
         std::string subtype = unused_columns.count("sub_type") ? cm.get(row_i, "sub_type") : "nosubtype";
         if (0 == type.compare(0, strlen("device"), "device") && 0 == subtype.compare(0, strlen("rackcontroller"), "rackcontroller")) {
-            zsys_debug("CSV contains RC on row %u", row_i);
+            log_debug("CSV contains RC on row %u", row_i);
             rcs_in_csv.push_back(row_i);
             if (have_ids && 0 == cm.get(row_i, "id").compare("rackcontroller-0")) {
                 rc0_row = rcs_in_csv.size() - 1;
-                zsys_debug("identified RC-0 as %d item of RCs list", row_i);
+                log_debug("identified RC-0 as %d item of RCs list", row_i);
             }
         }
     }
     if (0 == rcs_in_csv.size()) {
-        zsys_debug("There are no RCs in CSV, returning -1");
+        log_debug("There are no RCs in CSV, returning -1");
         return -1;
     }
     touch_fn(); // renew request watchdog timer
@@ -309,7 +309,7 @@ promote_rc0(
     char *srv_type  = zmsg_popstr (resp);
     char *srv_stype = zmsg_popstr (resp);
     char *srv_port  = zmsg_popstr (resp);
-    zsys_debug("Receieved message from info: %s %s %s %s %s", command, srv_name, srv_type, srv_stype, srv_port);
+    log_debug("Receieved message from info: %s %s %s %s %s", command, srv_name, srv_type, srv_stype, srv_port);
     zframe_t *frame_infos = zmsg_next (resp);
     if (NULL == frame_infos) {
         zuuid_destroy (&uuid);
@@ -330,7 +330,7 @@ promote_rc0(
     info_ip3 = (char *)zhash_lookup(info, "ip.3");
     info_serial = (char *)zhash_lookup(info, "serial");
     info_hostname = (char *)zhash_lookup(info, "hostname");
-    zsys_debug("Receieved message from info: ip1=%s, ip2=%s, ip3=%s, serial=%s, hostname=%s",
+    log_debug("Receieved message from info: ip1=%s, ip2=%s, ip3=%s, serial=%s, hostname=%s",
             info_ip1, info_ip2, info_ip3, info_serial, info_hostname);
     zmsg_destroy (&resp);
     touch_fn(); // renew request watchdog timer
@@ -363,14 +363,14 @@ promote_rc0(
         // workaround for having count of RC assets, as we consider only 0/1+ state
         rcs_in_db.push_back((char*)"rackcontroller-0");
     } else {
-        zsys_debug("Receieved message that is not fty_proto");
+        log_debug("Receieved message that is not fty_proto");
         myself_db_ext = NULL;
     }
     if (NULL == myself_db_ext) {
-        zsys_debug("Receieved message from asset: no data about RC-0");
+        log_debug("Receieved message from asset: no data about RC-0");
         myself_db_ext = zhash_new();
     } else {
-        zsys_debug("Receieved message from asset: RC-0 data gained successfully");
+        log_debug("Receieved message from asset: RC-0 data gained successfully");
     }
     fty_proto_destroy (&myself_db);
     touch_fn(); // renew request watchdog timer
@@ -403,7 +403,7 @@ promote_rc0(
     char *asset = zmsg_popstr(resp);
     while (asset) {
         rcs_in_db.push_back(asset);
-        zsys_debug("From database came rackcontroller: %s", asset);
+        log_debug("From database came rackcontroller: %s", asset);
         asset = zmsg_popstr(resp);
     }
     zmsg_destroy (&resp);
@@ -415,26 +415,26 @@ promote_rc0(
     do { // easier memory freeing
         // check how many RCs we already have in database
         if (0 == rcs_in_db.size()) {
-            zsys_debug("0 RCs in database");
+            log_debug("0 RCs in database");
             // promote the only one RC to RC-0
             if (1 == rcs_in_csv.size()) {
-                zsys_debug("Get the only one");
+                log_debug("Get the only one");
                 retval = rcs_in_csv[0];
                 break;
             }
             // multiple RCs, check for RC-0 for promotion
             if (-1 != rc0_row) {
-                zsys_debug("Pick one marked as RC-0");
+                log_debug("Pick one marked as RC-0");
                 retval = rcs_in_csv[rc0_row];
                 break;
             }
         } else {
-            zsys_debug("1+ RCs in database");
+            log_debug("1+ RCs in database");
         }
         // check for special case = 1 RC in DB, 1 RC in CSV, internal id not set
         if (1 == rcs_in_db.size() && 1 == rcs_in_csv.size() && 0 == unused_columns.count("id")) {
             retval = rcs_in_csv[0];
-            zsys_debug("Picked one by special condition 1RC in CSV and DB, id column not set");
+            log_debug("Picked one by special condition 1RC in CSV and DB, id column not set");
             break;
         }
         // check for uuid match
@@ -493,21 +493,21 @@ promote_rc0(
         // database is empty, or this is considered initial import, take first available
         if (0 == rcs_in_db.size() || 0 == unused_columns.count("id")) {
             if (-1 != rc0_row) {
-                zsys_debug("Pick one marked as RC-0");
+                log_debug("Pick one marked as RC-0");
                 retval = rcs_in_csv[rc0_row];
                 break;
             }
-            zsys_debug("Picked first available");
+            log_debug("Picked first available");
             retval = rcs_in_csv[0];
             break;
         }
     } while (0);
     zhash_destroy(&info);
     if (unused_columns.count("name") && 0 < retval) {
-        zsys_debug("Resulting RC-0 output is %d, matching RC named '%s'", retval, cm.get(retval, "name").c_str());
+        log_debug("Resulting RC-0 output is %d, matching RC named '%s'", retval, cm.get(retval, "name").c_str());
     } else {
         retval = -1;
-        zsys_debug("Resulting RC-0 output is %d, having no name", retval);
+        log_debug("Resulting RC-0 output is %d, having no name", retval);
     }
     touch_fn(); // renew request watchdog timer
     return retval;
@@ -677,10 +677,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto id_str = unused_columns.count("id") ? cm.get(row_i, "id") : "";
     if ("rackcontroller-0" == id_str && rc_0 == std::string::npos  ) {
         // we got RC-0 but it don't match "myself", change it to something else ("")
-        zsys_debug("RC is marked as rackcontroller-0, but it's not myself");
+        log_debug("RC is marked as rackcontroller-0, but it's not myself");
         id_str = "";
     } else if (rc_0 == row_i && id_str != "rackcontroller-0") {
-        zsys_debug("RC is identified as rackcontroller-0");
+        log_debug("RC is identified as rackcontroller-0");
         id_str = "rackcontroller-0";
     }
 
@@ -1352,10 +1352,10 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
     }
     std::string iname = unused_columns.count("id") ? cm.get(1, "id") : "noid";
     if ("rackcontroller-0" == iname) {
-        zsys_debug("RC-0 detected");
+        log_debug("RC-0 detected");
         rc_0 = 1;
     } else {
-        zsys_debug("RC-0 not detected");
+        log_debug("RC-0 not detected");
         rc_0 = -1;
     }
     LIMITATIONS_STRUCT limitations;

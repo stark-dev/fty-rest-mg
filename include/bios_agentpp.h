@@ -2,7 +2,7 @@
 
 /*
 Copyright (C) 2014 Eaton
- 
+
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
@@ -31,7 +31,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <ctime>
 
 #include "bios_agent.h"
-    
+
 class BIOSAgent {
  public:
     explicit BIOSAgent(const char *agentName) { _agentName = agentName; };
@@ -73,21 +73,21 @@ class BIOSAgent {
         zsock_t *pipe = msgpipe();
         zpoller_t *poller = zpoller_new(pipe, NULL);
         zsock_t *which = NULL;
-        
+
         uint64_t last = zclock_mono ();
         while(! zsys_interrupted) {
             which = (zsock_t *)zpoller_wait(poller, _timeout);
             uint64_t now = zclock_mono();
             if (now - last >= static_cast<uint64_t>(_timeout)) {
                 last = now;
-                zsys_debug("Periodic polling");
+                log_debug("Periodic polling");
                 onPoll();
             }
             if( zsys_interrupted ) break;
             if(which) {
                 ymsg_t *message = recv( );
                 if( ! message ) continue;
-                
+
                 switch( ymsg_id(message) ) {
                 case YMSG_REPLY:
                     onReply( &message );
@@ -105,7 +105,7 @@ class BIOSAgent {
     };
     bool connect(const char * endpoint, const char *stream = NULL,
                                         const char *pattern = NULL) {
-        if( endpoint == NULL || _agentName.empty() ) return false; 
+        if( endpoint == NULL || _agentName.empty() ) return false;
         if( _bios_agent ) bios_agent_destroy( &_bios_agent );
         _bios_agent = bios_agent_new( endpoint, _agentName.c_str() );
         if( _bios_agent == NULL ) return false;
@@ -135,5 +135,3 @@ class BIOSAgent {
 };
 
 #endif // INCLUDE_BIOS_AGENTPP_H__
-
-

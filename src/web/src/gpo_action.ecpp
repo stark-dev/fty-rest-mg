@@ -33,9 +33,9 @@ req_gpo_interaction (zuuid_t *uuid, std::string sensor, std::string action)
 {
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
-    zsys_debug ("sensor = %s", sensor.c_str ());
+    log_debug ("sensor = %s", sensor.c_str ());
     zmsg_addstr (msg, strdup (sensor.c_str ()));
-    zsys_debug ("action = %s", action.c_str ());
+    log_debug ("action = %s", action.c_str ());
     zmsg_addstr (msg, strdup (action.c_str ()));
     return msg;
 }
