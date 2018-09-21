@@ -56,7 +56,7 @@ const char * Sse::connectMalamute()
   if (!_clientMlm)
   {
     log_fatal("mlm_client_new() failed.");
-    return "mlm_client_new() failed.";
+    return TRANSLATE_ME ("mlm_client_new() failed.");
   }
 
   std::string client_name = utils::generate_mlm_client_id("web.sse");
@@ -67,21 +67,21 @@ const char * Sse::connectMalamute()
   {
     log_fatal("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
                  MLM_ENDPOINT, 1000, client_name.c_str());
-    return "mlm_client_connect() failed.";
+    return TRANSLATE_ME ("mlm_client_connect() failed.");
   }
 
   _pipe = mlm_client_msgpipe(_clientMlm);
   if (!_pipe)
   {
     log_fatal("mlm_client_msgpipe() failed.");
-    return "mlm_client_msgpipe()";
+    return TRANSLATE_ME ("mlm_client_msgpipe()");
   }
 
   _poller = zpoller_new(_pipe, NULL);
   if (!_poller)
   {
     log_fatal("zpoller_new() failed.");
-    return "zpoller_new() failed.";
+    return TRANSLATE_ME ("zpoller_new() failed.");
   }
 
   return NULL;
@@ -143,16 +143,16 @@ const char * Sse::loadAssetFromDatacenter()
       });
     if (rv != 0)
     {
-      return "DBAssets::select_assets_by_container () failed.";
+      return TRANSLATE_ME ("DBAssets::select_assets_by_container () failed.");
     }
   }
   catch (const tntdb::Error& e)
   {
-    return e.what();
+    return JSONIFY (e.what());
   }
   catch (const std::exception& e)
   {
-    return e.what();
+    return JSONIFY (e.what());
   }
   _assetsOfDatacenter = assets;
   if(ManageFtyLog::getInstanceFtylog()->isLogDebug())
@@ -176,16 +176,16 @@ const char * Sse::loadAssetFromDatacenter()
       });
     if (rv != 0)
     {
-      return "DBAssets::select_assets_by_container () failed.";
+      return TRANSLATE_ME ("DBAssets::select_assets_by_container () failed.");
     }
   }
   catch (const tntdb::Error& e)
   {
-    return e.what();
+    return JSONIFY (e.what());
   }
   catch (const std::exception& e)
   {
-    return e.what();
+    return JSONIFY (e.what());
   }
   _assetsWithNoLocation = assetsWithNoLocation;
 
