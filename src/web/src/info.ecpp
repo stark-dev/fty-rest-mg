@@ -26,6 +26,7 @@
 #include <string>
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_rest_helpers.h>
+#include <fty_common_macros.h>
 
 // info request
 static zmsg_t *
@@ -121,13 +122,13 @@ UserInfo user;
     std::string output;
     int rv = get_rc_info (output);
     if (rv == -1)
-        http_die ("internal-error", "mlmpool.get () failed.");
+        http_die ("internal-error", TRANSLATE_ME ("mlmpool.get () failed."));
     else
     if (rv == -2)
-        http_die ("internal-error", "client->sendto () failed.");
+        http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed."));
     else
     if (rv == -3)
-        http_die ("internal-error", "client->recv () failed.");
+        http_die ("internal-error", TRANSLATE_ME ("client->recv () failed."));
     else
 </%cpp>
 <$$ output $>

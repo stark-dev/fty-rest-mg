@@ -32,6 +32,7 @@
 #include <time.h>
 #include <tnt/mimedb.h>
 #include <fty_common_rest_helpers.h>
+#include <fty_common_macros.h>
 #include <fty_common_mlm_subprocess.h>
 #include "shared/utils.h"
 
@@ -345,13 +346,16 @@ UserInfo user;
             } else if (logname_base == "www-audit") {
                 logfile = "/var/log/tntnet/" + logname_base + ".log";
             } else {
-                throw std::runtime_error("Sorry, logname '" + logname_base + "' support is currently not implemented");
+                char *error = zsys_sprintf (TRANSLATE_ME ("Sorry, logname '%s' support is currently not implemented", logname_base.c_str ()));
+                std::string error_str (error);
+                zstr_free (&error);
+                throw std::runtime_error(error_str);
             }
         }
 
         if (logfile == "") {
             log_error("Authorized request to download an unsupported log file was denied");
-            http_die("request-param-bad", "logname", ("'" + slogname_base + slogname_ext + "'").c_str(), "'messages' optionally with '.gz' or '.txt' extension");
+            http_die("request-param-bad", "logname", ("'" + slogname_base + slogname_ext + "'").c_str(), TRANSLATE_ME ("'messages' optionally with '.gz' or '.txt' extension"));
         }
 
         /* We have a definite officially supported request, try to fulfill it */
@@ -411,7 +415,7 @@ UserInfo user;
         if (logname_ext == "" || logname_ext == ".txt") {
             std::ifstream in( logfile.c_str() );
             if (!in)
-                throw std::runtime_error("Could not open requested logfile: " + logfile);
+                throw std::runtime_error(TRANSLATE_ME ("Could not open requested logfile: ") + logfile);
 
             reply.out() << in.rdbuf();
             in.close();
@@ -429,7 +433,7 @@ UserInfo user;
                 /* Compressor requires the data length in advance */
                 std::ifstream in( logfile.c_str() );
                 if (!in)
-                    throw std::runtime_error("Could not open requested logfile: " + logfile);
+                    throw std::runtime_error(TRANSLATE_ME ("Could not open requested logfile: ") + logfile);
 
                 /* TODO: Can this be optimized to reduce pouring from one to another? */
                 std::ostringstream tmp;
@@ -453,7 +457,10 @@ UserInfo user;
                 log_debug("%s", ("Posting logfile extension '" + logname_ext + "' (MIME type '" + reply.getContentType() + "') in mode " + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str() );
                 return HTTP_OK;
             } else {
-                throw std::runtime_error("Sorry, logfile extension '" + logname_ext + "' (MIME type '" + reply.getContentType() + "') support is currently not implemented");
+                char *error = zsys_sprintf (TRANSLATE_ME ("Sorry, logfile extension '%s' (MIME type '%s') support is currently not implemented", logname_ext.c_str (), reply.getContentType()));
+                std::string error_str (error);
+                zstr_free (&error);
+                throw std::runtime_error(error_str);
             }
         }
     }
@@ -512,7 +519,7 @@ UserInfo user;
         reply.resetContent();
         message.assign ("Exception caught: ").append (e.what ());
         log_error ("%s", message.c_str ());
-        http_die( "internal-error", "Exception caught. Please check logs for more details.");
+        http_die( "internal-error", TRANSLATE_ME ("Exception caught. Please check logs for more details."));
     }
 
 </%cpp>

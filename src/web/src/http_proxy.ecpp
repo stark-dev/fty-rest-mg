@@ -30,6 +30,7 @@
 #include <cxxtools/regex.h>
 #include <cxxtools/jsondeserializer.h>
 #include "shared/utils.h"
+#include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
 </%pre>
 <%request scope="global">
@@ -69,7 +70,7 @@ UserInfo user;
         }
         catch (const std::exception& e) {
             log_debug ("Bad request document - invalid json: %s", e.what ());
-            http_die ("bad-request-document", "Please check RFC-11 for valid json schema description.");
+            http_die ("bad-request-document", TRANSLATE_ME ("Please check RFC-11 for valid json schema description."));
         }
         log_debug ("proxy_line = '%s'", proxy_line.c_str ());
 
@@ -83,7 +84,7 @@ UserInfo user;
 
         std::ofstream out_file (path);
         if (!out_file) {
-            http_die ("internal-error", "open HTTP proxy file for writing");
+            http_die ("internal-error", TRANSLATE_ME ("open HTTP proxy file for writing"));
         }
 
         // Build content
@@ -98,7 +99,7 @@ UserInfo user;
 
     std::ifstream in_file (path);
     if (!in_file) {
-        http_die ("internal-error", "Cannot open HTTP proxy file for reading");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot open HTTP proxy file for reading"));
     }
 
     getline(in_file, proxy_line);
