@@ -61,21 +61,21 @@ req_add (zuuid_t *uuid, gpio_params_t *params)
 {
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
-    zsys_debug ("part_number = %s", params->part_number.c_str ());
+    log_debug ("part_number = %s", params->part_number.c_str ());
     zmsg_addstr (msg, strdup (params->part_number.c_str ()));
-    zsys_debug ("manufacturer = %s", params->manufacturer.c_str ());
+    log_debug ("manufacturer = %s", params->manufacturer.c_str ());
     zmsg_addstr (msg, strdup (params->manufacturer.c_str ()));
-    zsys_debug ("type = %s", params->type.c_str ());
+    log_debug ("type = %s", params->type.c_str ());
     zmsg_addstr (msg, strdup (params->type.c_str ()));
-    zsys_debug ("normal_state = %s", params->normal_state.c_str ());
+    log_debug ("normal_state = %s", params->normal_state.c_str ());
     zmsg_addstr (msg, strdup (params->normal_state.c_str ()));
-    zsys_debug ("gpx_direction = %s", params->gpx_direction.c_str ());
+    log_debug ("gpx_direction = %s", params->gpx_direction.c_str ());
     zmsg_addstr (msg, strdup (params->gpx_direction.c_str ()));
-    zsys_debug ("gpx_power_source = %s", params->gpx_power_source.c_str ());
+    log_debug ("gpx_power_source = %s", params->gpx_power_source.c_str ());
     zmsg_addstr (msg, strdup (params->gpx_power_source.c_str ()));
-    zsys_debug ("alarm_severity = %s", params->alarm_severity.c_str ());
+    log_debug ("alarm_severity = %s", params->alarm_severity.c_str ());
     zmsg_addstr (msg, strdup (params->alarm_severity.c_str ()));
-    zsys_debug ("alarm_message = %s", params->alarm_message.c_str ());
+    log_debug ("alarm_message = %s", params->alarm_message.c_str ());
     zmsg_addstr (msg, strdup (params->alarm_message.c_str ()));
     return msg;
 }

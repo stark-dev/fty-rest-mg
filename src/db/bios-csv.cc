@@ -75,7 +75,7 @@ s_compare(
 
     // 1. number of rows must be the same
     if (c1.rows() != c2.rows()) {
-        zsys_error("different number of rows, %s: %zu != %s: %zu", file1, c1.rows(), file2, c2.rows());
+        log_error("different number of rows, %s: %zu != %s: %zu", file1, c1.rows(), file2, c2.rows());
         return false;
     }
 
@@ -90,7 +90,7 @@ s_compare(
             {
                 // c1 has column named AAAA, but c2 doesn't
                 if ( !c1.get(line, title).empty() ) {
-                    zsys_error("%s[%zu][%s] = %s has no equivalent is %s",
+                    log_error("%s[%zu][%s] = %s has no equivalent is %s",
                             file1, line, title.c_str(), c1.get(line, title).c_str(),
                             file2
                             );
@@ -122,7 +122,7 @@ s_compare(
                     equals = (c1.get(line, title) == c2.get(line, title));
                 }
                 if (!equals) {
-                    zsys_error("%s[%zu][%s] = %s != %s[%zu][%s] = %s",
+                    log_error("%s[%zu][%s] = %s != %s[%zu][%s] = %s",
                             file1, line, title.c_str(), c1.get(line, title).c_str(),
                             file2, line, title.c_str(), c2.get(line, title).c_str()
                             );
@@ -138,7 +138,7 @@ s_compare(
         for ( auto &one_col : unused_columns )
             if ( !c2.get(line, one_col).empty() )
             {
-                zsys_error("%s[%zu][%s] = %s  has no equivalent in %s",
+                log_error("%s[%zu][%s] = %s  has no equivalent in %s",
                         file2, line, one_col.c_str(), c2.get(line, one_col).c_str(),
                         file1
                         );
@@ -146,7 +146,7 @@ s_compare(
             }
     }
 
-    zsys_info("'%s' corresponds with '%s'", file2, file1);
+    log_info("'%s' corresponds with '%s'", file2, file1);
     return true;
 }
 
@@ -202,16 +202,16 @@ int main(int argc, char** argv)
         }
         else
         {
-            zsys_error("Unknown command '%s'", argv[1]);
+            log_error("Unknown command '%s'", argv[1]);
             exit(EXIT_FAILURE);
         }
     }
     catch (const std::exception& e) {
-        zsys_error ("%s", e.what());
+        log_error ("%s", e.what());
         exit (EXIT_FAILURE);
     }
     catch (...) {
-        zsys_error ("Unknown exception");
+        log_error ("Unknown exception");
         exit (EXIT_FAILURE);
     }
     exit(EXIT_SUCCESS);

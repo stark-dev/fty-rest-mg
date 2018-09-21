@@ -29,6 +29,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_tokens.h>
 #include <fty_common_rest_sasl.h>
+#include <fty_common_macros.h>
 #include <string>
 #include <iostream>
 #include <cxxtools/regex.h>
@@ -127,18 +128,18 @@ std::string checked_token;
 
     if (checked_username == BIOS_SCRIPT_USER && request.getPeerIp() != "127.0.0.1") {
         log_error ("request POST oauth2: username %s, grant_type %s authentication FAILED", checked_username.c_str (), checked_grant_type.c_str ());
-        http_die ("request-param-bad", "(user|passwd)", "<invalid user or password>", "<valid user and password>");
+        http_die ("request-param-bad", "(user|passwd)", TRANSLATE_ME ("<invalid user or password>"), TRANSLATE_ME ("<valid user and password>"));
     }
 
     if ( !authenticate(checked_username.c_str(), checked_password.c_str()) ) {
         log_error ("request POST oauth2: username %s, grant_type %s authentication FAILED", checked_username.c_str (), checked_grant_type.c_str ());
-        http_die ("request-param-bad", "(user|passwd)", "<invalid user or password>", "<valid user and password>");
+        http_die ("request-param-bad", "(user|passwd)", TRANSLATE_ME ("<invalid user or password>"), TRANSLATE_ME ("<valid user and password>"));
     }
     std::string access_token;
     long int expires_in;
     BiosProfile profile = tokens::get_instance()->gen_token(checked_username.c_str(), access_token, &expires_in);
     if (profile == BiosProfile::Anonymous)
-        http_die ("internal-error", "Cannot map use group id to bios profile!");
+        http_die ("internal-error", TRANSLATE_ME ("Cannot map use group id to bios profile!"));
 </%cpp>
 {
     "access_token" : "<$$ access_token $>",

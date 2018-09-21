@@ -12,19 +12,19 @@
      * The XML model used for this code generation: common_msg.xml, or
      * The code generation script that built this file: zproto_codec_c_v1
     ************************************************************************
-                                                                        
-    Copyright (C) 2014 Eaton                                            
-                                                                        
+
+    Copyright (C) 2014 Eaton
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or   
-    (at your option) any later version.                                 
-                                                                        
-    This program is distributed in the hope that it will be useful,     
-    but WITHOUT ANY WARRANTY; without even the implied warranty of      
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the       
-    GNU General Public License for more details.                        
-                                                                        
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
@@ -39,6 +39,7 @@
 */
 
 #include "msg/common_msg.h"
+#include <fty_log.h>
 
 //  Structure of our class
 
@@ -63,9 +64,9 @@ struct _common_msg_t {
     zmsg_t *msg;                        //   Client to be inserted
     uint32_t client_id;                 //   Unique ID of the client to be updated
     char *client_name;                  //   Name of the client
-    char *device_name;                  //   device name 
-    char *device_type;                  //   device type 
-    uint64_t value;                     //   measurement value 
+    char *device_name;                  //   device name
+    char *device_type;                  //   device type
+    uint64_t value;                     //   measurement value
     uint32_t device_id;                 //   A device id
     zchunk_t *info;                     //   Information about device gathered by client (data+ its size)
     uint32_t date;                      //   Date when this information was gathered
@@ -331,7 +332,7 @@ is_common_msg (zmsg_t *msg)
 
 //  --------------------------------------------------------------------------
 //  Parse a common_msg from zmsg_t. Returns a new object, or NULL if
-//  the message could not be parsed, or was NULL. Destroys msg and 
+//  the message could not be parsed, or was NULL. Destroys msg and
 //  nullifies the msg reference.
 
 common_msg_t *
@@ -341,11 +342,11 @@ common_msg_decode (zmsg_t **msg_p)
     zmsg_t *msg = *msg_p;
     if (msg == NULL)
         return NULL;
-        
+
     common_msg_t *self = common_msg_new (0);
     //  Read and parse command in frame
     zframe_t *frame = zmsg_pop (msg);
-    if (!frame) 
+    if (!frame)
         goto empty;             //  Malformed or empty
 
     //  Get and check protocol signature
@@ -607,7 +608,7 @@ common_msg_decode (zmsg_t **msg_p)
 
     //  Error returns
     malformed:
-        zsys_error ("malformed message '%d'\n", self->id);
+        log_error ("malformed message '%d'\n", self->id);
     empty:
         zframe_destroy (&frame);
         zmsg_destroy (msg_p);
@@ -625,7 +626,7 @@ common_msg_encode (common_msg_t **self_p)
 {
     assert (self_p);
     assert (*self_p);
-    
+
     common_msg_t *self = *self_p;
     zmsg_t *msg = zmsg_new ();
 
@@ -635,7 +636,7 @@ common_msg_encode (common_msg_t **self_p)
             //  mt_id is a 2-byte integer
             frame_size += 2;
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_TYPE_S:
             //  mt_name is a string with 1-byte length
             frame_size++;       //  Size is one octet
@@ -646,14 +647,14 @@ common_msg_encode (common_msg_t **self_p)
             if (self->mt_unit)
                 frame_size += strlen (self->mt_unit);
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_SUBTYPE_I:
             //  mt_id is a 2-byte integer
             frame_size += 2;
             //  mts_id is a 2-byte integer
             frame_size += 2;
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_SUBTYPE_S:
             //  mt_id is a 2-byte integer
             frame_size += 2;
@@ -664,7 +665,7 @@ common_msg_encode (common_msg_t **self_p)
             //  mts_scale is a 1-byte integer
             frame_size += 1;
             break;
-            
+
         case COMMON_MSG_RETURN_MEASURE_TYPE:
             //  mt_id is a 2-byte integer
             frame_size += 2;
@@ -677,7 +678,7 @@ common_msg_encode (common_msg_t **self_p)
             if (self->mt_unit)
                 frame_size += strlen (self->mt_unit);
             break;
-            
+
         case COMMON_MSG_RETURN_MEASURE_SUBTYPE:
             //  mts_id is a 2-byte integer
             frame_size += 2;
@@ -690,7 +691,7 @@ common_msg_encode (common_msg_t **self_p)
             if (self->mts_name)
                 frame_size += strlen (self->mts_name);
             break;
-            
+
         case COMMON_MSG_FAIL:
             //  errtype is a 1-byte integer
             frame_size += 1;
@@ -714,7 +715,7 @@ common_msg_encode (common_msg_t **self_p)
             }
             frame_size += self->aux_bytes;
             break;
-            
+
         case COMMON_MSG_DB_OK:
             //  rowid is a 4-byte integer
             frame_size += 4;
@@ -732,32 +733,32 @@ common_msg_encode (common_msg_t **self_p)
             }
             frame_size += self->aux_bytes;
             break;
-            
+
         case COMMON_MSG_CLIENT:
             //  name is a string with 1-byte length
             frame_size++;       //  Size is one octet
             if (self->name)
                 frame_size += strlen (self->name);
             break;
-            
+
         case COMMON_MSG_INSERT_CLIENT:
             break;
-            
+
         case COMMON_MSG_UPDATE_CLIENT:
             //  client_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_DELETE_CLIENT:
             //  client_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_RETURN_CLIENT:
             //  rowid is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_NEW_MEASUREMENT:
             //  client_name is a string with 1-byte length
             frame_size++;       //  Size is one octet
@@ -778,7 +779,7 @@ common_msg_encode (common_msg_t **self_p)
             //  value is a 8-byte integer
             frame_size += 8;
             break;
-            
+
         case COMMON_MSG_CLIENT_INFO:
             //  client_id is a 4-byte integer
             frame_size += 4;
@@ -791,20 +792,20 @@ common_msg_encode (common_msg_t **self_p)
             //  date is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_INSERT_CINFO:
             break;
-            
+
         case COMMON_MSG_DELETE_CINFO:
             //  cinfo_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_RETURN_CINFO:
             //  rowid is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_DEVICE:
             //  devicetype_id is a 4-byte integer
             frame_size += 4;
@@ -813,65 +814,65 @@ common_msg_encode (common_msg_t **self_p)
             if (self->name)
                 frame_size += strlen (self->name);
             break;
-            
+
         case COMMON_MSG_INSERT_DEVICE:
             break;
-            
+
         case COMMON_MSG_DELETE_DEVICE:
             //  device_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_RETURN_DEVICE:
             //  rowid is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_DEVICE_TYPE:
             //  name is a string with 1-byte length
             frame_size++;       //  Size is one octet
             if (self->name)
                 frame_size += strlen (self->name);
             break;
-            
+
         case COMMON_MSG_INSERT_DEVTYPE:
             break;
-            
+
         case COMMON_MSG_DELETE_DEVTYPE:
             //  devicetype_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_RETURN_DEVTYPE:
             //  rowid is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_GET_CLIENT:
             //  client_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_GET_CINFO:
             //  cinfo_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_GET_DEVICE:
             //  device_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_GET_DEVTYPE:
             //  devicetype_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_GET_LAST_MEASUREMENTS:
             //  device_id is a 4-byte integer
             frame_size += 4;
             break;
-            
+
         case COMMON_MSG_RETURN_LAST_MEASUREMENTS:
             //  device_id is a 4-byte integer
             frame_size += 4;
@@ -890,9 +891,9 @@ common_msg_encode (common_msg_t **self_p)
                 }
             }
             break;
-            
+
         default:
-            zsys_error ("bad message type '%d', not sent\n", self->id);
+            log_error ("bad message type '%d', not sent\n", self->id);
             //  No recovery, this is a fatal application error
             assert (false);
     }
@@ -1356,7 +1357,7 @@ common_msg_send (common_msg_t **self_p, void *output)
 
     //  Encode common_msg message to a single zmsg
     zmsg_t *msg = common_msg_encode (self_p);
-    
+
     //  If we're sending to a ROUTER, send the routing_id first
     if (zsocket_type (zsock_resolve (output)) == ZMQ_ROUTER) {
         assert (routing_id);
@@ -1364,7 +1365,7 @@ common_msg_send (common_msg_t **self_p, void *output)
     }
     else
         zframe_destroy (&routing_id);
-        
+
     if (msg && zmsg_send (&msg, output) == 0)
         return 0;
     else
@@ -1388,7 +1389,7 @@ common_msg_send_again (common_msg_t *self, void *output)
 //  --------------------------------------------------------------------------
 //  Encode GET_MEASURE_TYPE_I message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_measure_type_i (
     uint16_t mt_id)
 {
@@ -1401,7 +1402,7 @@ common_msg_encode_get_measure_type_i (
 //  --------------------------------------------------------------------------
 //  Encode GET_MEASURE_TYPE_S message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_measure_type_s (
     const char *mt_name,
     const char *mt_unit)
@@ -1416,7 +1417,7 @@ common_msg_encode_get_measure_type_s (
 //  --------------------------------------------------------------------------
 //  Encode GET_MEASURE_SUBTYPE_I message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_measure_subtype_i (
     uint16_t mt_id,
     uint16_t mts_id)
@@ -1431,7 +1432,7 @@ common_msg_encode_get_measure_subtype_i (
 //  --------------------------------------------------------------------------
 //  Encode GET_MEASURE_SUBTYPE_S message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_measure_subtype_s (
     uint16_t mt_id,
     const char *mts_name,
@@ -1448,7 +1449,7 @@ common_msg_encode_get_measure_subtype_s (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_MEASURE_TYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_measure_type (
     uint16_t mt_id,
     const char *mt_name,
@@ -1465,7 +1466,7 @@ common_msg_encode_return_measure_type (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_MEASURE_SUBTYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_measure_subtype (
     uint16_t mts_id,
     uint16_t mt_id,
@@ -1484,7 +1485,7 @@ common_msg_encode_return_measure_subtype (
 //  --------------------------------------------------------------------------
 //  Encode FAIL message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_fail (
     byte errtype,
     uint32_t errorno,
@@ -1504,7 +1505,7 @@ common_msg_encode_fail (
 //  --------------------------------------------------------------------------
 //  Encode DB_OK message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_db_ok (
     uint32_t rowid,
     zhash_t *aux)
@@ -1520,7 +1521,7 @@ common_msg_encode_db_ok (
 //  --------------------------------------------------------------------------
 //  Encode CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_client (
     const char *name)
 {
@@ -1533,7 +1534,7 @@ common_msg_encode_client (
 //  --------------------------------------------------------------------------
 //  Encode INSERT_CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_insert_client (
     zmsg_t *msg)
 {
@@ -1547,7 +1548,7 @@ common_msg_encode_insert_client (
 //  --------------------------------------------------------------------------
 //  Encode UPDATE_CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_update_client (
     uint32_t client_id,
     zmsg_t *msg)
@@ -1563,7 +1564,7 @@ common_msg_encode_update_client (
 //  --------------------------------------------------------------------------
 //  Encode DELETE_CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_delete_client (
     uint32_t client_id)
 {
@@ -1576,7 +1577,7 @@ common_msg_encode_delete_client (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_client (
     uint32_t rowid,
     zmsg_t *msg)
@@ -1592,7 +1593,7 @@ common_msg_encode_return_client (
 //  --------------------------------------------------------------------------
 //  Encode NEW_MEASUREMENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_new_measurement (
     const char *client_name,
     const char *device_name,
@@ -1615,7 +1616,7 @@ common_msg_encode_new_measurement (
 //  --------------------------------------------------------------------------
 //  Encode CLIENT_INFO message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_client_info (
     uint32_t client_id,
     uint32_t device_id,
@@ -1635,7 +1636,7 @@ common_msg_encode_client_info (
 //  --------------------------------------------------------------------------
 //  Encode INSERT_CINFO message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_insert_cinfo (
     zmsg_t *msg)
 {
@@ -1649,7 +1650,7 @@ common_msg_encode_insert_cinfo (
 //  --------------------------------------------------------------------------
 //  Encode DELETE_CINFO message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_delete_cinfo (
     uint32_t cinfo_id)
 {
@@ -1662,7 +1663,7 @@ common_msg_encode_delete_cinfo (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_CINFO message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_cinfo (
     uint32_t rowid,
     zmsg_t *msg)
@@ -1678,7 +1679,7 @@ common_msg_encode_return_cinfo (
 //  --------------------------------------------------------------------------
 //  Encode DEVICE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_device (
     uint32_t devicetype_id,
     const char *name)
@@ -1693,7 +1694,7 @@ common_msg_encode_device (
 //  --------------------------------------------------------------------------
 //  Encode INSERT_DEVICE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_insert_device (
     zmsg_t *msg)
 {
@@ -1707,7 +1708,7 @@ common_msg_encode_insert_device (
 //  --------------------------------------------------------------------------
 //  Encode DELETE_DEVICE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_delete_device (
     uint32_t device_id)
 {
@@ -1720,7 +1721,7 @@ common_msg_encode_delete_device (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_DEVICE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_device (
     uint32_t rowid,
     zmsg_t *msg)
@@ -1736,7 +1737,7 @@ common_msg_encode_return_device (
 //  --------------------------------------------------------------------------
 //  Encode DEVICE_TYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_device_type (
     const char *name)
 {
@@ -1749,7 +1750,7 @@ common_msg_encode_device_type (
 //  --------------------------------------------------------------------------
 //  Encode INSERT_DEVTYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_insert_devtype (
     zmsg_t *msg)
 {
@@ -1763,7 +1764,7 @@ common_msg_encode_insert_devtype (
 //  --------------------------------------------------------------------------
 //  Encode DELETE_DEVTYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_delete_devtype (
     uint32_t devicetype_id)
 {
@@ -1776,7 +1777,7 @@ common_msg_encode_delete_devtype (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_DEVTYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_devtype (
     uint32_t rowid,
     zmsg_t *msg)
@@ -1792,7 +1793,7 @@ common_msg_encode_return_devtype (
 //  --------------------------------------------------------------------------
 //  Encode GET_CLIENT message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_client (
     uint32_t client_id)
 {
@@ -1805,7 +1806,7 @@ common_msg_encode_get_client (
 //  --------------------------------------------------------------------------
 //  Encode GET_CINFO message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_cinfo (
     uint32_t cinfo_id)
 {
@@ -1818,7 +1819,7 @@ common_msg_encode_get_cinfo (
 //  --------------------------------------------------------------------------
 //  Encode GET_DEVICE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_device (
     uint32_t device_id)
 {
@@ -1831,7 +1832,7 @@ common_msg_encode_get_device (
 //  --------------------------------------------------------------------------
 //  Encode GET_DEVTYPE message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_devtype (
     uint32_t devicetype_id)
 {
@@ -1844,7 +1845,7 @@ common_msg_encode_get_devtype (
 //  --------------------------------------------------------------------------
 //  Encode GET_LAST_MEASUREMENTS message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_get_last_measurements (
     uint32_t device_id)
 {
@@ -1857,7 +1858,7 @@ common_msg_encode_get_last_measurements (
 //  --------------------------------------------------------------------------
 //  Encode RETURN_LAST_MEASUREMENTS message
 
-zmsg_t * 
+zmsg_t *
 common_msg_encode_return_last_measurements (
     uint32_t device_id,
     const char *device_name,
@@ -2399,7 +2400,7 @@ common_msg_dup (common_msg_t *self)
 {
     if (!self)
         return NULL;
-        
+
     common_msg_t *copy = common_msg_new (self->id);
     if (self->routing_id)
         copy->routing_id = zframe_dup (self->routing_id);
@@ -2575,297 +2576,297 @@ common_msg_print (common_msg_t *self)
     assert (self);
     switch (self->id) {
         case COMMON_MSG_GET_MEASURE_TYPE_I:
-            zsys_debug ("COMMON_MSG_GET_MEASURE_TYPE_I:");
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("COMMON_MSG_GET_MEASURE_TYPE_I:");
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_TYPE_S:
-            zsys_debug ("COMMON_MSG_GET_MEASURE_TYPE_S:");
+            log_debug ("COMMON_MSG_GET_MEASURE_TYPE_S:");
             if (self->mt_name)
-                zsys_debug ("    mt_name='%s'", self->mt_name);
+                log_debug ("    mt_name='%s'", self->mt_name);
             else
-                zsys_debug ("    mt_name=");
+                log_debug ("    mt_name=");
             if (self->mt_unit)
-                zsys_debug ("    mt_unit='%s'", self->mt_unit);
+                log_debug ("    mt_unit='%s'", self->mt_unit);
             else
-                zsys_debug ("    mt_unit=");
+                log_debug ("    mt_unit=");
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_SUBTYPE_I:
-            zsys_debug ("COMMON_MSG_GET_MEASURE_SUBTYPE_I:");
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
-            zsys_debug ("    mts_id=%ld", (long) self->mts_id);
+            log_debug ("COMMON_MSG_GET_MEASURE_SUBTYPE_I:");
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("    mts_id=%ld", (long) self->mts_id);
             break;
-            
+
         case COMMON_MSG_GET_MEASURE_SUBTYPE_S:
-            zsys_debug ("COMMON_MSG_GET_MEASURE_SUBTYPE_S:");
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("COMMON_MSG_GET_MEASURE_SUBTYPE_S:");
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
             if (self->mts_name)
-                zsys_debug ("    mts_name='%s'", self->mts_name);
+                log_debug ("    mts_name='%s'", self->mts_name);
             else
-                zsys_debug ("    mts_name=");
-            zsys_debug ("    mts_scale=%ld", (long) self->mts_scale);
+                log_debug ("    mts_name=");
+            log_debug ("    mts_scale=%ld", (long) self->mts_scale);
             break;
-            
+
         case COMMON_MSG_RETURN_MEASURE_TYPE:
-            zsys_debug ("COMMON_MSG_RETURN_MEASURE_TYPE:");
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("COMMON_MSG_RETURN_MEASURE_TYPE:");
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
             if (self->mt_name)
-                zsys_debug ("    mt_name='%s'", self->mt_name);
+                log_debug ("    mt_name='%s'", self->mt_name);
             else
-                zsys_debug ("    mt_name=");
+                log_debug ("    mt_name=");
             if (self->mt_unit)
-                zsys_debug ("    mt_unit='%s'", self->mt_unit);
+                log_debug ("    mt_unit='%s'", self->mt_unit);
             else
-                zsys_debug ("    mt_unit=");
+                log_debug ("    mt_unit=");
             break;
-            
+
         case COMMON_MSG_RETURN_MEASURE_SUBTYPE:
-            zsys_debug ("COMMON_MSG_RETURN_MEASURE_SUBTYPE:");
-            zsys_debug ("    mts_id=%ld", (long) self->mts_id);
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
-            zsys_debug ("    mts_scale=%ld", (long) self->mts_scale);
+            log_debug ("COMMON_MSG_RETURN_MEASURE_SUBTYPE:");
+            log_debug ("    mts_id=%ld", (long) self->mts_id);
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("    mts_scale=%ld", (long) self->mts_scale);
             if (self->mts_name)
-                zsys_debug ("    mts_name='%s'", self->mts_name);
+                log_debug ("    mts_name='%s'", self->mts_name);
             else
-                zsys_debug ("    mts_name=");
+                log_debug ("    mts_name=");
             break;
-            
+
         case COMMON_MSG_FAIL:
-            zsys_debug ("COMMON_MSG_FAIL:");
-            zsys_debug ("    errtype=%ld", (long) self->errtype);
-            zsys_debug ("    errorno=%ld", (long) self->errorno);
+            log_debug ("COMMON_MSG_FAIL:");
+            log_debug ("    errtype=%ld", (long) self->errtype);
+            log_debug ("    errorno=%ld", (long) self->errorno);
             if (self->errmsg)
-                zsys_debug ("    errmsg='%s'", self->errmsg);
+                log_debug ("    errmsg='%s'", self->errmsg);
             else
-                zsys_debug ("    errmsg=");
-            zsys_debug ("    aux=");
+                log_debug ("    errmsg=");
+            log_debug ("    aux=");
             if (self->aux) {
                 char *item = (char *) zhash_first (self->aux);
                 while (item) {
-                    zsys_debug ("        %s=%s", zhash_cursor (self->aux), item);
+                    log_debug ("        %s=%s", zhash_cursor (self->aux), item);
                     item = (char *) zhash_next (self->aux);
                 }
             }
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DB_OK:
-            zsys_debug ("COMMON_MSG_DB_OK:");
-            zsys_debug ("    rowid=%ld", (long) self->rowid);
-            zsys_debug ("    aux=");
+            log_debug ("COMMON_MSG_DB_OK:");
+            log_debug ("    rowid=%ld", (long) self->rowid);
+            log_debug ("    aux=");
             if (self->aux) {
                 char *item = (char *) zhash_first (self->aux);
                 while (item) {
-                    zsys_debug ("        %s=%s", zhash_cursor (self->aux), item);
+                    log_debug ("        %s=%s", zhash_cursor (self->aux), item);
                     item = (char *) zhash_next (self->aux);
                 }
             }
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_CLIENT:
-            zsys_debug ("COMMON_MSG_CLIENT:");
+            log_debug ("COMMON_MSG_CLIENT:");
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             break;
-            
+
         case COMMON_MSG_INSERT_CLIENT:
-            zsys_debug ("COMMON_MSG_INSERT_CLIENT:");
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_INSERT_CLIENT:");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_UPDATE_CLIENT:
-            zsys_debug ("COMMON_MSG_UPDATE_CLIENT:");
-            zsys_debug ("    client_id=%ld", (long) self->client_id);
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_UPDATE_CLIENT:");
+            log_debug ("    client_id=%ld", (long) self->client_id);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DELETE_CLIENT:
-            zsys_debug ("COMMON_MSG_DELETE_CLIENT:");
-            zsys_debug ("    client_id=%ld", (long) self->client_id);
+            log_debug ("COMMON_MSG_DELETE_CLIENT:");
+            log_debug ("    client_id=%ld", (long) self->client_id);
             break;
-            
+
         case COMMON_MSG_RETURN_CLIENT:
-            zsys_debug ("COMMON_MSG_RETURN_CLIENT:");
-            zsys_debug ("    rowid=%ld", (long) self->rowid);
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_RETURN_CLIENT:");
+            log_debug ("    rowid=%ld", (long) self->rowid);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_NEW_MEASUREMENT:
-            zsys_debug ("COMMON_MSG_NEW_MEASUREMENT:");
+            log_debug ("COMMON_MSG_NEW_MEASUREMENT:");
             if (self->client_name)
-                zsys_debug ("    client_name='%s'", self->client_name);
+                log_debug ("    client_name='%s'", self->client_name);
             else
-                zsys_debug ("    client_name=");
+                log_debug ("    client_name=");
             if (self->device_name)
-                zsys_debug ("    device_name='%s'", self->device_name);
+                log_debug ("    device_name='%s'", self->device_name);
             else
-                zsys_debug ("    device_name=");
+                log_debug ("    device_name=");
             if (self->device_type)
-                zsys_debug ("    device_type='%s'", self->device_type);
+                log_debug ("    device_type='%s'", self->device_type);
             else
-                zsys_debug ("    device_type=");
-            zsys_debug ("    mt_id=%ld", (long) self->mt_id);
-            zsys_debug ("    mts_id=%ld", (long) self->mts_id);
-            zsys_debug ("    value=%ld", (long) self->value);
+                log_debug ("    device_type=");
+            log_debug ("    mt_id=%ld", (long) self->mt_id);
+            log_debug ("    mts_id=%ld", (long) self->mts_id);
+            log_debug ("    value=%ld", (long) self->value);
             break;
-            
+
         case COMMON_MSG_CLIENT_INFO:
-            zsys_debug ("COMMON_MSG_CLIENT_INFO:");
-            zsys_debug ("    client_id=%ld", (long) self->client_id);
-            zsys_debug ("    device_id=%ld", (long) self->device_id);
-            zsys_debug ("    info=[ ... ]");
-            zsys_debug ("    date=%ld", (long) self->date);
+            log_debug ("COMMON_MSG_CLIENT_INFO:");
+            log_debug ("    client_id=%ld", (long) self->client_id);
+            log_debug ("    device_id=%ld", (long) self->device_id);
+            log_debug ("    info=[ ... ]");
+            log_debug ("    date=%ld", (long) self->date);
             break;
-            
+
         case COMMON_MSG_INSERT_CINFO:
-            zsys_debug ("COMMON_MSG_INSERT_CINFO:");
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_INSERT_CINFO:");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DELETE_CINFO:
-            zsys_debug ("COMMON_MSG_DELETE_CINFO:");
-            zsys_debug ("    cinfo_id=%ld", (long) self->cinfo_id);
+            log_debug ("COMMON_MSG_DELETE_CINFO:");
+            log_debug ("    cinfo_id=%ld", (long) self->cinfo_id);
             break;
-            
+
         case COMMON_MSG_RETURN_CINFO:
-            zsys_debug ("COMMON_MSG_RETURN_CINFO:");
-            zsys_debug ("    rowid=%ld", (long) self->rowid);
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_RETURN_CINFO:");
+            log_debug ("    rowid=%ld", (long) self->rowid);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DEVICE:
-            zsys_debug ("COMMON_MSG_DEVICE:");
-            zsys_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
+            log_debug ("COMMON_MSG_DEVICE:");
+            log_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             break;
-            
+
         case COMMON_MSG_INSERT_DEVICE:
-            zsys_debug ("COMMON_MSG_INSERT_DEVICE:");
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_INSERT_DEVICE:");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DELETE_DEVICE:
-            zsys_debug ("COMMON_MSG_DELETE_DEVICE:");
-            zsys_debug ("    device_id=%ld", (long) self->device_id);
+            log_debug ("COMMON_MSG_DELETE_DEVICE:");
+            log_debug ("    device_id=%ld", (long) self->device_id);
             break;
-            
+
         case COMMON_MSG_RETURN_DEVICE:
-            zsys_debug ("COMMON_MSG_RETURN_DEVICE:");
-            zsys_debug ("    rowid=%ld", (long) self->rowid);
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_RETURN_DEVICE:");
+            log_debug ("    rowid=%ld", (long) self->rowid);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DEVICE_TYPE:
-            zsys_debug ("COMMON_MSG_DEVICE_TYPE:");
+            log_debug ("COMMON_MSG_DEVICE_TYPE:");
             if (self->name)
-                zsys_debug ("    name='%s'", self->name);
+                log_debug ("    name='%s'", self->name);
             else
-                zsys_debug ("    name=");
+                log_debug ("    name=");
             break;
-            
+
         case COMMON_MSG_INSERT_DEVTYPE:
-            zsys_debug ("COMMON_MSG_INSERT_DEVTYPE:");
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_INSERT_DEVTYPE:");
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_DELETE_DEVTYPE:
-            zsys_debug ("COMMON_MSG_DELETE_DEVTYPE:");
-            zsys_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
+            log_debug ("COMMON_MSG_DELETE_DEVTYPE:");
+            log_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
             break;
-            
+
         case COMMON_MSG_RETURN_DEVTYPE:
-            zsys_debug ("COMMON_MSG_RETURN_DEVTYPE:");
-            zsys_debug ("    rowid=%ld", (long) self->rowid);
-            zsys_debug ("    msg=");
+            log_debug ("COMMON_MSG_RETURN_DEVTYPE:");
+            log_debug ("    rowid=%ld", (long) self->rowid);
+            log_debug ("    msg=");
             if (self->msg)
                 zmsg_print (self->msg);
             else
-                zsys_debug ("(NULL)");
+                log_debug ("(NULL)");
             break;
-            
+
         case COMMON_MSG_GET_CLIENT:
-            zsys_debug ("COMMON_MSG_GET_CLIENT:");
-            zsys_debug ("    client_id=%ld", (long) self->client_id);
+            log_debug ("COMMON_MSG_GET_CLIENT:");
+            log_debug ("    client_id=%ld", (long) self->client_id);
             break;
-            
+
         case COMMON_MSG_GET_CINFO:
-            zsys_debug ("COMMON_MSG_GET_CINFO:");
-            zsys_debug ("    cinfo_id=%ld", (long) self->cinfo_id);
+            log_debug ("COMMON_MSG_GET_CINFO:");
+            log_debug ("    cinfo_id=%ld", (long) self->cinfo_id);
             break;
-            
+
         case COMMON_MSG_GET_DEVICE:
-            zsys_debug ("COMMON_MSG_GET_DEVICE:");
-            zsys_debug ("    device_id=%ld", (long) self->device_id);
+            log_debug ("COMMON_MSG_GET_DEVICE:");
+            log_debug ("    device_id=%ld", (long) self->device_id);
             break;
-            
+
         case COMMON_MSG_GET_DEVTYPE:
-            zsys_debug ("COMMON_MSG_GET_DEVTYPE:");
-            zsys_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
+            log_debug ("COMMON_MSG_GET_DEVTYPE:");
+            log_debug ("    devicetype_id=%ld", (long) self->devicetype_id);
             break;
-            
+
         case COMMON_MSG_GET_LAST_MEASUREMENTS:
-            zsys_debug ("COMMON_MSG_GET_LAST_MEASUREMENTS:");
-            zsys_debug ("    device_id=%ld", (long) self->device_id);
+            log_debug ("COMMON_MSG_GET_LAST_MEASUREMENTS:");
+            log_debug ("    device_id=%ld", (long) self->device_id);
             break;
-            
+
         case COMMON_MSG_RETURN_LAST_MEASUREMENTS:
-            zsys_debug ("COMMON_MSG_RETURN_LAST_MEASUREMENTS:");
-            zsys_debug ("    device_id=%ld", (long) self->device_id);
+            log_debug ("COMMON_MSG_RETURN_LAST_MEASUREMENTS:");
+            log_debug ("    device_id=%ld", (long) self->device_id);
             if (self->device_name)
-                zsys_debug ("    device_name='%s'", self->device_name);
+                log_debug ("    device_name='%s'", self->device_name);
             else
-                zsys_debug ("    device_name=");
-            zsys_debug ("    measurements=");
+                log_debug ("    device_name=");
+            log_debug ("    measurements=");
             if (self->measurements) {
                 char *measurements = (char *) zlist_first (self->measurements);
                 while (measurements) {
-                    zsys_debug ("        '%s'", measurements);
+                    log_debug ("        '%s'", measurements);
                     measurements = (char *) zlist_next (self->measurements);
                 }
             }
             break;
-            
+
     }
 }
 
@@ -3680,7 +3681,7 @@ common_msg_test (bool verbose)
     int instance;
     common_msg_t *copy;
     self = common_msg_new (COMMON_MSG_GET_MEASURE_TYPE_I);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3695,12 +3696,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_mt_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_MEASURE_TYPE_S);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3716,13 +3717,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (streq (common_msg_mt_name (self), "Life is short but Now lasts for ever"));
         assert (streq (common_msg_mt_unit (self), "Life is short but Now lasts for ever"));
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_MEASURE_SUBTYPE_I);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3738,13 +3739,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_mt_id (self) == 123);
         assert (common_msg_mts_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_MEASURE_SUBTYPE_S);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3761,14 +3762,14 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_mt_id (self) == 123);
         assert (streq (common_msg_mts_name (self), "Life is short but Now lasts for ever"));
         assert (common_msg_mts_scale (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_MEASURE_TYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3785,14 +3786,14 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_mt_id (self) == 123);
         assert (streq (common_msg_mt_name (self), "Life is short but Now lasts for ever"));
         assert (streq (common_msg_mt_unit (self), "Life is short but Now lasts for ever"));
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_MEASURE_SUBTYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3810,7 +3811,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_mts_id (self) == 123);
         assert (common_msg_mt_id (self) == 123);
         assert (common_msg_mts_scale (self) == 123);
@@ -3818,7 +3819,7 @@ common_msg_test (bool verbose)
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_FAIL);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3837,7 +3838,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_errtype (self) == 123);
         assert (common_msg_errorno (self) == 123);
         assert (streq (common_msg_errmsg (self), "Life is short but Now lasts for ever"));
@@ -3847,7 +3848,7 @@ common_msg_test (bool verbose)
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DB_OK);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3864,7 +3865,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_rowid (self) == 123);
         assert (common_msg_aux_size (self) == 2);
         assert (streq (common_msg_aux_string (self, "Name", "?"), "Brutus"));
@@ -3872,7 +3873,7 @@ common_msg_test (bool verbose)
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3887,12 +3888,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (streq (common_msg_name (self), "Life is short but Now lasts for ever"));
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_INSERT_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3909,12 +3910,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_UPDATE_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3932,13 +3933,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_client_id (self) == 123);
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DELETE_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3953,12 +3954,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_client_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -3976,13 +3977,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_rowid (self) == 123);
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_NEW_MEASUREMENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4002,7 +4003,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (streq (common_msg_client_name (self), "Life is short but Now lasts for ever"));
         assert (streq (common_msg_device_name (self), "Life is short but Now lasts for ever"));
         assert (streq (common_msg_device_type (self), "Life is short but Now lasts for ever"));
@@ -4012,7 +4013,7 @@ common_msg_test (bool verbose)
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_CLIENT_INFO);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4031,7 +4032,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_client_id (self) == 123);
         assert (common_msg_device_id (self) == 123);
         assert (memcmp (zchunk_data (common_msg_info (self)), "Captcha Diem", 12) == 0);
@@ -4039,7 +4040,7 @@ common_msg_test (bool verbose)
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_INSERT_CINFO);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4056,12 +4057,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DELETE_CINFO);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4076,12 +4077,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_cinfo_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_CINFO);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4099,13 +4100,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_rowid (self) == 123);
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4121,13 +4122,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_devicetype_id (self) == 123);
         assert (streq (common_msg_name (self), "Life is short but Now lasts for ever"));
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_INSERT_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4144,12 +4145,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DELETE_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4164,12 +4165,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_device_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4187,13 +4188,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_rowid (self) == 123);
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DEVICE_TYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4208,12 +4209,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (streq (common_msg_name (self), "Life is short but Now lasts for ever"));
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_INSERT_DEVTYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4230,12 +4231,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_DELETE_DEVTYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4250,12 +4251,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_devicetype_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_DEVTYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4273,13 +4274,13 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_rowid (self) == 123);
         assert (zmsg_size (common_msg_msg (self)) == 1);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_CLIENT);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4294,12 +4295,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_client_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_CINFO);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4314,12 +4315,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_cinfo_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_DEVICE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4334,12 +4335,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_device_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_DEVTYPE);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4354,12 +4355,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_devicetype_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_GET_LAST_MEASUREMENTS);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4374,12 +4375,12 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_device_id (self) == 123);
         common_msg_destroy (&self);
     }
     self = common_msg_new (COMMON_MSG_RETURN_LAST_MEASUREMENTS);
-    
+
     //  Check that _dup works on empty message
     copy = common_msg_dup (self);
     assert (copy);
@@ -4397,7 +4398,7 @@ common_msg_test (bool verbose)
         self = common_msg_recv (input);
         assert (self);
         assert (common_msg_routing_id (self));
-        
+
         assert (common_msg_device_id (self) == 123);
         assert (streq (common_msg_device_name (self), "Life is short but Now lasts for ever"));
         assert (common_msg_measurements_size (self) == 2);
