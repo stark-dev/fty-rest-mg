@@ -28,6 +28,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/jsonserializer.h>
 #include <fty_common.h>
+#include <fty_common_macros.h>
 
 #include "db/topology2.h"
 
@@ -85,7 +86,7 @@ class NodeMap {
 
             auto ins = seen.insert (name);
             if (!ins.second) {
-                std::string msg("Power source loop detected:");
+                std::string msg(TRANSLATE_ME("Power source loop detected:"));
                 for (auto a : seen)
                     msg += " " + a;
                 log_error("%s", msg.c_str());
