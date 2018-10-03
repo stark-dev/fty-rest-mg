@@ -34,6 +34,7 @@
 #include <fty_common_db_asset.h>
 #include <fty_common.h>
 #include <fty_common_macros.h>
+#include <fty_common_utf8.h>
 
 #include "shared/data.h"
 #include "web/src/location_helpers.h"
@@ -252,7 +253,7 @@ bool database_ready;
                         json.append ("\t");
                     }
                     json.append("\"name\" : \"")
-                        .append(utils::json::escape (ext_name))
+                        .append(UTF8::escape (ext_name))
                         .append("\",\n");
                     for (int i = 0; i < indent; i++) {
                         json.append ("\t");
@@ -279,13 +280,13 @@ bool database_ready;
                         json.append ("\t");
                     }
                     json.append("\"name\" : \"")
-                        .append(utils::json::escape (ext_name))
+                        .append(UTF8::escape (ext_name))
                         .append("\",\n");
                     for (int i = 0; i < indent; i++) {
                         json.append ("\t");
                     }
                     json.append("\"id\" : \"")
-                        .append(utils::json::escape (std::get<3>(row)))
+                        .append(UTF8::escape (std::get<3>(row)))
                         .append("\"");
                     json.append(",\n");
                     json += "\"type\" : \"" + persist::typeid_to_type(std::get<1>(row)) + "\",";

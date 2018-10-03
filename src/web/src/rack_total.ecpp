@@ -40,6 +40,7 @@
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_asset_types.h>
 #include <fty_common_macros.h>
+#include <fty_common_utf8.h>
 #include "src/persist/assetcrud.h"
 #include "shared/data.h"
 #include "cleanup.h"
@@ -262,7 +263,7 @@ std::string checked_arg2;
             json <<
 "\t\t{\n"
 "\t\t\t\"id\": \"" << racks[R] << "\",\n"
-"\t\t\t\"name\": \"" << utils::json::escape(rackNames[R]) << "\",\n";
+"\t\t\t\"name\": \"" << UTF8::escape(rackNames[R]) << "\",\n";
             for(size_t P = 0; P < requestedParams.size(); P++ ) {
                 const std::string& key = requestedParams[P];
                 const std::string& val = PARAM_TO_SRC.at(key);   //XXX: operator[] does not work here!

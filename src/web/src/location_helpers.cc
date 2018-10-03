@@ -31,6 +31,7 @@
 #include <tnt/http.h>
 #include <fty_common_db_asset.h>
 #include <fty_common.h>
+#include <fty_common_utf8.h>
 
 #include "cleanup.h"
 #include "shared/utilspp.h"
@@ -46,8 +47,8 @@ int asset_location_r(asset_msg_t** asset_msg, std::string& json) {
         return HTTP_INTERNAL_SERVER_ERROR;
 
     json += "{";
-    json += "\"name\" : \"" + utils::json::escape (elem_names.second) + "\", ";
-    json += "\"id\" : \"" + utils::json::escape (name) + "\",";
+    json += "\"name\" : \"" + UTF8::escape (elem_names.second) + "\", ";
+    json += "\"id\" : \"" + UTF8::escape (name) + "\",";
     json += "\"type\" : \"" + persist::typeid_to_type(type_id) + "\",";
     if ( (type_id == persist::asset_type::DEVICE ) ||
          (type_id == persist::asset_type::GROUP) ) {
@@ -115,7 +116,7 @@ int asset_location_r(asset_msg_t** asset_msg, std::string& json) {
                     first_contains = false;
                     json += ", \"contains\" : { ";
                 }
-                json += "\"" + utils::json::escape (name_it)+ "\" : [";
+                json += "\"" + UTF8::escape (name_it)+ "\" : [";
                 first = false;
             }
             if(asset_location_r(&item, json) != HTTP_OK)
