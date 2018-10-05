@@ -30,6 +30,7 @@
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_mlm_subprocess.h>
 #include <fty_common_agents.h>
+#include <fty_common_utf8.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fstream>
@@ -305,7 +306,7 @@ UserInfo user;
     {
         "status" : "<$ status $>",
         "error_code" : <$ err_code $>,
-        "reason" : "<$ utils::json::escape (err_message) $>"
+        "reason" : "<$ UTF8::escape (err_message) $>"
     }
 }
 <%cpp>
