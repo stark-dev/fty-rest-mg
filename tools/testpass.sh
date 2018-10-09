@@ -1,4 +1,5 @@
 #!/bin/bash
+# Note: bash-specific syntax is in fact used below, do not change the shebang!
 #
 # Copyright (C) 2015-2018 Eaton
 #
@@ -59,7 +60,7 @@ if [ -s /etc/pam.d/fty-password ] && [ -r /etc/pam.d/fty-password ]; then
         # Take the token after '=' (if any) and strip the first minus (if any)
         # NOTE: This is not necessarily a leading minus though
         V="`echo "$T" | (IFS== read K V; echo "$V" | (IFS=- read KK VV; echo "$KK$VV"))`" || V=""
-        [ -n "$V" ] && [ "$V" -ge 0 ] && \
+        [[ -n "$V" ]] && [[ "$V" -ge 0 ]] && \
         case "$T" in
             minlen=*)	SCORE_MIN="$V" ;;       # Nothing for CHARS_TOTAL_MIN ?
             lcredit=-*)	CHARS_LOWER_MIN="$V" && CHARS_LOWER_CREDIT="$V" ;;
@@ -74,7 +75,7 @@ if [ -s /etc/pam.d/fty-password ] && [ -r /etc/pam.d/fty-password ]; then
     done
 fi
 
-if [ -s /etc/default/bios-testpass ] && [ -r /etc/default/bios-testpass ] ; then
+if [[ -s /etc/default/bios-testpass ]] && [[ -r /etc/default/bios-testpass ]] ; then
     echo "Sourcing settings from /etc/default/bios-testpass"
     . /etc/default/bios-testpass
 fi
@@ -105,36 +106,36 @@ check_passwd_cracklib() {
     local NEW_PASSWD="$2"
     local RES=0
 
-    [ -n "${CRACKLIB_CHECK}" ] && [ -x "${CRACKLIB_CHECK}" ] || \
+    [[ -n "${CRACKLIB_CHECK}" ]] && [[ -x "${CRACKLIB_CHECK}" ]] || \
         CRACKLIB_CHECK="`which cracklib-check 2>/dev/null | egrep '^/' | head -1`"
-    [ -n "${CRACKLIB_CHECK}" ] && [ -x "${CRACKLIB_CHECK}" ] || \
+    [[ -n "${CRACKLIB_CHECK}" ]] && [[ -x "${CRACKLIB_CHECK}" ]] || \
         { echo "Missing cracklib-check program - test skipped" >&2
           return 0; }
 
-    if [ -n "${NEW_USER}" ] && \
+    if [[ -n "${NEW_USER}" ]] && \
         /usr/bin/getent passwd ${NEW_USER} >/dev/null && \
-        [ "$(/usr/bin/id -u)" = 0 ] \
+        [[ "$(/usr/bin/id -u)" = 0 ]] \
     ; then      # Can 'su', so cracklib uses user info as well
         echo -e "Testing with cracklib-check program for user ${NEW_USER}... \c" >&2
         OUT="`su -c "${CRACKLIB_CHECK}" "${NEW_USER}" << EOF
 ${NEW_PASSWD}
 EOF`" && \
-        [ -n "`egrep ': OK$' >/dev/null << EOF
+        [[ -n "`egrep ': OK$' >/dev/null << EOF
 ${OUT}
-EOF`" ] || \
+EOF`" ]] || \
         RES=11
     else
         echo -e "Testing with cracklib-check program... \c" >&2
         OUT="`${CRACKLIB_CHECK} << EOF
 ${NEW_PASSWD}
 EOF`" && \
-        [ -n "`egrep ': OK$' >/dev/null << EOF
+        [[ -n "`egrep ': OK$' >/dev/null << EOF
 ${OUT}
-EOF`" ] || \
+EOF`" ]] || \
         RES=11
     fi
 
-    if [ "$RES" -gt 0 ]; then
+    if [[ "$RES" -gt 0 ]]; then
         echo "failed ($RES)" >&2
         echo "BAD PASSWORD: `cut -c $((${#NEW_PASSWD}+3))- << EOF
 ${OUT}
@@ -165,7 +166,7 @@ check_passwd_complexity() {
     echo -e 'Running a complexity check... \c' >&2
 
     local COUNT_TOTAL="${#NEW_PASSWD}"
-    if [ "$COUNT_TOTAL" -lt "$CHARS_TOTAL_MIN" ] ; then
+    if [[ "$COUNT_TOTAL" -lt "$CHARS_TOTAL_MIN" ]] ; then
         echo "failed" >&2
         echo "BAD PASSWORD: it is too short" >&2
         return 12
@@ -189,23 +190,23 @@ EOF`" && \
         COUNT_OTHER="${#STRING}"
 
     if \
-        [ "$COUNT_LOWER" -lt "$CHARS_LOWER_MIN" ] || \
-        [ "$COUNT_UPPER" -lt "$CHARS_UPPER_MIN" ] || \
-        [ "$COUNT_DIGIT" -lt "$CHARS_DIGIT_MIN" ] || \
-        [ "$COUNT_OTHER" -lt "$CHARS_OTHER_MIN" ] \
+        [[ "$COUNT_LOWER" -lt "$CHARS_LOWER_MIN" ]] || \
+        [[ "$COUNT_UPPER" -lt "$CHARS_UPPER_MIN" ]] || \
+        [[ "$COUNT_DIGIT" -lt "$CHARS_DIGIT_MIN" ]] || \
+        [[ "$COUNT_OTHER" -lt "$CHARS_OTHER_MIN" ]] \
     ; then
         echo "failed" >&2
         echo "BAD PASSWORD: not enough characters of various types" >&2
         return 12
     fi
 
-    [ "$COUNT_LOWER" -gt "$CHARS_LOWER_CREDIT" ] && SCORE_LOWER="$CHARS_LOWER_CREDIT" || SCORE_LOWER="$COUNT_LOWER"
-    [ "$COUNT_UPPER" -gt "$CHARS_UPPER_CREDIT" ] && SCORE_UPPER="$CHARS_UPPER_CREDIT" || SCORE_UPPER="$COUNT_UPPER"
-    [ "$COUNT_DIGIT" -gt "$CHARS_DIGIT_CREDIT" ] && SCORE_DIGIT="$CHARS_DIGIT_CREDIT" || SCORE_DIGIT="$COUNT_DIGIT"
-    [ "$COUNT_OTHER" -gt "$CHARS_OTHER_CREDIT" ] && SCORE_OTHER="$CHARS_OTHER_CREDIT" || SCORE_OTHER="$COUNT_OTHER"
+    [[ "$COUNT_LOWER" -gt "$CHARS_LOWER_CREDIT" ]] && SCORE_LOWER="$CHARS_LOWER_CREDIT" || SCORE_LOWER="$COUNT_LOWER"
+    [[ "$COUNT_UPPER" -gt "$CHARS_UPPER_CREDIT" ]] && SCORE_UPPER="$CHARS_UPPER_CREDIT" || SCORE_UPPER="$COUNT_UPPER"
+    [[ "$COUNT_DIGIT" -gt "$CHARS_DIGIT_CREDIT" ]] && SCORE_DIGIT="$CHARS_DIGIT_CREDIT" || SCORE_DIGIT="$COUNT_DIGIT"
+    [[ "$COUNT_OTHER" -gt "$CHARS_OTHER_CREDIT" ]] && SCORE_OTHER="$CHARS_OTHER_CREDIT" || SCORE_OTHER="$COUNT_OTHER"
 
     SCORE_TOTAL=$(($COUNT_TOTAL+$SCORE_LOWER+$SCORE_UPPER+$SCORE_DIGIT+$SCORE_OTHER))
-    if [ "$SCORE_TOTAL" -lt "$SCORE_MIN" ] ; then
+    if [[ "$SCORE_TOTAL" -lt "$SCORE_MIN" ]] ; then
         echo "failed by overall complexity score" >&2
         echo "BAD PASSWORD: overall complexity score too low" >&2
         return 12
@@ -221,7 +222,7 @@ check_passwd_username() {
     local NEW_USER="$1"
     local NEW_PASSWD="$2"
 
-    [ -z "$NEW_USER" ] && \
+    [[ -z "$NEW_USER" ]] && \
         echo "Missing username - test skipped" >&2 && \
         return 0
 
@@ -233,8 +234,8 @@ ${NEW_PASSWD}
 EOF`"
     local LC_USER="`echo "$NEW_USER" | tr '[:upper:]' '[:lower:]'`"
 
-    if  echo "$LC_PASS" | grep "$LC_USER" >/dev/null || \
-        echo "$LC_USER" | grep "$LC_PASS" >/dev/null \
+    if  [[ "$LC_USER" =~ "$LC_PASS" ]] || \
+        [[ "$LC_PASS" =~ "$LC_USER" ]] \
     ; then
         echo "failed" >&2
         echo "BAD PASSWORD: too similar to the username" >&2
@@ -250,12 +251,12 @@ check_passwd_oldpasswd() {
     local NEW_PASSWD="$2"
     local OLD_PASSWD="$3"
 
-    [ -z "${OLD_PASSWD}" ] && \
+    [[ -z "${OLD_PASSWD}" ]] && \
         echo "Missing old password - test skipped" >&2 && \
         return 0
 
     echo -e "Running a check against old password... \c" >&2
-    if [ "${OLD_PASSWD}" = "${NEW_PASSWD}" ] ; then
+    if [[ "${OLD_PASSWD}" = "${NEW_PASSWD}" ]] ; then
         echo "failed" >&2
         echo "BAD PASSWORD: too similar to the old password" >&2
         return 14
@@ -268,8 +269,8 @@ EOF`"
 ${OLD_PASSWD}
 EOF`"
 
-    if  echo "$LC_NPASS" | grep "$LC_OPASS" >/dev/null || \
-        echo "$LC_OPASS" | grep "$LC_NPASS" >/dev/null \
+    if  [[ "$LC_NPASS" =~ "$LC_OPASS" ]] || \
+        [[ "$LC_OPASS" =~ "$LC_NPASS" ]] \
     ; then
         echo "failed" >&2
         echo "BAD PASSWORD: too similar to the old password" >&2
@@ -287,7 +288,7 @@ check_passwd() {
     check_passwd_cracklib "$@" && \
     check_passwd_complexity "$@" && \
     check_passwd_username "$@" && \
-    { if [ -n "$NEW_USER" ] && [ "x${NEW_USER}" != "x${USER}" ] ; then
+    { if [[ -n "$NEW_USER" ]] && [[ "x${NEW_USER}" != "x${USER}" ]] ; then
         check_passwd_username "${USER}" "${NEW_PASSWD}"
       else true; fi; } && \
     check_passwd_oldpasswd "$@"
@@ -297,9 +298,9 @@ read NEW_USER || { usage; die "Bad input"; }
 read NEW_PASSWD || { usage; die "Bad input"; }
 read OLD_PASSWD || OLD_PASSWD=""        # Optional
 
-[ -n "${NEW_PASSWD}" ] || { usage; die "Bad input: new password is empty"; }
+[[ -n "${NEW_PASSWD}" ]] || { usage; die "Bad input: new password is empty"; }
 
-#[ -n "${NEW_USER}" ] || die "new username is empty"
+#[[ -n "${NEW_USER}" ]] || die "new username is empty"
 #if ! /usr/bin/getent passwd ${NEW_USER} >/dev/null; then
 #    die "User ${NEW_USER} not found by /usr/bin/getent passwd"
 #fi
