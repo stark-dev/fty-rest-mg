@@ -49,9 +49,9 @@ if [[ -x /usr/bin/expect ]]; then
     do_passwd() {
         echo "using expect"
         local user old_passwd new_passwd ret
-        user=${1}
-        old_passwd=${2}
-        new_passwd=${3}
+        user="${1}"
+        old_passwd="${2}"
+        new_passwd="${3}"
 
         # run the expect script
         # if passwd prompts the BAD (PASSWORD), script exists with 1
@@ -80,11 +80,15 @@ EOF
     }
 else
     do_passwd() {
+        # This is done as root, and so does not ask for old password
         local user old_passwd new_passwd
-        user=${1}
-        old_passwd=${2}
-        new_passwd=${3}
-        /usr/bin/printf "%s\n%s" "${new_passwd}" "${new_passwd}" | /usr/bin/passwd "${user}"
+        user="${1}"
+        old_passwd="${2}"
+        new_passwd="${3}"
+        /usr/bin/passwd "${user}" << EOF
+${new_passwd}
+${new_passwd}
+EOF
     }
 fi
 
