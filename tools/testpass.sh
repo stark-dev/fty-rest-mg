@@ -163,7 +163,8 @@ check_passwd_complexity() {
     local COUNT_DIGIT=0
     local COUNT_OTHER=0
 
-    echo -e 'Running a complexity check... \c' >&2
+    # Note: intentionally no newline follows this print:
+    printf 'Running a complexity check... ' >&2
 
     local COUNT_TOTAL="${#NEW_PASSWD}"
     if [[ "$COUNT_TOTAL" -lt "$CHARS_TOTAL_MIN" ]] ; then
