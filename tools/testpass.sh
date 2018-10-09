@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2015 Eaton
+# Copyright (C) 2015-2018 Eaton
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -116,19 +116,29 @@ check_passwd_cracklib() {
         [ "$(/usr/bin/id -u)" = 0 ] \
     ; then      # Can 'su', so cracklib uses user info as well
         echo -e "Testing with cracklib-check program for user ${NEW_USER}... \c" >&2
-        OUT="`echo "$NEW_PASSWD" | su -c "${CRACKLIB_CHECK}" "${NEW_USER}"`" && \
-        echo "$OUT" | egrep ': OK$' >/dev/null || \
+        OUT="`su -c "${CRACKLIB_CHECK}" "${NEW_USER}" << EOF
+${NEW_PASSWD}
+EOF`" && \
+        [ -n "`egrep ': OK$' >/dev/null << EOF
+${OUT}
+EOF`" ] || \
         RES=11
     else
         echo -e "Testing with cracklib-check program... \c" >&2
-        OUT="`echo "$NEW_PASSWD" | ${CRACKLIB_CHECK}`" && \
-        echo "$OUT" | egrep ': OK$' >/dev/null || \
+        OUT="`${CRACKLIB_CHECK} << EOF
+${NEW_PASSWD}
+EOF`" && \
+        [ -n "`egrep ': OK$' >/dev/null << EOF
+${OUT}
+EOF`" ] || \
         RES=11
     fi
 
     if [ "$RES" -gt 0 ]; then
         echo "failed ($RES)" >&2
-        echo "BAD PASSWORD: `echo "$OUT" | cut -c $((${#NEW_PASSWD}+3))-`" >&2
+        echo "BAD PASSWORD: `cut -c $((${#NEW_PASSWD}+3))- << EOF
+${OUT}
+EOF`" >&2
         return $RES
     fi
 
@@ -161,13 +171,21 @@ check_passwd_complexity() {
         return 12
     fi
 
-    STRING="`echo "${NEW_PASSWD}" | sed 's,[^[:lower:]],,g'`" && \
+    STRING="`sed 's,[^[:lower:]],,g' << EOF
+${NEW_PASSWD}
+EOF`" && \
         COUNT_LOWER="${#STRING}"
-    STRING="`echo "${NEW_PASSWD}" | sed 's,[^[:upper:]],,g'`" && \
+    STRING="`sed 's,[^[:upper:]],,g' << EOF
+${NEW_PASSWD}
+EOF`" && \
         COUNT_UPPER="${#STRING}"
-    STRING="`echo "${NEW_PASSWD}" | sed 's,[^[:digit:]],,g'`" && \
+    STRING="`sed 's,[^[:digit:]],,g' << EOF
+${NEW_PASSWD}
+EOF`" && \
         COUNT_DIGIT="${#STRING}"
-    STRING="`echo "${NEW_PASSWD}" | sed 's,[[:digit:][:lower:][:upper:]],,g'`" && \
+    STRING="`sed 's,[[:digit:][:lower:][:upper:]],,g' << EOF
+${NEW_PASSWD}
+EOF`" && \
         COUNT_OTHER="${#STRING}"
 
     if \
@@ -209,7 +227,10 @@ check_passwd_username() {
 
     echo -e "Running a username check against $NEW_USER... \c" >&2
 
-    local LC_PASS="`echo "$NEW_PASSWD" | tr '[:upper:]' '[:lower:]'`"
+    # Reduce chances for password leaking to envvars or command args history
+    local LC_PASS="`tr '[:upper:]' '[:lower:]' << EOF
+${NEW_PASSWD}
+EOF`"
     local LC_USER="`echo "$NEW_USER" | tr '[:upper:]' '[:lower:]'`"
 
     if  echo "$LC_PASS" | grep "$LC_USER" >/dev/null || \
@@ -240,8 +261,12 @@ check_passwd_oldpasswd() {
         return 14
     fi
 
-    local LC_NPASS="`echo "$NEW_PASSWD" | tr '[:upper:]' '[:lower:]'`"
-    local LC_OPASS="`echo "$OLD_PASSWD" | tr '[:upper:]' '[:lower:]'`"
+    local LC_NPASS="`tr '[:upper:]' '[:lower:]' << EOF
+${NEW_PASSWD}
+EOF`"
+    local LC_OPASS="`tr '[:upper:]' '[:lower:]' << EOF
+${OLD_PASSWD}
+EOF`"
 
     if  echo "$LC_NPASS" | grep "$LC_OPASS" >/dev/null || \
         echo "$LC_OPASS" | grep "$LC_NPASS" >/dev/null \
@@ -262,7 +287,7 @@ check_passwd() {
     check_passwd_cracklib "$@" && \
     check_passwd_complexity "$@" && \
     check_passwd_username "$@" && \
-    { if [ -n "$NEW_USER" ] && [ "x$NEW_USER" != "x${USER}" ] ; then
+    { if [ -n "$NEW_USER" ] && [ "x${NEW_USER}" != "x${USER}" ] ; then
         check_passwd_username "${USER}" "${NEW_PASSWD}"
       else true; fi; } && \
     check_passwd_oldpasswd "$@"
