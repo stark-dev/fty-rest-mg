@@ -237,7 +237,7 @@ if (streq (part, "ERROR")) {
     mlm_client_destroy (&client);
     http_die ("internal-error",
               std::string (TRANSLATE_ME ("Error while retrieving details of rule name = '")).append (checked_name).append ("': ").
-              append (TRANSLATE_ME (reason)).append(".").c_str ());
+              append (TRANSLATE_ME (reason.c_str ())).append(".").c_str ());
 }
 // Message does not conform to protocol
 free (part);

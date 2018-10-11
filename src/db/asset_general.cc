@@ -90,7 +90,7 @@ int
     if ( ret3.status == 0 )
     {
         trans.rollback();
-        errmsg = JSONIFY(errmsg);
+        errmsg = JSONIFY(errmsg.c_str ());
         log_error ("end: %s", errmsg.c_str());
         return 3;
     }
@@ -101,7 +101,7 @@ int
         if ( ret31.status == 0 )
         {
             trans.rollback();
-            errmsg = JSONIFY(errmsg);
+            errmsg = JSONIFY(errmsg.c_str ());
             log_error ("end: %s", errmsg.c_str());
             return 31;
         }
@@ -192,7 +192,7 @@ int
     if ( ret3.status == 0 )
     {
         trans.rollback();
-        errmsg = JSONIFY(errmsg);
+        errmsg = JSONIFY(errmsg.c_str ());
         log_error ("end: %s", errmsg.c_str());
         return 3;
     }
@@ -203,7 +203,7 @@ int
         if ( ret31.status == 0 )
         {
             trans.rollback();
-            errmsg = JSONIFY(errmsg);
+            errmsg = JSONIFY(errmsg.c_str ());
             log_error ("end: %s", errmsg.c_str());
             return 31;
         }
@@ -310,7 +310,7 @@ db_reply_t
     {
         trans.rollback();
         log_error ("end: element was not inserted");
-        reply_insert1.msg = JSONIFY(reply_insert1.msg);
+        reply_insert1.msg = JSONIFY(reply_insert1.msg.c_str ());
         return reply_insert1;
     }
     auto element_id = reply_insert1.rowid;
@@ -323,7 +323,7 @@ db_reply_t
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        reply_insert2.msg = JSONIFY(reply_insert2.msg);
+        reply_insert2.msg = JSONIFY(reply_insert2.msg.c_str ());
         return reply_insert2;
     }
 
@@ -336,7 +336,7 @@ db_reply_t
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            reply_insert21.msg = JSONIFY(reply_insert21.msg);
+            reply_insert21.msg = JSONIFY(reply_insert21.msg.c_str ());
             return reply_insert21;
         }
     }
@@ -346,7 +346,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: device was not inserted (fail into groups)");
-        reply_insert3.msg = JSONIFY(reply_insert3.msg);
+        reply_insert3.msg = JSONIFY(reply_insert3.msg.c_str ());
         return reply_insert3;
     }
 
@@ -359,7 +359,7 @@ db_reply_t
         {
             trans.rollback();
             log_info ("end: \"device\" was not inserted (fail monitor_device)");
-            reply_insert4.msg = JSONIFY(reply_insert4.msg);
+            reply_insert4.msg = JSONIFY(reply_insert4.msg.c_str ());
             return reply_insert4;
         }
         auto reply_insert5 = DBAssetsInsert::insert_into_monitor_asset_relation
@@ -368,14 +368,14 @@ db_reply_t
         {
             trans.rollback();
             log_info ("end: monitor asset link was not inserted (fail monitor asset relation)");
-            reply_insert5.msg = JSONIFY(reply_insert5.msg);
+            reply_insert5.msg = JSONIFY(reply_insert5.msg.c_str ());
             return reply_insert5;
         }
     }
 
     trans.commit();
     LOG_END;
-    reply_insert1.msg = JSONIFY(reply_insert1.msg);
+    reply_insert1.msg = JSONIFY(reply_insert1.msg.c_str ());
     return reply_insert1;
 }
 
@@ -420,7 +420,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: device was not inserted (fail in element)");
-        reply_insert1.msg = JSONIFY(reply_insert1.msg);
+        reply_insert1.msg = JSONIFY(reply_insert1.msg.c_str ());
         return reply_insert1;
     }
     auto element_id = reply_insert1.rowid;
@@ -432,7 +432,7 @@ db_reply_t
     {
         trans.rollback();
         log_error ("end: device was not inserted (fail in ext_attributes)");
-        reply_insert2.msg = JSONIFY(reply_insert2.msg);
+        reply_insert2.msg = JSONIFY(reply_insert2.msg.c_str ());
         return reply_insert2;
     }
 
@@ -444,7 +444,7 @@ db_reply_t
         {
             trans.rollback();
             log_error ("end: device was not inserted (fail in ext_attributes)");
-            reply_insert21.msg = JSONIFY(reply_insert21.msg);
+            reply_insert21.msg = JSONIFY(reply_insert21.msg.c_str ());
             return reply_insert21;
         }
     }
@@ -454,7 +454,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: device was not inserted (fail into groups)");
-        reply_insert3.msg = JSONIFY(reply_insert3.msg);
+        reply_insert3.msg = JSONIFY(reply_insert3.msg.c_str ());
         return reply_insert3;
     }
 
@@ -470,7 +470,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: not all links were inserted (fail asset_link)");
-        reply_insert5.msg = JSONIFY(reply_insert5.msg);
+        reply_insert5.msg = JSONIFY(reply_insert5.msg.c_str ());
         return reply_insert5;
     }
 
@@ -484,7 +484,7 @@ db_reply_t
         {
             trans.rollback();
             log_info ("end: device was not inserted (fail monitor_device)");
-            reply_insert6.msg = JSONIFY(reply_insert6.msg);
+            reply_insert6.msg = JSONIFY(reply_insert6.msg.c_str ());
             return reply_insert6;
         }
 
@@ -494,7 +494,7 @@ db_reply_t
         {
             trans.rollback();
             log_info ("end: monitor asset link was not inserted (fail monitor asset relation)");
-            reply_insert7.msg = JSONIFY(reply_insert7.msg);
+            reply_insert7.msg = JSONIFY(reply_insert7.msg.c_str ());
             return reply_insert7;
         }
     }
@@ -506,13 +506,13 @@ db_reply_t
     {
         trans.rollback();
         log_warning ("end: some error in denoting a type of device in monitor part");
-        reply_select.msg = JSONIFY(reply_select.msg);
+        reply_select.msg = JSONIFY(reply_select.msg.c_str ());
         return reply_select;
 
     }
     trans.commit();
     LOG_END;
-    reply_insert1.msg = JSONIFY(reply_insert1.msg);
+    reply_insert1.msg = JSONIFY(reply_insert1.msg.c_str ());
     return reply_insert1;
 }
 //=============================================================================
@@ -551,7 +551,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing from groups");
-        reply_delete2.msg = JSONIFY(reply_delete2.msg);
+        reply_delete2.msg = JSONIFY(reply_delete2.msg.c_str ());
         return reply_delete2;
     }
 
@@ -576,7 +576,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing ma relation");
-        reply_delete3.msg = JSONIFY(reply_delete3.msg);
+        reply_delete3.msg = JSONIFY(reply_delete3.msg.c_str ());
         return reply_delete3;
     }
 
@@ -585,13 +585,13 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing element");
-        reply_delete4.msg = JSONIFY(reply_delete4.msg);
+        reply_delete4.msg = JSONIFY(reply_delete4.msg.c_str ());
         return reply_delete4;
     }
 
     trans.commit();
     LOG_END;
-    reply_delete4.msg = JSONIFY(reply_delete4.msg);
+    reply_delete4.msg = JSONIFY(reply_delete4.msg.c_str ());
     return reply_delete4;
 }
 
@@ -609,7 +609,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing from groups");
-        reply_delete2.msg = JSONIFY(reply_delete2.msg);
+        reply_delete2.msg = JSONIFY(reply_delete2.msg.c_str ());
         return reply_delete2;
     }
 
@@ -618,13 +618,13 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing element");
-        reply_delete3.msg = JSONIFY(reply_delete3.msg);
+        reply_delete3.msg = JSONIFY(reply_delete3.msg.c_str ());
         return reply_delete3;
     }
 
     trans.commit();
     LOG_END;
-    reply_delete3.msg = JSONIFY(reply_delete3.msg);
+    reply_delete3.msg = JSONIFY(reply_delete3.msg.c_str ());
     return reply_delete3;
 }
 
@@ -642,7 +642,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing from groups");
-        reply_delete2.msg = JSONIFY(reply_delete2.msg);
+        reply_delete2.msg = JSONIFY(reply_delete2.msg.c_str ());
         return reply_delete2;
     }
 
@@ -651,7 +651,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing links");
-        reply_delete3.msg = JSONIFY(reply_delete3.msg);
+        reply_delete3.msg = JSONIFY(reply_delete3.msg.c_str ());
         return reply_delete3;
     }
 
@@ -661,7 +661,7 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing ma relation");
-        reply_delete5.msg = JSONIFY(reply_delete5.msg);
+        reply_delete5.msg = JSONIFY(reply_delete5.msg.c_str ());
         return reply_delete5;
     }
 
@@ -670,13 +670,13 @@ db_reply_t
     {
         trans.rollback();
         log_info ("end: error occured during removing element");
-        reply_delete6.msg = JSONIFY(reply_delete6.msg);
+        reply_delete6.msg = JSONIFY(reply_delete6.msg.c_str ());
         return reply_delete6;
     }
 
     trans.commit();
     LOG_END;
-    reply_delete6.msg = JSONIFY(reply_delete6.msg);
+    reply_delete6.msg = JSONIFY(reply_delete6.msg.c_str ());
     return reply_delete6;
 }
 

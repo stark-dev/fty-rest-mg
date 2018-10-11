@@ -108,7 +108,7 @@ db_reply <db_web_element_t>
             ret.status        = basic_ret.status;
             ret.errtype       = basic_ret.errtype;
             ret.errsubtype    = basic_ret.errsubtype;
-            ret.msg           = JSONIFY(basic_ret.msg);
+            ret.msg           = JSONIFY(basic_ret.msg.c_str ());
             log_warning ("%s", ret.msg.c_str());
             return ret;
         }
@@ -123,7 +123,7 @@ db_reply <db_web_element_t>
             ret.status        = ext_ret.status;
             ret.errtype       = ext_ret.errtype;
             ret.errsubtype    = ext_ret.errsubtype;
-            ret.msg           = JSONIFY(ext_ret.msg);
+            ret.msg           = JSONIFY(ext_ret.msg.c_str ());
             log_warning ("%s", ret.msg.c_str());
             return ret;
         }
@@ -138,7 +138,7 @@ db_reply <db_web_element_t>
             ret.status        = group_ret.status;
             ret.errtype       = group_ret.errtype;
             ret.errsubtype    = group_ret.errsubtype;
-            ret.msg           = JSONIFY(group_ret.msg);
+            ret.msg           = JSONIFY(group_ret.msg.c_str ());
             log_warning ("%s", ret.msg.c_str());
             return ret;
         }
@@ -155,7 +155,7 @@ db_reply <db_web_element_t>
                 ret.status        = powers.status;
                 ret.errtype       = powers.errtype;
                 ret.errsubtype    = powers.errsubtype;
-                ret.msg           = JSONIFY(powers.msg);
+                ret.msg           = JSONIFY(powers.msg.c_str ());
                 log_warning ("%s", ret.msg.c_str());
                 return ret;
             }
