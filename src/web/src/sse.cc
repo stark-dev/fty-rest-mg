@@ -49,7 +49,7 @@ Sse::~Sse()
   }
 }
 
-const char * Sse::connectMalamute()
+std::string Sse::connectMalamute()
 {
   // connect to malamute
   _clientMlm = mlm_client_new();
@@ -84,7 +84,7 @@ const char * Sse::connectMalamute()
     return TRANSLATE_ME ("zpoller_new() failed.");
   }
 
-  return NULL;
+  return std::string("");
 }
 
 int Sse::consumeStream(std::string stream, std::string pattern)
@@ -117,7 +117,7 @@ zmsg_t * Sse::getMessageFromMlm()
   return mlm_client_recv(_clientMlm);
 }
 
-const char * Sse::loadAssetFromDatacenter()
+std::string Sse::loadAssetFromDatacenter()
 {
 
   std::map<std::string, int> assets;
@@ -198,7 +198,7 @@ const char * Sse::loadAssetFromDatacenter()
     }
     log_debug("=== end ===");
   }
-  return NULL;
+  return std::string("");
 }
 
 std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)

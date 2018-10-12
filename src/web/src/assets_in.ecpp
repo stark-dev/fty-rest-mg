@@ -99,7 +99,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -149,7 +150,8 @@ bool database_ready;
             for( const auto &it : items ) {
                 a_elmnt_stp_id_t sub_type_id = persist::subtype_to_subtypeid(it);
                 if ( sub_type_id == persist::asset_subtype::SUNKNOWN ) {
-                    http_die ("request-param-bad", "sub_type", TRANSLATE_ME (it.c_str()), TRANSLATE_ME ("valid sub_type like feed, ups, etc..."));
+                    std::string expected = TRANSLATE_ME ("valid sub_type like feed, ups, etc...");
+                    http_die ("request-param-bad", "sub_type", it.c_str(), expected.c_str ());
                 }
                 checked_subtypes.push_back(sub_type_id);
             }
@@ -160,7 +162,8 @@ bool database_ready;
             for( const auto &it : items ) {
                 a_elmnt_stp_id_t type_id = persist::type_to_typeid(it);
                 if ( type_id == persist::asset_type::TUNKNOWN ) {
-                    http_die ("request-param-bad", "type", TRANSLATE_ME (it.c_str()), TRANSLATE_ME ("valid type like datacenter, room, etc..."));
+                    std::string expected = TRANSLATE_ME ("valid type like datacenter, room, etc...");
+                    http_die ("request-param-bad", "type", it.c_str(), expected.c_str ());
                 }
                 checked_types.push_back(type_id);
             }
@@ -179,18 +182,21 @@ bool database_ready;
     }
     catch (const tntdb::Error& e) {
         log_error ("tntdb::connectCached (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
-        http_die ("internal-error", TRANSLATE_ME ("Connecting to database failed."));
+        std::string err =  TRANSLATE_ME ("Connecting to database failed.");
+        http_die ("internal-error", err.c_str ());
     }
     catch (const std::exception& e) {
         log_error ("Exception caught: '%s'.", e.what ());
-        http_die ("internal-error", e.what ());
+        std::string err = JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
     }
     // do the stuff
     Assets assets;
     try {
         assets = assets_in_container(connection, checked_id, checked_types, checked_subtypes, without, status);
     } catch (std::exception &e) {
-        http_die ("internal-error", e.what());
+        std::string err = JSONIFY (e.what());
+        http_die ("internal-error", err.c_str ());
     }
 
     if (!details.empty() && details == "true") {

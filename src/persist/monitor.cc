@@ -76,8 +76,9 @@ db_reply_t
         ret.status     = 0;
         ret.errtype    = DB_ERR;
         ret.errsubtype = DB_ERROR_NOTFOUND;
-        ret.msg        = e.what();
-        log_info (TRANSLATE_ME("end: discovered device was not found with '%s'", JSONIFY(e.what())));
+        ret.msg        = JSONIFY (e.what());
+        std::string log_msg = TRANSLATE_ME("end: discovered device was not found with '%s'", ret.msg.c_str ());
+        log_info (log_msg.c_str ());
         return ret;
     }
     catch (const std::exception &e) {

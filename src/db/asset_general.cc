@@ -55,9 +55,7 @@ int
     int affected_rows = 0;
 
     if (streq (status, "nonactive")) {
-        char *msg = zsys_sprintf(TRANSLATE_ME("%s: Element cannot be inactivated. Change status to 'active'.", element_name));
-        errmsg = std::string (msg);
-        zstr_free(&msg);
+        errmsg = TRANSLATE_ME("%s: Element cannot be inactivated. Change status to 'active'.", element_name);
         log_error ("%s", errmsg.c_str ());
         return 1;
     }
@@ -158,9 +156,7 @@ int
 
     // dbid for RC_0 is 1: element_id == 1
     if (element_id == 1 && streq (status, "nonactive")) {
-        char *msg = zsys_sprintf(TRANSLATE_ME("%s: Default rack controller cannot be inactivated. Change status to 'active'.", element_name));
-        errmsg = std::string (msg);
-        zstr_free(&msg);
+        errmsg = TRANSLATE_ME("%s: Default rack controller cannot be inactivated. Change status to 'active'.", element_name);
         log_error ("%s", errmsg.c_str ());
         return 1;
     }
@@ -277,13 +273,11 @@ db_reply_t
     LOG_START;
     if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
-        char* msg1 = zsys_sprintf (TRANSLATE_ME ("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name));
         ret.status     = 0;
         ret.errtype    = DB_ERR;
         ret.errsubtype = DB_ERROR_BADINPUT;
         ret.rowid      = 8;
-        ret.msg        = std::string (msg1);
-        zstr_free (&msg1);
+        ret.msg        = TRANSLATE_ME ("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name);
         return ret;
     }
     setlocale (LC_ALL, ""); // move this to main?
@@ -292,13 +286,11 @@ db_reply_t
 
     if (streq (status, "nonactive")) {
         db_reply_t ret;
-        char *msg2 = zsys_sprintf (TRANSLATE_ME ("Element '%s' cannot be inactivated. Change status to 'active'.", element_name));
         ret.status     = 0;
         ret.errtype    = DB_ERR;
         ret.errsubtype = DB_ERROR_BADINPUT;
         ret.rowid      = 8;
-        ret.msg        = std::string (msg2);
-        zstr_free (&msg2);
+        ret.msg        = TRANSLATE_ME ("Element '%s' cannot be inactivated. Change status to 'active'.", element_name);
         return ret;
     }
 
@@ -398,13 +390,11 @@ db_reply_t
     LOG_START;
     if (DBAssets::extname_to_asset_id(element_name) != -1) {
         db_reply_t ret;
-        char* msg1 = zsys_sprintf (TRANSLATE_ME("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name));
         ret.status     = 0;
         ret.errtype    = DB_ERR;
         ret.errsubtype = DB_ERROR_BADINPUT;
         ret.rowid      = 8;
-        ret.msg        = std::string (msg1);
-        zstr_free (&msg1);
+        ret.msg        = TRANSLATE_ME("Element '%s' cannot be processed because of conflict. Most likely duplicate entry.", element_name);
         return ret;
     }
     setlocale (LC_ALL, ""); // move this to main?

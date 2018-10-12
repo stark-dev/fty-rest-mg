@@ -45,14 +45,16 @@ UserInfo user;
 
     char *license_file = get_current_license_file ();
     if ( license_file == NULL ) {
-        http_die ("internal-error", TRANSLATE_ME ("Cannot get the path to the text of the current license"));
+        std::string err =  TRANSLATE_ME ("Cannot get the path to the text of the current license");
+        http_die ("internal-error", err.c_str ());
     }
 	log_debug("license_file='%s'", license_file);
     std::ifstream source(license_file, std::ios::binary);
     if ( !source.good() ) {
         log_debug("Error reading license textfrom file '%s'", license_file);
         free (license_file); license_file = NULL;
-        http_die("internal-error", TRANSLATE_ME ("Error reading license file, check integrity of storage."));
+        std::string err =  TRANSLATE_ME ("Error reading license file, check integrity of storage.");
+        http_die("internal-error", err.c_str ());
     }
     reply.setContentType("text/plain;charset=UTF-8");
     reply.out() << source.rdbuf();

@@ -40,7 +40,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -55,8 +56,10 @@ bool database_ready;
 
     char buf[21] = {0x00};
     int r = calendar_to_datetime(time(NULL), buf, 21);
-    if (r != 0)
-        http_die ("internal-error", TRANSLATE_ME ("Cannot get system time"));
+    if (r != 0) {
+        std::string err =  TRANSLATE_ME ("Cannot get system time");
+        http_die ("internal-error", err.c_str ());
+    }
 
     // replace colons ':' by dash '-'
     // prevents http://latkin.org/blog/2016/07/20/git-for-windows-accidentally-creates-ntfs-alternate-data-streams/

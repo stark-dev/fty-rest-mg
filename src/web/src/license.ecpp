@@ -41,20 +41,23 @@
     // checked for any USER any URL and any METHOD
     char *license_file = get_current_license_file ();
     if ( license_file == NULL ) {
-        http_die ("internal-error", TRANSLATE_ME ("Cannot get the path to the text of the current license"));
+        std::string err =  TRANSLATE_ME ("Cannot get the path to the text of the current license");
+        http_die ("internal-error", err.c_str ());
     }
 	log_debug("license_file='%s'", license_file);
     char *current_license_version = get_current_license_version (license_file);
     if ( current_license_version == NULL ) {
         free (license_file); license_file = NULL;
-        http_die ("internal-error", TRANSLATE_ME ("Cannot get version of the text of the current license"));
+        std::string err =  TRANSLATE_ME ("Cannot get version of the text of the current license");
+        http_die ("internal-error", err.c_str ());
     }
 
     char *accepted_license_file = get_accepted_license_file ();
     if ( accepted_license_file == NULL ) {
         free (current_license_version); current_license_version = NULL;
         free (license_file); license_file = NULL;
-        http_die ("internal-error", TRANSLATE_ME ("Cannot get the path to the actual status of the accepted license"));
+        std::string err =  TRANSLATE_ME ("Cannot get the path to the actual status of the accepted license");
+        http_die ("internal-error", err.c_str ());
     }
 	log_debug("accepted_license_file='%s'", accepted_license_file);
 
@@ -70,13 +73,13 @@
 //        fscanf(src,"%ms\n", &accepted_license_version);
 //        fclose(src);
 //    }
-    if ( accepted_license_version.empty() )
-        http_die("action-forbidden", "REST API call", TRANSLATE_ME ("Please accept license first."));
+    if ( accepted_license_version.empty() ) {
+        std::string reason = TRANSLATE_ME ("Please accept license first.");
+        http_die("action-forbidden", "REST API call", reason.c_str ());
+    }
     if ( !streq(accepted_license_version.c_str(), current_license_version) ) {
-        char *msg = zsys_sprintf (TRANSLATE_ME ("License version changed (new is %s, accepted is %s). Please accept new license first", current_license_version, accepted_license_version.c_str()));
-        std::string msg_str (msg);
-        zstr_free (&msg);
-        http_die("action-forbidden", "REST API call", msg_str.c_str());
+        std::string msg = TRANSLATE_ME ("License version changed (new is %s, accepted is %s). Please accept new license first", current_license_version, accepted_license_version.c_str());
+        http_die("action-forbidden", "REST API call", msg.c_str());
     } else {
         return DECLINED;
     }

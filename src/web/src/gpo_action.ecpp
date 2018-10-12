@@ -131,12 +131,17 @@ UserInfo user;
             int rv = DBAssets::extname_to_asset_name (sensor, iname);
             if (rv == -1)
                 http_die ("not-found", sensor.c_str ());
-            if (rv == -2)
-                http_die ("internal-error", TRANSLATE_ME ("database failure"));
+            if (rv == -2) {
+                std::string err =  TRANSLATE_ME ("database failure");
+                http_die ("internal-error", err.c_str ());
+            }
             checked_sensor = sensor;
         }
-        else
-            http_die ("request-param-bad", "sensor", TRANSLATE_ME ("empty asset name"), TRANSLATE_ME ("non-empty asset name"));
+        else {
+            std::string received = TRANSLATE_ME ("empty asset name");
+            std::string expected = TRANSLATE_ME ("non-empty asset name");
+            http_die ("request-param-bad", "sensor", received.c_str (), expected.c_str ());
+        }
     }
 
     // action will be checked in fty-sensor-gpio
@@ -145,31 +150,50 @@ UserInfo user;
         std::string action = qparam.param ("action");
         if (!action.empty ())
             checked_action = action;
-        else
-            http_die ("request-param-bad", "action", TRANSLATE_ME ("empty action"), TRANSLATE_ME ("non-empty action"));
+        else {
+            std::string received = TRANSLATE_ME ("empty action");
+            std::string expected = TRANSLATE_ME ("non-empty action");
+            http_die ("request-param-bad", "action", received.c_str (), expected.c_str ());
+        }
     }
 
     int rv = gpo_action (checked_sensor, checked_action);
-    if (rv == -1)
-        http_die ("internal-error", TRANSLATE_ME ("mlmpool.get () failed."));
+    if (rv == -1) {
+        std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -2)
-        http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed."));
+    if (rv == -2) {
+        std::string err =  TRANSLATE_ME ("client->sendto () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -3)
-        http_die ("internal-error", TRANSLATE_ME ("client->recv () failed."));
+    if (rv == -3) {
+        std::string err =  TRANSLATE_ME ("client->recv () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -4)
-        http_die ("request-param-bad", "sensor", TRANSLATE_ME ("not a GPO asset"), TRANSLATE_ME ("GPO asset"));
+    if (rv == -4) {
+        std::string received = TRANSLATE_ME ("not a GPO asset");
+        std::string expected =  TRANSLATE_ME ("GPO asset");
+        http_die ("request-param-bad", "sensor", received.c_str (), expected.c_str ());
+    }
     else
-    if (rv == -5)
-        http_die ("precondition-failed", TRANSLATE_ME ("required action is not applicable in current state."));
+    if (rv == -5) {
+        std::string err =  TRANSLATE_ME ("required action is not applicable in current state.");
+        http_die ("precondition-failed", err.c_str ());
+    }
     else
-    if (rv == -6)
-        http_die ("request-param-bad", "action", TRANSLATE_ME ("invalid action"), TRANSLATE_ME ("valid action"));
+    if (rv == -6) {
+        std::string received = TRANSLATE_ME ("invalid action");
+        std::string expected = TRANSLATE_ME ("valid action");
+        http_die ("request-param-bad", "action", received.c_str (), expected.c_str ());
+    }
     else
-    if (rv == -7)
-        http_die ("internal-error", TRANSLATE_ME ("fty-asset-gpio returned malformed or unexpected message."));
+    if (rv == -7) {
+        std::string err =  TRANSLATE_ME ("fty-asset-gpio returned malformed or unexpected message.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
 </%cpp>
 {}

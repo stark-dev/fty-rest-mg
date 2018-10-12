@@ -48,7 +48,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // Sanity check end
@@ -103,12 +104,18 @@ bool database_ready;
 
         if (!feed_by.empty ())
         {
-            if (filter != "devices")
-                http_die("parameter-conflict", TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'"));
-            if ( from == "none")
-                http_die("parameter-conflict", TRANSLATE_ME("With variable 'feed_by' variable 'from' can not be 'none'"));
-            if (!persist::is_power_device (conn, feed_by))
-                http_die("request-param-bad", "feed_by", feed_by.c_str(), TRANSLATE_ME("must be a power device."));
+            if (filter != "devices") {
+                std::string err =  TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'");
+                http_die("parameter-conflict", err.c_str ());
+            }
+            if ( from == "none") {
+                std::string err =  TRANSLATE_ME("With variable 'feed_by' variable 'from' can not be 'none'");
+                http_die("parameter-conflict", err.c_str ());
+            }
+            if (!persist::is_power_device (conn, feed_by)) {
+                std::string expected = TRANSLATE_ME("must be a power device.");
+                http_die("request-param-bad", "feed_by", feed_by.c_str (), expected.c_str ());
+            }
             else
                 checked_feed_by = feed_by;
         }
@@ -125,14 +132,17 @@ bool database_ready;
     if (!checked_feed_by.empty ())
     {
 		fed_by = persist::topology2_feed_by (conn, checked_feed_by);
-        if (fed_by.empty ())
-            http_die("request-param-bad", "feed_by", checked_feed_by.c_str(), TRANSLATE_ME("must be a device."));
+        if (fed_by.empty ()) {
+            std::string expected = TRANSLATE_ME("must be a device.");
+            http_die("request-param-bad", "feed_by", checked_feed_by.c_str(), expected.c_str ());
+        }
     }
 
-
 	auto result = persist::topology2_from (conn, checked_from);
-    if (result.empty () && checked_from != "none")
-        http_die("request-param-bad", "from", checked_from.c_str(), TRANSLATE_ME("valid asset name."));
+    if (result.empty () && checked_from != "none") {
+        std::string expected = TRANSLATE_ME("valid asset name.");
+        http_die("request-param-bad", "from", checked_from.c_str(), expected.c_str ());
+    }
 
     auto groups = persist::topology2_groups (conn, checked_from, checked_recursive);
 

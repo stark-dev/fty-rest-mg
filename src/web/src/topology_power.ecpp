@@ -50,7 +50,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -82,7 +83,8 @@ bool database_ready;
 
         if (!from.empty()) {
             if (!to.empty() || !filter_dc.empty() || !filter_group.empty()) {
-                http_die("parameter-conflict", TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'"));
+                std::string err =  TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                http_die("parameter-conflict", err.c_str ());
             }
             request_type = ASSET_MSG_GET_POWER_FROM;
             asset_id = from;
@@ -91,7 +93,8 @@ bool database_ready;
 
         if (!to.empty()) {
             if ( !filter_dc.empty() || !filter_group.empty() || !from.empty() ) {
-                http_die("parameter-conflict", TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'"));
+                std::string err =  TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                http_die("parameter-conflict", err.c_str ());
             }
             request_type = ASSET_MSG_GET_POWER_TO;
             asset_id = to;
@@ -100,7 +103,8 @@ bool database_ready;
 
         if (!filter_dc.empty()) {
             if (!filter_group.empty() || !to.empty() || !from.empty()) {
-                http_die("parameter-conflict", TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'"));
+                std::string err =  TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                http_die("parameter-conflict", err.c_str ());
             }
             request_type = ASSET_MSG_GET_POWER_DATACENTER;
             asset_id = filter_dc;
@@ -109,20 +113,26 @@ bool database_ready;
 
         if (!filter_group.empty()) {
             if (!to.empty() || !from.empty() || !filter_dc.empty()) {
-                http_die("parameter-conflict", TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'"));
+                std::string err =  TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                http_die("parameter-conflict", err.c_str ());
             }
             request_type = ASSET_MSG_GET_POWER_GROUP;
             asset_id = filter_group;
             parameter_name = "filter_group";
         }
 
-        if (!persist::is_ok_name (asset_id.c_str ()) )
-            http_die ("request-param-bad", "id", asset_id.c_str (), TRANSLATE_ME("valid asset name"));
+        if (!persist::is_ok_name (asset_id.c_str ()) ) {
+            std::string expected = TRANSLATE_ME("valid asset name");
+            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+        }
         checked_id = DBAssets::name_to_asset_id (asset_id);
-        if (checked_id == -1)
-            http_die ("request-param-bad", "id", asset_id.c_str (), TRANSLATE_ME("existing asset name"));
+        if (checked_id == -1) {
+            std::string expected = TRANSLATE_ME("existing asset name");
+            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+        }
         if (checked_id == -2) {
-            http_die ("internal-error", TRANSLATE_ME("Connecting to database failed."));
+            std::string err =  TRANSLATE_ME("Connecting to database failed.");
+            http_die ("internal-error", err.c_str ());
     }
     }
     // Sanity check end
@@ -131,7 +141,8 @@ bool database_ready;
     // BLOCK 2
     _scoped_asset_msg_t *input_msg = asset_msg_new (request_type);
     if ( !input_msg ) {
-        http_die ("internal-error", TRANSLATE_ME("Cannot allocate memory"));
+        std::string err =  TRANSLATE_ME("Cannot allocate memory");
+        http_die ("internal-error", err.c_str ());
     }
 
    // Call persistence layer
@@ -156,7 +167,11 @@ bool database_ready;
             log_error ("common_msg is COMMON_MSG_FAIL");
             switch(common_msg_errorno(common_msg)) {
                 case(DB_ERROR_BADINPUT):
-                    http_die("request-param-bad", parameter_name.c_str(), TRANSLATE_ME("id of the asset, that is not a device"), TRANSLATE_ME("id of the asset, that is a device"));
+                {
+                    std::string received = TRANSLATE_ME("id of the asset, that is not a device");
+                    std::string expected = TRANSLATE_ME("id of the asset, that is a device");
+                    http_die("request-param-bad", parameter_name.c_str(), received.c_str (), expected.c_str ());
+                }
                 case(DB_ERROR_NOTFOUND):
                     http_die("element-not-found", asset_id.c_str());
                 default:
@@ -224,8 +239,10 @@ bool database_ready;
                         first = false;
                     }
                     std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (asset_msg_element_id (item));
-                    if (asset_names.first.empty () && asset_names.second.empty ())
-                        http_die ("internal-error", TRANSLATE_ME("Database failure"));
+                    if (asset_names.first.empty () && asset_names.second.empty ()) {
+                        std::string err =  TRANSLATE_ME("Database failure");
+                        http_die ("internal-error", err.c_str ());
+                    }
 
                     json.append("{ \"name\" : \"").append(asset_names.second).append("\",");
                     json.append("\"id\" : \"").append(asset_msg_name (item)).append("\",");
@@ -260,16 +277,20 @@ bool database_ready;
                         tokens.push_back(tmp);
                     }
                     std::pair<std::string,std::string> src_names = DBAssets::id_to_name_ext_name (std::stoi (tokens[1]));
-                    if (src_names.first.empty () && src_names.second.empty ())
-                        http_die ("internal-error", TRANSLATE_ME("Database failure"));
+                    if (src_names.first.empty () && src_names.second.empty ()) {
+                        std::string err =  TRANSLATE_ME("Database failure");
+                        http_die ("internal-error", err.c_str ());
+                    }
                     json.append("\"src-id\" : \"").append(src_names.first).append("\",");
 
                     if (!tokens[0].empty() && tokens[0] != "999") {
                         json.append("\"src-socket\" : \"").append(tokens[0]).append("\",");
                     }
                     std::pair<std::string,std::string> dst_names = DBAssets::id_to_name_ext_name (std::stoi (tokens[3]));
-                    if (dst_names.first.empty () && dst_names.second.empty ())
-                        http_die ("internal-error", TRANSLATE_ME("Database failure"));
+                    if (dst_names.first.empty () && dst_names.second.empty ()) {
+                        std::string err =  TRANSLATE_ME("Database failure");
+                        http_die ("internal-error", err.c_str ());
+                    }
                     json.append("\"dst-id\" : \"").append(dst_names.first).append("\"");
 
                     if (!tokens[2].empty() && tokens[2] != "999") {

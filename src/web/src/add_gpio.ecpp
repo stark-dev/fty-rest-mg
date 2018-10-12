@@ -158,23 +158,34 @@ UserInfo user;
     std::string json = request.getBody ();
 
     if (json.empty ()) {
-        http_die ("request-param-required", TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>"));
+        std::string err =  TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+        http_die ("request-param-required", err.c_str ());
     }
 
     int rv = add_gpio (json);
-    if (rv == -1)
-        http_die ("internal-error", TRANSLATE_ME ("mlmpool.get () failed."));
+    if (rv == -1) {
+        std::string err = TRANSLATE_ME ("mlmpool.get () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -2)
-        http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed."));
+    if (rv == -2) {
+        std::string err = TRANSLATE_ME ("client->sendto () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -3)
-        http_die ("internal-error", TRANSLATE_ME ("client->recv () failed."));
+    if (rv == -3) {
+        std::string err = TRANSLATE_ME ("client->recv () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -4)
-        http_die ("request-param-required", TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>"));
+    if (rv == -4) {
+        std::string err = TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+        http_die ("request-param-required", err.c_str ());
+    }
     else
-    if (rv == -5)
-        http_die ("internal-error", TRANSLATE_ME ("fty-discovery returned malformed or unexpected message."));
+    if (rv == -5) {
+        std::string err = TRANSLATE_ME ("fty-discovery returned malformed or unexpected message.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
 </%cpp>

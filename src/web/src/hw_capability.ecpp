@@ -53,13 +53,13 @@ build_json (std::string &output, const std::string &hw_type,
 
 // get a given HW capability from fty-info
 int
-get_hw_capability (const char *type, std::string &res, const char*& errstr)
+get_hw_capability (const char *type, std::string &res, std::string& errstr)
 {
     // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
     {
-        errstr = "mlm_pool.get () failed.";
+        errstr = TRANSLATE_ME ("mlm_pool.get () failed.");
         log_fatal ("hw_capability: mlm_pool.get () failed.");
         return -1;
     }
@@ -68,7 +68,7 @@ get_hw_capability (const char *type, std::string &res, const char*& errstr)
     zmsg_t *send = req_hw_cap (uuid, type);
     if (client->sendto ("fty-info", "hwcapabaility", 1000, &send) < 0)
     {
-        errstr = "client->sendto () failed.";
+        errstr = TRANSLATE_ME ("client->sendto () failed.");
         log_fatal ("hw_capability: client->sendto (address = '%s') failed.", "fty-info");
         zmsg_destroy (&send);
         zuuid_destroy (&uuid);
@@ -79,7 +79,7 @@ get_hw_capability (const char *type, std::string &res, const char*& errstr)
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        errstr = "client->recv () failed.";
+        errstr = TRANSLATE_ME ("client->recv () failed.");
         log_fatal ("hw_capability: client->recv (timeout = '5') returned NULL");
         zmsg_destroy (&resp);
         return -1;
@@ -96,7 +96,7 @@ get_hw_capability (const char *type, std::string &res, const char*& errstr)
         else {
             zstr_free (&resp_type);
             zmsg_destroy (&resp);
-            errstr = "unexpected response from fty-info.";
+            errstr = TRANSLATE_ME ("unexpected response from fty-info.");
             log_fatal ("hw_capability: unexpected response from fty-info");
             return -1;
         }
@@ -104,7 +104,7 @@ get_hw_capability (const char *type, std::string &res, const char*& errstr)
     else {
         zstr_free (&result);
         zmsg_destroy (&resp);
-        errstr = "ERROR response from fty-info.";
+        errstr = TRANSLATE_ME ("ERROR response from fty-info.");
         log_fatal ("hw_capability: ERROR response from fty-info.");
         return -1;
     }
@@ -126,17 +126,19 @@ UserInfo user;
     std::string id = request.getArg("id");
     if (id.empty())
         http_die("request-param-required", "id");
-    if (id != "rackcontroller-0")
-        http_die ("request-param-bad", "id", id.c_str (), TRANSLATE_ME ("not supported"));
+    if (id != "rackcontroller-0") {
+        std::string reason = TRANSLATE_ME ("not supported");
+        http_die ("request-param-bad", "id", id.c_str (), reason.c_str ());
+    }
 
     std::string output, hw_type, gpi_count, gpo_count;
-    const char *errstr = "unspecified error";
+    std::string errstr = TRANSLATE_ME ("unspecified error");
     if (get_hw_capability ("type", hw_type, errstr) < 0)
-        http_die ("internal-error", errstr);
+        http_die ("internal-error", errstr.c_str ());
     if (get_hw_capability ("gpi", gpi_count, errstr) < 0)
-        http_die ("internal-error", errstr);
+        http_die ("internal-error", errstr.c_str ());
     if (get_hw_capability ("gpo", gpo_count, errstr) < 0)
-        http_die ("internal-error", errstr);
+        http_die ("internal-error", errstr.c_str ());
     build_json (output, hw_type, gpi_count, gpo_count);
 </%cpp>
 <$$ output $>

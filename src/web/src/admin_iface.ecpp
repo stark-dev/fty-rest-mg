@@ -54,17 +54,14 @@ UserInfo user;
 
     auto dta = get_iface(checked_iface);
     if(dta.mac.empty()) {
-        char *msg = zsys_sprintf (TRANSLATE_ME ("value that does not exist '%s'"), checked_iface.c_str ());
-        std::string str = msg;
-        zstr_free (&msg);
-        http_die ("request-param-bad", "iface_name", str.c_str (), TRANSLATE_ME ("one of valid interface names that can be obtained using GET 'admin/ifaces'."));
+        std::string received = TRANSLATE_ME ("value that does not exist '%s'", checked_iface.c_str ());
+        std::string expected = TRANSLATE_ME ("one of valid interface names that can be obtained using GET 'admin/ifaces'.");
+        http_die ("request-param-bad", "iface_name", received.c_str (), expected.c_str ());
     }
 
     if (dta.ip.size () != dta.netmask.size ()) {
-        char *msg = zsys_sprintf (TRANSLATE_ME ("Number of ip addresses '%d' %s '%d'."), dta.ip.size (), "do not match number of netmasks", dta.netmask.size ());
-        std::string str = msg;
-        zstr_free (&msg);
-        http_die ("internal-error", str.c_str ());
+        std::string err = TRANSLATE_ME ("Number of ip addresses '%d' do not match number of netmasks '%d'.", dta.ip.size (), dta.netmask.size ());
+        http_die ("internal-error", err.c_str ());
     }
 
     bool first = true;
@@ -119,7 +116,8 @@ UserInfo user;
         }
     } catch (const std::exception& e) {
         log_error ("Exception caught: %s", e.what ());
-        http_die ("internal-error", TRANSLATE_ME ("Exception caught." ));
+        std::string err = TRANSLATE_ME ("Exception caught." );
+        http_die ("internal-error", err.c_str ());
     }
 
 // Print out the result

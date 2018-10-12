@@ -161,7 +161,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // an example of macro usage
@@ -200,15 +201,11 @@ std::string checked_arg2;
 
     for (const std::string& param: requestedParams) {
         if (!s_is_valid_param (param)) {
-            char *msg_expected = zsys_sprintf (TRANSLATE_ME ("one of the following values: ['%s']", utils::join_keys_map (PARAM_TO_SRC, ",").c_str ()));
-            std::string msg_expected_str (msg_expected);
-            zstr_free (&msg_expected);
-            char *msg_received = zsys_sprintf (TRANSLATE_ME ("value '%s'", param.c_str()));
-            std::string msg_received_str (msg_expected);
-            zstr_free (&msg_received);
+            std::string msg_expected = TRANSLATE_ME ("one of the following values: ['%s']", utils::join_keys_map (PARAM_TO_SRC, ",").c_str ());
+            std::string msg_received = TRANSLATE_ME ("value '%s'", param.c_str());
             http_die ("request-param-bad", "arg2",
-                msg_received_str.c_str (),
-                msg_expected_str.c_str ());
+                msg_received.c_str (),
+                msg_expected.c_str ());
         }
     }
 
@@ -222,33 +219,40 @@ std::string checked_arg2;
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
         log_fatal ("mlm_pool.get () failed");
-        http_die ("internal-error", TRANSLATE_ME ("mlm_pool.get () failed."));
+        std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check that racks exists
     auto allRacksShort = asset_mgr.get_items1("rack", "");
     if ( allRacksShort.status == 0 ) {
-        http_die ("internal-error", TRANSLATE_ME ("Error while retrieving information about racks."));
+        std::string err =  TRANSLATE_ME ("Error while retrieving information about racks.");
+        http_die ("internal-error", err.c_str ());
     }
 
     for (auto const& item : racks) {
-        if ( !persist::is_ok_name (item.c_str ()) )
-            http_die ("request-param-bad", "arg2", item.c_str (), TRANSLATE_ME ("valid asset name"));
+        if ( !persist::is_ok_name (item.c_str ()) ) {
+            std::string expected = TRANSLATE_ME ("valid asset name");
+            http_die ("request-param-bad", "arg2", item.c_str (), expected.c_str ());
+        }
 
         auto dbid = DBAssets::name_to_asset_id (item);
         if (dbid == -1) {
             http_die ("element-not-found", item.c_str ());
         }
         if (dbid == -2) {
-                http_die ("internal-error", TRANSLATE_ME ("Connecting to database failed."));
+            std::string err =  TRANSLATE_ME ("Connecting to database failed.");
+            http_die ("internal-error", err.c_str ());
         }
         auto it = allRacksShort.item.find(dbid);
         if (it == allRacksShort.item.end()) {
             http_die ("element-not-found", item.c_str ());
         }
        std::pair <std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (dbid);
-       if (asset_names.first.empty () && asset_names.second.empty ())
-            http_die ("internal-error", TRANSLATE_ME ("Database failure"));
+       if (asset_names.first.empty () && asset_names.second.empty ()) {
+           std::string err =  TRANSLATE_ME ("Database failure");
+           http_die ("internal-error", err.c_str ());
+       }
        rackNames.push_back (asset_names.second);
     }
 
@@ -277,15 +281,18 @@ std::string checked_arg2;
     }
     catch (const tntdb::Error& e) {
         log_error ("%s", e.what ());
-        http_die ("internal-error", TRANSLATE_ME ("Database related error."));
+        std::string err =  TRANSLATE_ME ("Database related error.");
+        http_die ("internal-error", err.c_str ());
     }
     catch (const std::runtime_error &e) {
         log_error ("%s", e.what ());
-        http_die ("internal-error", JSONIFY (e.what ()));
+        std::string err =  JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
     }
     catch (const std::exception& e) {
         log_error ("%s", e.what ());
-        http_die ("internal-error", TRANSLATE_ME ("Exception caught."));
+        std::string err =  TRANSLATE_ME ("Exception caught.");
+        http_die ("internal-error", err.c_str ());
     }
 </%cpp>
 <$$ json.str() $>
