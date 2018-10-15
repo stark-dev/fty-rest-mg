@@ -654,7 +654,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     log_debug ("################ Row number is %zu", row_i);
     static const std::set<std::string> STATUSES = \
-        { TRANSLATE_ME ("active"), TRANSLATE_ME ("nonactive"), TRANSLATE_ME ("spare"), TRANSLATE_ME ("retired")};
+        { "active", "nonactive", "spare", "retired"};
 
     if (0 == limitations.global_configurability) {
         std::string action = TRANSLATE_ME ("Asset handling");
