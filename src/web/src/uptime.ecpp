@@ -76,16 +76,21 @@ bool database_ready;
         // check that DC exists
         auto allDcsShort = asset_mgr.get_items1 ("datacenter", "");
         if (allDcsShort.status == 0) {
-            http_die ("internal-error", TRANSLATE_ME ("Error while retrieving information about datacenters."));
+            std::string err =  TRANSLATE_ME ("Error while retrieving information about datacenters.");
+            http_die ("internal-error", err.c_str ());
         }
 
         for (auto const& item : DCNames) {
             int rv = DBAssets::name_to_extname (item, ExtName);
 
-            if (rv == -1)
-                http_die ("not-found", item.c_str ());
-            if (rv == -2)
-                http_die ("internal-error", TRANSLATE_ME ("Database failure"));
+            if (rv == -1) {
+                std::string err =  item.c_str ();
+                http_die ("not-found", err.c_str ());
+            }
+            if (rv == -2) {
+                std::string err =  TRANSLATE_ME ("Database failure");
+                http_die ("internal-error", err.c_str ());
+            }
 
             DCExtNames.push_back (ExtName);
 

@@ -44,8 +44,9 @@ bool database_ready;
 {
     // verify server is ready
     if (!database_ready) {
-        log_debug (TRANSLATE_ME ("Database is not ready yet."));
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        log_debug ("Database is not ready yet.");
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -78,18 +79,22 @@ bool database_ready;
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL(e);
-        http_die ("internal-error", TRANSLATE_ME ("See logs for more details"));
+        std::string err =  TRANSLATE_ME ("See logs for more details");
+        http_die ("internal-error", err.c_str ());
     }
 
     if (cm.cols() == 0 || cm.rows() == 0) {
-        http_die("bad-request-document", TRANSLATE_ME ("Cannot import empty document."));
+        std::string err =  TRANSLATE_ME ("Cannot import empty document.");
+        http_die("bad-request-document", err.c_str ());
     }
     // in underlying functions like update_device
     if (!cm.hasTitle("type")) {
-        http_die ("request-param-required", TRANSLATE_ME ("type"));
+        std::string err =  TRANSLATE_ME ("type");
+        http_die ("request-param-required", err.c_str ());
     }
     if (cm.hasTitle("id")) {
-        http_die ("bad-request-document", TRANSLATE_ME ("key 'id' is forbidden to be used"));
+        std::string err =  TRANSLATE_ME ("key 'id' is forbidden to be used");
+        http_die ("bad-request-document", err.c_str ());
     }
 
     try {
@@ -116,8 +121,10 @@ bool database_ready;
         // no unexpected errors was detected
         // process results
         std::pair<std::string,std::string> foo =  DBAssets::id_to_name_ext_name (row.first.id);
-        if (foo.first.empty () && foo.second.empty ())
-            http_die ("internal-error", TRANSLATE_ME ("Database failure"));
+        if (foo.first.empty () && foo.second.empty ()) {
+            std::string err =  TRANSLATE_ME ("Database failure");
+            http_die ("internal-error", err.c_str ());
+        }
 </%cpp>
 {<$$ utils::json::jsonify ("id", foo.first) $>}
 <%cpp>
@@ -128,7 +135,7 @@ bool database_ready;
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL(e);
-        http_die ("internal-error", TRANSLATE_ME (""));
+        http_die ("internal-error", "");
     }
 }
 </%cpp>

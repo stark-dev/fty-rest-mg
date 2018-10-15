@@ -133,16 +133,23 @@ UserInfo user;
     {
         std::string operation = request.getArg ("operation");
         std::transform (operation.begin(), operation.end(), operation.begin(), ::tolower);
-        if (!is_GET_operation (operation) && !is_POST_operation (operation))
-            http_die ("request-param-bad", TRANSLATE_ME ("operation"), operation.c_str (), "status/list/enable/disable/start/stop/restart");
+        if (!is_GET_operation (operation) && !is_POST_operation (operation)) {
+            std::string param = TRANSLATE_ME ("operation");
+            std::string expected = TRANSLATE_ME ("status/list/enable/disable/start/stop/restart");
+            http_die ("request-param-bad", param.c_str (), operation.c_str (), expected.c_str ());
+        }
 
         if (request.getMethod() == "GET" && is_POST_operation (operation)) {
-            std::string msg = std::string (TRANSLATE_ME ("an operation allowed for GET method:")) + "status/list.";
-            http_die ("request-param-bad", TRANSLATE_ME ("operation"), operation.c_str(), msg.c_str());
+            std::string msg = TRANSLATE_ME ("an operation allowed for GET method:") + "status/list.";
+            std::string param = TRANSLATE_ME ("operation");
+            http_die ("request-param-bad", param.c_str(), operation.c_str(), msg.c_str());
 
         }
-        if (request.getMethod() == "POST" && is_GET_operation (operation))
-            http_die ("request-param-bad", TRANSLATE_ME ("operation"), operation.c_str(), "an operation allowed for POST method: enable/disable/start/stop/restart.");
+        if (request.getMethod() == "POST" && is_GET_operation (operation)) {
+            std::string param = TRANSLATE_ME ("operation");
+            std::string expected = TRANSLATE_ME ("an operation allowed for POST method: enable/disable/start/stop/restart.");
+            http_die ("request-param-bad", param.c_str (), operation.c_str(), expected.c_str ());
+        }
         checked_operation = operation;
     }
     log_info ("checked_operation: '%s'", checked_operation.c_str ());
@@ -180,15 +187,19 @@ UserInfo user;
                 std::string message;
                 message.assign ("Exception caught: ").append (e.what ());
                 log_error ("%s", message.c_str ());
-                http_die( "internal-error", TRANSLATE_ME ("Exception caught. Please check logs for more details."));
+                std::string err =  TRANSLATE_ME ("Exception caught. Please check logs for more details.");
+                http_die( "internal-error", err.c_str ());
             }
         }
 
-        if (service_name.empty () && checked_operation != "list")
-            http_die ("request-param-bad", "service_name", service_name.c_str (), TRANSLATE_ME ("one of service names that can be obtained through systemctl/list call"));
+        std::string expected = TRANSLATE_ME ("one of service names that can be obtained through systemctl/list call");
+        if (service_name.empty () && checked_operation != "list") {
+            http_die ("request-param-bad", "service_name", service_name.c_str (), expected.c_str ());
+        }
 
-        if (!systemctl_valid_service_name (service_name))
-            http_die ("request-param-bad", "service_name", service_name.c_str (), TRANSLATE_ME ("one of service names that can be obtained through systemctl/list call"));
+        if (!systemctl_valid_service_name (service_name)) {
+            http_die ("request-param-bad", "service_name", service_name.c_str (), expected.c_str ());
+        }
 
         checked_service_name.assign (service_name);
     }
@@ -226,8 +237,10 @@ UserInfo user;
     else
     if (checked_operation == "status") {
         std::string ActiveState, SubState, LoadState, UnitFileState;
-        if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState))
-            http_die ("internal-error", TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details."));
+        if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState)) {
+            std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
+            http_die ("internal-error", err.c_str ());
+        }
 
         std::string message;
         message.assign (
@@ -262,12 +275,15 @@ UserInfo user;
             std::string message;
             message = "`sudo /bin/systemctl " + checked_operation + " " + checked_service_name  + "'.";
             log_error ("%s", message.c_str ());
-            http_die ("internal-error", TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details."));
+            std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
+            http_die ("internal-error", err.c_str ());
         }
 
         std::string ActiveState, SubState, LoadState, UnitFileState;
-        if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState))
-            http_die ("internal-error", TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details."));
+        if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState)) {
+            std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
+            http_die ("internal-error", err.c_str ());
+        }
         std::string message;
         message.assign (
             "{\n"

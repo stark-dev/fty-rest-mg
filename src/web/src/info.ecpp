@@ -121,14 +121,20 @@ UserInfo user;
 
     std::string output;
     int rv = get_rc_info (output);
-    if (rv == -1)
-        http_die ("internal-error", TRANSLATE_ME ("mlmpool.get () failed."));
+    if (rv == -1) {
+        std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -2)
-        http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed."));
+    if (rv == -2) {
+        std::string err =  TRANSLATE_ME ("client->sendto () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -3)
-        http_die ("internal-error", TRANSLATE_ME ("client->recv () failed."));
+    if (rv == -3) {
+        std::string err =  TRANSLATE_ME ("client->recv () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
 </%cpp>
 <$$ output $>

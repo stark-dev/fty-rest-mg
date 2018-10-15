@@ -45,7 +45,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -78,7 +79,8 @@ bool database_ready;
         for ( const auto &subtype: checked_subtypes ) {
             log_debug ("\tsubtype=%s", subtype.c_str ());
             if ( !persist::subtype_to_subtypeid (subtype) ) {
-                http_die ("request-param-bad", "subtype", subtype.c_str (), TRANSLATE_ME ("See RFC-11 for possible values"));
+                std::string expected =  TRANSLATE_ME ("See RFC-11 for possible values");
+                http_die ("request-param-bad", "subtype", subtype.c_str (), expected.c_str ());
             }
         }
     }
@@ -96,8 +98,10 @@ bool database_ready;
 
         for ( auto &oneAsset : allAssetsShort.item ) {
             std::pair<std::string, std::string> asset_names =  DBAssets::id_to_name_ext_name (oneAsset.first);
-            if (asset_names.first.empty () && asset_names.second.empty ())
-                http_die ("internal-error", TRANSLATE_ME ("Database failure"));
+            if (asset_names.first.empty () && asset_names.second.empty ()) {
+                std::string err =  TRANSLATE_ME ("Database failure");
+                http_die ("internal-error", err.c_str ());
+            }
             ext_name = asset_names.second;
             json += "{";
             json += utils::json::jsonify ("id", oneAsset.second);

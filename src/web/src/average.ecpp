@@ -81,7 +81,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -137,7 +138,8 @@ bool database_ready;
             // possible compinations:
             //      ( relative != "" ) XOR ( start_ts != "" AND end_ts != "" )
             if (csv != "yes") { // for non-csv we parse "relative", for csv by BIOS-3225 we do not yet
-                http_die ("request-param-required", zsys_sprintf ((char *) "%s %s %s", "start_ts", TRANSLATE_ME ("or"), "relative"));
+                std::string err = TRANSLATE_ME ("start_ts or relative");
+                http_die ("request-param-required", err.c_str ());
             } else {
                 http_die ("request-param-required", "start_ts");
             }
@@ -156,8 +158,8 @@ bool database_ready;
 
         // check that start_ts < end_ts
         if (end <= st) {
-            http_die ("parameter-conflict",
-                      TRANSLATE_ME (std::string ("Start timestamp '").append (checked_start_ts).append ("' is greater than end timestamp '").append (checked_end_ts).append ("'.").c_str ()));
+            std::string err = TRANSLATE_ME ("Start timestamp '%s' is greater than end timestamp '%s'.", checked_start_ts.c_str (), checked_end_ts.c_str ());
+            http_die ("parameter-conflict", err.c_str ());
         }
     }
     else {
@@ -165,8 +167,8 @@ bool database_ready;
         std::transform (checked_relative.begin(), checked_relative.end(), checked_relative.begin(), ::tolower);
         int64_t now = (int64_t) time (NULL);
         if (!relative_to_unixtime (checked_relative, now, st)) {
-            http_die ("request-param-bad", "relative", std::string ("'").append (checked_relative).append ("'").c_str (),
-                      TRANSLATE_ME ("one of the following values: '24h', '7d', '30d'."));
+            std::string expected = TRANSLATE_ME ("one of the following values: '24h', '7d', '30d'.");
+            http_die ("request-param-bad", "relative", std::string ("'").append (checked_relative).append ("'").c_str (), expected.c_str ());
         }
         end = (int64_t) time (NULL);
     }
@@ -178,9 +180,9 @@ bool database_ready;
         checked_type.assign (AVG_TYPES[0]);
     }
     else if (!is_average_type_supported (checked_type.c_str ())) {
+        std::string expected = TRANSLATE_ME ("one of the following values: [%s]", utils::join (AVG_TYPES, AVG_TYPES_SIZE, ", ").c_str ());
         http_die ("request-param-bad", "type",
-                  std::string ("'").append (checked_type).append ("'").c_str (),
-                  TRANSLATE_ME (std::string ("one of the following values: [").append (utils::join (AVG_TYPES, AVG_TYPES_SIZE, ", ")).append("].").c_str ()));
+                  std::string ("'").append (checked_type).append ("'").c_str (), expected.c_str ());
     }
 
     // step
@@ -188,9 +190,9 @@ bool database_ready;
         http_die ("request-param-required", "step");
     }
     if (!is_average_step_supported (checked_step.c_str ())) {
+        std::string expected = TRANSLATE_ME ("one of the following values: [%s]", utils::join (AVG_STEPS, AVG_STEPS_SIZE, ", ").c_str ());
         http_die ("request-param-bad", "step",
-                  std::string ("'").append (checked_step).append ("'").c_str (),
-                  TRANSLATE_ME (std::string ("one of the following values: [").append (utils::join (AVG_STEPS, AVG_STEPS_SIZE, ", ")).append("].").c_str ()));
+                  std::string ("'").append (checked_step).append ("'").c_str (), expected.c_str ());
     }
 
     // source
@@ -207,19 +209,22 @@ bool database_ready;
             http_die ("element-not-found", "");
         }
         if ( basic_ret.status == 0 && basic_ret.errsubtype == DB_ERROR_INTERNAL) {
-            http_die ("internal-error", TRANSLATE_ME ("Database failure"));
+            std::string err =  TRANSLATE_ME ("Database failure");
+            http_die ("internal-error", err.c_str ());
         }
 
         element_name = basic_ret.item.name;
     }
     catch (const  std::exception &e ) {
-        http_die ("internal-error", e.what());
+        std::string err = JSONIFY (e.what());
+        http_die ("internal-error", err.c_str ());
     }
     // connect to malamute
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
         log_fatal ("mlm_pool.get () failed.");
-        http_die ("internal-error", TRANSLATE_ME ("mlm_pool.get () failed."));
+        std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
+        http_die ("internal-error", err.c_str ());
     }
 
     if (csv == "yes")
@@ -246,14 +251,16 @@ bool database_ready;
             if (rv == -1) {
                 zuuid_destroy (&uuid);
                 log_fatal ("Cannot send message to fty-metric-store");
-                http_die ("internal-error", TRANSLATE_ME ("mlm_client_sendto failed."));
+                std::string err =  TRANSLATE_ME ("mlm_client_sendto failed.");
+                http_die ("internal-error", err.c_str ());
             }
 
             zmsg_t *recv_msg = client->recv (zuuid_str_canonical (uuid), 30);
             zuuid_destroy (&uuid);
             if (!recv_msg) {
                 log_fatal ("client->recv (timeout = '30') returned NULL");
-                http_die ("internal-error", TRANSLATE_ME ("client->recv () returned NULL"));
+                std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
+                http_die ("internal-error", err.c_str ());
             }
 
             char *frame = zmsg_popstr (recv_msg);
@@ -338,14 +345,16 @@ bool database_ready;
         if (rv == -1) {
             zuuid_destroy (&uuid);
             log_fatal ("Cannot send message to fty-metric-store");
-            http_die ("internal-error", TRANSLATE_ME ("mlm_client_sendto failed."));
+            std::string err =  TRANSLATE_ME ("mlm_client_sendto failed.");
+            http_die ("internal-error", err.c_str ());
         }
 
         zmsg_t *recv_msg = client->recv (zuuid_str_canonical (uuid), 30);
         zuuid_destroy (&uuid);
         if (!recv_msg) {
             log_fatal ("client->recv (timeout = '30') returned NULL");
-            http_die ("internal-error", TRANSLATE_ME ("client->recv () returned NULL"));
+            std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
+            http_die ("internal-error", err.c_str ());
         }
 
         char *frame = zmsg_popstr (recv_msg);

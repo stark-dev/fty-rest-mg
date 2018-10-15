@@ -68,7 +68,8 @@ if (type.empty ()) {
 MlmClientPool::Ptr client = mlm_pool.get ();
 if (!client.getPointer ()) {
     log_fatal ("mlm_pool.get () failed.");
-    http_die ("internal-error", TRANSLATE_ME ("mlm_pool.get () failed."));
+    std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
+    http_die ("internal-error", err.c_str ());
 }
 
 zuuid_t *uuid = zuuid_new ();
@@ -80,14 +81,16 @@ if (rv == -1) {
     log_fatal (
             "client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
             "fty-autoconfig", "rfc-evaluator-rules");
-    http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed"));
+    std::string err =  TRANSLATE_ME ("client->sendto () failed");
+    http_die ("internal-error", err.c_str ());
 }
 
 zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
 zuuid_destroy (&uuid);
 if (!msg) {
     log_fatal ("client->recv (timeout = '5') returned NULL");
-    http_die ("internal-error", TRANSLATE_ME ("client->recv () returned NULL"));
+    std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
+    http_die ("internal-error", err.c_str ());
 }
 
 char *result = zmsg_popstr (msg);
@@ -95,7 +98,8 @@ if (!result || !streq (result, "LIST")) {
     log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result);
     zstr_free (&result);
     zmsg_destroy (&msg);
-    http_die ("internal-error", TRANSLATE_ME ("LIST template bad response"));
+    std::string err =  TRANSLATE_ME ("LIST template bad response");
+    http_die ("internal-error", err.c_str ());
 }
 zstr_free (&result);
 
@@ -104,7 +108,8 @@ if (!result || !streq (result, type.c_str())) {
     log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result);
     zstr_free (&result);
     zmsg_destroy (&msg);
-    http_die ("internal-error", TRANSLATE_ME ("LIST template bad response"));
+    std::string err =  TRANSLATE_ME ("LIST template bad response");
+    http_die ("internal-error", err.c_str ());
 }
 zstr_free (&result);
 cxxtools::SerializationInfo si;

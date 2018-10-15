@@ -70,7 +70,7 @@
 #endif
 
 /* If OSIMAGE_BASENAME==NULL - no envvar, tntnet is not running under systemd */
-const char * OSIMAGE_BASENAME = ( getenv("OSIMAGE_BASENAME") ? getenv("OSIMAGE_BASENAME") : TRANSLATE_ME ("OS image name is not available") );
+const char * OSIMAGE_BASENAME = ( getenv("OSIMAGE_BASENAME") ? getenv("OSIMAGE_BASENAME") : TRANSLATE_ME ("OS image name is not available").c_str () );
 
 void
 get_location (
@@ -110,7 +110,8 @@ get_location (
             log_debug ("get_location() did not find any 'datacenter' asset with an 'address'");
     }
     catch (const std::exception& e) {
-        log_error ("Exception caught: %s", JSONIFY(e.what ()));
+        std::string err =  JSONIFY(e.what ());
+        log_error ("Exception caught: %s", err.c_str ());
     }
 }
 
@@ -136,7 +137,8 @@ get_installation_date (
         }
     }
     catch (const std::exception& e) {
-        log_error ("Exception caught: %s", JSONIFY(e.what ()));
+        std::string err =  JSONIFY(e.what ());
+        log_error ("Exception caught: %s", err.c_str ());
     }
 }
 

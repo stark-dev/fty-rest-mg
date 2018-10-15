@@ -262,7 +262,8 @@ promote_rc0(
     // first find all rows with rcs_in_db
     auto unused_columns = cm.getTitles();
     if (unused_columns.empty()) {
-        bios_throw("bad-request-document", TRANSLATE_ME ("Cannot import empty document."));
+        std::string err = TRANSLATE_ME ("Cannot import empty document.");
+        bios_throw("bad-request-document", err.c_str ());
     }
     have_ids = unused_columns.count("id");
     for (size_t row_i = 1; row_i != cm.rows(); row_i++) {
@@ -586,14 +587,16 @@ void get_licensing_limitation(LIMITATIONS_STRUCT &limitations)
     if (rv == -1) {
         zuuid_destroy (&zuuid);
         log_fatal ("Cannot send message to etn-licensing");
-        bios_throw ("internal-error", TRANSLATE_ME ("mlm_client_sendto failed."));
+        std::string err = TRANSLATE_ME ("mlm_client_sendto failed.");
+        bios_throw ("internal-error", err.c_str ());
     }
 
     zmsg_t *response = client_ptr->recv (zuuid_str, 30);
     zuuid_destroy (&zuuid);
     if (!response) {
         log_fatal ("client->recv (timeout = '30') returned NULL for LIMITATION_QUERY");
-        bios_throw ("internal-error", TRANSLATE_ME ("client->recv () returned NULL"));
+        std::string err = TRANSLATE_ME ("client->recv () returned NULL");
+        bios_throw ("internal-error", err.c_str ());
     }
     char *reply = zmsg_popstr (response);
     char *status = zmsg_popstr (response);
@@ -651,10 +654,12 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     log_debug ("################ Row number is %zu", row_i);
     static const std::set<std::string> STATUSES = \
-        { TRANSLATE_ME ("active"), TRANSLATE_ME ("nonactive"), TRANSLATE_ME ("spare"), TRANSLATE_ME ("retired")};
+        { "active", "nonactive", "spare", "retired"};
 
     if (0 == limitations.global_configurability) {
-        bios_throw("action-forbidden", TRANSLATE_ME ("Asset handling"), TRANSLATE_ME ("Licensing global_configurability limit hit"));
+        std::string action = TRANSLATE_ME ("Asset handling");
+        std::string reason = TRANSLATE_ME ("Licensing global_configurability limit hit");
+        bios_throw("action-forbidden", action.c_str (), reason.c_str ());
     }
 
     // get location, powersource etc as name from ext.name
@@ -666,7 +671,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto unused_columns = cm.getTitles();
 
     if (unused_columns.empty()) {
-        bios_throw("bad-request-document", TRANSLATE_ME ("Cannot import empty document."));
+        std::string err = TRANSLATE_ME ("Cannot import empty document.");
+        bios_throw("bad-request-document", err.c_str ());
     }
 
     // remove the column 'create_mode' which is set to a different value anyway
@@ -694,10 +700,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             bios_throw("element-not-found", id_str.c_str ());
         }
         if ( ids.count(id) == 1 ) {
-            char *msg = zsys_sprintf (TRANSLATE_ME ("Element id '%s' found twice, aborting", id_str.c_str ()));
-            std::string msg_str(msg);
-            zstr_free (&msg);
-            bios_throw("bad-request-document", msg_str.c_str());
+            std::string msg = TRANSLATE_ME ("Element id '%s' found twice, aborting", id_str.c_str ());
+            bios_throw("bad-request-document", msg.c_str());
         }
         /*
          * removed ids insert here as we only want to pair good rows
@@ -707,20 +711,26 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
 
     auto ename = cm.get(row_i, "name");
-    if (ename.empty ())
-        bios_throw("request-param-bad", "name", TRANSLATE_ME ("<empty>"), TRANSLATE_ME ("<unique, non empty value>"));
+    if (ename.empty ()) {
+        std::string received = TRANSLATE_ME ("<empty>");
+        std::string expected = TRANSLATE_ME ("<unique, non empty value>");
+        bios_throw("request-param-bad", "name", received.c_str (), expected.c_str ());
+    }
     std::string iname;
     int rv = DBAssets::extname_to_asset_name (ename, iname);
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
     if (rv == -2) {
-        bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+        std::string err = TRANSLATE_ME ("Database failure");
+        bios_throw("internal-error", err.c_str ());
     }
     unused_columns.erase("name");
 
     auto type = cm.get_strip(row_i, "type");
     log_debug ("type = '%s'", type.c_str());
     if ( TYPES.find(type) == TYPES.end() ) {
-        bios_throw("request-param-bad", "type", type.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (type.c_str()), JSONIFY(utils::join_keys_map(TYPES, ", ").c_str()));
+        std::string received = type.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (type.c_str());
+        std::string expected = JSONIFY(utils::join_keys_map(TYPES, ", ").c_str());
+        bios_throw("request-param-bad", "type", received.c_str (), expected.c_str ());
     }
     auto type_id = TYPES.find(type)->second;
     unused_columns.erase("type");
@@ -728,15 +738,18 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto status = cm.get_strip(row_i, "status");
     log_debug ("status = '%s'", status.c_str());
     if ( STATUSES.find(status) == STATUSES.end() ) {
-        bios_throw ("request-param-bad", "status", status.empty() ? TRANSLATE_ME ("<empty>") : TRANSLATE_ME (status.c_str()),
-            JSONIFY(cxxtools::join(STATUSES.cbegin(), STATUSES.cend(), ", ").c_str()));
+        std::string received = status.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (status.c_str());
+        std::string expected = JSONIFY(cxxtools::join(STATUSES.cbegin(), STATUSES.cend(), ", ").c_str());
+        bios_throw ("request-param-bad", "status", received.c_str (), expected.c_str ());
     }
     unused_columns.erase("status");
 
     auto asset_tag =  unused_columns.count("asset_tag") ? cm.get(row_i, "asset_tag") : "";
     log_debug ("asset_tag = '%s'", asset_tag.c_str());
     if ( ( !asset_tag.empty() ) && ( asset_tag.length() > 50 ) ){
-        bios_throw("request-param-bad", "asset_tag", TRANSLATE_ME ("<too long>"), TRANSLATE_ME ("<unique string from 1 to 50 characters>"));
+        std::string received = TRANSLATE_ME ("<too long>");
+        std::string expected = TRANSLATE_ME ("<unique string from 1 to 50 characters>");
+        bios_throw("request-param-bad", "asset_tag", received.c_str (), expected.c_str ());
     }
     unused_columns.erase("asset_tag");
 
@@ -754,10 +767,12 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             parent_id = ret.item.id;
         else {
             if (ret.errsubtype == DB_ERROR_NOTFOUND) {
-                bios_throw("request-param-bad", "location", location.c_str(), TRANSLATE_ME ("<existing asset name>"));
+                std::string expected = TRANSLATE_ME ("<existing asset name>");
+                bios_throw("request-param-bad", "location", location.c_str(), expected.c_str ());
             }
             else {
-                bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+                std::string err = TRANSLATE_ME ("Database failure");
+                bios_throw("internal-error", err.c_str ());
             }
         }
     }
@@ -781,7 +796,9 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     log_debug ("subtype = '%s'", subtype.c_str());
     if ( ( type == "device" ) &&
          ( local_SUBTYPES.find(subtype) == local_SUBTYPES.cend() ) ) {
-        bios_throw("request-param-bad", "subtype", subtype.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (subtype.c_str()), JSONIFY(utils::join_keys_map(SUBTYPES, ", ").c_str()));
+        std::string received = subtype.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (subtype.c_str());
+        std::string expected = JSONIFY(utils::join_keys_map(SUBTYPES, ", ").c_str());
+        bios_throw("request-param-bad", "subtype", received.c_str (), expected.c_str ());
     }
 
     if ( ( !subtype.empty() ) && ( type != "device" ) && ( type != "group") )
@@ -790,7 +807,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
 
     if ( ( subtype.empty() ) && ( type == "group" ) ) {
-        bios_throw("request-param-required", TRANSLATE_ME ("subtype (for type group)"));
+        std::string expected = TRANSLATE_ME ("subtype (for type group)");
+        bios_throw("request-param-required", expected.c_str ());
     }
 
     auto subtype_id = local_SUBTYPES.find(subtype)->second;
@@ -808,7 +826,9 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     || SUBTYPES.find("genset")->second == subtype_id
                     || SUBTYPES.find("pdu")->second == subtype_id
                     ) && DBAssets::get_active_power_devices (conn) + 1 > limitations.max_active_power_devices) {
-                bios_throw("action-forbidden", TRANSLATE_ME ("Asset handling"), TRANSLATE_ME ("Licensing maximum amount of active power devices limit reached"));
+                std::string action = TRANSLATE_ME ("Asset handling");
+                std::string reason = TRANSLATE_ME ("Licensing maximum amount of active power devices limit reached");
+                bios_throw("action-forbidden", action.c_str (), reason.c_str ());
             }
         }
     }
@@ -824,17 +844,20 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                 bios_throw("element-not-found", id_str.c_str());
             }
             else {
-                bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+                std::string err = TRANSLATE_ME ("Database failure");
+                bios_throw("internal-error", err.c_str ());
             }
         }
         else
         {
             if ( element_in_db.item.type_id != type_id ) {
-                bios_throw("bad-request-document", TRANSLATE_ME ("Changing of asset type is forbidden"));
+                std::string err = TRANSLATE_ME ("Changing of asset type is forbidden");
+                bios_throw("bad-request-document", err.c_str ());
             }
             if ( ( element_in_db.item.subtype_id != subtype_id ) &&
                  ( element_in_db.item.subtype_name != "N_A" ) ) {
-                bios_throw("bad-request-document", TRANSLATE_ME ("Changing of asset subtype is forbidden"));
+                std::string err = TRANSLATE_ME ("Changing of asset subtype is forbidden");
+                bios_throw("bad-request-document", err.c_str ());
             }
         }
     }
@@ -876,7 +899,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     bios_throw("element-not-found", group.c_str());
                 }
                 else {
-                    bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+                    std::string err = TRANSLATE_ME ("Database failure");
+                    bios_throw("internal-error", err.c_str ());
                 }
             }
         }
@@ -932,7 +956,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     bios_throw("element-not-found", link_source.c_str());
                 }
                 else {
-                    bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+                    std::string err = TRANSLATE_ME ("Database failure");
+                    bios_throw("internal-error", err.c_str ());
                 }
             }
         }
@@ -1041,7 +1066,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             char *date = sanitize_date (value.c_str());
             if (!date) {
                 log_info ("Cannot sanitize %s '%s' for device '%s'", key.c_str(), value.c_str(), ename.c_str());
-                bios_throw("request-param-bad", key.c_str(), value.c_str(), TRANSLATE_ME("ISO date"));
+                std::string expected = TRANSLATE_ME("ISO date");
+                bios_throw("request-param-bad", key.c_str(), value.c_str(), expected.c_str ());
             }
             value = date;
             zstr_free (&date);
@@ -1064,7 +1090,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     bios_throw("element-not-found", value.c_str());
                 }
                 else {
-                    bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+                    std::string err = TRANSLATE_ME ("Database failure");
+                    bios_throw("internal-error", err.c_str ());
                 }
 
                 log_info ("logical_asset '%s' does not present in DB, rejected",
@@ -1087,7 +1114,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             double d_value = sanitize_value_double (key, value);
             if ( d_value < 0 ) {
                 log_info ("Extattribute: %s='%s' is neither positive not zero", key.c_str(), value.c_str());
-                bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), TRANSLATE_ME ("value must be a not negative number"));
+                std::string expected = TRANSLATE_ME ("value must be a not negative number");
+                bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), expected.c_str ());
             }
         }
         // BIOS-2781
@@ -1098,15 +1126,19 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                 ul = std::stoul (value, &pos);
                 if  ( pos != value.length() ) {
                     log_info ("Extattribute: %s='%s' is not unsigned integer", key.c_str(), value.c_str());
-                    bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), TRANSLATE_ME ("value must be an unsigned integer"));
+                    std::string expected = TRANSLATE_ME ("value must be an unsigned integer");
+                    bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), expected.c_str ());
                 }
             }
             catch (const std::exception& e) {
                 log_info ("Extattribute: %s='%s' is not unsigned integer", key.c_str(), value.c_str());
-                bios_throw ("request-param-bad", "location_u_pos", ("'" + value + "'").c_str (), TRANSLATE_ME ("value must be an unsigned integer"));
+                std::string expected = TRANSLATE_ME ("value must be an unsigned integer");
+                bios_throw ("request-param-bad", "location_u_pos", ("'" + value + "'").c_str (), expected.c_str ());
             }
-            if (ul == 0 || ul > 52)
-                bios_throw ("request-param-bad", "location_u_pos", ("'" + value + "'").c_str (), TRANSLATE_ME ("value must be between <1, rack size>, where rack size must be <= 52."));
+            if (ul == 0 || ul > 52) {
+                std::string expected = TRANSLATE_ME ("value must be between <1, rack size>, where rack size must be <= 52.");
+                bios_throw ("request-param-bad", "location_u_pos", ("'" + value + "'").c_str (), expected.c_str ());
+            }
         }
         // BIOS-2799
         if ( key == "u_size" && !value.empty() ) {
@@ -1116,15 +1148,19 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                 ul = std::stoul (value, &pos);
                 if  ( pos != value.length() ) {
                     log_info ("Extattribute: %s='%s' is not unsigned integer", key.c_str(), value.c_str());
-                    bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), TRANSLATE_ME ("value must be an unsigned integer"));
+                    std::string expected = TRANSLATE_ME ("value must be an unsigned integer");
+                    bios_throw ("request-param-bad", key.c_str(), ("'" + value + "'").c_str(), expected.c_str ());
                 }
             }
             catch (const std::exception& e) {
                 log_info ("Extattribute: %s='%s' is not unsigned integer", key.c_str(), value.c_str());
-                bios_throw ("request-param-bad", "u_size", ("'" + value + "'").c_str (), TRANSLATE_ME ("value must be an unsigned integer"));
+                std::string expected = TRANSLATE_ME ("value must be an unsigned integer");
+                bios_throw ("request-param-bad", "u_size", ("'" + value + "'").c_str (), expected.c_str ());
             }
-            if (ul == 0 || ul > 52)
-                bios_throw ("request-param-bad", "u_size", ("'" + value + "'").c_str (), TRANSLATE_ME ("value must be between <1, rack size>, where rack size must be <= 52."));
+            if (ul == 0 || ul > 52) {
+                std::string expected = TRANSLATE_ME ("value must be between <1, rack size>, where rack size must be <= 52.");
+                bios_throw ("request-param-bad", "u_size", ("'" + value + "'").c_str (), expected.c_str ());
+            }
         }
 
         if ( match_ext_attr (value, key) )
@@ -1221,8 +1257,10 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         }
     }
     rv = DBAssets::extname_to_asset_name (ename, m.name);
-    if (rv != 0)
-         bios_throw("internal-error", TRANSLATE_ME ("Database failure"));
+    if (rv != 0) {
+        std::string err = TRANSLATE_ME ("Database failure");
+        bios_throw("internal-error", err.c_str ());
+    }
     m.status = status;
     m.parent_id = parent_id;
     m.priority = priority;
@@ -1381,13 +1419,9 @@ void
         std::string msg{"column '" + m + "' is missing, import is aborted"};
         log_error("%s", msg.c_str());
         LOG_END;
-        char *msg_received = zsys_sprintf (TRANSLATE_ME ("<missing column '%s'>", m.c_str ()));
-        std::string msg_received_str(msg_received);
-        zstr_free (&msg_received);
-        char* msg_expected = zsys_sprintf (TRANSLATE_ME ("<column '%s' is present in csv>", m.c_str ()));
-        std::string msg_expected_str(msg_expected);
-        zstr_free (&msg_expected);
-        bios_throw("request-param-bad", m.c_str(), msg_received_str.c_str(), msg_expected_str.c_str());
+        std::string msg_received = TRANSLATE_ME ("<missing column '%s'>", m.c_str ());
+        std::string msg_expected = TRANSLATE_ME ("<column '%s' is present in csv>", m.c_str ());
+        bios_throw("request-param-bad", m.c_str(), msg_received.c_str(), msg_expected.c_str());
     }
 
     tntdb::Connection conn;

@@ -187,25 +187,39 @@ UserInfo user;
         http_die("method-not-allowed", request.getMethod().c_str() );
 
 
-    if (rv == -1)
-        http_die ("internal-error", TRANSLATE_ME ("mlmpool.get () failed."));
+    if (rv == -1) {
+        std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -2)
-        http_die ("internal-error", TRANSLATE_ME ("client->sendto () failed."));
+    if (rv == -2) {
+        std::string err =  TRANSLATE_ME ("client->sendto () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -3)
-        http_die ("internal-error", TRANSLATE_ME ("client->recv () failed."));
+    if (rv == -3) {
+        std::string err =  TRANSLATE_ME ("client->recv () failed.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -4)
-        http_die ("internal-error", TRANSLATE_ME ("fty-discovery returned error."));
+    if (rv == -4) {
+        std::string err =  TRANSLATE_ME ("fty-discovery returned error.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -5)
-        http_die ("internal-error", TRANSLATE_ME ("fty-discovery returned malformed or unexpected message."));
+    if (rv == -5) {
+        std::string err =  TRANSLATE_ME ("fty-discovery returned malformed or unexpected message.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -6)
-        http_die ("internal-error", TRANSLATE_ME ("fty-discovery precedent scan currently stopping."));
+    if (rv == -6) {
+        std::string err =  TRANSLATE_ME ("fty-discovery precedent scan currently stopping.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
-    if (rv == -7)
-        http_die ("internal-error", TRANSLATE_ME ("fty-discovery already have a scan running."));
+    if (rv == -7) {
+        std::string err =  TRANSLATE_ME ("fty-discovery already have a scan running.");
+        http_die ("internal-error", err.c_str ());
+    }
     else
 </%cpp>

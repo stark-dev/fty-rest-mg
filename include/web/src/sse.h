@@ -73,10 +73,10 @@ private:
   mlm_client_t *_clientMlm = NULL;
   zsock_t *_pipe = NULL;
   zpoller_t *_poller = NULL;
-  
+
   bool isAssetInDatacenter(fty_proto_t *asset);
   bool shouldPublishAlert(fty_proto_t *alert);
-  
+
 public:
   //Constructor/destructor
   Sse();
@@ -115,7 +115,7 @@ public:
 
   //Connect to malamute and initialize pipe and the poller
   //return Null if connection to malamute is ok, else an error message
-  const char * connectMalamute();
+  std::string connectMalamute();
 
   //Add consumer stream to malamute client
   int consumeStream(std::string stream, std::string pattern);
@@ -132,7 +132,7 @@ public:
 
   //Search all asset included in the datacenter
   //Return null or an error message if error
-  const char * loadAssetFromDatacenter();
+  std::string loadAssetFromDatacenter();
 
   //Convert an fty_proto_alert message to json
   //Return an empty string if error
@@ -141,7 +141,7 @@ public:
   //Convert an fty_proto_asset message to json
   //Return an empty string if error
   std::string changeFtyProtoAsset2Json(fty_proto_t *asset);
-  
+
 };
 
 #endif // SRC_WEB_INCLUDE_SSE_H

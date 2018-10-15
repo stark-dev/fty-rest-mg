@@ -131,20 +131,24 @@ UserInfo user;
             http_die_error(errors);
         }
         if (user == "root") {
-            http_die("request-param-bad", "user", user.c_str(), TRANSLATE_ME ("<user name other than 'root'>"));
+            std::string expected = TRANSLATE_ME ("<user name other than 'root'>");
+            http_die("request-param-bad", "user", user.c_str(), expected.c_str ());
         }
         if (user == BIOS_SCRIPT_USER) {
-            http_die("request-param-bad", "user", user.c_str(), TRANSLATE_ME ("<user name other than this one>"));
+            std::string expected = TRANSLATE_ME ("<user name other than this one>");
+            http_die("request-param-bad", "user", user.c_str(), expected.c_str ());
         }
 
+        std::string received = TRANSLATE_ME ("<empty>");
+        std::string expected = TRANSLATE_ME ("<password>");
         if (old_passwd.empty()) {
-            http_die("request-param-bad", "old_passwd", TRANSLATE_ME ("<empty>"), TRANSLATE_ME ("<password>"));
+            http_die("request-param-bad", "old_passwd", received.c_str (), expected.c_str ());
         } else {
             checked_old_passwd = old_passwd;
         }
 
         if (new_passwd.empty()) {
-            http_die("request-param-bad", "new_passwd", TRANSLATE_ME ("<empty>"), TRANSLATE_ME ("<password>"));
+            http_die("request-param-bad", "new_passwd", received.c_str (), expected.c_str ());
         } else {
             checked_new_passwd = new_passwd;
         }
@@ -158,8 +162,11 @@ UserInfo user;
             http_die ("not-authorized", "");
     }
 
-    if (!authenticate(checked_user.c_str(), checked_old_passwd.c_str()))
-        http_die("request-param-bad", "(user|old_passwd)", TRANSLATE_ME ("<invalid user or password>"), TRANSLATE_ME ("<valid user and password>"));
+    if (!authenticate(checked_user.c_str(), checked_old_passwd.c_str())) {
+        std::string received = TRANSLATE_ME ("<invalid user or password>");
+        std::string expected = TRANSLATE_ME ("<valid user and password>");
+        http_die("request-param-bad", "(user|old_passwd)", received.c_str (), expected.c_str ());
+    }
 
     std::string reason;
     std::string received;
@@ -178,7 +185,9 @@ UserInfo user;
     }
 
     /* Verify the new password and so flush the SASLAUTHD cache that trusts the old one still */
-    if (!authenticate(checked_user.c_str(), checked_new_passwd.c_str()))
-        http_die("internal-error", TRANSLATE_ME ("Can't authenticate user with new password, saslauthd service failed"));
+    if (!authenticate(checked_user.c_str(), checked_new_passwd.c_str())) {
+        std::string err =  TRANSLATE_ME ("Can't authenticate user with new password, saslauthd service failed");
+        http_die("internal-error", err.c_str ());
+    }
 </%cpp>
 { "passwd" : "<$$ "password for '" + checked_user + "' changed" $>" }

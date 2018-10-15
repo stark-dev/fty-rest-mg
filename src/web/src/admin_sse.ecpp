@@ -45,7 +45,8 @@ bool database_ready;
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        http_die ("internal-error", TRANSLATE_ME ("Database is not ready yet, please try again after a while."));
+        std::string err = TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
     }
 
     // check user permissions
@@ -76,7 +77,8 @@ bool database_ready;
             http_die ("element-not-found", dc.c_str ());
     }
     if (dbid == -2) {
-            http_die ("internal-error", TRANSLATE_ME ("Connecting to database failed."));
+            std::string err = TRANSLATE_ME ("Connecting to database failed.");
+            http_die ("internal-error", err.c_str ());
     }
     log_debug ("datacenter id = '%" PRIu32 "'.", (uint32_t) dbid);
 
@@ -89,32 +91,36 @@ bool database_ready;
     }
     catch (const tntdb::Error& e) {
         log_error ("tntdb::connectCached (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
-        http_die ("internal-error", TRANSLATE_ME ("Connecting to database failed."));
+        std::string err = TRANSLATE_ME ("Connecting to database failed.");
+        http_die ("internal-error", err.c_str ());
     }
     catch (const std::exception& e) {
         log_error ("Exception caught: '%s'.", e.what ());
-        http_die ("internal-error", JSONIFY (e.what ()));
+        std::string err = JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
     }
 
     //Get asset from the datacenter
-    const char * errorMsgAsset = sseManager.loadAssetFromDatacenter();
-    if (errorMsgAsset) {
-        http_die ("internal-error", errorMsgAsset);
+    std::string errorMsgAsset = sseManager.loadAssetFromDatacenter();
+    if (!errorMsgAsset.empty ()) {
+        http_die ("internal-error", errorMsgAsset.c_str ());
     }
 
     // connect to malamute and streams
-    const char * errorMsgMlm  = sseManager.connectMalamute();
-    if (errorMsgMlm) {
-        http_die ("internal-error", errorMsgMlm);
+    std::string errorMsgMlm  = sseManager.connectMalamute();
+    if (!errorMsgMlm.empty ()) {
+        http_die ("internal-error", errorMsgMlm.c_str ());
     }
     //Stream Alert
     if (-1 == sseManager.consumeStream("ALERTS", ".*")) {
-        http_die ("internal-error", TRANSLATE_ME ("Cannot consume ALERT stream"));
+        std::string err = TRANSLATE_ME ("Cannot consume ALERT stream");
+        http_die ("internal-error", err.c_str ());
     }
 
     //Stream Asset
     if (-1 == sseManager.consumeStream("ASSETS", ".*")) {
-        http_die ("internal-error", TRANSLATE_ME ("Cannot consume ASSETS stream"));
+        std::string err = TRANSLATE_ME ("Cannot consume ASSETS stream");
+        http_die ("internal-error", err.c_str ());
     }
 
     // Sse specification :  https://html.spec.whatwg.org/multipage/server-sent-events.html#server-sent-events
@@ -132,7 +138,8 @@ bool database_ready;
 
     if (access_token.empty()){
       log_error("Token empty");
-      http_die ("internal-error", TRANSLATE_ME ("Cannot get token value"));
+      std::string err = TRANSLATE_ME ("Cannot get token value");
+      http_die ("internal-error", err.c_str ());
     }
 
     sseManager.setToken(access_token);
