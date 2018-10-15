@@ -180,7 +180,7 @@ bool database_ready;
         checked_type.assign (AVG_TYPES[0]);
     }
     else if (!is_average_type_supported (checked_type.c_str ())) {
-        std::string expected = TRANSLATE_ME (std::string ("one of the following values: [").append (utils::join (AVG_TYPES, AVG_TYPES_SIZE, ", ")).append("].").c_str ());
+        std::string expected = TRANSLATE_ME ("one of the following values: [%s]", utils::join (AVG_TYPES, AVG_TYPES_SIZE, ", ").c_str ());
         http_die ("request-param-bad", "type",
                   std::string ("'").append (checked_type).append ("'").c_str (), expected.c_str ());
     }
@@ -190,7 +190,7 @@ bool database_ready;
         http_die ("request-param-required", "step");
     }
     if (!is_average_step_supported (checked_step.c_str ())) {
-        std::string expected = TRANSLATE_ME (std::string ("one of the following values: [").append (utils::join (AVG_STEPS, AVG_STEPS_SIZE, ", ")).append("].").c_str ());
+        std::string expected = TRANSLATE_ME ("one of the following values: [%s]", utils::join (AVG_STEPS, AVG_STEPS_SIZE, ", ").c_str ());
         http_die ("request-param-bad", "step",
                   std::string ("'").append (checked_step).append ("'").c_str (), expected.c_str ());
     }

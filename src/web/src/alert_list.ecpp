@@ -437,7 +437,8 @@ if (streq (part, "ERROR")) {
     free (part); part = NULL;
     zmsg_destroy (&recv_msg);
     mlm_client_destroy (&client);
-    http_die ("internal-error", TRANSLATE_ME ("Error while requesting list of alerts: ").append (reason).c_str ());
+    std::string err =  TRANSLATE_ME ("Error while requesting list of alerts: %s", reason.c_str ());
+    http_die ("internal-error", err.c_str ());
 }
 // Message does not conform to protocol
 log_error ("Unexptected reply from  '%s'. Does not conform to '%s' protocol.",

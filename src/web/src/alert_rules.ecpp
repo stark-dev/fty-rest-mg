@@ -218,7 +218,8 @@ if (streq (part, "ERROR")) {
         log_error ("Rule name '%s' does not exist.", checked_name.c_str ());
         zmsg_destroy (&recv_msg);
         mlm_client_destroy (&client);
-        http_die ("not-found", TRANSLATE_ME ("Rule name '").append (checked_name).append ("'").c_str ());
+        std::string err =  TRANSLATE_ME ("Rule name '%s'", checked_name.c_str ());
+        http_die ("not-found", err.c_str ());
     }
     if (streq (part, "BAD_LUA")) {
         free (part);
@@ -250,9 +251,8 @@ if (streq (part, "ERROR")) {
     free (part);
     zmsg_destroy (&recv_msg);
     mlm_client_destroy (&client);
-    http_die ("internal-error",
-              TRANSLATE_ME ("Error while retrieving details of rule name = '").append (checked_name).append ("': ").
-              append (TRANSLATE_ME (reason.c_str ())).append(".").c_str ());
+    std::string err =  TRANSLATE_ME ("Error while retrieving details of rule name = '%s': %s.", checked_name.c_str (), reason.c_str ());
+    http_die ("internal-error", err.c_str ());
 }
 // Message does not conform to protocol
 free (part);

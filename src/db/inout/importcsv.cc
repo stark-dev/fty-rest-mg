@@ -738,7 +738,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto status = cm.get_strip(row_i, "status");
     log_debug ("status = '%s'", status.c_str());
     if ( STATUSES.find(status) == STATUSES.end() ) {
-        std::string received = status.empty() ? TRANSLATE_ME ("<empty>") : TRANSLATE_ME (status.c_str());
+        std::string received = status.empty() ? TRANSLATE_ME ("<empty>") : JSONIFY (status.c_str());
         std::string expected = JSONIFY(cxxtools::join(STATUSES.cbegin(), STATUSES.cend(), ", ").c_str());
         bios_throw ("request-param-bad", "status", received.c_str (), expected.c_str ());
     }

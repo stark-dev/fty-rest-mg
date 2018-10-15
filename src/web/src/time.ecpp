@@ -65,7 +65,8 @@ UserInfo user;
         try {
             deserializer.deserialize(si);
         } catch (const std::exception& e) {
-            http_die ("bad-request-document", std::string(TRANSLATE_ME ("Expecting valid json document: ")).append (e.what ()).c_str ());
+            std::string err =  TRANSLATE_ME ("Expecting valid json document: %s", JSONIFY (e.what ()).c_str ());
+            http_die ("bad-request-document", err.c_str ());
         }
 
         std::string time;

@@ -235,9 +235,8 @@ if (streq (part, "ERROR")) {
     free (part);
     zmsg_destroy (&recv_msg);
     mlm_client_destroy (&client);
-    http_die ("internal-error",
-        TRANSLATE_ME ("Error while retrieving list of rules with type = '").append (checked_type).append ("': ").
-        append (reason).append(".").c_str ());
+    std::string err =  TRANSLATE_ME ("Error while retrieving list of rules with type = '%s': %s.", checked_type.c_str (), reason.c_str ());
+    http_die ("internal-error", err.c_str ());
 }
 // Message does not conform to protocol
 free (part);
