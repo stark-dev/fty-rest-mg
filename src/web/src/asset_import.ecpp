@@ -131,7 +131,7 @@ try{
     {
         cnt++;
 </%cpp>
-            [ <$$ oneRow.first$>, "<$$ oneRow.second.c_str()$>"]<$$ cnt != failRows.size() ? ',' : ' ' $>
+            [ <$$ oneRow.first$>, <$$ oneRow.second.c_str()$>]<$$ cnt != failRows.size() ? ',' : ' ' $>
 %   }
     ]
 }
