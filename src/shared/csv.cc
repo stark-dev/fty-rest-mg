@@ -24,6 +24,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include <cxxtools/csvdeserializer.h>
 #include <fty_common.h>
+#include <fty_common_macros.h>
 
 #include "shared/csv.h"
 #include "../persist/assetcrud.h"
@@ -66,16 +67,15 @@ CsvMap::CsvMap(const CsvMap::CxxData& data) :
 void CsvMap::deserialize() {
 
     if (_data.size() == 0) {
-        throw std::invalid_argument("Can't process empty data set");
+        throw std::invalid_argument(TRANSLATE_ME ("Can't process empty data set"));
     }
 
     size_t i = 0;
     for (const std::string& title_name : _data[0]) {
         std::string title = _ci_strip(title_name);
         if (_title_to_index.count(title) == 1) {
-            std::ostringstream buf;
-            buf << "duplicate title name '" << title << "'";
-            throw std::invalid_argument(buf.str());
+            std::string msg = TRANSLATE_ME ("duplicate title name '%s'", title.c_str ());
+            throw std::invalid_argument(msg);
         }
 
         _title_to_index.emplace(title, i);
@@ -86,25 +86,21 @@ void CsvMap::deserialize() {
 const std::string& CsvMap::get(size_t row_i, const std::string& title_name) const {
 
     if (row_i >= _data.size()) {
-        std::ostringstream buf;
-        buf << "row_index " << row_i << " was out of range " << _data.size();
-        throw std::out_of_range(buf.str());
+        std::string msg = TRANSLATE_ME ("row_index %zu was out of range %zu", row_i, _data.size ());
+        throw std::out_of_range(msg);
     }
 
     std::string title = _ci_strip(title_name);
 
     if (_title_to_index.count(title) == 0) {
-        std::ostringstream buf;
-        buf << "title name '" << title << "' not found";
-        throw std::out_of_range{buf.str()};
+        std::string msg = TRANSLATE_ME ("title name '%s' not found", title.c_str ());
+        throw std::out_of_range{msg};
     }
 
     size_t col_i = _title_to_index.at(title);
     if (col_i >= _data[row_i].size()) {
-        throw std::out_of_range{
-            "On line " + std::to_string(row_i+1) + \
-            ": requested column " + title_name + " (index " + std::to_string(col_i +1) + \
-            ") where maximum is " + std::to_string(_data[row_i].size())};
+        const char *err = "On line %zu: requested column %s (index %zu) where maximum is %zu";
+        throw std::out_of_range(TRANSLATE_ME (err, row_i+1, title_name.c_str (), col_i+1, _data[row_i].size()));
     }
     return _data[row_i][col_i];
 }
@@ -207,8 +203,8 @@ CsvMap_from_istream(
     cxxtools::CsvDeserializer deserializer(in);
     char delimiter = findDelimiter(in);
     if (delimiter == '\x0') {
-        const char* msg = "Cannot detect the delimiter, use comma (,) semicolon (;) or tabulator";
-        log_error("%s\n", msg);
+        std::string msg = TRANSLATE_ME ("Cannot detect the delimiter, use comma (,) semicolon (;) or tabulator");
+        log_error("%s\n", msg.c_str ());
         LOG_END;
         throw std::invalid_argument(msg);
     }
@@ -229,14 +225,14 @@ static void
     )
 {
     if ( powers_si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'powers' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'powers' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
     for ( const auto &oneElement : powers_si ) { // iterate through the array
         // src_name is mandatory
         if (  oneElement.findMember("src_name") == NULL ) {
-            throw std::invalid_argument("Key 'src_name' in the key 'powers' is mandatory");
+            throw std::invalid_argument(TRANSLATE_ME ("Key 'src_name' in the key 'powers' is mandatory"));
         }
 
         cxxtools::String src_name{};
@@ -272,7 +268,7 @@ static void
     )
 {
     if ( groups_si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'groups' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'groups' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
@@ -280,7 +276,7 @@ static void
         // id is just an informational field, ignore it here
         // name is mandatory
         if (  oneElement.findMember("name") == NULL ) {
-            throw std::invalid_argument("Key 'name' in the key 'groups' is mandatory");
+            throw std::invalid_argument(TRANSLATE_ME ("Key 'name' in the key 'groups' is mandatory"));
         }
         else {
             cxxtools::String group_name{};
@@ -301,7 +297,7 @@ static void
 {
     LOG_START;
     if ( si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'ips' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'ips' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
@@ -323,7 +319,7 @@ static void
 {
     LOG_START;
     if ( si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'macs' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'macs' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
@@ -345,7 +341,7 @@ static void
 {
     LOG_START;
     if ( si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'hostnames' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'hostnames' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
@@ -367,7 +363,7 @@ static void
 {
     LOG_START;
     if ( si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key 'fqdns' should be an array");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'fqdns' should be an array"));
     }
     // we need a counter for fields
     int i = 1;
@@ -387,7 +383,8 @@ static void
     )
 {
     if ( outlet_si.category () != cxxtools::SerializationInfo::Array ) {
-        throw std::invalid_argument("Key '" + outlet_si.name() +"' should be an array");
+        std::string msg = TRANSLATE_ME ("Key '%s' should be an array", outlet_si.name().c_str ());
+        throw std::invalid_argument(msg);
     }
     std::string name;
     std::string value;
@@ -399,7 +396,7 @@ static void
             oneOutletAttr.getMember("read_only").getValue(isReadOnly);
         }
         catch (...) {
-            throw std::invalid_argument("In outlet object key 'name/value/read_only' is missing");
+            throw std::invalid_argument(TRANSLATE_ME ("In outlet object key 'name/value/read_only' is missing"));
         }
         data[0].push_back(cxxtools::String ("outlet." + outlet_si.name() + "." + name));
         data[1].push_back(cxxtools::String (value));
@@ -414,7 +411,7 @@ static void
     )
 {
     if ( outlets_si.category () != cxxtools::SerializationInfo::Object ) {
-        throw std::invalid_argument("Key 'outlets' should be an object");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'outlets' should be an object"));
     }
     for ( const auto &oneOutlet : outlets_si ) { // iterate through the object
         process_oneOutlet (oneOutlet, data);
@@ -440,7 +437,7 @@ static void
         // this information in GET format
         for ( const auto &oneAttrEl : ext_si ) { // iterate through the array
             if ( oneAttrEl.memberCount() != 2 ) {
-                throw std::invalid_argument("Expected two properties per each ext attribute");
+                throw std::invalid_argument(TRANSLATE_ME ("Expected two properties per each ext attribute"));
             }
             // ASSUMPTION: oneAttr has 2 fields:
             // "read_only" - this is an information only
@@ -464,7 +461,7 @@ static void
         s_read_si(ext_si, data);
     }
     else {
-        throw std::invalid_argument("Key 'ext' should be an Array or Object");
+        throw std::invalid_argument(TRANSLATE_ME ("Key 'ext' should be an Array or Object"));
     }
 }
 
@@ -474,7 +471,7 @@ s_read_si(
         std::vector <std::vector<cxxtools::String> >& data)
 {
     if ( data.size() != 2 ) {
-        throw std::invalid_argument("Expected two items in array, got " + std::to_string(data.size()));
+        throw std::invalid_argument (TRANSLATE_ME ("Expected two items in array, got %zu", data.size()));
     }
 
     for (auto it = si.begin();
