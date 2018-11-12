@@ -88,7 +88,7 @@ std::string checked_state;
     std::string state;
     cxxtools::SerializationInfo si;
     try {
-        std::stringstream input (request.getBody(), std::ios_base::in);
+        std::stringstream input (request.getBody (), std::ios_base::in);
         cxxtools::JsonDeserializer deserializer (input);
         deserializer.deserialize (si);
         si.getMember ("state") >>= state;
@@ -105,7 +105,7 @@ std::string checked_state;
     if (!state_valid (state.c_str ())) {
         log_debug ("State is not a recognized valid alert state.");
         std::string err = TRANSLATE_ME ("one of the following values [ ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE ].");
-        http_die ("request-param-bad", "state", std::string ("'").append (state).append ("'").c_str (), err.c_str ());
+        http_die ("request-param-bad", "state", state.c_str (), err.c_str ());
     }
     else {
         checked_state = state;
@@ -125,12 +125,12 @@ std::string checked_state;
 // connect to malamute
 mlm_client_t *client = mlm_client_new ();
 if (!client) {
-    log_fatal ("mlm_client_new() failed.");
-    std::string err = TRANSLATE_ME ("mlm_client_new() failed.");
+    log_fatal ("mlm_client_new () failed.");
+    std::string err = TRANSLATE_ME ("mlm_client_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
 
-std::string client_name = utils::generate_mlm_client_id("web.alert_ack");
+std::string client_name = utils::generate_mlm_client_id ("web.alert_ack");
 log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
 int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
@@ -138,15 +138,15 @@ if (rv == -1) {
     log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
     mlm_client_destroy (&client);
-    std::string err =  TRANSLATE_ME ("mlm_client_connect() failed.");
+    std::string err =  TRANSLATE_ME ("mlm_client_connect () failed.");
     http_die ("internal-error", err.c_str ());
 }
 
 // prepare rfc-evaluator-rules ADD message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
-    log_fatal ("zmsg_new() failed.");
-    std::string err =  TRANSLATE_ME ("zmsg_new() failed.");
+    log_fatal ("zmsg_new () failed.");
+    std::string err =  TRANSLATE_ME ("zmsg_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
 std::string asset_id;
@@ -169,7 +169,7 @@ if (mlm_client_sendto (client, AGENT_FTY_ALERT_LIST, "rfc-alerts-acknowledge", N
         AGENT_FTY_ALERT_LIST, "rfc-alerts-acknowledge", 1000);
     zmsg_destroy (&send_msg);
     mlm_client_destroy (&client);
-    std::string err =  TRANSLATE_ME ("mlm_client_sendto() failed.");
+    std::string err =  TRANSLATE_ME ("mlm_client_sendto () failed.");
     http_die ("internal-error", err.c_str ());
 }
 
@@ -177,13 +177,13 @@ if (mlm_client_sendto (client, AGENT_FTY_ALERT_LIST, "rfc-alerts-acknowledge", N
 zmsg_t *recv_msg = NULL;
 zsock_t *pipe = mlm_client_msgpipe (client);
 if (!pipe) {
-    log_fatal ("mlm_client_msgpipe() failed.");
-    std::string err =  TRANSLATE_ME ("mlm_client_msgpipe() failed.");
+    log_fatal ("mlm_client_msgpipe () failed.");
+    std::string err =  TRANSLATE_ME ("mlm_client_msgpipe () failed.");
     http_die ("internal-error", err.c_str ());
 }
 zpoller_t *poller = zpoller_new (pipe, NULL);
 if (!poller) {
-    std::string err =  TRANSLATE_ME ("zpoller_new() failed.");
+    std::string err =  TRANSLATE_ME ("zpoller_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
 while (true) {
@@ -193,16 +193,16 @@ while (true) {
     }
     if (!recv_msg) {
         if (zpoller_expired (poller)) {
-            log_error ("zpoller_wait(timeout = 5000) timed out waiting for message.");
+            log_error ("zpoller_wait (timeout = 5000) timed out waiting for message.");
             mlm_client_destroy (&client);
             zpoller_destroy (&poller);
             std::string err =  TRANSLATE_ME ("Timed out waiting for message.");
             http_die ("internal-error", err.c_str ());
         }
-        log_error ("mlm_client_recv() failed.");
+        log_error ("mlm_client_recv () failed.");
         zpoller_destroy (&poller);
         mlm_client_destroy (&client);
-        std::string err =  TRANSLATE_ME ("mlm_client_recv() failed.");
+        std::string err =  TRANSLATE_ME ("mlm_client_recv () failed.");
         http_die ("internal-error", err.c_str ());
     }
     if (streq (mlm_client_sender (client), AGENT_FTY_ALERT_LIST))
