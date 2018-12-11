@@ -27,7 +27,7 @@
 */
 
 pipeline {
-                    agent { label "devel-image && x86_64" }
+                    agent { label "devel-image-ipm_1.5.0 && x86_64" }
     parameters {
         // Use DEFAULT_DEPLOY_BRANCH_PATTERN and DEFAULT_DEPLOY_JOB_NAME if
         // defined in this jenkins setup -- in Jenkins Management Web-GUI
@@ -120,7 +120,7 @@ pipeline {
             name: 'USE_CCACHE_LOGGING')
         booleanParam (
             defaultValue: false,
-            description: 'When using temporary subdirs in build/test workspaces, wipe them right after each successful build stage? (Note: in current fty-rest codebase, abs_top_srcdir etc. are used, so the original build dir name is required to exist during distcheck etc.)',
+            description: 'When using temporary subdirs in build/test workspaces, wipe them right after each successful build stage?',
             name: 'DO_CLEANUP_AFTER_BUILD')
         booleanParam (
             defaultValue: true,
@@ -173,8 +173,6 @@ pipeline {
         stage ('prepare') {
                     steps {
                         sh './autogen.sh'
-// Note : Customized bit of code for fty-rest to build and test properly
-                        sh './tools/git_details.sh > .git_details'
                         stash (name: 'prepped', includes: '**/*', excludes: '**/cppcheck.xml')
                         milestone ordinal: 40, label: "${env.JOB_NAME}@${env.BRANCH_NAME}"
                     }
