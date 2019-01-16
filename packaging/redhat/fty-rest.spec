@@ -70,6 +70,7 @@ BuildRequires:  openssl-devel
 BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  fty-proto-devel
+BuildRequires:  fty_shm-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -116,6 +117,7 @@ Requires:       openssl-devel
 Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
 Requires:       fty-proto-devel
+Requires:       fty_shm-devel
 
 %description devel
 common core rest api for 42ity project development tools

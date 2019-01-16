@@ -24,6 +24,7 @@
 #include <fty_common.h>
 #include <fty_common_rest.h>
 #include <fty_common_db_asset.h>
+#include <fty_shm.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
@@ -73,69 +74,82 @@ s_rack_realpower_nominal(
                          const std::string& name)
 {
   double ret = 0.0f;
-
-  zmsg_t *request = s_rt_encode_GET(name.c_str());
-  mlm_client_sendto(client, "fty-metric-cache", "latest-rt-data", NULL, 1000, &request);
-
-  //TODO: this intentionally wait forewer, to be fixed by proper client pool
-  zmsg_t *msg = mlm_client_recv(client);
-  if (!msg)
-    throw std::runtime_error("no reply from broker!");
-
-  //TODO: check if we have right uuid, to be fixed by proper client pool
-  char *uuid = zmsg_popstr(msg);
-  zstr_free(&uuid);
-
-  char *result = zmsg_popstr(msg);
-  if (NULL == result || !streq(result, "OK"))
-  {
-    log_warning("Error reply for device '%s', result=%s", name.c_str(), result);
-    if (NULL != result)
-    {
-      zstr_free(&result);
-    }
-    if (NULL != msg)
-    {
-      zmsg_destroy(&msg);
-    }
-    return ret;
-  }
-
-  char *element = zmsg_popstr(msg);
-  if (!streq(element, name.c_str()))
-  {
-    log_warning("element name (%s) from message differs from requested one (%s), ignoring", element, name.c_str());
-    zstr_free(&element);
-    zmsg_destroy(&msg);
-    return ret;
-  }
-  zstr_free(&element);
-
-  zmsg_t *data = zmsg_popmsg(msg);
-  while (data)
-  {
-    fty_proto_t *bmsg = fty_proto_decode(&data);
-    if (!bmsg)
-    {
-      log_warning("decoding fty_proto_t failed");
-      continue;
-    }
-
-    if (!streq(fty_proto_type(bmsg), "realpower.nominal"))
-    {
-      fty_proto_destroy(&bmsg);
-      data = zmsg_popmsg(msg);
-      continue;
-    }
-    else
-    {
-      ret = std::stod(fty_proto_value(bmsg));
-      fty_proto_destroy(&bmsg);
-      break;
+  std::string value;
+  if(fty::shm::read_metric_value(name,"realpower.nominal", value) != 0) {
+    log_warning("No realpower.nominal for '%s'", name.c_str());
+  } else  {
+    try {
+      ret = std::stod(value);
+    } catch (const std::exception& e) {
+        log_error ("the metric returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", value.c_str());
+        ret = NAN;
     }
   }
-  zmsg_destroy(&msg);
+
   return ret;
+//
+//  zmsg_t *request = s_rt_encode_GET(name.c_str());
+//  mlm_client_sendto(client, "fty-metric-cache", "latest-rt-data", NULL, 1000, &request);
+//
+//  //TODO: this intentionally wait forewer, to be fixed by proper client pool
+//  zmsg_t *msg = mlm_client_recv(client);
+//  if (!msg)
+//    throw std::runtime_error("no reply from broker!");
+//
+//  //TODO: check if we have right uuid, to be fixed by proper client pool
+//  char *uuid = zmsg_popstr(msg);
+//  zstr_free(&uuid);
+//
+//  char *result = zmsg_popstr(msg);
+//  if (NULL == result || !streq(result, "OK"))
+//  {
+//    log_warning("Error reply for device '%s', result=%s", name.c_str(), result);
+//    if (NULL != result)
+//    {
+//      zstr_free(&result);
+//    }
+//    if (NULL != msg)
+//    {
+//      zmsg_destroy(&msg);
+//    }
+//    return ret;
+//  }
+//
+//  char *element = zmsg_popstr(msg);
+//  if (!streq(element, name.c_str()))
+//  {
+//    log_warning("element name (%s) from message differs from requested one (%s), ignoring", element, name.c_str());
+//    zstr_free(&element);
+//    zmsg_destroy(&msg);
+//    return ret;
+//  }
+//  zstr_free(&element);
+//
+//  zmsg_t *data = zmsg_popmsg(msg);
+//  while (data)
+//  {
+//    fty_proto_t *bmsg = fty_proto_decode(&data);
+//    if (!bmsg)
+//    {
+//      log_warning("decoding fty_proto_t failed");
+//      continue;
+//    }
+//
+//    if (!streq(fty_proto_type(bmsg), "realpower.nominal"))
+//    {
+//      fty_proto_destroy(&bmsg);
+//      data = zmsg_popmsg(msg);
+//      continue;
+//    }
+//    else
+//    {
+//      ret = std::stod(fty_proto_value(bmsg));
+//      fty_proto_destroy(&bmsg);
+//      break;
+//    }
+//  }
+//  zmsg_destroy(&msg);
+//  return ret;
 }
 
 std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)

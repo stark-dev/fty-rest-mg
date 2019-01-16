@@ -45,6 +45,7 @@
 #include <fty_common_mlm.h>
 #include <sasl/sasl.h>
 #include <ftyproto.h>
+#include <fty_shm.h>
 
 //  FTY_REST version macros for compile-time API detection
 #define FTY_REST_VERSION_MAJOR 1

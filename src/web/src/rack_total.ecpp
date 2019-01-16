@@ -41,6 +41,7 @@
 #include <fty_common_asset_types.h>
 #include <fty_common_macros.h>
 #include <fty_common_utf8.h>
+#include <fty_shm.h>
 #include "src/persist/assetcrud.h"
 #include "shared/data.h"
 #include "cleanup.h"
@@ -55,21 +56,6 @@ static const std::map<std::string, const std::string> PARAM_TO_SRC = {
     {"avg_power_last_year", "<zero>"}
 };
 
-// encode metric GET request
-static zmsg_t*
-s_rt_encode_GET (const char* name, zuuid_t *uuid)
-{
-    assert (uuid);
-
-    static const char* method = "GET";
-
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, zuuid_str_canonical (uuid));
-    zmsg_addstr (msg, method);
-    zmsg_addstr (msg, name);
-    return msg;
-}
-
 static double
 s_total_rack_power(
     MlmClientPool::Ptr client,
@@ -80,66 +66,79 @@ s_total_rack_power(
 
     if (src == "<zero>")
         return ret;
-
-    zuuid_t *uuid = zuuid_new ();
-    zmsg_t *request = s_rt_encode_GET (name.c_str(), uuid);
-    int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
-    if (rv == -1) {
-        zuuid_destroy (&uuid);
-        log_fatal (
-                "client->sendto (address = '%s', subject = '%s') failed",
-                "fty-metric-cache", "latest-rt-data");
-        throw std::runtime_error (TRANSLATE_ME ("client->sendto () failed."));
+    
+    std::string mresult;
+    if(fty::shm::read_metric_value(name, src, mresult) != 0) {
+      log_warning ("Error reply for device '%s'", name.c_str ());
+      return ret;
     }
 
-    zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
-    zuuid_destroy (&uuid);
-    if (!msg) {
-        throw std::runtime_error (TRANSLATE_ME ("client->recv () returned NULL."));
+    try {
+        ret = std::stod (mresult);
+    }
+    catch (const std::exception &e) {
+        ret = NAN;      // handle non numeric or too big (for double??) values as JSON null
     }
 
-    char *result = zmsg_popstr (msg);
-    if (!streq (result, "OK")) {
-        log_warning ("Error reply for device '%s', result=%s", name.c_str (), result);
-        zstr_free (&result);
-        zmsg_destroy (&msg);
-        return ret;
-    }
-
-    char *element = zmsg_popstr (msg);
-    if (!streq (element, name.c_str ())) {
-        log_warning ("element name (%s) from message differs from requested one (%s), ignoring", element, name.c_str ());
-        zstr_free (&element);
-        zmsg_destroy (&msg);
-        return ret;
-    }
-    zstr_free (&element);
-
-    zmsg_t *data = zmsg_popmsg (msg);
-    while (data) {
-        fty_proto_t *bmsg = fty_proto_decode (&data);
-        if (!bmsg) {
-            log_warning ("decoding fty_proto_t failed");
-            continue;
-        }
-
-        if (!streq (fty_proto_type (bmsg), src.c_str ())) {
-            fty_proto_destroy (&bmsg);
-            data = zmsg_popmsg (msg);
-            continue;
-        }
-        else {
-            try {
-                ret = std::stod (fty_proto_value (bmsg));
-            }
-            catch (const std::exception &e) {
-                ret = NAN;      // handle non numeric or too big (for double??) values as JSON null
-            };
-            fty_proto_destroy (&bmsg);
-            break;
-        }
-    }
-    zmsg_destroy (&msg);
+//    zuuid_t *uuid = zuuid_new ();
+//    zmsg_t *request = s_rt_encode_GET (name.c_str(), uuid);
+//    int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
+//    if (rv == -1) {
+//        zuuid_destroy (&uuid);
+//        log_fatal (
+//                "client->sendto (address = '%s', subject = '%s') failed",
+//                "fty-metric-cache", "latest-rt-data");
+//        throw std::runtime_error (TRANSLATE_ME ("client->sendto () failed."));
+//    }
+//
+//    zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
+//    zuuid_destroy (&uuid);
+//    if (!msg) {
+//        throw std::runtime_error (TRANSLATE_ME ("client->recv () returned NULL."));
+//    }
+//
+//    char *result = zmsg_popstr (msg);
+//    if (!streq (result, "OK")) {
+//        log_warning ("Error reply for device '%s', result=%s", name.c_str (), result);
+//        zstr_free (&result);
+//        zmsg_destroy (&msg);
+//        return ret;
+//    }
+//
+//    char *element = zmsg_popstr (msg);
+//    if (!streq (element, name.c_str ())) {
+//        log_warning ("element name (%s) from message differs from requested one (%s), ignoring", element, name.c_str ());
+//        zstr_free (&element);
+//        zmsg_destroy (&msg);
+//        return ret;
+//    }
+//    zstr_free (&element);
+//
+//    zmsg_t *data = zmsg_popmsg (msg);
+//    while (data) {
+//        fty_proto_t *bmsg = fty_proto_decode (&data);
+//        if (!bmsg) {
+//            log_warning ("decoding fty_proto_t failed");
+//            continue;
+//        }
+//
+//        if (!streq (fty_proto_type (bmsg), src.c_str ())) {
+//            fty_proto_destroy (&bmsg);
+//            data = zmsg_popmsg (msg);
+//            continue;
+//        }
+//        else {
+//            try {
+//                ret = std::stod (fty_proto_value (bmsg));
+//            }
+//            catch (const std::exception &e) {
+//                ret = NAN;      // handle non numeric or too big (for double??) values as JSON null
+//            };
+//            fty_proto_destroy (&bmsg);
+//            break;
+//        }
+//    }
+//    zmsg_destroy (&msg);
     return ret;
 }
 
