@@ -173,6 +173,8 @@ pipeline {
         stage ('prepare') {
                     steps {
                         sh './autogen.sh'
+// Note : Customized bit of code for fty-rest to build and test properly
+                        sh './tools/git_details.sh > .git_details'
                         stash (name: 'prepped', includes: '**/*', excludes: '**/cppcheck.xml')
                         milestone ordinal: 40, label: "${env.JOB_NAME}@${env.BRANCH_NAME}"
                     }
