@@ -193,6 +193,7 @@ UserInfo user;
     if (streq (msg_subject, "SENDMAIL-ERR"))
     {
         status = "Failed";
+        http_die ("upstream-err", err_message);
     }
     else
     {
@@ -210,7 +211,7 @@ UserInfo user;
     {
         "status" : "<$ status $>",
         "error_code" : <$ err_code $>,
-        "reason" : "<$ UTF8::escape (err_message) $>"
+        "reason" : "<$ err_message $>"
     }
 }
 <%cpp>
