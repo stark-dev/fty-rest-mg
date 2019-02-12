@@ -1,4 +1,4 @@
-# Custom targets, not managed via  zproject
+# Custom targets, not managed via zproject
 
 ### No-arch pathnames wanted
 clientdir ?= $(libexecdir)/$(PACKAGE)
@@ -78,7 +78,6 @@ src_db_bios_csv_SOURCES += \
 
 src_db_bios_csv_CPPFLAGS += -I$(srcdir)/src
 endif #ENABLE_DB_BIOS_CSV
-
 
 # The /usr/libexec/bios is known and used by several components
 bios_libexecdir ?= $(prefix)/libexec/bios
@@ -217,11 +216,8 @@ ECPPFILES= \
   web/src/hw_capability.ecpp
 
 TNTLIB_BASENAME=libfty_rest
-TNTLIB_DIRNAME=$(pkglibdir)
-# Note: TNTLIB_DIRNAME used to be /usr/lib/bios before renaming in the project
-# structure, but tntnet looks for shared objects according to their "@name" in
-# its XML config, which impacts the directory pathname as well. Note that this
-# path should be the one set via <compPath>/<entry> items in the XML config
+TNTLIB_DIRNAME=$(prefix)/lib/bios
+# Note that this path should be the one set via <compPath>/<entry> items in the XML config
 # (see below for the tntnet.xml.example file generation - it seeds the OS image
 # configuration later on).
 
@@ -314,7 +310,7 @@ uninstall-local: uninstall-tntnet-nonshared uninstall-tntnet-includes
 install-exec-hook-tntnet-so:
 	mkdir -p $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    mv -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so.* $(DESTDIR)$(TNTLIB_DIRNAME)
-	/bin/rm -f $(DESTDIR)$(TNTLIB_DIRNAME)/$(TNTLIB_BASENAME).so $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
+	/bin/rm -f $(DESTDIR)$(libdir)/$(TNTLIB_BASENAME).so
 	cd $(DESTDIR)$(TNTLIB_DIRNAME) && \
 	    ln -fs "`ls -1 $(TNTLIB_BASENAME).so.* | tail -1`" $(TNTLIB_BASENAME).so
 
@@ -342,7 +338,7 @@ tntnet.xml: src/web/tntnet.xml Makefile
 ### This file contains the TNTNET settings distributed as an example for users
 ### Note: in daemon mode, "stderr > /dev/null" unless errorLog is defined
 tntnet.xml.example: src/web/tntnet.xml Makefile
-	${SED} -e 's|\(.*\)\(<!--.*<dir>/</dir>.*-->.*\)|\1<dir>$(datarootdir)/@PACKAGE@/web</dir>\n\1<compPath>\n\1\ \ \ <entry>$(pkglibdir)</entry>\n\1\ \ \ <entry>$(libdir)</entry>\n\1\ \ \ <entry>$(bios_libexecdir)</entry>\n\1\ \ \ <entry>$(bios_libdir)</entry>\n\1</compPath>|' \
+	${SED} -e 's|\(.*\)\(<!--.*<dir>/</dir>.*-->.*\)|\1<dir>$(datarootdir)/@PACKAGE@/web</dir>\n\1<compPath>\n\1\ \ \ <entry>$(bios_libdir)</entry>\n\1\ \ \ <entry>$(pkglibdir)</entry>\n\1\ \ \ <entry>$(libdir)</entry>\n\1\ \ \ <entry>$(bios_libexecdir)</entry>\n\1</compPath>|' \
 	       -e 's|<!-- <errorLog>/var/log/tntnet/error.log</errorLog> -->|<errorLog>/var/log/tntnet/error.log</errorLog>|' \
 	       -e 's|<port>8000</port>|<port>80</port>|' \
 	       -e 's|<port>8443</port>|<port>443</port>|' \
