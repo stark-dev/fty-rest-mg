@@ -36,6 +36,7 @@
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_asset_types.h>
 #include <fty_common_macros.h>
+#include <fty_shm.h>
 
 #include "shared/upsstatus.h"
 #include "shared/data.h"
@@ -114,21 +115,6 @@ struct OutletProperties {
     }
 
 };
-
-// encode metric GET request
-static zmsg_t*
-s_rt_encode_GET (const char* name, zuuid_t *uuid)
-{
-    assert (uuid);
-
-    static const char* method = "GET";
-
-    zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, zuuid_str_canonical (uuid));
-    zmsg_addstr (msg, method);
-    zmsg_addstr (msg, name);
-    return msg;
-}
 
 </%pre>
 <%request scope="global">
@@ -229,65 +215,84 @@ std::vector<uint32_t> asset_ids;
         }
 
         std::map <std::string, double> measurements{};
-
-        zuuid_t *uuid = zuuid_new ();
-        zmsg_t *request = s_rt_encode_GET (asset.item.name.c_str (), uuid);
-
-        int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
-        if (rv == -1) {
-            zuuid_destroy (&uuid);
-            log_fatal (
-                    "client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
-                    "fty-metric-cache", "latest-rt-data");
-            std::string err =  TRANSLATE_ME ("client->sendto () failed");
-            http_die ("internal-error", err.c_str ());
-        }
-
-        zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
-        zuuid_destroy (&uuid);
-        if (!msg) {
-            log_fatal ("client->recv (timeout = '5') returned NULL");
-            std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
-            http_die ("internal-error", err.c_str ());
-        }
-
-        char *result = zmsg_popstr (msg);
-        if (!streq (result, "OK")) {
-            log_warning ("Error reply for device '%s', result=%s", asset.item.name.c_str (), result);
-            zstr_free (&result);
-            zmsg_destroy (&msg);
+        {
+          fty::shm::shmMetrics mresult;
+          if(fty::shm::read_metrics(asset.item.name, ".*", mresult) != 0 ) {
+            log_warning ("Error reply for device '%s'", asset.item.name.c_str ());
             continue;
-        }
-
-        char *element = zmsg_popstr (msg);
-        if (!streq (element, asset.item.name.c_str ())) {
-            log_warning ("element name (%s) from message differs from requested one (%s), ignoring", element, asset.item.name.c_str ());
-            zstr_free (&element);
-            zmsg_destroy (&msg);
+          }
+          if(mresult.size() == 0) {
             continue;
+          }
+          for(auto &data : mresult) {
+              // TODO: non double values are not (yet) supported
+              double dvalue = 0.0;
+              try {
+                  dvalue = std::stod (fty_proto_value (data));
+              } catch (const std::exception& e) {
+                  log_error ("fty_proto_value () returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", fty_proto_value (data));
+              }
+              measurements.emplace (std::make_pair (fty_proto_type (data), dvalue));
+          }
         }
-        zstr_free (&element);
-
-        zmsg_t *data = zmsg_popmsg (msg);
-        while (data) {
-            fty_proto_t *bmsg = fty_proto_decode (&data);
-            if (!bmsg) {
-                log_warning ("decoding fty_proto_t failed");
-                continue;
-            }
-
-            // TODO: non double values are not (yet) supported
-            double dvalue = 0.0;
-            try {
-                dvalue = std::stod (fty_proto_value (bmsg));
-            } catch (const std::exception& e) {
-                log_error ("fty_proto_value () returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", fty_proto_value (bmsg));
-            }
-            measurements.emplace (std::make_pair (fty_proto_type (bmsg), dvalue));
-            fty_proto_destroy (&bmsg);
-            data = zmsg_popmsg (msg);
-        }
-        zmsg_destroy (&msg);
+//        zuuid_t *uuid = zuuid_new ();
+//        zmsg_t *request = s_rt_encode_GET (asset.item.name.c_str (), uuid);
+//
+//        int rv = client->sendto ("fty-metric-cache", "latest-rt-data", 1000, &request);
+//        if (rv == -1) {
+//            zuuid_destroy (&uuid);
+//            log_fatal (
+//                    "client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
+//                    "fty-metric-cache", "latest-rt-data");
+//            std::string err =  TRANSLATE_ME ("client->sendto () failed");
+//            http_die ("internal-error", err.c_str ());
+//        }
+//
+//        zmsg_t *msg = client->recv (zuuid_str_canonical (uuid), 5);
+//        zuuid_destroy (&uuid);
+//        if (!msg) {
+//            log_fatal ("client->recv (timeout = '5') returned NULL");
+//            std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
+//            http_die ("internal-error", err.c_str ());
+//        }
+//
+//        char *result = zmsg_popstr (msg);
+//        if (!streq (result, "OK")) {
+//            log_warning ("Error reply for device '%s', result=%s", asset.item.name.c_str (), result);
+//            zstr_free (&result);
+//            zmsg_destroy (&msg);
+//            continue;
+//        }
+//
+//        char *element = zmsg_popstr (msg);
+//        if (!streq (element, asset.item.name.c_str ())) {
+//            log_warning ("element name (%s) from message differs from requested one (%s), ignoring", element, asset.item.name.c_str ());
+//            zstr_free (&element);
+//            zmsg_destroy (&msg);
+//            continue;
+//        }
+//        zstr_free (&element);
+//
+//        zmsg_t *data = zmsg_popmsg (msg);
+//        while (data) {
+//            fty_proto_t *bmsg = fty_proto_decode (&data);
+//            if (!bmsg) {
+//                log_warning ("decoding fty_proto_t failed");
+//                continue;
+//            }
+//
+//            // TODO: non double values are not (yet) supported
+//            double dvalue = 0.0;
+//            try {
+//                dvalue = std::stod (fty_proto_value (bmsg));
+//            } catch (const std::exception& e) {
+//                log_error ("fty_proto_value () returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", fty_proto_value (bmsg));
+//            }
+//            measurements.emplace (std::make_pair (fty_proto_type (bmsg), dvalue));
+//            fty_proto_destroy (&bmsg);
+//            data = zmsg_popmsg (msg);
+//        }
+//        zmsg_destroy (&msg);
 
         // add mandatory keys if not in DB
         if ( persist::is_rack(asset.item.type_id) || persist::is_dc(asset.item.type_id) ) {
@@ -311,11 +316,11 @@ std::vector<uint32_t> asset_ids;
                 measurements.emplace(key, NAN);
             }
         }
-
-        if ( rv != 0 )
-        {
-            http_die("internal-error", "");
-        }
+//
+//        if ( rv != 0 )
+//        {
+//            http_die("internal-error", "");
+//        }
 
         std::pair<std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (asset_id);
         if (asset_names.first.empty () && asset_names.second.empty ()) {
