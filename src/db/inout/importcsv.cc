@@ -293,6 +293,7 @@ promote_rc0(
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     if (-1 == client->sendto ("fty-info", "info", 1000, &msg)) {
         zuuid_destroy (&uuid);
+        zmsg_destroy (&msg);
         throw std::runtime_error(TRANSLATE_ME ("Sending INFO message to fty-info failed"));
     }
     touch_fn(); // renew request watchdog timer
@@ -306,6 +307,8 @@ promote_rc0(
     char *command = zmsg_popstr (resp);
     if (0 == strcmp("ERROR", command)) {
         zuuid_destroy (&uuid);
+        zstr_free (&command);
+        zmsg_destroy (&resp);
         throw std::runtime_error(TRANSLATE_ME ("Response on INFO message from fty-info is ERROR"));
     }
     char *srv_name  = zmsg_popstr (resp); // we don't really need those, but we need to popstr them
@@ -316,13 +319,20 @@ promote_rc0(
     zframe_t *frame_infos = zmsg_next (resp);
     if (NULL == frame_infos) {
         zuuid_destroy (&uuid);
+        zstr_free (&command);
+        zstr_free(&srv_name);
+        zstr_free(&srv_type);
+        zstr_free(&srv_stype);
+        zstr_free(&srv_port);
+        zframe_destroy (&frame_infos);
+        zmsg_destroy (&resp);
         throw std::runtime_error(TRANSLATE_ME ("Response on INFO message from fty-info miss zhash frame"));
     }
     zhash_t *info = zhash_unpack(frame_infos); // serial, hostname, ip.[1-3]
-    char * item = (char *)zhash_first(info);
+    /*char * item = (char *)zhash_first(info);
     while (NULL != item) {
         item = (char *)zhash_next(info);
-    }
+    }*/
     zstr_free (&command);
     zstr_free(&srv_name);
     zstr_free(&srv_type);
@@ -341,10 +351,12 @@ promote_rc0(
     // ask for data about myself - asset next
     msg = zmsg_new ();
     zmsg_addstr (msg, "GET");
+    //FIXME: use new UUID here
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
     zmsg_addstr (msg, "rackcontroller-0");
     if (-1 == client->sendto ("asset-agent", "ASSET_DETAIL", 1000, &msg)) {
         zuuid_destroy (&uuid);
+        zmsg_destroy (&msg);
         throw std::runtime_error(TRANSLATE_ME ("Sending ASSET_DETAIL message to fty-asset failed"));
     }
     touch_fn(); // renew request watchdog timer
@@ -367,6 +379,7 @@ promote_rc0(
         rcs_in_db.push_back((char*)"rackcontroller-0");
     } else {
         log_debug("Receieved message that is not fty_proto");
+        zmsg_destroy (&resp);
         myself_db_ext = NULL;
     }
     if (NULL == myself_db_ext) {
@@ -588,6 +601,7 @@ void get_licensing_limitation(LIMITATIONS_STRUCT &limitations)
     int rv = client_ptr->sendto ("etn-licensing", "LIMITATION_QUERY", 1000, &request);
     if (rv == -1) {
         zuuid_destroy (&zuuid);
+        zmsg_destroy (&request);
         log_fatal ("Cannot send message to etn-licensing");
         std::string err = TRANSLATE_ME ("mlm_client_sendto failed.");
         bios_throw ("internal-error", err.c_str ());
