@@ -79,8 +79,6 @@
         http_die("action-forbidden", "REST API call", reason.c_str ());
     }
     if ( !streq(accepted_license_version.c_str(), current_license_version) ) {
-        free (accepted_license_file); accepted_license_file = NULL;
-        free (current_license_version); current_license_version = NULL;
         std::string msg = TRANSLATE_ME ("License version changed (new is %s, accepted is %s). Please accept new license first", current_license_version, accepted_license_version.c_str());
         free (accepted_license_file); accepted_license_file = NULL;
         free (current_license_version); current_license_version = NULL;
