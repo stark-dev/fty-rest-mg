@@ -104,6 +104,7 @@ long int Sse::checkTokenValidity()
     log_info("sse : Token revoked or expired");
     return -1;
   }
+  free (user_name); 
   return tme;
 }
 
