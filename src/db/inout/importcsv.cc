@@ -729,6 +729,11 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         std::string expected = TRANSLATE_ME ("<unique, non empty value>");
         bios_throw("request-param-bad", "name", received.c_str (), expected.c_str ());
     }
+    if (ename.length() > 50) {
+        std::string received = TRANSLATE_ME ("<too long>");
+        std::string expected = TRANSLATE_ME ("<unique string from 1 to 50 characters>");
+        bios_throw("request-param-bad", "name", received.c_str (), expected.c_str ());
+    }
     std::string iname;
     int rv = DBAssets::extname_to_asset_name (ename, iname);
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
