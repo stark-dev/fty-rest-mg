@@ -1468,7 +1468,10 @@ void
 
     // if there are rackcontroller in the import, promote one of it to rackcontroller-0 if not done already
     MlmClient client;
-    int rc0 = promote_rc0(&client, cm, touch_fn);
+    // rc0 promotion disabled due to multiple datacenter support
+    // - hard to decide whether it's import of DC after crash or another DC, RC location must be set manually
+    int rc0 = -1;
+    //int rc0 = promote_rc0(&client, cm, touch_fn);
     // get licensing limitation, if any
     LIMITATIONS_STRUCT limitations;
     get_licensing_limitation(limitations);
