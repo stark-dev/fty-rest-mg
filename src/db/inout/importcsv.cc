@@ -739,6 +739,14 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
     std::string iname;
     int rv = DBAssets::extname_to_asset_name (ename, iname);
+    if (!id_str.empty () && rv == 0) {
+        // internal name from DB must be the same as internal name from CSV
+        if (iname != id_str) {
+            std::string received = TRANSLATE_ME ("already existing name");
+            std::string expected = TRANSLATE_ME ("unique string from 1 to 50 characters");
+            bios_throw("request-param-bad", "name", received.c_str (), expected.c_str ());
+        }
+    }
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
     if (rv == -2) {
         std::string err = TRANSLATE_ME ("Database failure");
