@@ -520,6 +520,7 @@ promote_rc0(
             retval = rcs_in_csv[0];
             break;
         }
+        retval = cm.rows () + 1;
     } while (0);
     zhash_destroy(&info);
     if (unused_columns.count("name") && retval < cm.rows()) {
@@ -1481,7 +1482,7 @@ void
     MlmClient client;
     // rc0 promotion disabled due to multiple datacenter support
     // - hard to decide whether it's import of DC after crash or another DC, RC location must be set manually
-    int rc0 = std::numeric_limits<std::size_t>::max();
+    size_t rc0 = std::numeric_limits<std::size_t>::max();
     //int rc0 = promote_rc0(&client, cm, touch_fn);
     // get licensing limitation, if any
     LIMITATIONS_STRUCT limitations;
