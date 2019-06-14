@@ -32,8 +32,6 @@
 //  External API
 #include "../include/fty_rest.h"
 
-//  Extra headers
-
 //  Opaque class structures to allow forward references
 #ifndef DB_AGENTSTATE_AGENTSTATE_T_DEFINED
 typedef struct _db_agentstate_agentstate_t db_agentstate_agentstate_t;
@@ -327,6 +325,8 @@ typedef struct _web_src_security_removeheaders_t web_src_security_removeheaders_
 typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #define WEB_SRC_HW_CAPABILITY_T_DEFINED
 #endif
+
+//  Extra headers
 
 //  Internal API
 
