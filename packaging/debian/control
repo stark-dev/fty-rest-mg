@@ -118,3 +118,24 @@ Depends:
 Description: fty-rest debugging symbols
  This package contains the debugging symbols for fty-rest:
  common core rest api for 42ity project.
+ 
+ # Customization over zproject-generated code follows:
+Package: fty-rest-scripts
+Architecture: any
+Section: net
+Priority: optional
+Depends:
+    ${misc:Depends}
+Description: helper scripts used by fty-rest
+ This package contains helper scripts and data files used by
+ the overall solution with fty-rest.
+
+Package: fty-rest-clients
+Architecture: any
+Section: net
+Priority: optional
+Depends:
+    libfty-rest1 (= ${binary:Version}),
+    ${misc:Depends}, ${shlibs:Depends}
+Description: binary programs using fty-rest elements
+ This package contains binary programs that go along with fty-rest.
