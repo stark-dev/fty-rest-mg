@@ -1,6 +1,6 @@
 <#
  #
- # Copyright (C) 2015 - 2018 Eaton
+ # Copyright (C) 2015 - 2019 Eaton
  #
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -18,27 +18,25 @@
  #
  #><#
 /*!
- * \file asset_GET.ecpp
- * \author Alena Chernikava <AlenaChernikava@Eaton.com>
- * \author Michal Hrusecky <MichalHrusecky@Eaton.com>
- * \author Karol Hrdina <KarolHrdina@Eaton.com>
- * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
- * \brief Implementation of GET operation on any asset
+ * \file asset_counter_GET.ecpp
+ * \author Clement Perrette <ClementPerrette@Eaton.com>
+ * \brief Implementation of GET counter of active asset and more
  */
  #><%pre>
-#include <cxxtools/regex.h>
+#include <string>
+#include <exception>
+#include <czmq.h>
 
-#include <fty_proto.h>
-#include <malamute.h>
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
+#include <fty_common_db.h>
+#include <fty_common.h>
+#include <fty_common_macros.h>
+
+#include <cxxtools/jsonserializer.h>
 
 #include "shared/data.h"
-#include "shared/utils_json.h"
-#include "web/src/asset_computed_impl.h"
-#include <fty_common_rest_helpers.h>
-#include <fty_common_asset_types.h>
-#include <fty_common_mlm.h>
-#include <fty_common_mlm_utils.h>
-#include <fty_common_macros.h>
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -46,12 +44,16 @@ bool database_ready;
 </%request>
 <%cpp>
     // verify server is ready
-    if (!database_ready) {
+    if (!database_ready)
+    {
         log_debug ("Database is not ready yet.");
-        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        std::string err =  TRANSLATE_ME("Database is not ready yet, please try again after a while.");
         http_die ("internal-error", err.c_str ());
     }
 
+    // Sanity check end
+
+    // ##################################################
     // check user permissions
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Dashboard, "R"},
@@ -59,73 +61,33 @@ bool database_ready;
             };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
-    // checked parameters
-    uint32_t checked_id;
-    std::string checked_type;
-
-    // ##################################################
-    // BLOCK 1
-    // Sanity parameter check
+    tntdb::Connection connection;
+    try
     {
-        // dirty parameters
-        // Arguments parsed from URL: -> request.getArg("agrgumentName")
-        // Real parameters  in URL (after '?': -> qparam.param("parameterName")
-        std::string id  = request.getArg("id");
-        std::string type = request.getArg("type");
-        log_debug ("Request parameters - Initial tainted values received:\n\tid = '%s'\n\ttype = '%s'\n",
-                id.c_str (), type.c_str ());
+        connection = tntdb::connectCached (DBConn::url);
+        int numberActivePowerAsset = DBAssets::get_active_power_devices(connection);
 
-        if ( !type.empty() && !persist::type_to_typeid (type) ) {
-            std::string expected = TRANSLATE_ME ("one of datacenter/room/row/rack/group/device");
-            http_die("request-param-bad", "type", type.c_str (), expected.c_str ());
-        }
+        cxxtools::SerializationInfo si;
 
-        checked_type = type;
+        si.addMember("active_power_asset_count") <<= numberActivePowerAsset;
 
-        http_errors_t errors;
-        if (!check_element_identifier ("dev", id, checked_id, errors)) {
-            // XXX: we might have device called group.123, which will be passed as
-            //      id = '.123', type = 'group'
-            //      This is deprecated form of the call, but handle that gracefully
-            id = type + id;
-            http_errors_t errors;
-            if (!check_element_identifier ("dev", id, checked_id, errors)) {
-                http_die ("element-not-found", id.c_str ());
-            }
-        }
+        // Send reply.
+        reply.setContentType("application/json;charset=UTF-8");
+
+        cxxtools::JsonSerializer serializer(reply.out());
+        serializer.serialize(si);
     }
-    // Sanity check end
-
-    // ##################################################
-    // BLOCK 2
-    // connect to malamute
-    // copy & paste from alert_ack.ecpp
-    mlm_client_t *client = mlm_client_new ();
-    if (!client) {
-        log_fatal ("mlm_client_new() failed.");
-        std::string err =  TRANSLATE_ME ("mlm_client_new() failed.");
+    catch (const tntdb::Error& e)
+    {
+        log_error ("tntdb::connectCached (url = '%s') failed: %s.", url.c_str (), e.what ());
+        std::string err =  TRANSLATE_ME ("Connecting to database failed.");
+        http_die ("internal-error", err.c_str ());
+    }
+    catch (const std::exception& e)
+    {
+        log_error ("Exception caught: '%s'.", e.what ());
+        std::string err =  JSONIFY (e.what ());
         http_die ("internal-error", err.c_str ());
     }
 
-    std::string client_name = utils::generate_mlm_client_id("web.asset_get");
-    log_debug ("malamute client name = '%s'.", client_name.c_str ());
-
-    int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
-    if (rv == -1) {
-        log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
-                        MLM_ENDPOINT, 1000, client_name.c_str ());
-        mlm_client_destroy (&client);
-        std::string err =  TRANSLATE_ME ("mlm_client_connect() failed.");
-        http_die ("internal-error", err.c_str ());
-    }
-    // end connect to malamute
-    std::string jsonAsset = getJsonAsset(client,checked_id);
-    mlm_client_destroy (&client);
-    if (jsonAsset.empty())  {
-        std::string err =  TRANSLATE_ME ("get json asset failed.");
-        http_die ("internal-error", err.c_str ());
-    }
-
-// Prepare the reply
 </%cpp>
-    <$$ jsonAsset   $>
