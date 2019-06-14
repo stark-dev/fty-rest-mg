@@ -39,6 +39,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/asset_actions_POST.cc \
     src/web/src/asset_export.cc \
     src/web/src/asset_GET.cc \
+    src/web/src/asset_counter_GET.cc \
     src/web/src/asset_import.cc \
     src/web/src/asset_list.cc \
     src/web/src/asset_POST.cc \
