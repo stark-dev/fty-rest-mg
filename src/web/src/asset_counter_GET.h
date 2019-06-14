@@ -22,24 +22,4 @@
 #ifndef WEB_SRC_ASSET_COUNTER_GET_H_INCLUDED
 #define WEB_SRC_ASSET_COUNTER_GET_H_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-//  @interface
-//  Create a new web_src_asset_counter_get
-FTY_REST_PRIVATE web_src_asset_counter_get_t *
-    web_src_asset_counter_get_new (void);
-
-//  Destroy the web_src_asset_counter_get
-FTY_REST_PRIVATE void
-    web_src_asset_counter_get_destroy (web_src_asset_counter_get_t **self_p);
-
-
-//  @end
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif
