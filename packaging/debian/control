@@ -118,8 +118,8 @@ Depends:
 Description: fty-rest debugging symbols
  This package contains the debugging symbols for fty-rest:
  common core rest api for 42ity project.
- 
- # Customization over zproject-generated code follows:
+
+# Customization over zproject-generated code follows:
 Package: fty-rest-scripts
 Architecture: any
 Section: net
