@@ -254,6 +254,13 @@
       <url>^/api/v1/assets$</url>
     </mapping>
 
+    <!-- Counters on asset-->
+    <mapping>
+      <target>asset_counter_GET@libfty_rest</target>
+      <url>^/api/v1/asset-counters($|\?.+$)</url>
+      <method>GET</method>
+    </mapping>
+
     <mapping>
       <target>asset_list@libfty_rest</target>
       <url>^/api/v1/asset/(datacenter|room|row|rack|group|device)s.*$</url>

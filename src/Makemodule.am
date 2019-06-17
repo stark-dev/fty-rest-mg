@@ -39,6 +39,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/asset_actions_POST.cc \
     src/web/src/asset_export.cc \
     src/web/src/asset_GET.cc \
+    src/web/src/asset_counter_GET.cc \
     src/web/src/asset_import.cc \
     src/web/src/asset_list.cc \
     src/web/src/asset_POST.cc \
@@ -294,6 +295,16 @@ else
 coverage: src/fty_rest_selftest
 	@echo "call make clean && configure --with-gcov to enable code coverage"
 	@exit 1
+endif
+
+bindings: python-bindings
+
+python-bindings:
+if ENABLE_BINDINGS_PYTHON
+	-( cd bindings/python && python setup.py install )
+else
+	@echo "Python Bindings not enabled or missing setup.py... skipping"
+
 endif
 
 # A series of tests that the codebase and recipes are pretty, easy

@@ -1,0 +1,93 @@
+<#
+ #
+ # Copyright (C) 2015 - 2019 Eaton
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+ # the Free Software Foundation; either version 2 of the License, or
+ # (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU General Public License for more details.
+ #
+ # You should have received a copy of the GNU General Public License along
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ #
+ #><#
+/*!
+ * \file asset_counter_GET.ecpp
+ * \author Clement Perrette <ClementPerrette@Eaton.com>
+ * \brief Implementation of GET counter of active asset and more
+ */
+ #><%pre>
+#include <string>
+#include <exception>
+#include <czmq.h>
+
+#include <fty_common_rest_helpers.h>
+#include <fty_common_db_dbpath.h>
+#include <fty_common_db_asset.h>
+#include <fty_common_db.h>
+#include <fty_common.h>
+#include <fty_common_macros.h>
+
+#include <cxxtools/jsonserializer.h>
+
+#include "shared/data.h"
+</%pre>
+<%request scope="global">
+UserInfo user;
+bool database_ready;
+</%request>
+<%cpp>
+    // verify server is ready
+    if (!database_ready)
+    {
+        log_debug ("Database is not ready yet.");
+        std::string err =  TRANSLATE_ME("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
+    }
+
+    // Sanity check end
+
+    // ##################################################
+    // check user permissions
+    static const std::map <BiosProfile, std::string> PERMISSIONS = {
+            {BiosProfile::Dashboard, "R"},
+            {BiosProfile::Admin,     "R"}
+            };
+    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+
+    tntdb::Connection connection;
+    try
+    {
+        connection = tntdb::connectCached (DBConn::url);
+        int numberActivePowerAsset = DBAssets::get_active_power_devices(connection);
+
+        cxxtools::SerializationInfo si;
+
+        si.addMember("active_power_asset_count") <<= numberActivePowerAsset;
+
+        // Send reply.
+        reply.setContentType("application/json;charset=UTF-8");
+
+        cxxtools::JsonSerializer serializer(reply.out());
+        serializer.serialize(si);
+    }
+    catch (const tntdb::Error& e)
+    {
+        log_error ("tntdb::connectCached (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
+        std::string err =  TRANSLATE_ME ("Connecting to database failed.");
+        http_die ("internal-error", err.c_str ());
+    }
+    catch (const std::exception& e)
+    {
+        log_error ("Exception caught: '%s'.", e.what ());
+        std::string err =  JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
+    }
+
+</%cpp>
