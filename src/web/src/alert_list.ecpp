@@ -100,6 +100,8 @@ s_request_list (zuuid_t *uuid, const std::string& filter, const std::vector<std:
             zmsg_addstr (send_msg, item.c_str ());
         }
     }
+
+    return send_msg;
 }
 
 static std::string
