@@ -114,11 +114,7 @@ if (request.getMethod () == "PUT") {
     zmsg_addstr (send_msg, checked_name.c_str ());
 }
 
-// is it flexible
-cxxtools::Regex reg ("^[[:blank:][:cntrl:]]*\\{[[:blank:][:cntrl:]]*\"flexible\"", REG_EXTENDED);
-
 const char *dest = "fty-alert-engine";
-if (reg.match (request.getBody ())) dest = "fty-alert-flexible";
 
 // send it
 if (mlm_client_sendto (client, dest, "rfc-evaluator-rules", NULL, 1000, &send_msg) != 0) {
