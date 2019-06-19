@@ -70,20 +70,6 @@ is_requeststate (const char *state) {
     return is_alertstate (state);
 }
 
-static int
-is_state_included (const char *request, const char *alert) {
-    if (!is_requeststate (request))
-        return 0;
-    if (!is_alertstate (alert))
-        return 0;
-
-    if (streq (request, "ALL"))
-        return 1;
-    if (streq (request, "ALL-ACTIVE") && !streq (alert, "RESOLVED"))
-        return 1;
-    return streq (request, alert);
-}
-
 static zmsg_t*
 s_request_list (zuuid_t *uuid, const std::string& filter, const std::vector<std::string>& desired_elements) {
     zmsg_t *send_msg = zmsg_new ();
@@ -149,6 +135,8 @@ s_response_list (zmsg_t *resp, tntdb::Connection& connection) {
     }
 
     json += " ]";
+
+    return json;
 }
 
 </%pre>
