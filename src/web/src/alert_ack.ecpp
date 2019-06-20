@@ -49,12 +49,11 @@ int state_valid (const char *state) {
 }
 
 static zmsg_t*
-s_request_ack (zuuid_t *uuid, const std::string& rule_name, const std::string& element_name, const std::string& state) {
+s_request_ack (zuuid_t *uuid, const std::string& rule_name, const std::string& state) {
     zmsg_t *send_msg = zmsg_new ();
-    zmsg_addstr (send_msg, "CHANGESTATE");
     zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
-    std::string alert_id (rule_name + "@" + element_name);
-    zmsg_addstr (send_msg, alert_id.c_str ());
+    zmsg_addstr (send_msg, "CHANGESTATE");
+    zmsg_addstr (send_msg, rule_name.c_str ());
     zmsg_addstr (send_msg, state.c_str ());
 
     return send_msg;
@@ -63,15 +62,15 @@ s_request_ack (zuuid_t *uuid, const std::string& rule_name, const std::string& e
 </%pre>
 <%request scope="global">
 UserInfo user;
-bool database_ready;
+//bool database_ready;
 </%request>
 <%cpp>
     // verify server is ready
-    if (!database_ready) {
+/*    if (!database_ready) {
         log_debug ("Database is not ready yet.");
         std::string err = TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
         http_die ("internal-error", err.c_str ());
-    }
+    }*/
 
     // permission check
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
@@ -81,6 +80,7 @@ bool database_ready;
 
     // checked input arguments
     std::string checked_rule_name;
+    // TODO FIXME: unused, left for legacy compatibility
     std::string checked_element_name; // after last change this is unicode name
     std::string checked_state;
 
@@ -139,8 +139,9 @@ bool database_ready;
     }
 
     // convert external name to asset ID
-    std::string asset_id;
-    int rv = DBAssets::extname_to_asset_name (checked_element_name, asset_id);
+    int pos = checked_rule_name.find('@');
+    std::string asset_id = checked_rule_name.substr (pos+1);
+    /*int rv = DBAssets::extname_to_asset_name (checked_element_name, asset_id);
     if (rv == -1) {
         std::string msg_not_found = TRANSLATE_ME ("Cannot get asset ID for %s", checked_element_name.c_str ());
         http_die ("not-found", msg_not_found.c_str ());
@@ -148,7 +149,7 @@ bool database_ready;
     if (rv == -2) {
         std::string err =  TRANSLATE_ME ("Database failure");
         http_die ("internal-error", err.c_str ());
-    }
+    }*/
 
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ())
@@ -159,8 +160,8 @@ bool database_ready;
     }
 
     zuuid_t *uuid = zuuid_new ();
-    zmsg_t *request_msg = s_request_ack (uuid, checked_rule_name, checked_element_name, checked_state);
-    rv = client->sendto (AGENT_FTY_ALERT_LIST, RFC_ALERTS_ACK, 1000, &request_msg);
+    zmsg_t *request_msg = s_request_ack (uuid, checked_rule_name, checked_state);
+    int rv = client->sendto (AGENT_FTY_ALERT_LIST, RFC_ALERTS_ACK, 1000, &request_msg);
 
     if (rv == -1)
     {
@@ -190,19 +191,12 @@ bool database_ready;
     ZstrGuard part (zmsg_popstr (resp));
     if (streq (part, "CHANGESTATE")) {
         part = zmsg_popstr (resp);
-        if (!part || !streq (part, zuuid_str_canonical (uuid))) {
-            log_error ("Unexpected reply from '%s': Wrong correlation ID", client->sender ());
-            std::string err =  TRANSLATE_ME ("Bad message.");
-            http_die ("internal-error", err.c_str ());
-        }
-        part = zmsg_popstr (resp);
-        std::string alert_id (checked_rule_name + "@" + checked_element_name);
-        if (!part || !streq (part, alert_id.c_str ())) {
+        if (!part || !streq (part, checked_rule_name.c_str ())) {
             log_error ("Unexpected reply from '%s': Incorrect alert ID", client->sender ());
             std::string err =  TRANSLATE_ME ("Bad message.");
             http_die ("internal-error", err.c_str ());
         }
-    // TODO: rfc-11 is not written yet, json format can change freely
+    // TODO FIXME: JSON format kept for legacy compatibility - element name should be removed
     </%cpp>
     {
         <$$ utils::json::jsonify ("rule_name", checked_rule_name) $>,
