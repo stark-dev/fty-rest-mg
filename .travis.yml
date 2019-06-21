@@ -94,9 +94,9 @@ pkg_deps_doctools: &pkg_deps_doctools
 pkg_deps_devtools: &pkg_deps_devtools
     - git
 
-
 # NOTE: Unlike earlier zproject versions, the pkg_src* objects below do not
 # start with a dash, due to peculiarities of YAML alias dereferencing in Travis
+
 # dist==trusty means ubuntu14
 pkg_src_zeromq_ubuntu14: &pkg_src_zeromq_ubuntu14
   sourceline: 'deb http://download.opensuse.org/repositories/network:/messaging:/zeromq:/git-draft/xUbuntu_14.04/ ./'
@@ -167,7 +167,7 @@ matrix:
         - *pkg_deps_common
         - gcc-4.9
         - g++-4.9
-# Shadow-compilation setups below inspired by https://docs.travis-ci.com/user/language
+# Shadow-compilation setups below inspired by https://docs.travis-ci.com/user/languages/cpp/
   - env: BUILD_TYPE=default-Werror MATRIX_EVAL="CC=gcc-5 && CXX=g++-5 && export CC CXX"
     os: linux
     dist: trusty
