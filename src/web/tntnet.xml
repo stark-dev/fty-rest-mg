@@ -254,6 +254,13 @@
       <url>^/api/v1/assets$</url>
     </mapping>
 
+    <!-- Counters on asset-->
+    <mapping>
+      <target>asset_counter_GET@libfty_rest</target>
+      <url>^/api/v1/asset-counters($|\?.+$)</url>
+      <method>GET</method>
+    </mapping>
+
     <mapping>
       <target>asset_list@libfty_rest</target>
       <url>^/api/v1/asset/(datacenter|room|row|rack|group|device)s.*$</url>
@@ -268,11 +275,21 @@
       <url>^/api/v1/asset/import.*</url>
     </mapping>
 
+    <!-- Asset export (DC specific)-->
+    <mapping>
+      <target>asset_export@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/asset/export/(.*)</url>
+      <args>
+        <dc>$1</dc>
+      </args>
+    </mapping>
+
     <!-- Asset export -->
     <mapping>
       <target>asset_export@libfty_rest</target>
       <method>GET</method>
-      <url>^/api/v1/asset/export.*</url>
+      <url>^/api/v1/asset/export</url>
     </mapping>
 
     <mapping>
