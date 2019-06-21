@@ -74,13 +74,13 @@ static zmsg_t*
 s_request_list (zuuid_t *uuid, const std::string& filter, const std::vector<std::string>& desired_elements) {
     zmsg_t *send_msg = zmsg_new ();
     if (desired_elements.empty ()) {
-        zmsg_addstr (send_msg, "LISTALL");
         zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
+        zmsg_addstr (send_msg, "LISTALL");
         zmsg_addstr (send_msg, filter.c_str ());
     }
     else {
-        zmsg_addstr (send_msg, "LIST");
         zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
+        zmsg_addstr (send_msg, "LIST");
         zmsg_addstr (send_msg, filter.c_str ());
         for (auto const& item : desired_elements) {
             zmsg_addstr (send_msg, item.c_str ());
@@ -309,7 +309,7 @@ bool database_ready;
     ZstrGuard part (zmsg_popstr (resp));
     if (streq (part, "LISTALL")) {
         part = zmsg_popstr (resp);
-        part = zmsg_popstr (resp);
+        //part = zmsg_popstr (resp);
         json = s_response_list (resp, connection);
         if (json.empty ()) {
             std::string err = TRANSLATE_ME ("Invalid reply from %s", AGENT_FTY_ALERT_LIST);
@@ -318,7 +318,7 @@ bool database_ready;
     }
     else if (streq (part, "LIST")) {
         part = zmsg_popstr (resp);
-        part = zmsg_popstr (resp);
+        //part = zmsg_popstr (resp);
         json = s_response_list (resp, connection);
         if (json.empty ()) {
             std::string err = TRANSLATE_ME ("Invalid reply from %s", AGENT_FTY_ALERT_LIST);
