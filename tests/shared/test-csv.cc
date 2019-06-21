@@ -43,7 +43,7 @@
 #include "src/db/inout.h"
 using namespace shared;
 
-TEST_CASE("CSV map basic get test", "[csv]") {
+TEST_CASE ("CSV map basic get test", "[csv]") {
 
     std::stringstream buf;
 
@@ -52,65 +52,65 @@ TEST_CASE("CSV map basic get test", "[csv]") {
     buf << "RACK-02,rack,GR-01,GR-02,\"just\tmy\nrack\"\n";
 
     std::vector<std::vector<std::string> > data;
-    cxxtools::CsvDeserializer deserializer(buf);
-    deserializer.delimiter(',');
-    deserializer.readTitle(false);
-    deserializer.deserialize(data);
+    cxxtools::CsvDeserializer deserializer (buf);
+    deserializer.delimiter (',');
+    deserializer.readTitle (false);
+    deserializer.deserialize (data);
 
     shared::CsvMap cm{data};
-    cm.deserialize();
+    cm.deserialize ();
 
     // an access to headers
-    REQUIRE(cm.get(0, "Name") == "Name");
-    REQUIRE(cm.get(0, "name") == "Name");
-    REQUIRE(cm.get(0, "nAMe") == "Name");
+    REQUIRE (cm.get (0, "Name") == "Name");
+    REQUIRE (cm.get (0, "name") == "Name");
+    REQUIRE (cm.get (0, "nAMe") == "Name");
 
     // an access to data
-    REQUIRE(cm.get(1, "Name") == "RACK-01");
-    REQUIRE(cm.get(2, "Name") == "RACK-02");
+    REQUIRE (cm.get (1, "Name") == "RACK-01");
+    REQUIRE (cm.get (2, "Name") == "RACK-02");
 
     // an access to data
-    REQUIRE(cm.get(1, "Type") == "rack");
-    REQUIRE(cm.get(2, "tYpe") == "rack");
+    REQUIRE (cm.get (1, "Type") == "rack");
+    REQUIRE (cm.get (2, "tYpe") == "rack");
 
     // out of bound access
-    REQUIRE_THROWS_AS(cm.get(42, ""), std::out_of_range);
+    REQUIRE_THROWS_AS (cm.get (42, ""), std::out_of_range);
     // unknown key
-    REQUIRE_THROWS_AS(cm.get(0, ""), std::out_of_range);
+    REQUIRE_THROWS_AS (cm.get (0, ""), std::out_of_range);
 
     // test values with commas
-    REQUIRE(cm.get(1, "description") == "just,my,dc");
-    REQUIRE(cm.get(2, "description") == "just\tmy\nrack");
+    REQUIRE (cm.get (1, "description") == "just,my,dc");
+    REQUIRE (cm.get (2, "description") == "just\tmy\nrack");
 
-    auto titles = cm.getTitles();
-    REQUIRE(titles.size() == 5);
-    REQUIRE(titles.count("name") == 1);
-    REQUIRE(titles.count("type") == 1);
-    REQUIRE(titles.count("group.1") == 1);
-    REQUIRE(titles.count("group.2") == 1);
-    REQUIRE(titles.count("description") == 1);
+    auto titles = cm.getTitles ();
+    REQUIRE (titles.size () == 5);
+    REQUIRE (titles.count ("name") == 1);
+    REQUIRE (titles.count ("type") == 1);
+    REQUIRE (titles.count ("group.1") == 1);
+    REQUIRE (titles.count ("group.2") == 1);
+    REQUIRE (titles.count ("description") == 1);
 
 }
 
-TEST_CASE("CSV multiple field names", "[csv]") {
+TEST_CASE ("CSV multiple field names", "[csv]") {
 
     std::stringstream buf;
 
     buf << "Name, name\n";
 
     std::vector<std::vector<std::string> > data;
-    cxxtools::CsvDeserializer deserializer(buf);
-    deserializer.delimiter(',');
-    deserializer.readTitle(false);
-    deserializer.deserialize(data);
+    cxxtools::CsvDeserializer deserializer (buf);
+    deserializer.delimiter (',');
+    deserializer.readTitle (false);
+    deserializer.deserialize (data);
 
     shared::CsvMap cm{data};
-    REQUIRE_THROWS_AS(cm.deserialize(), std::invalid_argument);
+    REQUIRE_THROWS_AS (cm.deserialize (), std::invalid_argument);
 
 }
 
-inline std::string to_utf8(const cxxtools::String& ws) {
-    return cxxtools::Utf8Codec::encode(ws);
+inline std::string to_utf8 (const cxxtools::String& ws) {
+    return cxxtools::Utf8Codec::encode (ws);
 }
 
 /*
@@ -122,85 +122,85 @@ inline std::string to_utf8(const cxxtools::String& ws) {
  * expected usage, where iconv will be involved!
  *
  */
-TEST_CASE("CSV utf-8 input", "[csv]") {
+TEST_CASE ("CSV utf-8 input", "[csv]") {
 
     std::string path{__FILE__};
     path += ".csv";
 
     std::ifstream buf{path};
-    skip_utf8_BOM(buf);
+    skip_utf8_BOM (buf);
 
     std::vector<std::vector<cxxtools::String> > data;
 
-    cxxtools::CsvDeserializer deserializer(buf);
-    deserializer.delimiter('\t');
-    deserializer.readTitle(false);
-    deserializer.deserialize(data);
+    cxxtools::CsvDeserializer deserializer (buf);
+    deserializer.delimiter ('\t');
+    deserializer.readTitle (false);
+    deserializer.deserialize (data);
 
     shared::CsvMap cm{data};
-    REQUIRE_NOTHROW(cm.deserialize());
+    REQUIRE_NOTHROW (cm.deserialize ());
 
-    REQUIRE(cm.get(0, "field") == "Field");
-    REQUIRE(cm.get(0, "Ananotherone") == "An another one");
+    REQUIRE (cm.get (0, "field") == "Field");
+    REQUIRE (cm.get (0, "Ananotherone") == "An another one");
 
-    REQUIRE(cm.get(1, "field") == to_utf8(cxxtools::String(L"тест")));
-    REQUIRE(cm.get(2, "field") == to_utf8(cxxtools::String(L"测试")));
-    REQUIRE(cm.get(3, "field") == to_utf8(cxxtools::String(L"Test")));
+    REQUIRE (cm.get (1, "field") == to_utf8 (cxxtools::String (L"тест")));
+    REQUIRE (cm.get (2, "field") == to_utf8 (cxxtools::String (L"测试")));
+    REQUIRE (cm.get (3, "field") == to_utf8 (cxxtools::String (L"Test")));
 
 }
 
-TEST_CASE("CSV findDelimiter", "[csv]")
+TEST_CASE ("CSV findDelimiter", "[csv]")
 {
     {
     std::stringstream buf;
     buf << "Some;delimiter\n";
-    auto delim = findDelimiter(buf);
+    auto delim = findDelimiter (buf);
 
-    REQUIRE(buf.str().size() == 15);
-    REQUIRE(delim == ';');
-    REQUIRE(buf.str().size() == 15);
+    REQUIRE (buf.str ().size () == 15);
+    REQUIRE (delim == ';');
+    REQUIRE (buf.str ().size () == 15);
     }
 
     {
     std::stringstream buf;
     buf << "None delimiter\n";
-    auto delim = findDelimiter(buf);
+    auto delim = findDelimiter (buf);
 
-    REQUIRE(buf.str().size() == 15);
-    REQUIRE(delim == '\x0');
-    REQUIRE(buf.str().size() == 15);
+    REQUIRE (buf.str ().size () == 15);
+    REQUIRE (delim == '\x0');
+    REQUIRE (buf.str ().size () == 15);
     }
 
     {
     std::stringstream buf;
     buf << "None_delimiter\n";
-    auto delim = findDelimiter(buf);
+    auto delim = findDelimiter (buf);
 
-    REQUIRE(buf.str().size() == 15);
-    REQUIRE(delim == '\x0');
-    REQUIRE(buf.str().size() == 15);
+    REQUIRE (buf.str ().size () == 15);
+    REQUIRE (delim == '\x0');
+    REQUIRE (buf.str ().size () == 15);
     }
 
 }
 
-TEST_CASE("CSV from_serialization_info", "[csv][si]")
+TEST_CASE ("CSV from_serialization_info", "[csv][si]")
 {
 
     cxxtools::SerializationInfo si;
 
-    si.setTypeName("Object");
-    si.addMember("name") <<= "DC-1";
-    si.addMember("type") <<= "datacenter";
+    si.setTypeName ("Object");
+    si.addMember ("name") <<= "DC-1";
+    si.addMember ("type") <<= "datacenter";
 
-    cxxtools::SerializationInfo& esi = si.addMember("ext");
+    cxxtools::SerializationInfo& esi = si.addMember ("ext");
 
-    esi.setTypeName("Object");
-    esi.addMember("ext1") <<= "ext1";
-    esi.addMember("ext2") <<= "ext2";
+    esi.setTypeName ("Object");
+    esi.addMember ("ext1") <<= "ext1";
+    esi.addMember ("ext2") <<= "ext2";
 
-    CsvMap map = CsvMap_from_serialization_info(si);
-    REQUIRE(map.cols() == 4);
-    REQUIRE(map.rows() == 2);
+    CsvMap map = CsvMap_from_serialization_info (si);
+    REQUIRE (map.cols () == 4);
+    REQUIRE (map.rows () == 2);
 
     std::vector<std::vector<std::string>> EXP = {
         {"name", "type", "ext1", "ext2"},
@@ -209,13 +209,13 @@ TEST_CASE("CSV from_serialization_info", "[csv][si]")
 
     int i = 0;
     for (const auto& title : EXP[0]) {
-        REQUIRE(map.hasTitle(title));
-        REQUIRE(map.get(1, title) == EXP[1][i++]);
+        REQUIRE (map.hasTitle (title));
+        REQUIRE (map.get (1, title) == EXP[1][i++]);
     }
 
 }
 
-TEST_CASE("CSV from_json", "[csv][si]")
+TEST_CASE ("CSV from_json", "[csv][si]")
 {
 
     const char* JSON = "{\"name\":\"dc_name_test\",\"type\":\"datacenter\",\"sub_type\":\"\",\"location\":\"\",\"status\":\"active\",\"priority\":\"P1\",\"ext\":{\"asset_tag\":\"A123B123\",\"address\":\"ASDF\"}}";
@@ -224,12 +224,12 @@ TEST_CASE("CSV from_json", "[csv][si]")
 
     cxxtools::SerializationInfo si;
     cxxtools::JsonDeserializer jsd{json_s};
-    jsd.deserialize(si);
+    jsd.deserialize (si);
 
-    CsvMap map = CsvMap_from_serialization_info(si);
+    CsvMap map = CsvMap_from_serialization_info (si);
 
-    REQUIRE(map.cols() == 8);
-    REQUIRE(map.rows() == 2);
+    REQUIRE (map.cols () == 8);
+    REQUIRE (map.rows () == 2);
 
     std::vector<std::vector<std::string>> EXP = {
         {"name", "type", "sub_type", "location", "status", "priority", "asset_tag", "address"},
@@ -238,13 +238,13 @@ TEST_CASE("CSV from_json", "[csv][si]")
 
     int i = 0;
     for (const auto& title : EXP[0]) {
-        REQUIRE(map.hasTitle(title));
-        REQUIRE(map.get(1, title) == EXP[1][i++]);
+        REQUIRE (map.hasTitle (title));
+        REQUIRE (map.get (1, title) == EXP[1][i++]);
     }
 }
 
 
-TEST_CASE("CSV map apostrof", "[csv]") {
+TEST_CASE ("CSV map apostrof", "[csv]") {
 
     std::stringstream buf;
 
@@ -252,11 +252,11 @@ TEST_CASE("CSV map apostrof", "[csv]") {
     buf << "RACK-01,rack,GR-01,GR-02,\"just,my',dc\"\n";
     buf << "RACK-02,rack,GR-01,GR-02,\"just\tmy\nrack\"\n";
 
-    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream(buf));
+    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream (buf));
 }
 
 
-TEST_CASE("CSV map apostrof2", "[csv]") {
+TEST_CASE ("CSV map apostrof2", "[csv]") {
 
     std::stringstream buf;
 
@@ -264,56 +264,56 @@ TEST_CASE("CSV map apostrof2", "[csv]") {
     buf << "RACK'-01,rack,GR-01,GR-02,\"just,my',dc\"\n";
     buf << "RACK-02,rack,GR-01,GR-02,\"just\tmy\nrack\"\n";
 
-    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream(buf));
+    REQUIRE_NOTHROW ( shared::CsvMap cm = CsvMap_from_istream (buf));
 }
 
 
 class MlmClientTest: public MlmClient {
     public:
-        MlmClientTest(int sendto_retval) : MlmClient() {
+        MlmClientTest (int sendto_retval) : MlmClient () {
             sendto_rv = sendto_retval;
             reply_no = 0;
-            reply.clear();
+            reply.clear ();
         };
-        ~MlmClientTest() = default;
+        ~MlmClientTest () = default;
         zmsg_t* recv (const std::string& uuid, uint32_t timeout) override {
-            zsys_debug("Running mocked recv with uuid '%s' and timeout '%" PRIu32 "'", uuid.c_str(), timeout);
-            if (reply_no-1 < reply.size()) {
+            zsys_debug ("Running mocked recv with uuid '%s' and timeout '%" PRIu32 "'", uuid.c_str (), timeout);
+            if (reply_no-1 < reply.size ()) {
             } else {
-                throw std::range_error("Too many recv called, not enough replies provided");
+                throw std::range_error ("Too many recv called, not enough replies provided");
             }
-            zsys_debug("We have %u replies in vector, loading '%u' of them", reply.size(), reply_no);
-            zmsg_t *rv = zmsg_dup(reply[reply_no-1]);
+            zsys_debug ("We have %u replies in vector, loading '%u' of them", reply.size (), reply_no);
+            zmsg_t *rv = zmsg_dup (reply[reply_no-1]);
             if (NULL == rv)
-                throw std::bad_alloc();
+                throw std::bad_alloc ();
             return rv;
         }
         int sendto (const std::string& address, const std::string& subject, uint32_t timeout, zmsg_t **content_p) override {
-            zsys_debug("Running mocked sendto with address '%s', subject '%s' and timeout '%" PRIu32 "'",
-                    address.c_str(), subject.c_str(), timeout);
-            zmsg_destroy(content_p);
+            zsys_debug ("Running mocked sendto with address '%s', subject '%s' and timeout '%" PRIu32 "'",
+                    address.c_str (), subject.c_str (), timeout);
+            zmsg_destroy (content_p);
             *content_p = NULL;
             ++reply_no;
             return sendto_rv;
         }
-        void set_replies(zmsg_t *msg, ...) {
+        void set_replies (zmsg_t *msg, ...) {
             va_list va_lst;
-            reply.push_back(msg);
-            va_start(va_lst, msg);
-            zmsg_t *va_msg = va_arg(va_lst, zmsg_t *);
+            reply.push_back (msg);
+            va_start (va_lst, msg);
+            zmsg_t *va_msg = va_arg (va_lst, zmsg_t *);
             while (NULL != va_msg) {
-                reply.push_back(va_msg);
-                va_msg = va_arg(va_lst, zmsg_t *);
+                reply.push_back (va_msg);
+                va_msg = va_arg (va_lst, zmsg_t *);
             }
-            va_end(va_lst);
+            va_end (va_lst);
         }
-        void clear_replies() {
-            reply.clear();
+        void clear_replies () {
+            reply.clear ();
         }
-        void set_reply_no(size_t rn) {
+        void set_reply_no (size_t rn) {
             reply_no = rn;
         }
-        void set_sendto_rv(int sr) {
+        void set_sendto_rv (int sr) {
             sendto_rv = sr;
         }
     private:
@@ -323,11 +323,11 @@ class MlmClientTest: public MlmClient {
 };
 
 
-TEST_CASE("test for rackcontroller-0 detection", "[csv]") {
+TEST_CASE ("test for rackcontroller-0 detection", "[csv]") {
     auto void_fn = []() {return;};
     int rv;
     int row_number;
-    zsys_debug("Running test for rackcontroller-0 detection");
+    zsys_debug ("Running test for rackcontroller-0 detection");
     // prepare reply messages for testing
     zmsg_t *reply_info_ok = zmsg_new ();
     zmsg_t *reply_info_error = zmsg_new ();
@@ -343,15 +343,15 @@ TEST_CASE("test for rackcontroller-0 detection", "[csv]") {
     zmsg_addstr (reply_info_ok, "useless2");
     zmsg_addstr (reply_info_ok, "useless3");
     zmsg_addstr (reply_info_ok, "useless4");
-    zhash_t *map = zhash_new();
-    zhash_insert(map, "serial", (char *)"S3R1ALN0");
-    zhash_insert(map, "hostname", (char *)"myhname");
-    zhash_insert(map, "ip.1", (char *)"98.76.54.30");
-    zhash_insert(map, "ip.2", (char *)"98.76.54.31");
-    //zhash_insert(map, "ip.3", (char *)"98.76.54.32");
-    zframe_t * frame_infos = zhash_pack(map);
+    zhash_t *map = zhash_new ();
+    zhash_insert (map, "serial", (char *)"S3R1ALN0");
+    zhash_insert (map, "hostname", (char *)"myhname");
+    zhash_insert (map, "ip.1", (char *)"98.76.54.30");
+    zhash_insert (map, "ip.2", (char *)"98.76.54.31");
+    //zhash_insert (map, "ip.3", (char *)"98.76.54.32");
+    zframe_t * frame_infos = zhash_pack (map);
     zmsg_append (reply_info_ok, &frame_infos);
-    zframe_destroy(&frame_infos);
+    zframe_destroy (&frame_infos);
     // reply INFO info error
     zmsg_addstr (reply_info_error, "ERROR");
     zmsg_addstr (reply_info_error, "just error");
@@ -385,255 +385,255 @@ TEST_CASE("test for rackcontroller-0 detection", "[csv]") {
     zmsg_addstr (reply_asset_detail_rackcontroller0_error, "BAD_COMMAND");
     // initialization finished
 
-    zsys_debug("\tTesting: empty database, 0 RCs in csv - detect none");
+    zsys_debug ("\tTesting: empty database, 0 RCs in csv - detect none");
     // empty database, 0 RCs in csv - detect none
-    row_number = -1;
-    MlmClientTest *mct = new MlmClientTest(0);
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
+    row_number = 7; // rowcount + 1
+    MlmClientTest *mct = new MlmClientTest (0);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
     std::string base_path{__FILE__};
     std::string csv = base_path + ".rc0_1.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    zsys_debug ("Loading files from %s", csv.c_str());
-    std::ifstream csv_buf(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    zsys_debug ("Loading files from %s", csv.c_str ());
+    std::ifstream csv_buf (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: empty database, 1 rc in csv - promote it - was on row number 7");
+    zsys_debug ("\tTesting: empty database, 1 rc in csv - promote it - was on row number 7");
     // empty database, 1 rc in csv - promote it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_ok_empty, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_ok_empty, NULL);
     row_number = 6;
     csv = base_path + ".rc0_2.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: empty database, 3 RC in csv - promote one of it - was on row number 9");
+    zsys_debug ("\tTesting: empty database, 3 RC in csv - promote one of it - was on row number 9");
     // empty database, 3 RC in csv - promote one of it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_ok_empty, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_ok_empty, NULL);
     row_number = 8;
     csv = base_path + ".rc0_3.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 1 RC in database, 0 RCs in csv - detect none");
+    zsys_debug ("\tTesting: 1 RC in database, 0 RCs in csv - detect none");
     // 1 RC in database, 0 RCs in csv - detect none
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
+    row_number = 7; // rowcount + 1
     csv = base_path + ".rc0_1.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 1 RC in database, 1 RC in csv - promote it - was on row number 7");
+    zsys_debug ("\tTesting: 1 RC in database, 1 RC in csv - promote it - was on row number 7");
     // 1 RC in database, 1 RC in csv - promote it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
     row_number = 6;
     csv = base_path + ".rc0_2a.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 1 RC in database, 3 RC in csv - promote one of it - was on row number 9");
+    zsys_debug ("\tTesting: 1 RC in database, 3 RC in csv - promote one of it - was on row number 9");
     // 1 RC in database, 3 RC in csv - promote one of it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
     row_number = 8;
     csv = base_path + ".rc0_3.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 1 RC in database, 3 RC in csv - was none of it");
+    zsys_debug ("\tTesting: 1 RC in database, 3 RC in csv - was none of it");
     // 1 RC in database, 3 RC in csv - was none of it
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
+    row_number = 12; // rowcount + 1
     csv = base_path + ".rc0_4.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 1 RC in database, 3 RC in csv - was different than rackcontroller-0");
+    zsys_debug ("\tTesting: 1 RC in database, 3 RC in csv - was different than rackcontroller-0");
     // 1 RC in database, 3 RC in csv - was different than rackcontroller-0
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_single, NULL);
+    row_number = 13; // rowcount + 1
     csv = base_path + ".rc0_5.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 0 RCs in csv - detect none");
+    zsys_debug ("\tTesting: 3 RC in database, 0 RCs in csv - detect none");
     // 3 RC in database, 0 RCs in csv - detect none
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    row_number = 7; // rowcount + 1
     csv = base_path + ".rc0_1.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 1 RC in csv - promote it - was on row number 7");
+    zsys_debug ("\tTesting: 3 RC in database, 1 RC in csv - promote it - was on row number 7");
     // 3 RC in database, 1 RC in csv - promote it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
     row_number = 6;
     csv = base_path + ".rc0_2a.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 3 RC in csv - promote one of it - was on row number 9");
+    zsys_debug ("\tTesting: 3 RC in database, 3 RC in csv - promote one of it - was on row number 9");
     // 3 RC in database, 3 RC in csv - promote one of it - was on row number:
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
     row_number = 8;
     csv = base_path + ".rc0_3.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 3 RC in csv - was none of it");
+    zsys_debug ("\tTesting: 3 RC in database, 3 RC in csv - was none of it");
     // 3 RC in database, 3 RC in csv - was none of it
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    row_number = 12; // rowcount + 1
     csv = base_path + ".rc0_4.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 3 RC in csv - was different than rackcontroller-0");
+    zsys_debug ("\tTesting: 3 RC in database, 3 RC in csv - was different than rackcontroller-0");
     // 3 RC in database, 3 RC in csv - was different than rackcontroller-0
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
-    row_number = -1;
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    row_number = 13; // rowcount + 1
     csv = base_path + ".rc0_5.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    zsys_debug("\tTesting: 3 RC in database, 3 RC in csv - with missing ids");
+    zsys_debug ("\tTesting: 3 RC in database, 3 RC in csv - with missing ids");
     // 3 RC in database, 3 RC in csv - with missing ids
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_many, NULL);
     row_number = 8;
     csv = base_path + ".rc0_6.csv";
-    zsys_debug("Using file %s for this test", csv.c_str());
-    csv_buf.close();
-    csv_buf.clear();
-    csv_buf.open(csv);
-    REQUIRE_NOTHROW(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn));
-    REQUIRE(row_number == rv);
+    zsys_debug ("Using file %s for this test", csv.c_str ());
+    csv_buf.close ();
+    csv_buf.clear ();
+    csv_buf.open (csv);
+    REQUIRE_NOTHROW (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn));
+    REQUIRE (row_number == rv);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
     /*
      * disabled due to workaround to speed up api call
-    zsys_debug("\tTesting: getting assets from fty_assets fails");
+    zsys_debug ("\tTesting: getting assets from fty_assets fails");
     // getting assets from fty_assets fails
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_error, NULL);
-    REQUIRE_THROWS_AS(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn), std::runtime_error);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_error, NULL);
+    REQUIRE_THROWS_AS (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn), std::runtime_error);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
     */
 
     /*
      * disabled due to changes to enable running without alreday having RC-0 in DB
-    zsys_debug("\tTesting: getting asset detail from fty_assets fails");
+    zsys_debug ("\tTesting: getting asset detail from fty_assets fails");
     // getting asset detail from fty_assets fails
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_error, NULL);
-    REQUIRE_THROWS_AS(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn), std::runtime_error);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_error, reply_get_rackcontroller_error, NULL);
+    REQUIRE_THROWS_AS (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn), std::runtime_error);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
     */
 
-    zsys_debug("\tTesting: getting info from fty_info fails");
+    zsys_debug ("\tTesting: getting info from fty_info fails");
     // getting info from fty_info fails
-    mct->set_replies(reply_info_error, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
-    REQUIRE_THROWS_AS(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn), std::runtime_error);
+    mct->set_replies (reply_info_error, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
+    REQUIRE_THROWS_AS (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn), std::runtime_error);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
-    mct->set_sendto_rv(-1);
-    zsys_debug("\tTesting: sendto fails fails");
+    mct->set_sendto_rv (-1);
+    zsys_debug ("\tTesting: sendto fails fails");
     // sendto fails fails
-    mct->set_replies(reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
-    REQUIRE_THROWS_AS(rv = persist::promote_rc0(mct, shared::CsvMap_from_istream(csv_buf), void_fn), std::runtime_error);
+    mct->set_replies (reply_info_ok, reply_asset_detail_rackcontroller0_ok, reply_get_rackcontroller_ok_empty, NULL);
+    REQUIRE_THROWS_AS (rv = persist::promote_rc0 (mct, shared::CsvMap_from_istream (csv_buf), void_fn), std::runtime_error);
     // reset mct for next test
-    mct->set_reply_no(0);
-    mct->clear_replies();
+    mct->set_reply_no (0);
+    mct->clear_replies ();
 
     // clean up all the stuff
     zmsg_destroy (&reply_info_ok);

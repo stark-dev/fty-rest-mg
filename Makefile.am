@@ -104,6 +104,7 @@ EXTRA_DIST += \
     src/web/src/asset_actions_POST.h \
     src/web/src/asset_export.h \
     src/web/src/asset_GET.h \
+    src/web/src/asset_counter_GET.h \
     src/web/src/asset_import.h \
     src/web/src/asset_list.h \
     src/web/src/asset_POST.h \

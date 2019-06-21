@@ -1,7 +1,6 @@
 # Travis CI script
 # This is a skeleton created by zproject.
 # You can add hand-written code here.
-### Note: Customized after generation; take care upon regens
 
 language:
 - cpp
@@ -31,8 +30,7 @@ dist:
 # Set CI_REQUIRE_GOOD_CLANG_FORMAT=true to fail if "clang-format" check is not clean
 env:
   global:
-    # Note: Here we enable profiling of the Travis builds
-    - CI_TIME=true
+    - CI_TIME=false
     - CI_TRACE=false
     - CI_CONFIG_QUIET=true
     - CI_REQUIRE_GOOD_GITIGNORE=true
@@ -237,8 +235,7 @@ before_script:
 - ./.travis.fixsasl
 
 # Hand off to generated script for each BUILD_TYPE
-# Note: timeout bumped up
-script: travis_wait 30 ./ci_build.sh
+script: ./ci_build.sh
 before_deploy: . ./ci_deploy.sh && ./ci_deploy_obs.sh
 deploy:
   provider: releases

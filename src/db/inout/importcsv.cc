@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <ctype.h>
 #include <unordered_set>
+#include <limits>
+#include <cstddef>
 
 #include <tntdb/connect.h>
 #include <cxxtools/regex.h>
@@ -239,8 +241,9 @@ int check_column_match(
 
 /*
  * \brief Identify id of row with rackcontroller-0
- * \return -1 when RC-0 not found
+ * \return size_t::max when disabled
  * \return int number of RC-0 row
+ * \return number of rows + 1 when RC-0 not found
  * \throw runtime_error on failure
  */
 int
@@ -282,7 +285,7 @@ promote_rc0(
     }
     if (0 == rcs_in_csv.size()) {
         log_debug("There are no RCs in CSV, returning -1");
-        return -1;
+        return cm.rows() + 1;
     }
     touch_fn(); // renew request watchdog timer
 
@@ -427,7 +430,7 @@ promote_rc0(
     touch_fn(); // renew request watchdog timer
     */
 
-    int retval = -1;
+    size_t retval = cm.rows() + 1;
     do { // easier memory freeing
         // check how many RCs we already have in database
         if (0 == rcs_in_db.size()) {
@@ -517,13 +520,14 @@ promote_rc0(
             retval = rcs_in_csv[0];
             break;
         }
+        retval = cm.rows () + 1;
     } while (0);
     zhash_destroy(&info);
-    if (unused_columns.count("name") && 0 < retval) {
-        log_debug("Resulting RC-0 output is %d, matching RC named '%s'", retval, cm.get(retval, "name").c_str());
+    if (unused_columns.count("name") && retval < cm.rows()) {
+        log_debug("Resulting RC-0 output is %zu, matching RC named '%s'", retval, cm.get(retval, "name").c_str());
     } else {
-        retval = -1;
-        log_debug("Resulting RC-0 output is %d, having no name", retval);
+        retval = cm.rows() + 1;
+        log_debug("Resulting RC-0 output is %zu, having no name", retval);
     }
     touch_fn(); // renew request watchdog timer
     return retval;
@@ -694,7 +698,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
    // because id is definitely not an external attribute
     auto id_str = unused_columns.count("id") ? cm.get(row_i, "id") : "";
-    if ("rackcontroller-0" == id_str && rc_0 == std::string::npos  ) {
+    if (rc_0 != row_i && "rackcontroller-0" == id_str && rc_0 != std::numeric_limits<std::size_t>::max() ) {
         // we got RC-0 but it don't match "myself", change it to something else ("")
         log_debug("RC is marked as rackcontroller-0, but it's not myself");
         id_str = "";
@@ -736,6 +740,14 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
     std::string iname;
     int rv = DBAssets::extname_to_asset_name (ename, iname);
+    if (!id_str.empty () && rv == 0) {
+        // internal name from DB must be the same as internal name from CSV
+        if (iname != id_str) {
+            std::string received = TRANSLATE_ME ("already existing name");
+            std::string expected = TRANSLATE_ME ("unique string from 1 to 50 characters");
+            bios_throw("request-param-bad", "name", received.c_str (), expected.c_str ());
+        }
+    }
     log_debug ("name = '%s/%s'", ename.c_str(), iname.c_str());
     if (rv == -2) {
         std::string err = TRANSLATE_ME ("Database failure");
@@ -1468,7 +1480,10 @@ void
 
     // if there are rackcontroller in the import, promote one of it to rackcontroller-0 if not done already
     MlmClient client;
-    int rc0 = promote_rc0(&client, cm, touch_fn);
+    // rc0 promotion disabled due to multiple datacenter support
+    // - hard to decide whether it's import of DC after crash or another DC, RC location must be set manually
+    size_t rc0 = std::numeric_limits<std::size_t>::max();
+    //int rc0 = promote_rc0(&client, cm, touch_fn);
     // get licensing limitation, if any
     LIMITATIONS_STRUCT limitations;
     get_licensing_limitation(limitations);
