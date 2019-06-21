@@ -180,11 +180,13 @@ if (streq (part, "LIST")) {
     </%cpp>
 [
 % while (part) {
-%   if (first) {
+%   // FIXME: properly parse and write JSON instead of manipulating strings.
+%   const char *internalCat = "\"CAT_INTERNAL\"";
+%   if (first && (strstr(part, internalCat) == nullptr)) {
     <$$ part $>
 %     first = false;
 %   }
-%   else {
+%   else if (strstr(part, internalCat) == nullptr) {
 ,   <$$ part $>
 %   }
 % part = zmsg_popstr (recv_msg);
