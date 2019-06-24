@@ -283,11 +283,13 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
   }
   else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+          || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
   {
     log_debug("SSE get an update, create or inventory message");
 
-    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
+    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+        || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY))
     {
       //if update
       //Check if asset is in asset element
