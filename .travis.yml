@@ -16,6 +16,8 @@ os:
 # for the latter see also addons/apt/sources with the package repos in use.
 # See https://docs.travis-ci.com/user/reference/overview/ for up-to-date
 # allowed values of "dist" supported by the Travis CI service.
+#sudo: false
+sudo: required
 dist:
 - trusty
 

@@ -63,31 +63,33 @@ std::string checked_name;
 
 log_debug ("requested rule name = '%s'.", checked_name.c_str ());
 // connect to malamute
-MlmClientGuard client(mlm_client_new ());
+MlmClientGuard client (mlm_client_new ());
+ZuuidGuard uuid (zuuid_new ());
 if (!client) {
-    log_fatal ("mlm_client_new() failed.");
-    http_die ("internal-error", "mlm_client_new() failed.");
+    log_fatal ("mlm_client_new () failed.");
+    http_die ("internal-error", "mlm_client_new () failed.");
 }
 
-std::string client_name = utils::generate_mlm_client_id("web.alert_rules_detailed");
+std::string client_name = utils::generate_mlm_client_id ("web.alert_rules_detailed");
 log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
 int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
 if (rv == -1) {
     log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
-    std::string err =  TRANSLATE_ME ("mlm_client_connect() failed.");
+    std::string err =  TRANSLATE_ME ("mlm_client_connect () failed.");
     http_die ("internal-error", err.c_str ());
 }
 
 // prepare rfc-evaluator-rules GET message
 zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
-    log_fatal ("zmsg_new() failed.");
-    std::string err =  TRANSLATE_ME ("zmsg_new() failed.");
+    log_fatal ("zmsg_new () failed.");
+    std::string err =  TRANSLATE_ME ("zmsg_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
 zmsg_addstr (send_msg, "GET");
+zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
 zmsg_addstr (send_msg, checked_name.c_str ());
 
 // send it
@@ -95,15 +97,15 @@ if (mlm_client_sendto (client, "fty-alert-engine", "rfc-evaluator-rules", NULL, 
     log_debug ("mlm_client_sendto (address = '%s', subject = '%s', tracker = NULL, timeout = '%d') failed.",
         "fty-alert-engine", "rfc-evaluator-rules", 1000);
     zmsg_destroy (&send_msg);
-    std::string err =  TRANSLATE_ME ("mlm_client_sendto() failed.");
+    std::string err =  TRANSLATE_ME ("mlm_client_sendto () failed.");
     http_die ("internal-error", err.c_str ());
 }
 
 ZmsgGuard recv_msg;
-ZpollerGuard poller(zpoller_new (mlm_client_msgpipe (client), NULL));
+ZpollerGuard poller (zpoller_new (mlm_client_msgpipe (client), NULL));
 if (!poller) {
-    log_fatal ("zpoller_new() failed.");
-    std::string err =  TRANSLATE_ME ("zpoller_new() failed.");
+    log_fatal ("zpoller_new () failed.");
+    std::string err =  TRANSLATE_ME ("zpoller_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
 while (true) {
@@ -113,12 +115,12 @@ while (true) {
     }
     if (!recv_msg) {
         if (zpoller_expired (poller)) {
-            log_error ("zpoller_wait(timeout = 5000) timed out waiting for message.");
+            log_error ("zpoller_wait (timeout = 5000) timed out waiting for message.");
             std::string err =  TRANSLATE_ME ("Timed out waiting for message.");
             http_die ("internal-error", err.c_str ());
         }
-        log_error ("mlm_client_recv() failed.");
-        std::string err =  TRANSLATE_ME ("mlm_client_recv() failed.");
+        log_error ("mlm_client_recv () failed.");
+        std::string err =  TRANSLATE_ME ("mlm_client_recv () failed.");
         http_die ("internal-error", err.c_str ());
     }
     if (streq (mlm_client_sender (client), "fty-alert-engine"))
@@ -135,6 +137,13 @@ if (!streq (mlm_client_subject (client), "rfc-evaluator-rules")) {
 // Check command. Can be OK or ERROR
 ZstrGuard part (zmsg_popstr (recv_msg));
 if (streq (part, "OK")) {
+    // Check uuid.
+    part = zmsg_popstr (recv_msg);
+    if (!streq (part, zuuid_str_canonical (uuid))) {
+        log_error ("Message uuid mismatch.");
+        std::string err =  TRANSLATE_ME ("Message uuid mismatch.");
+        http_die ("internal-error", err.c_str ());
+    }
     part = zmsg_popstr (recv_msg);
     if (!part) {
         log_error ("Unexpected reply from '%s'. Expected OK/json. Got OK/(null).", mlm_client_sender (client));
@@ -148,6 +157,13 @@ if (streq (part, "OK")) {
     return HTTP_OK;
 }
 if (streq (part, "ERROR")) {
+    // Check uuid.
+    part = zmsg_popstr (recv_msg);
+    if (!streq (part, zuuid_str_canonical (uuid))) {
+        log_error ("Message uuid mismatch.");
+        std::string err =  TRANSLATE_ME ("Message uuid mismatch.");
+        http_die ("internal-error", err.c_str ());
+    }
     part = zmsg_popstr (recv_msg);
     if (!part) {
         log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
@@ -159,8 +175,8 @@ if (streq (part, "ERROR")) {
         std::string err =  TRANSLATE_ME ("Rule name '%s'", checked_name.c_str ());
         http_die ("not-found", err.c_str ());
     }
-    log_error ("%s", part.get());
-    std::string reason = part.get();
+    log_error ("%s", part.get ());
+    std::string reason = part.get ();
     std::string err =  TRANSLATE_ME ("Error while retrieving details of rule name = '%s': %s.", checked_name.c_str (), reason.c_str ());
     http_die ("internal-error", err.c_str ());
 }
