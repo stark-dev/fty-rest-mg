@@ -102,8 +102,8 @@ if (!send_msg) {
     std::string err =  TRANSLATE_ME ("zmsg_new () failed.");
     http_die ("internal-error", err.c_str ());
 }
-zmsg_addstr (send_msg, "LIST");
 zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
+zmsg_addstr (send_msg, "LIST");
 zmsg_addstr (send_msg, checked_type.c_str ());
 zmsg_addstr (send_msg, checked_rule_class.c_str ());
 
@@ -157,16 +157,16 @@ if (!streq (mlm_client_subject (client), "rfc-evaluator-rules")) {
     std::string err =  TRANSLATE_ME ("Bad message.");
     http_die ("internal-error", err.c_str ());
 }
-// Check command. Can be LIST or ERROR
+// Check uuid.
 ZstrGuard part (zmsg_popstr (recv_msg));
+if (!streq (part, zuuid_str_canonical (uuid))) {
+    log_error ("Message uuid mismatch.");
+    std::string err =  TRANSLATE_ME ("Message uuid mismatch.");
+    http_die ("internal-error", err.c_str ());
+}
+// Check command. Can be LIST or ERROR
+part = zmsg_popstr (recv_msg);
 if (streq (part, "LIST")) {
-    // Check uuid.
-    part = zmsg_popstr (recv_msg);
-    if (!streq (part, zuuid_str_canonical (uuid))) {
-        log_error ("Message uuid mismatch.");
-        std::string err =  TRANSLATE_ME ("Message uuid mismatch.");
-        http_die ("internal-error", err.c_str ());
-    }
     part = zmsg_popstr (recv_msg);
     // type received must be equal to type requested
     if (checked_type.compare (part) != 0) {
@@ -190,11 +190,11 @@ if (streq (part, "LIST")) {
 % while (part) {
 %   // FIXME: properly parse and write JSON instead of manipulating strings.
 %   const char *internalCat = "\"CAT_INTERNAL\"";
-%   if (first && (strstr(part, internalCat) == nullptr)) {
+%   if (first && (strstr (part, internalCat) == nullptr)) {
     <$$ part $>
 %     first = false;
 %   }
-%   else if (strstr(part, internalCat) == nullptr) {
+%   else if (strstr (part, internalCat) == nullptr) {
 ,   <$$ part $>
 %   }
 % part = zmsg_popstr (recv_msg);
@@ -204,13 +204,6 @@ if (streq (part, "LIST")) {
     return HTTP_OK;
 }
 if (streq (part, "ERROR")) {
-    // Check uuid.
-    part = zmsg_popstr (recv_msg);
-    if (!streq (part, zuuid_str_canonical (uuid))) {
-        log_error ("Message uuid mismatch.");
-        std::string err =  TRANSLATE_ME ("Message uuid mismatch.");
-        http_die ("internal-error", err.c_str ());
-    }
     part = zmsg_popstr (recv_msg);
     if (!part) {
         log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
