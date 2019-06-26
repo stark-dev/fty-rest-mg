@@ -139,8 +139,8 @@ void
         if (oneRow.first.subtype_id == persist::asset_subtype::UPS) {
             zhash_t *aux = zhash_new ();
 
-            if (!DBUptime::get_dc_upses (s_asset_name.c_str(), aux))
-                log_error ("Cannot read upses for dc with id = %s", s_asset_name.c_str ());
+            if (!DBUptime::get_dc_upses (dc_name.c_str(), aux))
+                log_error ("Cannot read upses for dc with id = %s", dc_name.c_str ());
 
             zhash_update (aux, "type", (void*) "datacenter");
             zmsg_t *msg = fty_proto_encode_asset (

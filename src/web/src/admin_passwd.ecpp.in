@@ -173,9 +173,9 @@ UserInfo user;
     int r = s_passwd(checked_user, checked_old_passwd, checked_new_passwd, reason);
     if (r != 0) {
         if (!reason.empty())
-            received = TRANSLATE_ME ("password with problems: ") + reason;
+            received = TRANSLATE_ME ("password with problems: %s", reason.c_str());
         else
-            received = TRANSLATE_ME ("bios-passwd returned error code ") + std::to_string(r);
+            received = TRANSLATE_ME ("bios-passwd returned error code %i", r);
 
         //this stretches semantics of request-param-bad!!!
         http_die("request-param-bad",

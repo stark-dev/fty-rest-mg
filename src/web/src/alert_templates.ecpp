@@ -41,8 +41,8 @@ s_request_LIST ( zuuid_t *uuid, const char* type)
     assert (uuid);
     static const char* method = "LIST";
     zmsg_t *msg = zmsg_new ();
-    zmsg_addstr (msg, method);
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
+    zmsg_addstr (msg, method);
     zmsg_addstr (msg, type);
     return msg;
 }
@@ -60,7 +60,7 @@ static const std::map <BiosProfile, std::string> PERMISSIONS = {
         };
 CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
-std::string type = qparam.param("type");
+std::string type = qparam.param ("type");
 // type
 if (type.empty ()) {
     type = "all";
@@ -74,7 +74,7 @@ if (!client.getPointer ()) {
 }
 
 ZuuidGuard uuid (zuuid_new ());
-zmsg_t *req_list = s_request_LIST (uuid,type.c_str());
+zmsg_t *req_list = s_request_LIST (uuid,type.c_str ());
 
 int rv = client->sendto ("fty-autoconfig", "rfc-evaluator-rules", 1000, &req_list);
 if (rv == -1) {
@@ -85,7 +85,7 @@ if (rv == -1) {
     http_die ("internal-error", err.c_str ());
 }
 
-ZmsgGuard msg(client->recv (zuuid_str_canonical (uuid), 5));
+ZmsgGuard msg (client->recv (zuuid_str_canonical (uuid), 5));
 if (!msg) {
     log_fatal ("client->recv (timeout = '5') returned NULL");
     std::string err =  TRANSLATE_ME ("client->recv () returned NULL");
@@ -94,40 +94,40 @@ if (!msg) {
 
 ZstrGuard result (zmsg_popstr (msg));
 if (!result || !streq (result, "LIST")) {
-    log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result.get());
+    log_warning ("Error reply LIST template '%s', result=%s", type.c_str (), result.get ());
     std::string err =  TRANSLATE_ME ("LIST template bad response");
     http_die ("internal-error", err.c_str ());
 }
 
 result = zmsg_popstr (msg);
-if (!result || !streq (result, type.c_str())) {
-    log_warning ("Error reply LIST template '%s', result=%s", type.c_str(), result.get());
+if (!result || !streq (result, type.c_str ())) {
+    log_warning ("Error reply LIST template '%s', result=%s", type.c_str (), result.get ());
     std::string err =  TRANSLATE_ME ("LIST template bad response");
     http_die ("internal-error", err.c_str ());
 }
 cxxtools::SerializationInfo si;
-si.setCategory(cxxtools::SerializationInfo::Category::Array);
+si.setCategory (cxxtools::SerializationInfo::Category::Array);
 ZstrGuard template_name (zmsg_popstr (msg));
 ZstrGuard templat (zmsg_popstr (msg));
 ZstrGuard asset_list (zmsg_popstr (msg));
-while(template_name){
-    cxxtools::SerializationInfo &si_templat_obj= si.addMember("");
-    si_templat_obj.addMember("name") <<= std::string(template_name);
-    cxxtools::SerializationInfo &si_templat = si_templat_obj.addMember("template");
-    std::stringstream input (templat.get());
-    cxxtools::JsonDeserializer  deserializer(input);
-    deserializer.deserialize(si_templat);
+while (template_name){
+    cxxtools::SerializationInfo &si_templat_obj= si.addMember ("");
+    si_templat_obj.addMember ("name") <<= std::string (template_name);
+    cxxtools::SerializationInfo &si_templat = si_templat_obj.addMember ("template");
+    std::stringstream input (templat.get ());
+    cxxtools::JsonDeserializer  deserializer (input);
+    deserializer.deserialize (si_templat);
     //the name should be set after the deserialization
-    si_templat.setName("template");
+    si_templat.setName ("template");
 
-    cxxtools::SerializationInfo &si_assets_id = si_templat_obj.addMember("assets_id");
-    si_assets_id.setCategory(cxxtools::SerializationInfo::Category::Array);
-    if (asset_list && strlen(asset_list)>0){
+    cxxtools::SerializationInfo &si_assets_id = si_templat_obj.addMember ("assets_id");
+    si_assets_id.setCategory (cxxtools::SerializationInfo::Category::Array);
+    if (asset_list && strlen (asset_list)>0){
        std::vector<std::string> asset_array;
-       cxxtools::split(",", std::string(asset_list), std::back_inserter(asset_array));
-       std::vector<std::string>::iterator it=asset_array.begin();
-       while ( it != asset_array.end()) {
-           si_assets_id.addMember("") <<= *it;
+       cxxtools::split (",", std::string (asset_list), std::back_inserter (asset_array));
+       std::vector<std::string>::iterator it=asset_array.begin ();
+       while ( it != asset_array.end ()) {
+           si_assets_id.addMember ("") <<= *it;
            it++;
        }
     }
@@ -135,10 +135,10 @@ while(template_name){
     templat = zmsg_popstr (msg);
     asset_list = zmsg_popstr (msg);
 }
-std::ostringstream outJsonStream(std::ios_base::out);
-cxxtools::JsonSerializer serializer(outJsonStream);
+std::ostringstream outJsonStream (std::ios_base::out);
+cxxtools::JsonSerializer serializer (outJsonStream);
 serializer.beautify (true);
-serializer.serialize(si).finish();
-std::string json = outJsonStream.str().c_str();
+serializer.serialize (si).finish ();
+std::string json = outJsonStream.str ().c_str ();
 </%cpp>
 <$$ json $>

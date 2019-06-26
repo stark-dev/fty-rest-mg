@@ -31,7 +31,7 @@ src/fty_rest_selftest
 *.app
 core
 
-# Distcheck workspace and archives under various possible names
+# Distcheck workspace and archives
 fty-rest-*/
 fty-rest-*.tar.gz
 fty-rest-*.zip
@@ -282,6 +282,7 @@ src/web/src/find_access_token.cc
 src/web/src/http_proxy.cc
 src/web/src/asset_actions_GET.cc
 src/web/src/asset_actions_POST.cc
+src/web/src/asset_counter_GET.cc
 
 tntnet.xml.example
 !src/web/tntnet.xml

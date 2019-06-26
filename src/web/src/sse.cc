@@ -104,7 +104,7 @@ long int Sse::checkTokenValidity()
     log_info("sse : Token revoked or expired");
     return -1;
   }
-  free (user_name); 
+  free (user_name);
   return tme;
 }
 
@@ -181,7 +181,7 @@ std::string Sse::loadAssetFromDatacenter()
     }
     log_debug("=== end ===");
   }
-  //Get all assets without location
+  //Get all devices without location
   try
   {
     int rv = DBAssets::select_assets_without_container(_connection,{persist::asset_type::DEVICE},{},
@@ -281,11 +281,13 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
     json += "data:{\"topic\":\"asset/" + nameElement + "\",\"payload\":{}}\n\n";
   }
   else if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+          || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
   {
-    log_debug("Sse get an update or create message");
+    log_debug("Sse get an update, create or inventory message");
 
-    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE))
+    if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
+        || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY))
     {
       //if update
       //Check if asset is in asset element
@@ -396,11 +398,11 @@ std::string Sse::changeSseMessage2Json(zmsg_t *message)
   aux = zmsg_popstr(message);
   topic = aux ? aux : "";
   zstr_free(&aux);
-  
+
   aux = zmsg_popstr(message);
   jsonPayload = aux ? aux : "";
   zstr_free(&aux);
-  
+
   aux = zmsg_popstr(message);
   assetID = aux ? aux : "";
   zstr_free(&aux);

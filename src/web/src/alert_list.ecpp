@@ -1,6 +1,6 @@
 <#
  #
- # Copyright (C) 2015 - 2018 Eaton
+ # Copyright (C) 2015 - 2019 Eaton
  #
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -27,21 +27,16 @@
 #include <string>
 #include <map>
 #include <functional>
-#include <malamute.h>
-#include <sys/types.h>
-#include <unistd.h>
 #include <tntdb/connection.h>
 #include <tntdb/error.h>
 
 #include <fty_proto.h>
-#include "shared/utils.h"
-#include "shared/utilspp.h"
-#include "cleanup.h"
 #include "shared/utils_json.h"
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset.h>
 #include <fty_common_mlm_utils.h>
+#include <fty_common_mlm_tntmlm.h>
 #include <fty_common_mlm_guards.h>
 #include <fty_common_macros.h>
 #include <fty_common_agents.h>
@@ -75,18 +70,73 @@ is_requeststate (const char *state) {
     return is_alertstate (state);
 }
 
-static int
-is_state_included (const char *request, const char *alert) {
-    if (!is_requeststate (request))
-        return 0;
-    if (!is_alertstate (alert))
-        return 0;
+static zmsg_t*
+s_request_list (zuuid_t *uuid, const std::string& filter, const std::vector<std::string>& desired_elements) {
+    zmsg_t *send_msg = zmsg_new ();
+    if (desired_elements.empty ()) {
+        zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
+        zmsg_addstr (send_msg, "LISTALL");
+        zmsg_addstr (send_msg, filter.c_str ());
+    }
+    else {
+        zmsg_addstr (send_msg, zuuid_str_canonical (uuid));
+        zmsg_addstr (send_msg, "LIST");
+        zmsg_addstr (send_msg, filter.c_str ());
+        for (auto const& item : desired_elements) {
+            zmsg_addstr (send_msg, item.c_str ());
+        }
+    }
 
-    if (streq (request, "ALL"))
-        return 1;
-    if (streq (request, "ALL-ACTIVE") && !streq (alert, "RESOLVED"))
-        return 1;
-    return streq (request, alert);
+    return send_msg;
+}
+
+static std::string
+s_response_list (zmsg_t *resp, tntdb::Connection& connection) {
+    std::string json ( "[ ");
+
+    std::string uuid = zmsg_popstr (resp);
+    zframe_t *frame = zmsg_pop (resp);
+    while (frame) {
+        #if CZMQ_VERSION_MAJOR == 3
+           zmsg_t *decoded_zmsg = zmsg_decode (zframe_data (frame), zframe_size (frame));
+        #else
+            zmsg_t *decoded_zmsg = zmsg_decode (frame);
+        #endif
+        zframe_destroy (&frame);
+
+        if (!decoded_zmsg) {
+           log_error ("Bad frame, skipping");
+           frame = zmsg_pop (resp);
+           continue;
+        }
+        fty_proto_t *decoded = fty_proto_decode (&decoded_zmsg);
+        if (!decoded) {
+           log_error ("Can't decode fty_proto");
+           frame = zmsg_pop (resp);
+           continue;
+        }
+        if (fty_proto_id (decoded) != FTY_PROTO_ALERT) {
+           log_error ("message id is not FTY_PROTO_ALERT");
+           fty_proto_destroy (&decoded);
+           frame = zmsg_pop (resp);
+           continue;
+        }
+
+        std::string jsonAlert = getJsonAlert(connection,decoded);
+
+        if (jsonAlert.empty()){
+           fty_proto_destroy (&decoded);
+           frame = zmsg_pop (resp);
+           continue;
+        }
+        frame = zmsg_pop (resp);
+            if (frame)
+                json += ", ";
+    }
+
+    json += " ]";
+
+    return json;
 }
 
 </%pre>
@@ -113,9 +163,7 @@ bool database_ready;
     std::string checked_state;
     std::string checked_asset;
     std::string checked_recursive;
-    uint32_t element_id = 0;
-    std::string url = DBConn::url;
-
+    std::vector<std::string> desired_elements;
     {
         std::string state = qparam.param("state");
         std::string asset = qparam.param("asset");
@@ -151,7 +199,8 @@ bool database_ready;
         {
             if (!persist::is_ok_name (asset.c_str ()))
             {
-                http_die ("request-param-bad", asset.c_str ());
+                std::string msg  = TRANSLATE_ME ("valid asset name");
+                http_die ("request-param-bad", "asset", asset.c_str (), msg.c_str ());
             }
         }
 
@@ -164,249 +213,130 @@ bool database_ready;
                 state.c_str (), asset.c_str (), recursive.c_str ());
     }
 
-    {
-        int64_t dbid =  DBAssets::name_to_asset_id (checked_asset);
-        if (!checked_asset.empty() && dbid == -1) {
-                http_die ("element-not-found", checked_asset.c_str ());
-        }
-        if (dbid == -2) {
+    tntdb::Connection connection;
+    try {
+        connection = tntdb::connectCached (DBConn::url);
+    }
+    catch (const tntdb::Error& e) {
+        std::string err = JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
+    }
+    catch (const std::exception& e) {
+        std::string err =  JSONIFY (e.what ());
+        http_die ("internal-error", err.c_str ());
+    }
+
+    if (!checked_asset.empty ()) {
+        int64_t element_id = DBAssets::name_to_asset_id (checked_asset);
+        if (element_id == -1)
+            http_die ("element-not-found", checked_asset.c_str ());
+        if (element_id == -2) {
             std::string err =  TRANSLATE_ME ("Connecting to database failed.");
             http_die ("internal-error", err.c_str ());
         }
-        element_id = (uint32_t) dbid;
-    }
+        log_debug ("Asset element id = '%" PRIu32 "'.", element_id);
 
-std::map<std::string, int> desired_elements;
-tntdb::Connection connection;
-try {
-    connection = tntdb::connectCached (url);
-}
-catch (const tntdb::Error& e) {
-    log_error ("tntdb::connectCached (url = '%s') failed: %s.", url.c_str (), e.what ());
-    std::string err =  TRANSLATE_ME ("Connecting to database failed.");
-    http_die ("internal-error", err.c_str ());
-}
-catch (const std::exception& e) {
-    log_error ("Exception caught: '%s'.", e.what ());
-    std::string err =  JSONIFY (e.what ());
-    http_die ("internal-error", err.c_str ());
-}
-log_debug ("Asset element id = '%" PRIu32 "'.", element_id);
-
-if (!checked_asset.empty ()) {
-    auto asset_element = DBAssets::select_asset_element_web_byId (connection, element_id);
-    if (asset_element.status != 1)
-        http_die ("internal-error", asset_element.msg.c_str ());
-    log_debug ("Asset element name = '%s'.", asset_element.item.name.c_str ());
-    desired_elements.emplace (std::make_pair (asset_element.item.name, 5));
-
-    if (checked_recursive.compare ("true") == 0) {
-        try {
-            int rv = DBAssets::select_assets_by_container (
-                connection,
-                element_id,
-                [&desired_elements](const tntdb::Row& row) -> void {
-                    std::string name;
-                    row[0].get (name);
-                    desired_elements.emplace (std::make_pair (name, 5));
-                });
-            if (rv != 0) {
-                std::string err =  TRANSLATE_ME ("DBAssets::select_assets_by_container () failed.");
+        desired_elements = {checked_asset};
+        if (checked_recursive == "true") {
+            try {
+                int rv = DBAssets::select_assets_by_container (
+                        connection,
+                        element_id,
+                        [&desired_elements](const tntdb::Row& row) -> void {
+                            std::string name;
+                            row[0].get (name);
+                            desired_elements.push_back (name);
+                        });
+                if (rv != 0) {
+                    std::string err =  TRANSLATE_ME ("DBAssets::select_assets_by_container () failed.");
+                    http_die ("internal-error", err.c_str ());
+                }
+            }
+            catch (const tntdb::Error& e) {
+                std::string err = JSONIFY (e.what ());
                 http_die ("internal-error", err.c_str ());
             }
-        }
-        catch (const tntdb::Error& e) {
-            std::string err = JSONIFY (e.what ());
-            http_die ("internal-error", err.c_str ());
-        }
-        catch (const std::exception& e) {
-            std::string err =  JSONIFY (e.what ());
-            http_die ("internal-error", err.c_str ());
+            catch (const std::exception& e) {
+                std::string err =  JSONIFY (e.what ());
+                http_die ("internal-error", err.c_str ());
+            }
+
+            log_trace ("=== These elements are topologically under element id: '%" PRIu32"' ===", element_id);
+            for (auto const& item : desired_elements) {
+                log_trace ("%s", item.c_str ());
+            }
+            log_trace ("=== end ===");
         }
     }
-}
 
-log_debug ("=== These elements are topologically under element id: '%" PRIu32"' ===", element_id);
-for (auto const& item : desired_elements) {
-    log_debug ("%s", item.first.c_str ());
-}
-log_debug ("=== end ===");
-
-// connect to malamute
-MlmClientGuard client(mlm_client_new ());
-if (!client) {
-    log_fatal ("mlm_client_new() failed.");
-    std::string err =  TRANSLATE_ME ("mlm_client_new() failed.");
-    http_die ("internal-error", err.c_str ());
-}
-
-std::string client_name = utils::generate_mlm_client_id("web.alert_list");
-log_debug ("malamute client name = '%s'.", client_name.c_str ());
-
-int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
-if (rv == -1) {
-    log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%" PRIu32"', address = '%s') failed.",
-                    MLM_ENDPOINT, 1000, client_name.c_str ());
-    std::string err =  TRANSLATE_ME ("mlm_client_connect() failed.");
-    http_die ("internal-error", err.c_str ());
-}
-
-// prepare rfc-alerts-list LIST message
-zmsg_t *send_msg = zmsg_new ();
-if (!send_msg) {
-    log_fatal ("zmsg_new() failed.");
-    std::string err =  TRANSLATE_ME ("zmsg_new() failed.");
-    http_die ("internal-error", err.c_str ());
-}
-zmsg_addstr (send_msg, "LIST");
-zmsg_addstr (send_msg, checked_state.c_str ());
-
-// send it
-if (mlm_client_sendto (client, AGENT_FTY_ALERT_LIST, RFC_ALERTS_LIST, NULL, 1000, &send_msg) != 0) {
-    log_debug ("mlm_client_sendto (address = '%s', subject = '%s', tracker = NULL, timeout = '%" PRIu32"') failed.",
-        AGENT_FTY_ALERT_LIST, RFC_ALERTS_LIST, 1000);
-    zmsg_destroy (&send_msg);
-    std::string err =  TRANSLATE_ME ("mlm_client_sendto() failed.");
-    http_die ("internal-error", err.c_str ());
-}
-
-// wait for the right message or time-out
-ZmsgGuard recv_msg;
-ZpollerGuard poller(zpoller_new ( mlm_client_msgpipe (client), NULL));
-if (!poller) {
-    log_fatal ("zpoller_new() failed.");
-    std::string err =  TRANSLATE_ME ("zpoller_new() failed.");
-    http_die ("internal-error", err.c_str ());
-}
-while (true) {
-    zsock_t *which = (zsock_t *) zpoller_wait (poller, 5000);
-    if (which) {
-        recv_msg = mlm_client_recv (client);
-    }
-    if (!recv_msg) {
-        if (zpoller_expired (poller) || zpoller_terminated (poller)) {
-            log_error ("zpoller_wait(timeout = 5000) timed out waiting for message.");
-            std::string err =  TRANSLATE_ME ("Timed out waiting for message.");
-            http_die ("internal-error", err.c_str ());
-        }
-        log_error ("mlm_client_recv() failed.");
-        std::string err =  TRANSLATE_ME ("mlm_client_recv() failed.");
+    MlmClientPool::Ptr client = mlm_pool.get ();
+    if (!client.getPointer ())
+    {
+        std::string err = TRANSLATE_ME ("mlm_pool.get () failed.");
+        log_fatal (err.c_str ());
         http_die ("internal-error", err.c_str ());
     }
-    if (streq (mlm_client_sender (client), AGENT_FTY_ALERT_LIST))
-        break;
-}
 
-// Got it
-// Check subject
-if (!streq (mlm_client_subject (client), RFC_ALERTS_LIST)) {
-    log_error ("Unexpected reply from '%s'. Subject expected = '%s', received = '%s'.",
-        mlm_client_sender (client), RFC_ALERTS_LIST, mlm_client_subject (client));
-    std::string err =  TRANSLATE_ME ("Bad message.");
-    http_die ("internal-error", err.c_str ());
-}
-log_debug (" subject ... OK.");
-log_debug (" number of frames = '%zu.", zmsg_size (recv_msg));
-// Check command. Can be LIST or ERROR
-ZstrGuard part (zmsg_popstr (recv_msg));
-if (streq (part, "LIST")) {
-    log_debug ("First frame == LIST ... OK");
-    part = zmsg_popstr (recv_msg);
-    if (!part || !streq (part, checked_state.c_str ())) {
-        log_error ("Unexpected reply from '%s'. Expected OK/state[/alert_1]...[/alert_N]. Got OK/(null).", mlm_client_sender (client));
+    zuuid_t *uuid = zuuid_new ();
+    zmsg_t *request_msg = s_request_list (uuid, checked_state, desired_elements);
+    int rv = client->sendto (AGENT_FTY_ALERT_LIST, RFC_ALERTS_LIST, 1000, &request_msg);
+
+    if (rv == -1)
+    {
+        zuuid_destroy (&uuid);
+        std::string err = TRANSLATE_ME ("client->sendto (address = '%s') failed.", AGENT_FTY_ALERT_LIST);
+        log_fatal (err.c_str ());
+        http_die ("internal-error", err.c_str ());
+    }
+
+    ZmsgGuard resp (client->recv (zuuid_str_canonical (uuid), 5));
+    zuuid_destroy (&uuid);
+    if (!resp)
+    {
+        std::string err = TRANSLATE_ME ("client->recv (timeout = '5') returned NULL");
+        log_fatal (err.c_str ());
+        http_die ("internal-error", err.c_str ());
+    }
+
+    if (!streq (client->subject (), RFC_ALERTS_LIST)) {
+        log_error ("Unexpected reply from '%s'. Subject expected = '%s', received = '%s'.",
+            client->sender (), RFC_ALERTS_LIST, client->subject ());
         std::string err =  TRANSLATE_ME ("Bad message.");
         http_die ("internal-error", err.c_str ());
     }
-    log_debug ("Second frame == '%s' ... OK", part.get());
-    zframe_t *frame = zmsg_pop (recv_msg);
-    if (!frame) {
-        log_debug ("First `zframe_t *frame = zmsg_pop (recv_msg)` returned NULL.");
+
+    std::string json;
+    ZstrGuard part (zmsg_popstr (resp));
+    if (streq (part, "LISTALL")) {
+        part = zmsg_popstr (resp);
+        //part = zmsg_popstr (resp);
+        json = s_response_list (resp, connection);
+        if (json.empty ()) {
+            std::string err = TRANSLATE_ME ("Invalid reply from %s", AGENT_FTY_ALERT_LIST);
+            http_die ("internal-error", err.c_str ());
+        }
     }
-    bool first = true;
-</%cpp>
-[
-<%cpp>
- while (frame) {
-#if CZMQ_VERSION_MAJOR == 3
-   zmsg_t *decoded_zmsg = zmsg_decode (zframe_data (frame), zframe_size (frame));
-#else
-    zmsg_t *decoded_zmsg = zmsg_decode (frame);
-#endif
-</%cpp>
-%   zframe_destroy (&frame);
-%   if (!decoded_zmsg) {
-%       log_error ("Bad frame, skipping");
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   fty_proto_t *decoded = fty_proto_decode (&decoded_zmsg);
-%   if (!decoded) {
-%       log_error ("Can't decode fty_proto");
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if (fty_proto_id (decoded) != FTY_PROTO_ALERT) {
-%       log_error ("message id is not FTY_PROTO_ALERT");
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if ((!checked_asset.empty () && desired_elements.find (fty_proto_name (decoded)) == desired_elements.end ())) {
-%       log_debug ("skipping due to element_src '%s' not being in the list", fty_proto_name (decoded));
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%   if (!is_state_included (checked_state.c_str (), fty_proto_state (decoded))) {
-%       log_debug ("skipping due to state '%s' not being requested", fty_proto_state (decoded));
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%
-%   std::string jsonAlert = getJsonAlert(connection,decoded);
-%
-%   if (jsonAlert.empty()){
-%       fty_proto_destroy (&decoded);
-%       frame = zmsg_pop (recv_msg);
-%       continue;
-%   }
-%
-%   if (first) {
-      <$$ jsonAlert  $>
-%      first = false;
-%   }
-%   else {
-,
-      <$$ jsonAlert  $>
-%   }
-%   fty_proto_destroy (&decoded);
-%   frame = zmsg_pop (recv_msg);
-% }
-]
-<%cpp>
-    return HTTP_OK;
-}
-if (streq (part, "ERROR")) {
-    part = zmsg_popstr (recv_msg);
-    if (!part) {
-        log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
-        std::string err =  TRANSLATE_ME ("Bad message.");
-        http_die ("internal-error", err.c_str ());
+    else if (streq (part, "LIST")) {
+        part = zmsg_popstr (resp);
+        //part = zmsg_popstr (resp);
+        json = s_response_list (resp, connection);
+        if (json.empty ()) {
+            std::string err = TRANSLATE_ME ("Invalid reply from %s", AGENT_FTY_ALERT_LIST);
+            http_die ("internal-error", err.c_str ());
+        }
     }
-    if (streq (part, "NOT_FOUND")) {
-        log_error ("State = '%s' does not exist.", checked_state.c_str ());
-        std::string msg = TRANSLATE_ME ("State '%s'", checked_state.c_str ());
-        http_die ("not-found", msg.c_str ());
-    }
-    log_error ("%s", part.get());
-    std::string reason = part.get();
-    std::string err =  TRANSLATE_ME ("Error while requesting list of alerts: %s", reason.c_str ());
-    http_die ("internal-error", err.c_str ());
-}
-// Message does not conform to protocol
-log_error ("Unexptected reply from  '%s'. Does not conform to '%s' protocol.",
-    mlm_client_sender (client), RFC_ALERTS_LIST);
-std::string err =  TRANSLATE_ME ("Bad message.");
-http_die ("internal-error", err.c_str ());
+    else {
+        part = zmsg_popstr (resp);
+        if (!part) {
+            log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", AGENT_FTY_ALERT_LIST);
+            std::string err =  TRANSLATE_ME ("Bad message.");
+            http_die ("internal-error", err.c_str ());
+        }
+        else {
+            std::string reason = part.get();
+            std::string err =  TRANSLATE_ME ("Error while requesting list of alerts: %s", reason.c_str ());
+            http_die ("internal-error", err.c_str ());
+        }
+   }
 </%cpp>
+<$$ json $>

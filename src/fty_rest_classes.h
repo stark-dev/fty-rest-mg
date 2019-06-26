@@ -32,8 +32,6 @@
 //  External API
 #include "../include/fty_rest.h"
 
-//  Extra headers
-
 //  Opaque class structures to allow forward references
 #ifndef DB_AGENTSTATE_AGENTSTATE_T_DEFINED
 typedef struct _db_agentstate_agentstate_t db_agentstate_agentstate_t;
@@ -138,6 +136,10 @@ typedef struct _web_src_asset_export_t web_src_asset_export_t;
 #ifndef WEB_SRC_ASSET_GET_T_DEFINED
 typedef struct _web_src_asset_get_t web_src_asset_get_t;
 #define WEB_SRC_ASSET_GET_T_DEFINED
+#endif
+#ifndef WEB_SRC_ASSET_COUNTER_GET_T_DEFINED
+typedef struct _web_src_asset_counter_get_t web_src_asset_counter_get_t;
+#define WEB_SRC_ASSET_COUNTER_GET_T_DEFINED
 #endif
 #ifndef WEB_SRC_ASSET_IMPORT_T_DEFINED
 typedef struct _web_src_asset_import_t web_src_asset_import_t;
@@ -328,6 +330,8 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #define WEB_SRC_HW_CAPABILITY_T_DEFINED
 #endif
 
+//  Extra headers
+
 //  Internal API
 
 #include "db/agentstate/agentstate.h"
@@ -356,6 +360,7 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/asset_actions_POST.h"
 #include "web/src/asset_export.h"
 #include "web/src/asset_GET.h"
+#include "web/src/asset_counter_GET.h"
 #include "web/src/asset_import.h"
 #include "web/src/asset_list.h"
 #include "web/src/asset_POST.h"

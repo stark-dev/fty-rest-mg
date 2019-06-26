@@ -12,6 +12,10 @@
     <target name = "debian" />
     <target name = "redhat" />
     <target name = "travis" >
+        <!-- Force to use trusty because we still depend of auto_ptr :( -->
+        <option name = "dist" value = "trusty" />
+        <option name = "shadow_gcc" value = "2" />
+
         <!-- option name = "clangformat_implem" value = "autotools" / -->
         <option name = "use_cmake" value = "0" />
         <!-- option name = "clangformat_require_good" value = "1" / -->
@@ -50,7 +54,7 @@
         <option name = "use_checkout_explicit" value = "1" />
     </target>
 
-    <classfilename keep-tree = "true" pkgincludedir = "true" use-cxx = "true" pretty-print = "no" source-extension = "cc" />
+    <classfilename use-cxx-gcc-4-9 = "true" keep-tree = "true" pkgincludedir = "true" use-cxx = "true" pretty-print = "no" source-extension = "cc" />
     <include filename = "license.xml" />
 
     <version major = "1" minor = "0" patch = "0" />
@@ -427,8 +431,11 @@
         </use>
     </use>
 
-    <use project = "fty_shm" libname = "libfty_shm" header="fty_shm.h" min_major = "1" test = "fty_shm_test"
-	repository = "https://github.com/42ity/fty-shm.git"/>
+    <use project = "fty_shm" libname = "libfty_shm" header="fty_shm.h"
+		min_major = "1" test = "fty_shm_test"
+        repository = "https://github.com/42ity/fty-shm.git"
+        release = "master"
+        />
 
     <header name = "app"  />
     <header name = "bios_agent" />
@@ -508,6 +515,7 @@
     <class name = "web/src/asset_actions_POST" private = "1" selftest = "0">root object</class>
     <class name = "web/src/asset_export" private = "1" selftest = "0">root object</class>
     <class name = "web/src/asset_GET" private = "1" selftest = "0">root object</class>
+    <class name = "web/src/asset_counter_GET" private = "1" selftest = "0">root object</class>
     <class name = "web/src/asset_import" private = "1" selftest = "0">root object</class>
     <class name = "web/src/asset_list" private = "1" selftest = "0">root object</class>
     <class name = "web/src/asset_POST" private = "1" selftest = "0">root object</class>

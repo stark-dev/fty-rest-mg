@@ -71,6 +71,7 @@
               //Nothing to do, just keep the default value.
             }
           }
+          zconfig_destroy (&root);
         }
         zconfig_destroy (&root);
     }
