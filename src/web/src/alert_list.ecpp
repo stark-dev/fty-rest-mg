@@ -94,7 +94,6 @@ static std::string
 s_response_list (zmsg_t *resp, tntdb::Connection& connection) {
     std::string json ( "[ ");
 
-    std::string uuid = zmsg_popstr (resp);
     zframe_t *frame = zmsg_pop (resp);
     while (frame) {
         #if CZMQ_VERSION_MAJOR == 3
