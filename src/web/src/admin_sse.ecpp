@@ -237,7 +237,7 @@ bool database_ready;
                 {
                     log_debug ("message is FTY_PROTO_ASSET");
                     json = sseManager.changeFtyProtoAsset2Json(msgProto);
-                } 
+                }
                 else
                 {
                     log_debug ("FTY_PROTO message not handled (id: %d)", 
