@@ -181,7 +181,7 @@ std::string Sse::loadAssetFromDatacenter()
     }
     log_debug("=== end ===");
   }
-  //Get all devices without location
+  //Get all assets without location
   try
   {
     int rv = DBAssets::select_assets_without_container(_connection,{persist::asset_type::DEVICE},{},
@@ -250,6 +250,8 @@ std::string Sse::changeFtyProtoAlert2Json(fty_proto_t *alert)
 
 std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
 {
+  log_debug("SSE FtyProto asset message (name: %s, operation: %s)", fty_proto_name(asset), fty_proto_operation(asset));
+
   //return value
   std::string json = "";
 
@@ -258,7 +260,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
   //if delete send json
   if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_DELETE))
   {
-    log_debug("Sse get an delete message");
+    log_debug("SSE get an delete message");
     if (_assetsOfDatacenter.find(nameElement) == _assetsOfDatacenter.end())
     {
       //The asset is maybe without location
@@ -284,7 +286,7 @@ std::string Sse::changeFtyProtoAsset2Json(fty_proto_t *asset)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY)
           || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_CREATE))
   {
-    log_debug("Sse get an update or create message");
+    log_debug("SSE get an update, create or inventory message");
 
     if (streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_UPDATE)
         || streq(fty_proto_operation(asset), FTY_PROTO_ASSET_OP_INVENTORY))
