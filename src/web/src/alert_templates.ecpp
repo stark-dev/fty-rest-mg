@@ -74,7 +74,9 @@ if (!client.getPointer ()) {
 }
 
 ZuuidGuard uuid (zuuid_new ());
-zmsg_t *req_list = s_request_LIST (uuid,type.c_str ());
+
+std::string requestType = "all";
+zmsg_t *req_list = s_request_LIST (uuid,requestType.c_str ());
 
 int rv = client->sendto ("fty-autoconfig", "rfc-evaluator-rules", 1000, &req_list);
 if (rv == -1) {
@@ -94,25 +96,37 @@ if (!msg) {
 
 ZstrGuard result (zmsg_popstr (msg));
 if (!result || !streq (result, "LIST")) {
-    log_warning ("Error reply LIST template '%s', result=%s", type.c_str (), result.get ());
+    log_warning ("Error reply LIST template '%s', result=%s", requestType.c_str (), result.get ());
     std::string err =  TRANSLATE_ME ("LIST template bad response");
     http_die ("internal-error", err.c_str ());
 }
 
 result = zmsg_popstr (msg);
 if (!result || !streq (result, type.c_str ())) {
-    log_warning ("Error reply LIST template '%s', result=%s", type.c_str (), result.get ());
+    log_warning ("Error reply LIST template '%s', result=%s", requestType.c_str (), result.get ());
     std::string err =  TRANSLATE_ME ("LIST template bad response");
     http_die ("internal-error", err.c_str ());
 }
+
+
 cxxtools::SerializationInfo si;
 si.setCategory (cxxtools::SerializationInfo::Category::Array);
+
+
 ZstrGuard template_name (zmsg_popstr (msg));
 ZstrGuard templat (zmsg_popstr (msg));
 ZstrGuard asset_list (zmsg_popstr (msg));
+
 while (template_name){
-    cxxtools::SerializationInfo &si_templat_obj= si.addMember ("");
+
+    bool matched = false;
+
+    cxxtools::SerializationInfo si_templat_obj;
+
+    //add name
     si_templat_obj.addMember ("name") <<= std::string (template_name);
+
+    //add template
     cxxtools::SerializationInfo &si_templat = si_templat_obj.addMember ("template");
     std::stringstream input (templat.get ());
     cxxtools::JsonDeserializer  deserializer (input);
@@ -120,6 +134,29 @@ while (template_name){
     //the name should be set after the deserialization
     si_templat.setName ("template");
 
+    if(type == "all")
+    {
+        matched = true;
+    }
+    else
+    {
+        //check the categories
+        std::vector<std::string> categories;
+        si_templat.getMember("categories") >>= categories;
+
+        for(const std::string & categorie : categories)
+        {
+            if(categorie == type)
+            {
+                matched = true;
+                break;
+            }
+        }
+
+    }
+    
+
+    //add asset_id
     cxxtools::SerializationInfo &si_assets_id = si_templat_obj.addMember ("assets_id");
     si_assets_id.setCategory (cxxtools::SerializationInfo::Category::Array);
     if (asset_list && strlen (asset_list)>0){
@@ -131,14 +168,22 @@ while (template_name){
            it++;
        }
     }
+
+    //we add to the response if type matched
+    if(matched)
+    {
+        si.addMember("") <<= si_templat_obj;
+    }
+
     template_name = zmsg_popstr (msg);
     templat = zmsg_popstr (msg);
     asset_list = zmsg_popstr (msg);
 }
-std::ostringstream outJsonStream (std::ios_base::out);
-cxxtools::JsonSerializer serializer (outJsonStream);
-serializer.beautify (true);
-serializer.serialize (si).finish ();
-std::string json = outJsonStream.str ().c_str ();
+
+// Send reply.
+reply.setContentType("application/json;charset=UTF-8");
+cxxtools::JsonSerializer serializer(reply.out());
+serializer.beautify(true);
+serializer.serialize(si);
+
 </%cpp>
-<$$ json $>
