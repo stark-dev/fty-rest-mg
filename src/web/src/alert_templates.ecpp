@@ -102,7 +102,7 @@ if (!result || !streq (result, "LIST")) {
 }
 
 result = zmsg_popstr (msg);
-if (!result || !streq (result, type.c_str ())) {
+if (!result || !streq (result, requestType.c_str ())) {
     log_warning ("Error reply LIST template '%s', result=%s", requestType.c_str (), result.get ());
     std::string err =  TRANSLATE_ME ("LIST template bad response");
     http_die ("internal-error", err.c_str ());
