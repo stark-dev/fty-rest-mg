@@ -140,18 +140,28 @@ while (template_name){
     }
     else
     {
-        //check the categories
-        std::vector<std::string> categories;
-        si_templat.getMember("categories") >>= categories;
-
-        for(const std::string & categorie : categories)
+        try
         {
-            if(categorie == type)
+            //check the categories
+            std::vector<std::string> categories;
+            si_templat.getMember("threshold").getMember("categories") >>= categories;
+
+            for(const std::string & categorie : categories)
             {
-                matched = true;
-                break;
+                if(categorie == type)
+                {
+                    matched = true;
+                    break;
+                }
             }
         }
+        catch(const std::exception& e)
+        {
+            log_warning ("Error in extracting categories '%s'", e.what().c_str ());
+            std::cerr << e.what() << '\n';
+        }
+        
+        
 
     }
     
