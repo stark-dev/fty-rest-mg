@@ -157,7 +157,7 @@ while (template_name){
         }
         catch(const std::exception& e)
         {
-            log_warning ("Error in extracting categories '%s'", e.what().c_str ());
+            log_warning ("Error in extracting categories");
         }
         
         
