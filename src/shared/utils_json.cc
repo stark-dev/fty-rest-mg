@@ -183,11 +183,11 @@ std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)
   json += "{";
 
   json += utils::json::jsonify("timestamp", buff) + ",";
-  json += utils::json::jsonify("rule_name", fty_proto_rule(alert)) + ",";
-  json += utils::json::jsonify("element_id", fty_proto_name(alert)) + ",";
-  json += utils::json::jsonify("element_name", asset_element_names.second) + ",";
-  json += utils::json::jsonify("element_type", asset_element.item.type_name) + ",";
-  json += utils::json::jsonify("element_sub_type", utils::strip(asset_element.item.subtype_name)) + ",";
+  json += utils::json::jsonify("name", fty_proto_rule(alert)) + ",";
+  json += utils::json::jsonify("asset_id", fty_proto_name(alert)) + ",";
+  json += utils::json::jsonify("asset_name", asset_element_names.second) + ",";
+  json += utils::json::jsonify("asset_type", asset_element.item.type_name) + ",";
+  json += utils::json::jsonify("asset_sub_type", utils::strip(asset_element.item.subtype_name)) + ",";
   json += utils::json::jsonify("state", fty_proto_state(alert)) + ",";
   json += utils::json::jsonify("severity", fty_proto_severity(alert)) + ",";
   json += utils::json::jsonify("description", fty_proto_description(alert));
