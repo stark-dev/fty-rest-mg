@@ -114,15 +114,15 @@ get_scan_progress (std::string &output)
             if(!discovered_sts) return -5;
             output.append ("\"sts-discovered\" : \"");
             output.append(discovered_sts);
-            output.append("\",");
 
             ZstrGuard discovered_powermeter (zmsg_popstr (resp));
             if(!discovered_powermeter) {
                 // don't make it a failure, for now at least
                 // return -5;
-                ;
+                output.append("\"");
             }
             else {
+                output.append("\",");
                 output.append ("\"powermeter-discovered\" : \"");
                 output.append(discovered_powermeter);
                 output.append("\"");
