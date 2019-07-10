@@ -400,7 +400,7 @@ db_reply_t
         return ret;
     }
     setlocale (LC_ALL, ""); // move this to main?
-    std::string iname = utils::strip (persist::subtypeid_to_subtype (asset_device_type_id));
+    std::string iname = utils::strip (asset_device_type_name); //persist::subtypeid_to_subtype (asset_device_type_id));
     log_debug ("  element_name = '%s/%s'", element_name, iname.c_str ());
 
     tntdb::Transaction trans(conn);

@@ -842,6 +842,8 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     }
 
     auto subtype_id = local_SUBTYPES.find(subtype)->second;
+    std::string expected = JSONIFY(utils::join_keys_map(SUBTYPES, ", ").c_str());
+    log_debug ("subtype_id = '%i'\n\t%s", subtype_id, expected);
     unused_columns.erase("sub_type");
 
     // since we have all the data about the asset, licensing check could be done now
@@ -855,6 +857,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     || SUBTYPES.find("ups")->second == subtype_id
                     || SUBTYPES.find("genset")->second == subtype_id
                     || SUBTYPES.find("pdu")->second == subtype_id
+                    || SUBTYPES.find("powermeter")->second == subtype_id
                     ) && DBAssets::get_active_power_devices (conn) + 1 > limitations.max_active_power_devices) {
                 std::string action = TRANSLATE_ME ("Asset handling");
                 std::string reason = TRANSLATE_ME ("Licensing maximum amount of active power devices limit reached");
