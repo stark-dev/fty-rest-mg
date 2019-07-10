@@ -843,7 +843,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
     auto subtype_id = local_SUBTYPES.find(subtype)->second;
     std::string expected = JSONIFY(utils::join_keys_map(SUBTYPES, ", ").c_str());
-    log_debug ("subtype_id = '%i'\n\t%s", subtype_id, expected);
+    log_debug ("subtype_id = '%i'\n\t%s", subtype_id, expected.c_str());
     unused_columns.erase("sub_type");
 
     // since we have all the data about the asset, licensing check could be done now
