@@ -205,7 +205,7 @@ if (streq (part, "LIST")) {
             //format to json minified, that's not optimal but that's the best way
             // to ensure the good format to work with the regex
             // minify => deserialize and serialize it again
-            std::stringstream inputTmp(part);
+            std::stringstream inputTmp(part.get());
             cxxtools::JsonDeserializer deserializerTmp(inputTmp);
             
             cxxtools::SerializationInfo siTmp;
