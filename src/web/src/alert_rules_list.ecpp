@@ -220,7 +220,7 @@ if (streq (part, "LIST")) {
                     std::string currentEname = data.substr(start, end);
 
                     //get a proper json { "value" : "test", "assetLink" : "datacenter-3"}
-                    enameData = std::regex_replace (currentEname ,std::regex("\\\\\""), "\"");
+                    std::string enameData = std::regex_replace (currentEname ,std::regex("\\\\\""), "\"");
 
                     //unserialize the section
                     cxxtools::SerializationInfo siEname;
@@ -229,8 +229,7 @@ if (streq (part, "LIST")) {
                     cxxtools::JsonDeserializer deserializer(input);
                     deserializer.deserialize(siEname);
 
-                    cxxtools::SerializationInfo & siValue = siEname.getMember("value");
-                    cxxtools::SerializationInfo & siAssetLink = siEname.getMember("assetLink");
+                    const cxxtools::SerializationInfo & siAssetLink = siEname.getMember("assetLink");
 
                     //recover assetLink
                     std::string tmpAssetLink;
