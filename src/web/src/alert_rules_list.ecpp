@@ -23,10 +23,13 @@
  \brief  Returns a list of alert rules according specified parameters
 */
 #><%pre>
+#include <cxxtools/jsonserializer.h>
+#include <cxxtools/serializationinfo.h>
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/regex.h>
 #include <vector>
 #include <string>
+#include <regex>
 #include <malamute.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -35,12 +38,20 @@
 #include <fty_common_rest.h>
 #include <fty_common_mlm_utils.h>
 #include <fty_common_mlm_guards.h>
+#include <fty_common_db_asset.h>
 
 </%pre>
 <%request scope="global">
 UserInfo user;
+bool database_ready;
 </%request>
 <%cpp>
+    // verify server is ready
+    if (!database_ready) {
+        log_debug ("Database is not ready yet.");
+        std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        http_die ("internal-error", err.c_str ());
+    }
 
     // check user permissions
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
@@ -156,6 +167,7 @@ if (!streq (mlm_client_subject (client), "rfc-evaluator-rules")) {
     std::string err =  TRANSLATE_ME ("Bad message.");
     http_die ("internal-error", err.c_str ());
 }
+
 // Check command. Can be LIST or ERROR
 ZstrGuard part (zmsg_popstr (recv_msg));
 if (streq (part, "LIST")) {
@@ -176,25 +188,100 @@ if (streq (part, "LIST")) {
         http_die ("internal-error", err.c_str ());
     }
     part = zmsg_popstr (recv_msg);
-    bool first = true;
-    </%cpp>
-[
-% while (part) {
-%   // FIXME: properly parse and write JSON instead of manipulating strings.
-%   const char *internalCat = "\"CAT_INTERNAL\"";
-%   if (first && (strstr(part, internalCat) == nullptr)) {
-    <$$ part $>
-%     first = false;
-%   }
-%   else if (strstr(part, internalCat) == nullptr) {
-,   <$$ part $>
-%   }
-% part = zmsg_popstr (recv_msg);
-% }
-]
-    <%cpp>
+    
+    cxxtools::SerializationInfo si;
+    si.setCategory(cxxtools::SerializationInfo::Category::Array);
+
+    //variables for assetLink and ename
+    std::string assetLink = "";
+    std::string externalName = "";
+
+    while (part) {
+        const char *internalCat = "\"CAT_INTERNAL\"";
+
+        //we need to serialize the section
+        if (strstr(part, internalCat) == nullptr) {
+
+            //format to json minified, that's not optimal but that's the best way
+            // to ensure the good format to work with the regex
+            // minify => deserialize and serialize it again
+            std::stringstream inputTmp(part.get());
+            cxxtools::JsonDeserializer deserializerTmp(inputTmp);
+            
+            cxxtools::SerializationInfo siTmp;
+            deserializerTmp.deserialize(siTmp);
+
+            std::stringstream output;
+            cxxtools::JsonSerializer serializerTmp(output);
+            serializerTmp.beautify(false);
+            serializerTmp.serialize(siTmp).finish();
+
+            std::string data = output.str();
+
+            //recover the ename JSON => "ename":{"value":"epdu-8","assetLink":"epdu-8"}
+            std::size_t found = data.find("\"ename\":");
+
+            if(found!=std::string::npos){
+
+                try
+                {
+                    //we have an ename section. Extract {"value":"epdu-8","assetLink":"epdu-8"}
+                    std::size_t start = data.find("{", found);
+                    std::size_t end = data.find("}", found);
+
+                    std::string enameData = data.substr(start, end);
+
+                    //unserialize the section
+                    cxxtools::SerializationInfo siEname;
+
+                    std::stringstream input(enameData);
+                    cxxtools::JsonDeserializer deserializer(input);
+                    deserializer.deserialize(siEname);
+
+                    const cxxtools::SerializationInfo & siValue = siEname.getMember("value");
+                    const cxxtools::SerializationInfo & siAssetLink = siEname.getMember("assetLink");
+
+                    //recover assetLink
+                    std::string tmpAssetLink;
+                    siAssetLink.getValue(tmpAssetLink);
+
+                    //recover the data of the asset if needed
+                    if(tmpAssetLink != assetLink)
+                    {
+                        DBAssets::name_to_extname(tmpAssetLink, externalName);
+                        assetLink = tmpAssetLink;
+                    }
+
+                    std::string wrongName;
+                    siValue.getValue(wrongName);
+
+                    //Replace the ename by the correct one.
+                    data = std::regex_replace (data ,std::regex("\"value\":\""+wrongName+"\""), "\"value\":\""+externalName+"\"");
+                }
+                catch(const std::exception& /*e*/)
+                {
+                    //ignore the change and continue
+                }  
+            }
+
+            //deserialize the new data to add it in the answer json
+            cxxtools::SerializationInfo & siRule = si.addMember("");
+
+            std::stringstream input(data);
+            cxxtools::JsonDeserializer deserializer(input);
+            deserializer.deserialize(siRule);
+        }
+
+        part = zmsg_popstr (recv_msg);
+    }
+
+    cxxtools::JsonSerializer serializer(reply.out());
+    serializer.beautify (true);
+    serializer.serialize(si).finish();
+
     return HTTP_OK;
 }
+
 if (streq (part, "ERROR")) {
     part = zmsg_popstr (recv_msg);
     if (!part) {
@@ -213,6 +300,7 @@ if (streq (part, "ERROR")) {
     std::string err =  TRANSLATE_ME ("Error while retrieving list of rules with type = '%s': %s.", checked_type.c_str (), reason.c_str ());
     http_die ("internal-error", err.c_str ());
 }
+
 // Message does not conform to protocol
 log_error ("Unexptected reply from  '%s'. Does not conform to rfc-evaluator-rules.",
     mlm_client_sender (client));
