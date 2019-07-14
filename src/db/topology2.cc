@@ -263,6 +263,8 @@ topology2_groups (
     }
     return ret;
 }
+
+// FIXME: that should be deprecated in favoir of fty-common*
 bool
 is_power_device (tntdb::Connection &conn, std::string &asset_name)
 {
@@ -278,12 +280,13 @@ is_power_device (tntdb::Connection &conn, std::string &asset_name)
         for (auto &row : res)
             subtype = s_get (row, "id_subtype");
 
-        if (subtype == "1" ||
-            subtype == "2" ||
-            subtype == "3" ||
-            subtype == "4" ||
-            subtype == "6" ||
-            subtype == "7"
+        if (subtype == "1" ||   // UPS
+            subtype == "2" ||   // Genset
+            subtype == "3" ||   // ePDU
+            subtype == "4" ||   // PDU
+            subtype == "6" ||   // Feed
+            subtype == "7" ||   // ATS / STS
+            subtype == "55"     // Power Meter // FIXME: auto assigned (increment)!
         )
             return true;
         else
