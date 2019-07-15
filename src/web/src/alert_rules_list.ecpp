@@ -221,7 +221,7 @@ if (streq (part, "LIST")) {
                     std::size_t start = data.find("{", found);
                     std::size_t end = data.find("}", found);
 
-                    std::string currentEname = data.substr(start, end - found);
+                    std::string currentEname = data.substr(start,  (end - start +1));
 
                     log_debug("Current ename: %s", currentEname.c_str());
 
