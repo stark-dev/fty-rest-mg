@@ -206,7 +206,7 @@ if (streq (part, "LIST")) {
         if (strstr(part, internalCat) == nullptr) {
 
             std::string data(part.get());
-            log_debug ("Part: %s \n\n", data.c_str());
+            //log_debug ("Part: %s \n\n", data.c_str());
 
             //recover the ename JSON => \"ename\" : { \"value\" : \"test\", \"assetLink\" : \"datacenter-3\"}
             // Be careful: the ename section is a JSON inside an JSON attribut.
@@ -221,12 +221,14 @@ if (streq (part, "LIST")) {
                     std::size_t start = data.find("{", found);
                     std::size_t end = data.find("}", found);
 
-                    std::string currentEname = data.substr(start, end);
+                    std::string currentEname = data.substr(start, end - found);
 
                     log_debug("Current ename: %s", currentEname.c_str());
 
                     //get a proper json { "value" : "test", "assetLink" : "datacenter-3"}
                     std::string enameData = std::regex_replace (currentEname ,std::regex("\\\\\""), "\"");
+
+                    log_debug("Current in JSON format: %s", enameData.c_str());
 
                     //unserialize the section
                     cxxtools::SerializationInfo siEname;
@@ -241,6 +243,8 @@ if (streq (part, "LIST")) {
                     //recover assetLink
                     std::string tmpAssetLink;
                     siAssetLink.getValue(tmpAssetLink);
+
+                    log_debug("Current assetLink: %s", tmpAssetLink.c_str());
 
                     //recover the data of the asset if needed
                     if(tmpAssetLink != assetLink)
@@ -274,6 +278,8 @@ if (streq (part, "LIST")) {
                         //Advance index forward so the next iteration doesn't pick it up as well.
                         index += newEname.size();
                     }
+
+                    log_debug("Ename has been replaced.");
 
                     //ensure we are able to unserialize newData
                     cxxtools::SerializationInfo siTmp;
