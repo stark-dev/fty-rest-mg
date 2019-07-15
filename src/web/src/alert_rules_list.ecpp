@@ -196,13 +196,17 @@ if (streq (part, "LIST")) {
     std::string assetLink = "";
     std::string externalName = "";
 
+    log_debug ("Collecting the data:");
+
     while (part) {
+        
         const char *internalCat = "\"CAT_INTERNAL\"";
 
         //we need to serialize the section
         if (strstr(part, internalCat) == nullptr) {
 
             std::string data(part.get());
+            log_debug ("Part: %s \n\n", data.c_str());
 
             //recover the ename JSON => \"ename\" : { \"value\" : \"test\", \"assetLink\" : \"datacenter-3\"}
             // Be careful: the ename section is a JSON inside an JSON attribut.
@@ -219,6 +223,8 @@ if (streq (part, "LIST")) {
 
                     std::string currentEname = data.substr(start, end);
 
+                    log_debug("Current ename: %s", currentEname.c_str());
+
                     //get a proper json { "value" : "test", "assetLink" : "datacenter-3"}
                     std::string enameData = std::regex_replace (currentEname ,std::regex("\\\\\""), "\"");
 
@@ -226,6 +232,7 @@ if (streq (part, "LIST")) {
                     cxxtools::SerializationInfo siEname;
 
                     std::stringstream input(enameData);
+
                     cxxtools::JsonDeserializer deserializer(input);
                     deserializer.deserialize(siEname);
 
@@ -245,26 +252,42 @@ if (streq (part, "LIST")) {
                     //create it manualy to match the good format { \"value\" : \"test\", \"assetLink\" : \"datacenter-3\"}
                     std::string newEname = "{ \\\"value\\\" : \\\""+externalName+"\\\", \\\"assetLink\\\" : \\\""+assetLink+"\\\"}";
 
+                    log_debug("New ename: %s", newEname.c_str());
+
                     //Replace the ename section by the correct one in the file
+                    //make a copy first
+
+                    std::string newData = data;
+
                     size_t index = 0;
                     while (true)
                     {
                         //Locate the section to replace.
-                        index = data.find(currentEname, index);
+                        index = newData.find(currentEname, index);
 
                         //end of string
                         if (index == std::string::npos) break;
 
                         // Make the replacement.
-                        data.replace(index, currentEname.size(), newEname);
+                        newData.replace(index, currentEname.size(), newEname);
 
                         //Advance index forward so the next iteration doesn't pick it up as well.
                         index += newEname.size();
                     }
+
+                    //ensure we are able to unserialize newData
+                    cxxtools::SerializationInfo siTmp;
+                    std::stringstream inputTmp(newData);
+                    cxxtools::JsonDeserializer deserializerTmp(inputTmp);
+                    deserializerTmp.deserialize(siTmp);
+
+                    data = newData;
+
                 }
-                catch(const std::exception& /*e*/)
+                catch(const std::exception& e)
                 {
                     //ignore the change and continue
+                    log_error ("Error during replacement of ename: %s", e.what());
                 }  
             }
 
