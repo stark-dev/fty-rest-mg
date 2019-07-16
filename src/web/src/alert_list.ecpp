@@ -121,16 +121,18 @@ s_response_list (zmsg_t *resp, tntdb::Connection& connection) {
            continue;
         }
 
-        std::string jsonAlert = getJsonAlert(connection,decoded);
+        std::string jsonAlert = getJsonAlert (connection,decoded);
 
-        if (jsonAlert.empty()){
+        if (jsonAlert.empty ()){
            fty_proto_destroy (&decoded);
            frame = zmsg_pop (resp);
            continue;
         }
+
+        json += jsonAlert;
         frame = zmsg_pop (resp);
-            if (frame)
-                json += ", ";
+        if (frame)
+            json += ", ";
     }
 
     json += " ]";
@@ -164,9 +166,9 @@ bool database_ready;
     std::string checked_recursive;
     std::vector<std::string> desired_elements;
     {
-        std::string state = qparam.param("state");
-        std::string asset = qparam.param("asset");
-        std::string recursive = qparam.param("recursive");
+        std::string state = qparam.param ("state");
+        std::string asset = qparam.param ("asset");
+        std::string recursive = qparam.param ("recursive");
         log_debug ("Request parameters - Initial tainted values received:\n\tstate = '%s'\n\tasset = '%s'\n\trecursive = '%s'\n",
                 state.c_str (), asset.c_str (), recursive.c_str ());
 
@@ -179,7 +181,7 @@ bool database_ready;
                 log_error ("state = '%s' is not a valid alert state.", state.c_str ());
                 std::string msg1 = TRANSLATE_ME ("value '%s'", state.c_str ());
                 std::string msg2 = TRANSLATE_ME ("one of the following values %s", "[ ALL | ALL-ACTIVE | ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE | RESOLVED ]");
-                http_die ("request-param-bad", "state", msg1.c_str(), msg2.c_str ());
+                http_die ("request-param-bad", "state", msg1.c_str (), msg2.c_str ());
             }
 
         // Check 'recursive' parameter
@@ -332,7 +334,7 @@ bool database_ready;
             http_die ("internal-error", err.c_str ());
         }
         else {
-            std::string reason = part.get();
+            std::string reason = part.get ();
             std::string err =  TRANSLATE_ME ("Error while requesting list of alerts: %s", reason.c_str ());
             http_die ("internal-error", err.c_str ());
         }
