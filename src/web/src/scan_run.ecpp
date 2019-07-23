@@ -29,6 +29,7 @@
 #include <fty_common_mlm_guards.h>
 #include <fty_common_rest_helpers.h>
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common_rest_audit_log.h>
 
 // stop request
 static zmsg_t *
@@ -51,7 +52,7 @@ req_scan (zuuid_t *uuid)
 }
 
 int
-stop_scan()
+stop_scan ()
 {
     // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
@@ -73,7 +74,7 @@ stop_scan()
         return -2;
     }
 
-    ZmsgGuard resp(client->recv (zuuid_str_canonical (uuid), 5));
+    ZmsgGuard resp (client->recv (zuuid_str_canonical (uuid), 5));
     zuuid_destroy (&uuid);
     if (!resp)
     {
@@ -150,7 +151,7 @@ run_scan ()
     else
         return -5;
     zstr_free (&result);
-    zmsg_destroy(&resp);
+    zmsg_destroy (&resp);
     return 0;
 }
 
@@ -169,53 +170,62 @@ UserInfo user;
     //std::string config = request.getArg ("config");
     //std::string range = request.getArg ("range");
     //for compatibility with previous version, call can have an argument
-    std::string range = qparam.param("range");
+    std::string range = qparam.param ("range");
     //char *checked_range = strdup (range.c_str ());
 
     int rv;
-    if(request.getMethod() == "DELETE") {
-        rv = stop_scan();
+    if (request.getMethod () == "DELETE") {
+        rv = stop_scan ();
     }
-    else if (request.getMethod() == "POST") {
+    else if (request.getMethod () == "POST") {
         rv  = run_scan ();
     }
-    else
-        http_die("method-not-allowed", request.getMethod().c_str() );
+    else {
+        http_die ("method-not-allowed", request.getMethod ().c_str () );
+    }
 
 
     if (rv == -1) {
         std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -2) {
         std::string err =  TRANSLATE_ME ("client->sendto () failed.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -3) {
         std::string err =  TRANSLATE_ME ("client->recv () failed.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -4) {
         std::string err =  TRANSLATE_ME ("fty-discovery returned error.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -5) {
         std::string err =  TRANSLATE_ME ("fty-discovery returned malformed or unexpected message.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -6) {
         std::string err =  TRANSLATE_ME ("fty-discovery precedent scan currently stopping.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -7) {
         std::string err =  TRANSLATE_ME ("fty-discovery already have a scan running.");
+        log_info_audit ("Request %s scan_run FAILED", request.getMethod ().c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
+        log_info_audit ("Request %s scan_run SUCCESS", request.getMethod ().c_str ());
 </%cpp>

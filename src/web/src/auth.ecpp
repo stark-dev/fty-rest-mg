@@ -37,6 +37,7 @@
 #include <tnt/httpheader.h>
 #include <cxxtools/jsondeserializer.h>
 #include <stdio.h>
+#include <fty_common_rest_audit_log.h>
 </%pre>
 <%cpp>
 
@@ -49,28 +50,30 @@ std::string checked_password;
 std::string checked_token;
 {
     // sanitize token
-    std::string token = qparam.param("token");
+    std::string token = qparam.param ("token");
     check_regex_text_or_die ("token", token, checked_token, "^[-/._~+/a-z0-9]{0,255}={0,10}$");
     // sanitize token end
 }
 
   {
-    std::string method = request.getMethod();
+    std::string method = request.getMethod ();
     // Check if it is a revoke
-    static cxxtools::Regex rex_rev("^.*/revoke$");
-    if ( rex_rev.match(request.getUrl()) ) {
+    static cxxtools::Regex rex_rev ("^.*/revoke$");
+    if ( rex_rev.match (request.getUrl ()) ) {
         // it is a revoke
         if ( method != "POST" ) {
             http_die ("method-not-allowed", "");
         }
         http_errors_t errors;
-        if(checked_token.empty()) {
-            http_die("request-param-required", "'token'");
+        if (checked_token.empty ()) {
+            log_info_audit ("Request POST auth revoke FAILED");
+            http_die ("request-param-required", "'token'");
         }
-        tokens::get_instance()->revoke(checked_token);
+        tokens::get_instance ()->revoke (checked_token);
 </%cpp>
 { "success": "Everything went well" }
 <%cpp>
+        log_info_audit ("Request POST auth revoke SUCCESS");
         return HTTP_OK;
     }
 
@@ -92,25 +95,30 @@ std::string checked_token;
             deserializer.deserialize (si);
         }
         catch (const std::exception& e) {
-            LOG_END_ABNORMAL(e);
-            http_die("bad-request-document", e.what());
+            LOG_END_ABNORMAL (e);
+            log_info_audit ("Request POST auth FAILED");
+            http_die ("bad-request-document", e.what ());
         }
-        auto grant_type_si = si.findMember("grant_type");
+        auto grant_type_si = si.findMember ("grant_type");
         if ( !grant_type_si ) {
+            log_info_audit ("Request POST auth FAILED");
             http_die ("request-param-required", "grant_type");
         }
-        auto username_si = si.findMember("username");
+        auto username_si = si.findMember ("username");
         if ( !username_si ) {
+            log_info_audit ("Request POST auth FAILED");
             http_die ("request-param-required", "user_name");
         }
-        auto password_si = si.findMember("password");
+        auto password_si = si.findMember ("password");
         if ( !password_si ) {
+            log_info_audit ("Request POST auth FAILED");
             http_die ("request-param-required", "password");
         }
         *grant_type_si >>= grant_type;
         *username_si >>= username;
         *password_si >>= password;
     } else {
+        log_info_audit ("Request POST auth username %s FAILED", username.c_str ());
         http_die ("method-not-allowed", "");
     }
 
@@ -122,28 +130,33 @@ std::string checked_token;
 
     // with grant_type argument client wants to get new oauth2 token
     if ( checked_grant_type != "password" ) {
-        http_die ("request-param-bad", "grant_type", checked_grant_type.c_str(), "password");
+        log_info_audit ("Request POST auth username %s FAILED", checked_username.c_str ());
+        http_die ("request-param-bad", "grant_type", checked_grant_type.c_str (), "password");
     }
     log_info ("request POST oauth2: username %s, grant_type %s", checked_username.c_str (), checked_grant_type.c_str ());
 
     std::string received = TRANSLATE_ME ("<invalid user or password>");
     std::string expected = TRANSLATE_ME ("<valid user and password>");
-    if (checked_username == BIOS_SCRIPT_USER && request.getPeerIp() != "127.0.0.1") {
+    if (checked_username == BIOS_SCRIPT_USER && request.getPeerIp () != "127.0.0.1") {
         log_error ("request POST oauth2: username %s, grant_type %s authentication FAILED", checked_username.c_str (), checked_grant_type.c_str ());
+        log_info_audit ("Request POST auth username %s FAILED", checked_username.c_str ());
         http_die ("request-param-bad", "(user|passwd)", received.c_str (), expected.c_str ());
     }
 
-    if ( !authenticate(checked_username.c_str(), checked_password.c_str()) ) {
+    if ( !authenticate (checked_username.c_str (), checked_password.c_str ()) ) {
         log_error ("request POST oauth2: username %s, grant_type %s authentication FAILED", checked_username.c_str (), checked_grant_type.c_str ());
+        log_info_audit ("Request POST auth username %s FAILED", checked_username.c_str ());
         http_die ("request-param-bad", "(user|passwd)", received.c_str (), expected.c_str ());
     }
     std::string access_token;
     long int expires_in;
-    BiosProfile profile = tokens::get_instance()->gen_token(checked_username.c_str(), access_token, &expires_in);
+    BiosProfile profile = tokens::get_instance ()->gen_token (checked_username.c_str (), access_token, &expires_in);
     if (profile == BiosProfile::Anonymous) {
         std::string err =  TRANSLATE_ME ("Cannot map use group id to bios profile!");
+        log_info_audit ("Request POST auth username %s FAILED", checked_username.c_str ());
         http_die ("internal-error", err.c_str ());
     }
+log_info_audit ("Request POST auth username %s SUCCESS", checked_username.c_str ());
 </%cpp>
 {
     "access_token" : "<$$ access_token $>",

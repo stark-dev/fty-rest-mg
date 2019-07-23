@@ -28,6 +28,7 @@
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_rest_helpers.h>
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common_rest_audit_log.h>
 
 static zmsg_t *
 req_setconf (zuuid_t *uuid, std::string json)
@@ -44,76 +45,76 @@ req_setconf (zuuid_t *uuid, std::string json)
         deserializer.deserialize (request_doc);
 
         std::string scanType;
-        if(!request_doc.getMember("scan_type", scanType)) {
+        if (!request_doc.getMember ("scan_type", scanType)) {
             //ERROR
-            zmsg_destroy(&msg);
+            zmsg_destroy (&msg);
             return NULL;
         }
 
-        zmsg_addstr(msg, scanType.c_str());;
+        zmsg_addstr (msg, scanType.c_str ());;
 
-        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember("multiscan");
-        if(si_rangescan == NULL) {
+        cxxtools::SerializationInfo *si_rangescan = request_doc.findMember ("multiscan");
+        if (si_rangescan == NULL) {
             //ERROR
-            zmsg_destroy(&msg);
+            zmsg_destroy (&msg);
             return NULL;
         }
 
-        cxxtools::SerializationInfo *list_subnet = si_rangescan->findMember("subnet");
-        if(list_subnet == NULL) {
+        cxxtools::SerializationInfo *list_subnet = si_rangescan->findMember ("subnet");
+        if (list_subnet == NULL) {
             //ERROR
-            zmsg_destroy(&msg);
+            zmsg_destroy (&msg);
             return NULL;
         }
 
-        cxxtools::SerializationInfo *list_fromto = si_rangescan->findMember("from_to");
-        if(list_fromto == NULL) {
+        cxxtools::SerializationInfo *list_fromto = si_rangescan->findMember ("from_to");
+        if (list_fromto == NULL) {
             //ERROR
-            zmsg_destroy(&msg);
+            zmsg_destroy (&msg);
             return NULL;
         }
 
         int val =0;
-        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
+        for (auto it = list_subnet->begin (); it != list_subnet->end (); ++it) {
             val++;
         }
-        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
+        for (auto it = list_fromto->begin (); it != list_fromto->end (); ++it) {
             val++;
         }
 
-        zmsg_addstrf(msg, "%" PRIi32, val);
+        zmsg_addstrf (msg, "%" PRIi32, val);
 
         log_debug ("set_confscan: %i different scans", val);
 
         std::string value_sn;
-        for (auto it = list_subnet->begin(); it != list_subnet->end(); ++it) {
-            it->getValue(value_sn);
-            zmsg_addstr(msg, value_sn.c_str());
+        for (auto it = list_subnet->begin (); it != list_subnet->end (); ++it) {
+            it->getValue (value_sn);
+            zmsg_addstr (msg, value_sn.c_str ());
         }
-        for (auto it = list_fromto->begin(); it != list_fromto->end(); ++it) {
-            it->getValue(value_sn);
-            zmsg_addstr(msg, value_sn.c_str());
+        for (auto it = list_fromto->begin (); it != list_fromto->end (); ++it) {
+            it->getValue (value_sn);
+            zmsg_addstr (msg, value_sn.c_str ());
         }
 
-        cxxtools::SerializationInfo *listIp = request_doc.findMember("ips");
-        if(listIp == NULL) {
+        cxxtools::SerializationInfo *listIp = request_doc.findMember ("ips");
+        if (listIp == NULL) {
             //ERROR
-            zmsg_destroy(&msg);
+            zmsg_destroy (&msg);
             return NULL;
         }
 
         val = 0;
-        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
+        for (auto it = listIp->begin (); it != listIp->end (); ++it) {
             val++;
         }
 
-        zmsg_addstrf(msg, "%" PRIi32, val);
+        zmsg_addstrf (msg, "%" PRIi32, val);
 
         log_debug ("set_confscan: %i different IPs", val);
 
-        for(auto it = listIp->begin(); it != listIp->end(); ++it) {
-            it->getValue(value_sn);
-            zmsg_addstr(msg, value_sn.c_str());
+        for (auto it = listIp->begin (); it != listIp->end (); ++it) {
+            it->getValue (value_sn);
+            zmsg_addstr (msg, value_sn.c_str ());
         }
 
     }
@@ -126,7 +127,7 @@ req_setconf (zuuid_t *uuid, std::string json)
 
 
 int
-set_confscan(std::string json)
+set_confscan (std::string json)
 {
      // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
@@ -137,7 +138,7 @@ set_confscan(std::string json)
 
     zuuid_t *uuid = zuuid_new ();
     zmsg_t *request = req_setconf (uuid, json);
-    if(request == NULL) {
+    if (request == NULL) {
         zuuid_destroy (&uuid);
         return -8;
     }
@@ -182,7 +183,7 @@ set_confscan(std::string json)
     else
         return -5;
     zstr_free (&result);
-    zmsg_destroy(&resp);
+    zmsg_destroy (&resp);
     return 0;
 }
 
@@ -199,7 +200,7 @@ req_getconfscan (zuuid_t *uuid)
 int
 get_confscan (std::string &output)
 {
-    output.clear();
+    output.clear ();
 
     // connect to mlm client
     MlmClientPool::Ptr client = mlm_pool.get ();
@@ -234,7 +235,7 @@ get_confscan (std::string &output)
             zstr_free (&result);
             char *json_res = zmsg_popstr (resp);
             if (!json_res) return -5;
-            output.append(json_res);
+            output.append (json_res);
             zstr_free (&json_res);
         }
         else if (streq (result, "ERROR")) {
@@ -249,7 +250,7 @@ get_confscan (std::string &output)
     else
         return -5;
 
-    zmsg_destroy(&resp);
+    zmsg_destroy (&resp);
     return 0;
 }
 
@@ -268,56 +269,74 @@ UserInfo user;
 
     int rv = 0;
     std::string output;
-    if(request.getMethod() == "GET") {
-        rv = get_confscan(output);
+    if (request.getMethod () == "GET") {
+        rv = get_confscan (output);
     }
-    else if (request.getMethod() == "POST") {
+    else if (request.getMethod () == "POST") {
         std::string json = request.getBody ();
-        if(!json.empty())
-            rv = set_confscan(json);
+        if (!json.empty ())
+            rv = set_confscan (json);
     }
     else
-        http_die("method-not-allowed", request.getMethod().c_str() );
+        http_die ("method-not-allowed", request.getMethod ().c_str () );
 
     if (rv == -1) {
         std::string err = TRANSLATE_ME ("mlmpool.get () failed.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -2) {
         std::string err = TRANSLATE_ME ("client->sendto () failed.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -3) {
         std::string err = TRANSLATE_ME ("client->recv () failed.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -4) {
         std::string err = TRANSLATE_ME ("<range>");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("request-param-required", err.c_str ());
     }
     else
     if (rv == -5) {
         std::string err = TRANSLATE_ME ("fty-discovery returned malformed or unexpected message.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -6) {
         std::string err = TRANSLATE_ME ("fty-discovery precedent scan currently stopping.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -7) {
         std::string err = TRANSLATE_ME ("fty-discovery already have a scan running.");
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -8) {
         std::string err = TRANSLATE_ME ("Please check RFC-11 for valid json schema description.");
-        http_die("bad-request-document", err.c_str ());
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan FAILED");
+        http_die ("bad-request-document", err.c_str ());
     }
     else
+        if (request.getMethod () == "POST")
+            log_info_audit ("Request POST conf_scan SUCCESS");
 </%cpp>
 <$$ output $>

@@ -40,6 +40,7 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common_filesystem.h>
 #include <fty_common_mlm_subprocess.h>
+#include <fty_common_rest_audit_log.h>
 
 </%pre>
 <%request scope="global">
@@ -59,12 +60,14 @@ bool database_ready;
     char *license_file = get_current_license_file ();
     if ( license_file == NULL ) {
         std::string err =  TRANSLATE_ME ("Cannot get the path to the text of the current license");
+        log_info_audit ("Request POST license FAILED");
         http_die ("internal-error", err.c_str ());
     }
     char *current_license_version = get_current_license_version (license_file);
     if ( current_license_version == NULL ) {
         free (license_file); license_file = NULL;
         std::string err =  TRANSLATE_ME ("Cannot get version of the text of the current license");
+        log_info_audit ("Request POST license FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
@@ -73,6 +76,7 @@ bool database_ready;
         free (current_license_version); current_license_version = NULL;
         free (license_file); license_file = NULL;
         std::string err =  TRANSLATE_ME ("Cannot get the path to the actual status of the accepted license");
+        log_info_audit ("Request POST license FAILED");
         http_die ("internal-error", err.c_str ());
     }
     log_debug ("variable accepted_license_file == '%s'", accepted_license_file);
@@ -82,13 +86,14 @@ bool database_ready;
         free (current_license_version); current_license_version = NULL;
         free (license_file); license_file = NULL;
         std::string err =  TRANSLATE_ME ("Cannot open file with actual information about accepted license");
+        log_info_audit ("Request POST license FAILED");
         http_die ("internal-error", err.c_str ());
     }
-    uint64_t tme = ::time(NULL);
-    fprintf (f, "%s\n%" PRIu64 "\n%s\n", current_license_version, tme, user.login().c_str());
+    uint64_t tme = ::time (NULL);
+    fprintf (f, "%s\n%" PRIu64 "\n%s\n", current_license_version, tme, user.login ().c_str ());
     fclose (f);
-    log_debug("License: version='%s',tme='%" PRIu64 "',user='%s')",
-                current_license_version, tme, user.login().c_str());
+    log_debug ("License: version='%s',tme='%" PRIu64 "',user='%s')",
+                current_license_version, tme, user.login ().c_str ());
 
     std::string clv {current_license_version};
     free (accepted_license_file); accepted_license_file = NULL;
@@ -107,7 +112,7 @@ bool database_ready;
         // consider this thread "hung" and would self-restart after
         // 10 minutes; if this does happen - we should add a thread
         // to report "we're alive" to the server while waiting...
-        log_info("Starting db service .." );
+        log_info ("Starting db service .." );
         MlmSubprocess::Argv proc_cmd {"/usr/libexec/fty/start-db-services"};
         std::string proc_out, proc_err;
 
@@ -117,11 +122,12 @@ bool database_ready;
         // long before this; so even if it failed - try to use the DB...
         int rv_svc = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
         if (rv_svc != 0) {
-            log_error("Starting of start-db-services have failed. Consult system logs");
-            log_error("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                "/usr/libexec/fty/start-db-services", rv_svc, proc_out.c_str(), proc_err.c_str());
+            log_error ("Starting of start-db-services have failed. Consult system logs");
+            log_error ("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                "/usr/libexec/fty/start-db-services", rv_svc, proc_out.c_str (), proc_err.c_str ());
             if (rv_svc > 0) {
                 std::string err =  TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs");
+                log_info_audit ("Request POST license FAILED");
                 http_die ("internal-error", err.c_str ());
             }
             // Negative return means killed by signal, typically by our
@@ -141,6 +147,7 @@ bool database_ready;
                         + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
                     log_error ("%s", message.c_str ());
                     std::string err =  TRANSLATE_ME ("Database software service is not running");
+                    log_info_audit ("Request POST license FAILED");
                     http_die ("internal-error", err.c_str ());
                 } else {
                     // Not quite an error, but we want this message at the same logging level
@@ -162,6 +169,7 @@ bool database_ready;
                         + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
                     log_error ("%s", message.c_str ());
                     std::string err =  TRANSLATE_ME ("Database schema was not installed or verified successfully");
+                    log_info_audit ("Request POST license FAILED");
                     http_die ("internal-error", err.c_str ());
                 } else {
                     // Not quite an error, but we want this message at the same logging level
@@ -171,8 +179,8 @@ bool database_ready;
         }
 
         // once done, check environment files for accessing the database
-        log_info("db services were started, re-reading password ...");
-        int rv_dbcred = DBConn::dbreadcredentials();
+        log_info ("db services were started, re-reading password ...");
+        int rv_dbcred = DBConn::dbreadcredentials ();
         if (!rv_dbcred) {
             std::string message;
             if (rv_svc != 0) {
@@ -181,25 +189,27 @@ bool database_ready;
                 message = TRANSLATE_ME ("Database password file is missing");
             }
             log_error ("%s", message.c_str ());
-            http_die ("internal-error", message.c_str());
+            log_info_audit ("Request POST license FAILED");
+            http_die ("internal-error", message.c_str ());
         }
     } else {
         // enforce reload of credentials, e.g. if timely service startup
         // had failed previously but the system has caught up by now
-        log_info("db services were already started and set up, re-reading password just in case ...");
-        if (!DBConn::dbreadcredentials()) {
+        log_info ("db services were already started and set up, re-reading password just in case ...");
+        if (!DBConn::dbreadcredentials ()) {
             std::string err =  TRANSLATE_ME ("Database password file is missing");
+            log_info_audit ("Request POST license FAILED");
             http_die ("internal-error", err.c_str ());
         }
     }
 </%cpp>
 { "success" : "License version <$ clv $> accepted." }
 <%cpp>
-    log_info("license was accepted, db services were started, db credentials were refreshed");
-    log_debug("Current DB URL is: %s", DBConn::url.c_str());
+    log_info ("license was accepted, db services were started, db credentials were refreshed");
+    log_debug ("Current DB URL is: %s", DBConn::url.c_str ());
 
-    log_info("Making sure webserver can already connect to database...");
-    // Note: if we earlier failed to dbreadcredentials() and have no envvars
+    log_info ("Making sure webserver can already connect to database...");
+    // Note: if we earlier failed to dbreadcredentials () and have no envvars
     // set in the tntnet process now (DB_USER, DB_PASSWD), the mysql/mariadb
     // client library will fall back to reading $HOME/.my.cnf and normally
     // would not find it (we don't create one), but even if it did - the
@@ -208,27 +218,29 @@ bool database_ready;
 
     try {
         tntdb::Connection conn;
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connectCached (DBConn::url);
 
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepareCached (
             " SELECT * from t_empty"
 //            " SHOW databases"
         );
 
-        tntdb::Result result = st.select();
+        tntdb::Result result = st.select ();
         for ( auto &row: result )
         {
             std::string ret;
-            row[0].get(ret);
+            row[0].get (ret);
         }
         database_ready = true;
     } catch (std::exception &e) {
         // TODO: Check/evaluate accessibility of /run namespace and
-        // restart myself like `kill(getpid())` if there are issues?
-        log_error("Database connection test failed: %s", e.what());
+        // restart myself like `kill (getpid ())` if there are issues?
+        log_error ("Database connection test failed: %s", e.what ());
         database_ready = false;
         std::string err =  TRANSLATE_ME ("Database connection test failed");
+        log_info_audit ("Request POST license FAILED");
         http_die ("internal-error", err.c_str ());
     }
+    log_info_audit ("Request POST license SUCCESS");
 }
 </%cpp>
