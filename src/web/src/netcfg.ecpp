@@ -39,6 +39,7 @@
 #include <fty_common_macros.h>
 #include <fty_common_mlm_subprocess.h>
 #include <fty_common_rest_helpers.h>
+#include <fty_common_rest_audit_log.h>
 
 using namespace shared;
 
@@ -53,42 +54,50 @@ UserInfo user;
             };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
-augtool* augeas = augtool::get_instance();
+augtool* augeas = augtool::get_instance ();
 if (!augeas) {
     std::string err =  TRANSLATE_ME ("Cannot communicate with augtool. Is it installed or properly configured?");
+    if (request.getMethod () == "PUT")
+        log_info_audit ("Request PUT netcfg FAILED");
     http_die ("internal-error", err.c_str ());
 }
 std::string nil;
 
 // Make sure we have data that works
-nil = augeas->get_cmd_out("ls /augeas/files/etc/network/interfaces/error");
-if(!nil.empty()) {
+nil = augeas->get_cmd_out ("ls /augeas/files/etc/network/interfaces/error");
+if (!nil.empty ()) {
     std::string err =  TRANSLATE_ME ("Syntax error in /etc/network/interfaces config file");
+    if (request.getMethod () == "PUT")
+        log_info_audit ("Request PUT netcfg FAILED");
     http_die ("internal-error", err.c_str ());
 }
-nil = augeas->get_cmd_out("ls /augeas/files/etc/resolv.conf/error");
-if(!nil.empty()) {
+nil = augeas->get_cmd_out ("ls /augeas/files/etc/resolv.conf/error");
+if (!nil.empty ()) {
     std::string err =  TRANSLATE_ME ("Syntax error in /etc/resolv.conf config file");
+    if (request.getMethod () == "PUT")
+        log_info_audit ("Request PUT netcfg FAILED");
     http_die ("internal-error", err.c_str ());
 }
 
 // Are we asked to just list possible configurations?
-static cxxtools::Regex rex_ncfg("^.*/netcfgs$");
-if(rex_ncfg.match(request.getUrl())) {
-    std::string all_interfaces_str = augeas->get_cmd_out("match /files/etc/network/interfaces/iface[*]",
+static cxxtools::Regex rex_ncfg ("^.*/netcfgs$");
+if (rex_ncfg.match (request.getUrl ())) {
+    std::string all_interfaces_str = augeas->get_cmd_out ("match /files/etc/network/interfaces/iface[*]",
 							 true, ",",
 							 [](const std::string iface) -> bool {
 							 	return iface == "lo";
 							 }
 							);
-    if(all_interfaces_str.empty()) {
+    if (all_interfaces_str.empty ()) {
         std::string err =  TRANSLATE_ME ("No configurable interfaces found");
+        if (request.getMethod () == "PUT")
+            log_info_audit ("Request PUT netcfg FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
     std::set<std::string> active_interfaces = get_ifaces ();
     std::vector<std::string> all_interfaces;
-    cxxtools::split(",", all_interfaces_str, std::back_inserter(all_interfaces));
+    cxxtools::split (",", all_interfaces_str, std::back_inserter (all_interfaces));
 
     std::string out;
     for (std::string iface : all_interfaces) {
@@ -101,102 +110,114 @@ if(rex_ncfg.match(request.getUrl())) {
 </%cpp>
 { "netcfgs": [ <$$ out $> ] }
 <%cpp>
+    if (request.getMethod () == "PUT")
+        log_info_audit ("Request PUT netcfg SUCCESS");
     return HTTP_OK;
 }
 
 // We are discussing interface configuration, are we asked about real interface?
 std::string checked_iface;
 {
-    std::string iface = request.getArg("iface");
+    std::string iface = request.getArg ("iface");
     if (iface.empty ()) {
+        if (request.getMethod () == "PUT")
+            log_info_audit ("Request PUT netcfg FAILED");
         http_die ("request-param-required", "iface");
     }
     check_regex_text_or_die ("iface", iface, checked_iface, "^[[:alpha:]][[:alnum:]]{0,14}$");
 }
 
 // Where is the tree reflecting the interface?
-std::string address = augeas->get_cmd_out(
+std::string address = augeas->get_cmd_out (
                       "match /files/etc/network/interfaces/iface[*] " + checked_iface,
 					  false);
-if(address.empty()) {
+if (address.empty ()) {
     // Not perfect, but bad enough to create another message?
+    if (request.getMethod () == "PUT")
+        log_info_audit ("Request PUT netcfg FAILED");
     http_die ("element-not-found", checked_iface.c_str ());
 }
 
 #define AUG_GET(NAME, VAL) \
-    VAL = augeas->get_cmd_out("get " + address + "/" NAME);
+    VAL = augeas->get_cmd_out ("get " + address + "/" NAME);
 
 std::string method;
-AUG_GET("method", method);
+AUG_GET ("method", method);
 
 // Modifications requested?
-if(request.getMethod() == "PUT") {
-    std::stringstream input(request.getBody(), std::ios_base::in);
+if (request.getMethod () == "PUT") {
+    std::stringstream input (request.getBody (), std::ios_base::in);
     cxxtools::SerializationInfo si;
     cxxtools::SerializationInfo rsi;
-    cxxtools::JsonDeserializer deserializer(input);
+    cxxtools::JsonDeserializer deserializer (input);
     std::string val;
     try {
-        deserializer.deserialize(si);
-    } catch(const std::exception& e) {
+        deserializer.deserialize (si);
+    } catch (const std::exception& e) {
         std::string msg = TRANSLATE_ME ("Expected valid json document: %s", JSONIFY (e.what ()).c_str ());
+        log_info_audit ("Request PUT netcfg FAILED");
         http_die ("bad-request-document",  msg.c_str ());
     }
 
     try {
-        rsi = si.getMember(checked_iface);
-    } catch(const std::exception& e) {
+        rsi = si.getMember (checked_iface);
+    } catch (const std::exception& e) {
         std::string msg = TRANSLATE_ME ("No configuration for interface '%s' provided", checked_iface.c_str ());
+        log_info_audit ("Request PUT netcfg FAILED");
         http_die ("bad-request-document", msg.c_str ());
     }
 
 
 // Gets configuration from json and sets it in config while verifying it matches regexp
 #define AUG_SET(NAME, CHECK)         \
-    if(it.name() == NAME) { \
-        it.getValue(val); \
-        if(! CHECK ) { \
+    if (it.name () == NAME) { \
+        it.getValue (val); \
+        if (! CHECK ) { \
             std::string msg = TRANSLATE_ME ("Wrong value for '%s' setting or setting not expected for method %s.", NAME, method.c_str ()); \
+            if (request.getMethod () == "PUT")\
+                log_info_audit ("Request PUT netcfg FAILED");\
             http_die ("parameter-conflict", msg.c_str ()); \
         } \
-        augeas->run_cmd("set " + address + "/" NAME " " + val); \
+        augeas->run_cmd ("set " + address + "/" NAME " " + val); \
         handled = true; \
     }
 
     // All the things we need to set
-    for(auto it : rsi) {
+    for (auto it : rsi) {
         bool handled = false;
-        static cxxtools::Regex rex_mtd("^(dhcp|static|none|manual)$");
-        AUG_SET("method",  rex_mtd.match(method));
-        AUG_GET("method",  method);
-        AUG_SET("address", (CIDRAddress(val).valid()     && method == "static"));
-        AUG_SET("netmask", (CIDRAddress(val).isNetmask() && method == "static"));
+        static cxxtools::Regex rex_mtd ("^(dhcp|static|none|manual)$");
+        AUG_SET ("method",  rex_mtd.match (method));
+        AUG_GET ("method",  method);
+        AUG_SET ("address", (CIDRAddress (val).valid ()     && method == "static"));
+        AUG_SET ("netmask", (CIDRAddress (val).isNetmask () && method == "static"));
 
-        if(method != "static") {
-            augeas->run_cmd("rm " + address + "/address");
-            augeas->run_cmd("rm " + address + "/netmask");
-            augeas->run_cmd("rm " + address + "/gateway");
+        if (method != "static") {
+            augeas->run_cmd ("rm " + address + "/address");
+            augeas->run_cmd ("rm " + address + "/netmask");
+            augeas->run_cmd ("rm " + address + "/gateway");
         }
 
         //gateway could be unset, handle it differently
-        if(it.name() == "gateway" && method == "static") {
-            it.getValue(val);
-            if(val.empty()){
-                augeas->run_cmd("rm " + address + "/gateway");
+        if (it.name () == "gateway" && method == "static") {
+            it.getValue (val);
+            if (val.empty ()){
+                augeas->run_cmd ("rm " + address + "/gateway");
             }else{
-                if(! CIDRAddress(val).valid() ) {
+                if (! CIDRAddress (val).valid () ) {
                     std::string msg = TRANSLATE_ME ("Wrong value for 'gateway' setting or setting not expected for method %s.", method.c_str ());
+                    log_info_audit ("Request PUT netcfg FAILED");
                     http_die ("parameter-conflict", msg.c_str ());
                 }
-                augeas->run_cmd("set " + address + "/gateway " + val);
+                augeas->run_cmd ("set " + address + "/gateway " + val);
             }
             handled = true;
         }
 
         //DNS is array, handle differently
-        if(it.name() == "nameservers") {
-            if(it.category() != cxxtools::SerializationInfo::Category::Array) {
+        if (it.name () == "nameservers") {
+            if (it.category () != cxxtools::SerializationInfo::Category::Array) {
                 std::string err =  TRANSLATE_ME ("Wrong value for DNS setting - array expected");
+                log_info_audit ("Request PUT netcfg FAILED");
                 http_die ("bad-request-document", err.c_str ());
             }
             // get all interface from /etc/network/interfaces
@@ -206,88 +227,93 @@ if(request.getMethod() == "PUT") {
 
             std::string ns_list = "";
             // Build the list of nameservers
-            for(auto i : it) {
-                i.getValue(val);
-                if(!CIDRAddress(val).valid()) {
+            for (auto i : it) {
+                i.getValue (val);
+                if (!CIDRAddress (val).valid ()) {
                     std::string err =  TRANSLATE_ME ("Wrong value for DNS setting - array of IPs expected") ;
+                    log_info_audit ("Request PUT netcfg FAILED");
                     http_die ("bad-request-document", err.c_str ());
                 }
-                if(ns_list.length()>0){
+                if (ns_list.length ()>0){
                     ns_list += " " + val;
                 }else{
                     ns_list = val;
                 }
             }
-            log_debug("Nameservers list = '%s'", ns_list.c_str());
+            log_debug ("Nameservers list = '%s'", ns_list.c_str ());
             // Now set nameservers for each interfaces
             for (auto iface : interfaces) {
-                log_debug("Processing interface %s", iface.c_str ());
+                log_debug ("Processing interface %s", iface.c_str ());
                 //avoid lo interface and some augtool cli weird iface
-                if (iface.find("lo")==std::string::npos
-                        && iface.find("*")==std::string::npos
-                        && iface.find("]")!=std::string::npos) {
-                    std::size_t found = iface.find("]");
-                    std::string sub_iface=iface.substr(0,found+1);
+                if (iface.find ("lo")==std::string::npos
+                        && iface.find ("*")==std::string::npos
+                        && iface.find ("]")!=std::string::npos) {
+                    std::size_t found = iface.find ("]");
+                    std::string sub_iface=iface.substr (0,found+1);
                     char *path;
-                    if (ns_list.empty()){
-                        log_debug("rm %s/dns-nameservers",sub_iface.c_str());
+                    if (ns_list.empty ()){
+                        log_debug ("rm %s/dns-nameservers",sub_iface.c_str ());
                         path = zsys_sprintf ("rm %s/dns-nameservers",
-                                sub_iface.c_str());
+                                sub_iface.c_str ());
                     }else{
-                        log_debug("set %s/dns-nameservers '%s'",
-                                sub_iface.c_str(), ns_list.c_str ());
+                        log_debug ("set %s/dns-nameservers '%s'",
+                                sub_iface.c_str (), ns_list.c_str ());
                         path = zsys_sprintf ("set %s/dns-nameservers '%s'",
-                                sub_iface.c_str(), ns_list.c_str ());
+                                sub_iface.c_str (), ns_list.c_str ());
                    }
                    augeas->run_cmd (std::string (path));
                 }
             }
             handled = true;
         }
-        if(!handled) {
+        if (!handled) {
             std::string msg = TRANSLATE_ME ("Invalid option '%s'", it.name ().c_str ());
+            log_info_audit ("Request PUT netcfg FAILED");
             http_die ("bad-request-document", msg.c_str ());
         }
     }
 
     // Commit everything
-	augeas->save();
+	augeas->save ();
 
     // Make sure we have data that works
-	nil = augeas->get_cmd_out("ls /augeas/files/etc/network/interfaces/error");
-    if(!nil.empty()) {
+	nil = augeas->get_cmd_out ("ls /augeas/files/etc/network/interfaces/error");
+    if (!nil.empty ()) {
         std::string err =  TRANSLATE_ME ("Syntax error in /etc/network/interfaces config file");
+        log_info_audit ("Request PUT netcfg FAILED");
         http_die ("internal-error", err.c_str ());
     }
-	nil = augeas->get_cmd_out("ls /augeas/files/etc/resolv.conf/error");
-    if(!nil.empty()) {
+	nil = augeas->get_cmd_out ("ls /augeas/files/etc/resolv.conf/error");
+    if (!nil.empty ()) {
         std::string err =  TRANSLATE_ME ("Syntax error in /etc/resolv.conf config file");
+        log_info_audit ("Request PUT netcfg FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
+    log_info_audit ("Request PUT netcfg SUCCESS");
 }
 
 std::string ip, netmask, gateway, dns;
-AUG_GET("method", method);
-AUG_GET("address", ip);
-AUG_GET("netmask", netmask);
-AUG_GET("gateway", gateway);
-dns = augeas->get_cmd_out("match /files/etc/resolv.conf/nameserver", true, "\", \"");
+AUG_GET ("method", method);
+AUG_GET ("address", ip);
+AUG_GET ("netmask", netmask);
+AUG_GET ("gateway", gateway);
+dns = augeas->get_cmd_out ("match /files/etc/resolv.conf/nameserver", true, "\", \"");
 
 </%cpp>
 { "<$ checked_iface $>":
     {
         "method": "<$ method $>"
-% if(!ip.empty()) {
+% if (!ip.empty ()) {
       , "address": "<$ ip $>"
 % }
-% if(!netmask.empty()) {
+% if (!netmask.empty ()) {
       , "netmask": "<$ netmask $>"
 % }
-% if(!gateway.empty()) {
+% if (!gateway.empty ()) {
       , "gateway": "<$ gateway $>"
 % }
-% if(!dns.empty()) {
+% if (!dns.empty ()) {
       , "nameservers": [ "<$$ dns $>" ]
 % }
     }

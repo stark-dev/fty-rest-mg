@@ -36,6 +36,7 @@
 #include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_utils_web.h>
+#include <fty_common_rest_audit_log.h>
 
 // define json serialization objects
 struct Array
@@ -60,23 +61,23 @@ struct Value
 
 void operator<<= (cxxtools::SerializationInfo& si, const Array::Config& config)
 {
-    si.addMember("key") <<= config.key;
-    si.addMember("value") <<= config.value;
+    si.addMember ("key") <<= config.key;
+    si.addMember ("value") <<= config.value;
 }
 void operator<<= (cxxtools::SerializationInfo& si, const Array& array)
 {
-    si.addMember("config") <<= array.config;
+    si.addMember ("config") <<= array.config;
 }
 
 
 void operator<<= (cxxtools::SerializationInfo& si, const Value::Config& config)
 {
-    si.addMember("key") <<= config.key;
-    si.addMember("value") <<= config.value;
+    si.addMember ("key") <<= config.key;
+    si.addMember ("value") <<= config.value;
 }
 void operator<<= (cxxtools::SerializationInfo& si, const Value& value)
 {
-    si.addMember("config") <<= value.config;
+    si.addMember ("config") <<= value.config;
 }
 
 zconfig_t *
@@ -112,9 +113,9 @@ UserInfo user;
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
     std::string key_format_string = "^[-._a-zA-Z0-9]+$";
-    cxxtools::Regex key_format(key_format_string);
+    cxxtools::Regex key_format (key_format_string);
     std::string value_format_string = "^[[:blank:][:alnum:][:punct:]]*$";
-    cxxtools::Regex value_format(value_format_string);
+    cxxtools::Regex value_format (value_format_string);
 
     ///////////////////
     ///     GET     ///
@@ -125,7 +126,7 @@ UserInfo user;
             std::string key = qparam.param ("key");
             if (!key_format.match (key)) {
                 std::string msg = std::string (TRANSLATE_ME ("satisfy format ")) + key_format_string;
-                http_die ("request-param-bad", "key", key.c_str(), msg.c_str() );
+                http_die ("request-param-bad", "key", key.c_str (), msg.c_str () );
             }
             checked_key = std::move (key);
         }
@@ -140,7 +141,7 @@ UserInfo user;
         zconfig_t *item = zconfig_locate (root, config_key);
         if (!item) {
             zconfig_destroy (&root);
-            http_die("element-not-found", checked_key.c_str ());
+            http_die ("element-not-found", checked_key.c_str ());
         }
 
         bool is_array = false;
@@ -201,7 +202,8 @@ UserInfo user;
                 if (rv == -1) {
                     utils::config::roots_destroy (roots);
                     std::string msg = TRANSLATE_ME ("Cannot save config file ") + it.first;
-                    http_die ("internal-error", msg.c_str());
+                    log_info_audit ("Request POST config FAILED");
+                    http_die ("internal-error", msg.c_str ());
                 }
             }
         }   // unlock the guard
@@ -209,13 +211,16 @@ UserInfo user;
 {}
 <%cpp>
         utils::config::roots_destroy (roots);
+        log_info_audit ("Request POST config SUCCESS");
         return HTTP_OK;
         }
         catch (const BiosError &e) {
             utils::config::roots_destroy (roots);
-            http_die_idx(e.idx, e.what());
+            log_info_audit ("Request POST config FAILED");
+            http_die_idx (e.idx, e.what ());
         }
         catch (const std::exception &e) {
+            log_info_audit ("Request POST config FAILED");
             http_die ("bad-request-document", e.what ());
         }
     }

@@ -31,18 +31,19 @@
 #include <fty_common_utf8.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <fty_common_rest_audit_log.h>
 
 // encode GET message for smtp agent
 static zmsg_t*
 s_smtp_GET_message (const char* email, zuuid_t *uuid)
 {
-    assert(email);
+    assert (email);
 
     zmsg_t *msg = zmsg_new ();
     zmsg_addstr (msg, zuuid_str_canonical (uuid));
-    zmsg_addstr(msg, email);
+    zmsg_addstr (msg, email);
     zmsg_addstr (msg, "Test email");                              // email subject
-    zmsg_addstr(msg, "This is email test. Do not reply.");        // body
+    zmsg_addstr (msg, "This is email test. Do not reply.");        // body
     return msg;
 }
 
@@ -65,11 +66,14 @@ UserInfo user;
         if (email.empty ())
             email = qparam.param ("email");
 
-        if (email.empty ())
+        if (email.empty ()) {
+            log_info_audit ("Request POST email_test FAILED");
             http_die ("request-param-required", "to");
+        }
 
         if (email.find ('@', 0) == std::string::npos) {
             std::string expected =  TRANSLATE_ME ("valid email address");
+            log_info_audit ("Request POST email_test FAILED");
             http_die ("request-param-bad", "to", email.c_str (), expected.c_str ());
         }
 
@@ -90,12 +94,13 @@ UserInfo user;
     if (!client.getPointer ()) {
         log_fatal ("Error: mlm_pool.get () failed.");
         std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
+        log_info_audit ("Request POST email_test FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
     // send message
-    ZuuidGuard uuid(zuuid_new ());
-    zmsg_t *send = s_smtp_GET_message (checked_email.c_str(), uuid);
+    ZuuidGuard uuid (zuuid_new ());
+    zmsg_t *send = s_smtp_GET_message (checked_email.c_str (), uuid);
     int rv = client->sendto (AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL", 1000, &send);
     if (rv == -1)
     {
@@ -103,7 +108,8 @@ UserInfo user;
                     "Error: client->sendto (address = '%s', subject = '%s', timeout = 1000) failed.",
                         AGENT_FTY_EMAIL_SENDMAIL_ONLY, "SENDMAIL");
         std::string err =  TRANSLATE_ME ("client->sendto () failed");
-        zmsg_destroy(&send);
+        zmsg_destroy (&send);
+        log_info_audit ("Request POST email_test FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
@@ -112,12 +118,13 @@ UserInfo user;
     {
         std::string msg = TRANSLATE_ME ("Error: client-> recv (timeout = '%d') returned NULL", _timeout);
         log_error ("%s", msg.c_str ());
+        log_info_audit ("Request POST email_test FAILED");
         http_die ("internal-error", msg.c_str ());
     }
 
     ZstrGuard err_code (zmsg_popstr (recieve));
     ZstrGuard err_message (zmsg_popstr (recieve));
-    const char *msg_subject = client->subject();
+    const char *msg_subject = client->subject ();
     std::string status;
 
     if (streq (msg_subject, "SENDMAIL-OK"))
@@ -128,15 +135,18 @@ UserInfo user;
     if (streq (msg_subject, "SENDMAIL-ERR"))
     {
         status = "Failed";
-        http_die ("upstream-err", err_message.get());
+        log_info_audit ("Request POST email_test FAILED");
+        http_die ("upstream-err", err_message.get ());
     }
     else
     {
         status = "Failed";
         log_fatal ("Error: message recieved with invalid subject.");
         std::string err =  TRANSLATE_ME ("client->recv () invalid message subject");
+        log_info_audit ("Request POST email_test FAILED");
         http_die ("internal-error", err.c_str ());
     }
+    log_info_audit ("Request POST email_test SUCCESS");
 
 </%cpp>
 {
