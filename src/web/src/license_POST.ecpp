@@ -208,9 +208,9 @@ bool database_ready;
 
     try {
         tntdb::Connection conn;
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
 
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT * from t_empty"
 //            " SHOW databases"
         );

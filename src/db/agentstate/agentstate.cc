@@ -45,7 +45,7 @@ static int
     LOG_START;
 
     try{
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " INSERT INTO t_bios_agent_info (agent_name, info) "
             " VALUES "
             "   (:name, :info) "
@@ -91,7 +91,7 @@ int
 {
     int result = 1;
     try {
-        auto connection = tntdb::connectCached(DBConn::url);
+        auto connection = tntdb::connect(DBConn::url);
         result = save_agent_info(connection, agent_name, data );
         connection.close();
     } catch( const std::exception &e ) {
@@ -110,7 +110,7 @@ int
     agent_info = "";
 
     try {
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT "
             "   v.info "
             " FROM "
@@ -152,7 +152,7 @@ int
         std::string       &agent_info)
 {
     try {
-        auto connection = tntdb::connectCached(DBConn::url);
+        auto connection = tntdb::connect(DBConn::url);
         return load_agent_info(connection, agent_name, agent_info);
     } catch( const std::exception &e ) {
         log_info("Cannot load agent %s info: %s", agent_name.c_str(), e.what() );

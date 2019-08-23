@@ -34,7 +34,7 @@ TEST_CASE("UPDATE asset element #1","[db][CRUD][update][asset_element][crud_test
     log_info ("=============== UPDATE asset element #1 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     // assumption
     // (id_asset_element, name, id_type, id_parent, status, priority) VALUES (6, "asset_crud_DEVICE_update",6, 1, "nonactive", 3);

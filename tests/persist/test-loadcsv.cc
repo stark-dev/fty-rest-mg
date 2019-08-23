@@ -40,9 +40,9 @@ using namespace persist;
 
 std::string get_dc_lab_description() {
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
-    tntdb::Statement st = conn.prepareCached(
+    tntdb::Statement st = conn.prepare(
         " SELECT value from t_bios_asset_ext_attributes"
         " WHERE id_asset_element in ("
         "   SELECT id_asset_element FROM t_bios_asset_element"

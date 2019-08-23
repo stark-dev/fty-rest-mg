@@ -56,8 +56,8 @@ get_input_power_group_id
      uint32_t datacenter_id)
 {
     try {
-        tntdb::Connection connection = tntdb::connectCached (url);
-        tntdb::Statement statement = connection.prepareCached (
+        tntdb::Connection connection = tntdb::connect (url);
+        tntdb::Statement statement = connection.prepare (
             " SELECT a.id_asset_element "
             " FROM t_bios_asset_element as a "
             " LEFT JOIN t_bios_asset_element_type as b ON a.id_type=b.id_asset_element_type "
@@ -72,7 +72,7 @@ get_input_power_group_id
 		    group_candidates.push_back (group_id);
 	    }
     	for (const auto& group_candidate : group_candidates) {
-            statement = connection.prepareCached (
+            statement = connection.prepare (
                 " SELECT id_asset_element "
                 " FROM t_bios_asset_ext_attributes "
                 " WHERE id_asset_element= :group_id "
@@ -105,8 +105,8 @@ get_power_topology_group
      std::vector <std::tuple <std::string, std::string, std::string, std::string>>& powerchains)
 {
     try {
-        tntdb::Connection connection = tntdb::connectCached (url);
-        tntdb::Statement statement = connection.prepareCached (
+        tntdb::Connection connection = tntdb::connect (url);
+        tntdb::Statement statement = connection.prepare (
             " SELECT id_asset_device_src as src_id, src_out as src_socket, a.name as src_name, c.name as src_subtype, "
             "        id_asset_device_dest as dest_id, dest_in as dest_socket, b.name as dest_name, d.name as dest_subtype "
             " FROM t_bios_asset_link "
@@ -144,7 +144,7 @@ get_power_topology_group
             }
             powerchains.push_back (std::make_tuple (dest_id, dest_socket, source_id, source_socket));
         }
-        statement = connection.prepareCached (
+        statement = connection.prepare (
             " SELECT c.id_asset_element, a.name, b.name AS sub_type "
             " FROM t_bios_asset_group_relation c, t_bios_asset_element a, v_bios_asset_device b "
             " WHERE c.id_asset_group = :group_id AND a.id_asset_element = c.id_asset_element AND b.id_asset_element = c.id_asset_element "
@@ -176,8 +176,8 @@ construct_input_power_group
      std::vector <std::tuple <std::string, std::string, std::string, std::string>>& powerchains)
 {
     try {
-        tntdb::Connection connection = tntdb::connectCached (url);
-        tntdb::Statement statement = connection.prepareCached (
+        tntdb::Connection connection = tntdb::connect (url);
+        tntdb::Statement statement = connection.prepare (
             " SELECT id_asset_element, a.name, c.name "
             " FROM t_bios_asset_element as a "
             " LEFT JOIN t_bios_asset_element_type as b "
@@ -198,7 +198,7 @@ construct_input_power_group
                 devices.emplace (std::make_pair (device_id, std::make_pair (device_name, device_subtype)));
         }
 
-        statement = connection.prepareCached (
+        statement = connection.prepare (
             " SELECT "
             "   id_asset_device_src as src_id, "
             "   src_out as src_socket, "
@@ -258,7 +258,7 @@ input_power_group_response
      std::vector <std::tuple <std::string, std::string, std::string, std::string>>& powerchains)
 {
     try {
-        tntdb::Connection connection = tntdb::connectCached (url);
+        tntdb::Connection connection = tntdb::connect (url);
         int group_id = get_input_power_group_id (url, datacenter_id);
         if (group_id == -1)
             return -1;
@@ -461,8 +461,8 @@ zmsg_t* select_group_elements(
     log_debug ("filter_type = %" PRIu16, filtertype);
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Connection conn = tntdb::connect(url);
+        tntdb::Statement st = conn.prepare(
                 " SELECT"
                 "   v.id_asset_element,"
                 "   v1.name,"
@@ -604,7 +604,7 @@ zframe_t* select_childs(
     log_debug ("feed_by_id = %" PRIu32, feed_by_id);
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
         tntdb::Statement st;
         tntdb::Result result;
         if ( element_id != 0 )
@@ -613,7 +613,7 @@ zframe_t* select_childs(
             // because type of the group should be selected
             if ( child_type_id == persist::asset_type::GROUP )
             {
-                st = conn.prepareCached(
+                st = conn.prepare(
                     " SELECT"
                     "    v.id, v.name, v.id_type, v1.value as dtype_name"
                     " FROM v_bios_asset_element v"
@@ -627,7 +627,7 @@ zframe_t* select_childs(
             }
             else
             {
-                st = conn.prepareCached(
+                st = conn.prepare(
                     " SELECT"
                     "    v.id, v.name, v.id_type, v1.name as dtype_name"
                     " FROM v_bios_asset_element v"
@@ -650,7 +650,7 @@ zframe_t* select_childs(
             // because type of the group should be selected
             if ( child_type_id == persist::asset_type::GROUP )
             {
-                st = conn.prepareCached(
+                st = conn.prepare(
                     " SELECT"
                     "    v.id, v.name, v.id_type, v1.value as dtype_name"
                     " FROM v_bios_asset_element v"
@@ -663,7 +663,7 @@ zframe_t* select_childs(
             }
             else
             {
-                st = conn.prepareCached(
+                st = conn.prepare(
                     " SELECT"
                     "    v.id, v.name, v.id_type, v1.name as dtype_name"
                     " FROM v_bios_asset_element v"
@@ -910,8 +910,8 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
     {
         // if looking for a lockated elements
         try{
-            tntdb::Connection conn = tntdb::connectCached(url);
-            tntdb::Statement st = conn.prepareCached(
+            tntdb::Connection conn = tntdb::connect(url);
+            tntdb::Statement st = conn.prepare(
                 " SELECT"
                 "    v.name, v.id_subtype, v.id_type"
                 " FROM v_bios_asset_element v"
@@ -949,8 +949,8 @@ zmsg_t* get_return_topology_from(const char* url, asset_msg_t* getmsg, a_elmnt_i
         if ( type_id == persist::asset_type::GROUP )
         {
             try{
-                tntdb::Connection conn = tntdb::connectCached(url);
-                tntdb::Statement st = conn.prepareCached(
+                tntdb::Connection conn = tntdb::connect(url);
+                tntdb::Statement st = conn.prepare(
                     " SELECT"
                     "    v.value"
                     " FROM"
@@ -1288,14 +1288,14 @@ zmsg_t* select_parents (const char* url, a_elmnt_id_t element_id,
     log_debug ("element_type_id = %" PRIu16, element_type_id);
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
         tntdb::Statement st;
 
         // for the groups, other select is needed
         // because type of the group should be selected
         if ( element_type_id != persist::asset_type::GROUP )
         {
-            st = conn.prepareCached(
+            st = conn.prepare(
                   " SELECT"
                   "     v.id_parent, v.id_parent_type,v.name,"
                   "     v1.name as dtype_name"
@@ -1309,7 +1309,7 @@ zmsg_t* select_parents (const char* url, a_elmnt_id_t element_id,
         }
         else
         {
-            st = conn.prepareCached(
+            st = conn.prepare(
                   " SELECT"
                   "     v.id_parent, v.id_parent_type,v.name,"
                   "     v1.value as dtype_name"
@@ -1393,8 +1393,8 @@ zmsg_t* get_return_topology_to(const char* url, asset_msg_t* getmsg)
 
     // select additional information about starting device
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Connection conn = tntdb::connect(url);
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "    v.id_type"
             " FROM v_bios_asset_element v"
@@ -1434,9 +1434,9 @@ std::tuple <std::string, std::string, a_elmnt_tp_id_t>
                               a_elmnt_id_t asset_element_id)
 {
     // select information about specidied asset element
-    tntdb::Connection conn = tntdb::connectCached(url);
+    tntdb::Connection conn = tntdb::connect(url);
 
-    tntdb::Statement st = conn.prepareCached(
+    tntdb::Statement st = conn.prepare(
         " SELECT"
         "   v.name, v1.name as type_name, v1.id_asset_device_type"
         " FROM"
@@ -1577,9 +1577,9 @@ zmsg_t* get_return_power_topology_from(const char* url, asset_msg_t* getmsg)
                                         device_type_name, device_type_id));
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
 
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "  v.id_asset_element_dest, v.src_out, v.dest_in, v.dest_name,"
             "  v.dest_type_name, v.dest_type_id"
@@ -1736,9 +1736,9 @@ select_power_topology_to (const char* url, a_elmnt_id_t element_id,
 
         // 2. select and process process powerlinks
         try{
-            tntdb::Connection conn = tntdb::connectCached(url);
+            tntdb::Connection conn = tntdb::connect(url);
 
-            tntdb::Statement st = conn.prepareCached(
+            tntdb::Statement st = conn.prepare(
                 " SELECT"
                 "  v.id_asset_element_src, v.src_out, v.dest_in, v.src_name,"
                 "  v.src_type_name, v.src_type_id "
@@ -1899,10 +1899,10 @@ zmsg_t* get_return_power_topology_group(const char* url, asset_msg_t* getmsg)
     //  all powerlinks are included into "resultpowers"
     std::set< powerlink_info_t > resultpowers;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
         // v_bios_asset_link are only devices,
         // so there is no need to add more constrains
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.src_out, v.id_asset_element_src,"
             "   v.dest_in, v.id_asset_element_dest"
@@ -1978,11 +1978,11 @@ zmsg_t* get_return_power_topology_group(const char* url, asset_msg_t* getmsg)
     // result set of found devices
     std::set< device_info_t > resultdevices;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
         // select is done from pure t_bios_asset_element,
         // because v_bios_asset_element has unnecessary union
         // (for parents) here
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v1.name, v2.name AS type_name,"
             "   v.id_asset_element, v2.id_asset_device_type"
@@ -2058,8 +2058,8 @@ zmsg_t* get_return_power_topology_datacenter(const char* url,
     // result set of found devices
     std::set< device_info_t > resultdevices;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Connection conn = tntdb::connect(url);
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.id_asset_element, v.name,"
             "   v.id_asset_device_type"
@@ -2120,10 +2120,10 @@ zmsg_t* get_return_power_topology_datacenter(const char* url,
     //      all powerlinks are included into "resultpowers"
     std::set< powerlink_info_t > resultpowers;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
         // v_bios_asset_link are only devices,
         // so there is no need to add more constrains
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.src_out, v.id_asset_element_src, v.dest_in,"
             "   v.id_asset_element_dest"

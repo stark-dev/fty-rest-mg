@@ -203,7 +203,7 @@ bool database_ready;
 
     std::string element_name;
     try{
-        tntdb::Connection conn = tntdb::connectCached (DBConn::url);
+        tntdb::Connection conn = tntdb::connect (DBConn::url);
 
         auto basic_ret = DBAssets::select_asset_element_web_byId (conn, checked_element_id);
         if ( basic_ret.status == 0 && basic_ret.errsubtype == DB_ERROR_NOTFOUND) {

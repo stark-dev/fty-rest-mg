@@ -56,7 +56,7 @@ zlist_t* select_asset_device_links_all(tntdb::Connection &conn,
         if ( link_type_id == 0 )
         {
             // take links of any type
-            tntdb::Statement st_pow = conn.prepareCached(
+            tntdb::Statement st_pow = conn.prepare(
                 " SELECT"
                 "   v.id_asset_element_dest, v.id_asset_element_src,"
                 "   v.src_out, v.dest_in"
@@ -71,7 +71,7 @@ zlist_t* select_asset_device_links_all(tntdb::Connection &conn,
         else
         {
             // take links of specified type
-            tntdb::Statement st_pow = conn.prepareCached(
+            tntdb::Statement st_pow = conn.prepare(
                 " SELECT"
                 "   v.id_asset_element_dest, v.id_asset_element_src,"
                 "   v.src_out, v.dest_in"
@@ -133,7 +133,7 @@ std::set <a_elmnt_id_t> select_asset_group_elements (tntdb::Connection &conn, a_
     log_debug ("asset_group_id = %" PRIu32, group_id);
 
     try{
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.id_asset_element"
             " FROM"
@@ -190,7 +190,7 @@ db_reply < std::map <std::string, int> >
     db_reply < std::map<std::string, int> > ret = db_reply_new(mymap);
 
     try {
-        tntdb::Statement st = conn.prepareCached(st_str);
+        tntdb::Statement st = conn.prepare(st_str);
         tntdb::Result res = st.select();
 
         std::string name = "";
@@ -256,7 +256,7 @@ db_reply <db_a_elmnt_t>
         tntdb::Statement st;
         tntdb::Row row;
         try {
-            tntdb::Statement st = conn.prepareCached(
+            tntdb::Statement st = conn.prepare(
                 " SELECT"
                 "   v.name, v.id_parent, v.status, v.priority, v.id, v.id_type"
                 " FROM"
@@ -268,7 +268,7 @@ db_reply <db_a_elmnt_t>
         }
         catch (const tntdb::NotFound &e) {
             // maybe we got extname instead of name
-            tntdb::Statement st = conn.prepareCached(
+            tntdb::Statement st = conn.prepare(
                 " SELECT v.name, v.id_parent, v.status, v.priority, v.id, v.id_type "
                 " FROM "
                 "   v_bios_asset_element AS v "
@@ -326,7 +326,7 @@ db_reply <std::vector<db_a_elmnt_t>>
 
     try{
         // Can return more than one row.
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.name , v.id_parent, v.status, v.priority, v.id, v.id_subtype"
             " FROM"
@@ -387,7 +387,7 @@ db_reply <std::set <std::pair<a_elmnt_id_t ,a_elmnt_id_t>>>
     try{
         // v_bios_asset_link are only devices,
         // so there is no need to add more constrains
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.id_asset_element_src,"
             "   v.id_asset_element_dest"

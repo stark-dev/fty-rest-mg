@@ -61,7 +61,7 @@ void
         mlm_client_destroy (&client);
         throw std::runtime_error(" mlm_client_set_producer () failed.");
     }
-    tntdb::Connection conn = tntdb::connectCached (DBConn::url);
+    tntdb::Connection conn = tntdb::connect (DBConn::url);
     for ( const  auto &oneRow : rows ) {
 
         std::string s_priority = std::to_string (oneRow.first.priority);
