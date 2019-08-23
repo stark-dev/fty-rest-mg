@@ -68,9 +68,9 @@ m_dvc_id_t convert_asset_to_monitor_old(const char* url,
     m_dvc_id_t       device_discovered_id = 0;
     a_elmnt_tp_id_t  element_type_id      = 0;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
+        tntdb::Connection conn = tntdb::connect(url);
 
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.id_discovered_device, v1.id_type"
             " FROM"
@@ -140,8 +140,8 @@ a_elmnt_id_t convert_monitor_to_asset(const char* url,
     assert ( discovered_device_id );
     a_elmnt_id_t asset_element_id = 0;
     try{
-        tntdb::Connection conn = tntdb::connectCached(url);
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Connection conn = tntdb::connect(url);
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             " id_asset_element"
             " FROM"

@@ -53,7 +53,7 @@ db_reply_t
 
     try{
         // ASSUMPTION: devices have unique names
-        tntdb::Statement st = conn.prepareCached(
+        tntdb::Statement st = conn.prepare(
             " SELECT"
             "   v.id"
             " FROM"

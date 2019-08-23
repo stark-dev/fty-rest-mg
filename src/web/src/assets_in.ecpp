@@ -178,10 +178,10 @@ bool database_ready;
     // create a database connection
     tntdb::Connection connection;
     try {
-        connection = tntdb::connectCached (DBConn::url);
+        connection = tntdb::connect (DBConn::url);
     }
     catch (const tntdb::Error& e) {
-        log_error ("tntdb::connectCached (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
+        log_error ("tntdb::connect (url = '%s') failed: %s.", DBConn::url.c_str (), e.what ());
         std::string err =  TRANSLATE_ME ("Connecting to database failed.");
         http_die ("internal-error", err.c_str ());
     }

@@ -56,7 +56,7 @@ int free_u_size( a_elmnt_id_t elementId)
 {
     try{
         tntdb::Connection conn;
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
 
         // get the rack u_size
         std::set<a_elmnt_id_t> rack_id{elementId};
@@ -163,7 +163,7 @@ rack_outlets_available(
 
     int rv;
     try {
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
         rv = DBAssets::select_assets_by_container(
                 conn, elementId, cb);
 

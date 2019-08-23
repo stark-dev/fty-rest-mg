@@ -518,7 +518,7 @@ db_reply_t
 
     // Don't allow the deletion of the last datacenter (unless overriden)
     if (getenv(ENV_OVERRIDE_LAST_DC_DELETION_CHECK) == nullptr) {
-        unsigned numDatacentersAfterDelete = conn.prepareCached(
+        unsigned numDatacentersAfterDelete = conn.prepare(
                 " SELECT COUNT(id_asset_element)"
                 " FROM"
                 "   t_bios_asset_element"

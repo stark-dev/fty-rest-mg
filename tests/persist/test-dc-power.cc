@@ -44,7 +44,7 @@ TEST_CASE("DC power #1 v2","[db][power][dc][calc][v2][dc_power.sql]")
     log_info ("=============== DC POWER #1 v2 ==================");
 /*
     tntdb::Connection conn;
-    REQUIRE_NOTHROW (conn = tntdb::connectCached(url));
+    REQUIRE_NOTHROW (conn = tntdb::connect(url));
 
     db_reply <std::map<std::string, std::vector<std::string>>> ret =
         select_devices_total_power_dcs (conn);

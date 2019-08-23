@@ -85,8 +85,8 @@ get_location (
     /* NOTE ASSUMPTION: this returns the first DC with an address,
      * assuming it is the only one available */
     try {
-        tntdb::Connection conn = tntdb::connectCached (DBConn::url);
-        log_debug ("tntdb::connectCached (url = '%s') successful", DBConn::url.c_str ());
+        tntdb::Connection conn = tntdb::connect (DBConn::url);
+        log_debug ("tntdb::connect (url = '%s') successful", DBConn::url.c_str ());
         db_reply <std::map <uint32_t, std::string>> elements =
             DBAssets::select_short_elements (
                                     conn,

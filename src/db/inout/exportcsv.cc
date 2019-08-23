@@ -144,7 +144,7 @@ void
     tntdb::Connection conn;
     std::string msg{TRANSLATE_ME ("no connection to database")};
     try{
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
     }
     catch(...)
     {
@@ -387,7 +387,7 @@ void
     tntdb::Connection conn;
     std::string msg{"no connection to database"};
     try{
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
     }
     catch(...)
     {
