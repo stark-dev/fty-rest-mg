@@ -220,9 +220,8 @@ bool database_ready;
         }
         log_debug("database_ready_file='%s'", database_ready_file);
 
-        /* Stat returns 0 on success, so database_ready is inverted value of it. */
-        int database_ready_flagfile = !stat(database_ready_file, &db_stat);
-        while (!database_ready_flagfile) {
+        /* Stat returns 0 on success */
+        while (0 != stat(database_ready_file, &db_stat)) {
             // Note: after 10 mins wait tntnet may kill the "hung" loop
             // and/or the appserver. The database really should be up by
             // then and maybe it just does not see it (shifted /tmp etc...)
