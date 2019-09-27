@@ -1,6 +1,6 @@
 <#
  #
- # Copyright (C) 2015 - 2018 Eaton
+ # Copyright (C) 2015 - 2019 Eaton
  #
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ UserInfo user;
             };
     std::string audit_msg;
     if (request.getMethod () == "POST")
-        audit_msg = std::string ("Request CREATE systemctl FAILED");
+        audit_msg = std::string ("Request EXECUTE systemctl FAILED");
     CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
 
     // check method
@@ -141,7 +141,7 @@ UserInfo user;
             std::string param = TRANSLATE_ME ("operation");
             std::string expected = TRANSLATE_ME ("status/list/enable/disable/start/stop/restart");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s FAILED", operation.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s FAILED", operation.c_str ());
             }
             http_die ("request-param-bad", param.c_str (), operation.c_str (), expected.c_str ());
         }
@@ -150,7 +150,7 @@ UserInfo user;
             std::string msg = TRANSLATE_ME ("an operation allowed for GET method:") + "status/list.";
             std::string param = TRANSLATE_ME ("operation");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s FAILED", operation.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s FAILED", operation.c_str ());
             }
             http_die ("request-param-bad", param.c_str (), operation.c_str (), msg.c_str ());
 
@@ -159,7 +159,7 @@ UserInfo user;
             std::string param = TRANSLATE_ME ("operation");
             std::string expected = TRANSLATE_ME ("an operation allowed for POST method: enable/disable/start/stop/restart.");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s FAILED", operation.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s FAILED", operation.c_str ());
             }
             http_die ("request-param-bad", param.c_str (), operation.c_str (), expected.c_str ());
         }
@@ -180,7 +180,7 @@ UserInfo user;
             if (request.getBody ().empty ()) {
                 std::string msg = std::string (TRANSLATE_ME ("Expected json document")) + "  { \"service_name\" : \"<service_name>\" }." + std::string (TRANSLATE_ME (" Received empty request document."));
                 if (request.getMethod () == "POST") {
-                    log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
+                    log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
                 }
                 http_die ("bad-request-document", msg.c_str ());
             }
@@ -198,7 +198,7 @@ UserInfo user;
                 std::string message;
                 message.assign ("Expected json document { \"service_name\" : \"<service_name>\" }. ").append (e.what ());
                 if (request.getMethod () == "POST") {
-                    log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
+                    log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
                 }
                 http_die ("bad-request-document", message.c_str ());
             }
@@ -208,7 +208,7 @@ UserInfo user;
                 log_error ("%s", message.c_str ());
                 std::string err =  TRANSLATE_ME ("Exception caught. Please check logs for more details.");
                 if (request.getMethod () == "POST") {
-                    log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
+                    log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
                 }
                 http_die ( "internal-error", err.c_str ());
             }
@@ -217,14 +217,14 @@ UserInfo user;
         std::string expected = TRANSLATE_ME ("one of service names that can be obtained through systemctl/list call");
         if (service_name.empty () && checked_operation != "list") {
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
             }
             http_die ("request-param-bad", "service_name", service_name.c_str (), expected.c_str ());
         }
 
         if (!systemctl_valid_service_name (service_name)) {
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
             }
             http_die ("request-param-bad", "service_name", service_name.c_str (), expected.c_str ());
         }
@@ -261,7 +261,7 @@ UserInfo user;
             "}");
         reply.out () << message;
         if (request.getMethod () == "POST") {
-            log_info_audit ("Request CREATE systemctl %s %s SUCCESS", checked_operation.c_str (), checked_service_name.c_str ());
+            log_info_audit ("Request EXECUTE systemctl %s %s SUCCESS", checked_operation.c_str (), checked_service_name.c_str ());
         }
         return HTTP_OK;
     }
@@ -271,7 +271,7 @@ UserInfo user;
         if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState)) {
             std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
             }
             http_die ("internal-error", err.c_str ());
         }
@@ -311,7 +311,7 @@ UserInfo user;
             log_error ("%s", message.c_str ());
             std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
             }
             http_die ("internal-error", err.c_str ());
         }
@@ -320,7 +320,7 @@ UserInfo user;
         if (!systemctl_service_status (checked_service_name, LoadState, ActiveState, UnitFileState, SubState)) {
             std::string err =  TRANSLATE_ME ("Executing systemctl failed. Please check logs for more details.");
             if (request.getMethod () == "POST") {
-                log_error_audit ("Request CREATE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
+                log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), checked_service_name.c_str ());
             }
             http_die ("internal-error", err.c_str ());
         }
@@ -336,7 +336,7 @@ UserInfo user;
             "}");
         reply.out () << message;
         if (request.getMethod () == "POST") {
-            log_info_audit ("Request CREATE systemctl %s %s SUCCESS", checked_operation.c_str (), checked_service_name.c_str ());
+            log_info_audit ("Request EXECUTE systemctl %s %s SUCCESS", checked_operation.c_str (), checked_service_name.c_str ());
         }
         return HTTP_OK;
     }
