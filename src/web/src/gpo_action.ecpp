@@ -28,6 +28,7 @@
 #include <fty_common_mlm_tntmlm.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_asset.h>
+#include <fty_common_rest_audit_log.h>
 // request GPO interaction
 static zmsg_t *
 req_gpo_interaction (zuuid_t *uuid, std::string sensor, std::string action)
@@ -104,7 +105,7 @@ gpo_action (std::string sensor, std::string action)
     else
         return -7;
     zstr_free (&result);
-    zmsg_destroy(&resp);
+    zmsg_destroy (&resp);
     return 0;
 }
 </%pre>
@@ -116,10 +117,13 @@ UserInfo user;
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Admin,     "C"}
             };
-    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+    std::string audit_msg;
+    if (request.getMethod () == "POST")
+        audit_msg = std::string ("Request CREATE gpo_action FAILED");
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
 
-    if (request.getMethod() != "POST") {
-        http_die("method-not-allowed", request.getMethod().c_str() );
+    if (request.getMethod () != "POST") {
+        http_die ("method-not-allowed", request.getMethod ().c_str () );
     }
 
     std::string checked_sensor;
@@ -129,10 +133,13 @@ UserInfo user;
         if (!sensor.empty ()) {
             std::string iname;
             int rv = DBAssets::extname_to_asset_name (sensor, iname);
-            if (rv == -1)
+            if (rv == -1) {
+                log_error_audit ("Request CREATE gpo_action sensor %s FAILED", sensor.c_str ());
                 http_die ("not-found", sensor.c_str ());
+            }
             if (rv == -2) {
                 std::string err =  TRANSLATE_ME ("database failure");
+                log_error_audit ("Request CREATE gpo_action sensor %s FAILED", sensor.c_str ());
                 http_die ("internal-error", err.c_str ());
             }
             checked_sensor = sensor;
@@ -140,6 +147,7 @@ UserInfo user;
         else {
             std::string received = TRANSLATE_ME ("empty asset name");
             std::string expected = TRANSLATE_ME ("non-empty asset name");
+            log_error_audit ("Request CREATE gpo_action FAILED");
             http_die ("request-param-bad", "sensor", received.c_str (), expected.c_str ());
         }
     }
@@ -153,6 +161,7 @@ UserInfo user;
         else {
             std::string received = TRANSLATE_ME ("empty action");
             std::string expected = TRANSLATE_ME ("non-empty action");
+            log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
             http_die ("request-param-bad", "action", received.c_str (), expected.c_str ());
         }
     }
@@ -160,40 +169,52 @@ UserInfo user;
     int rv = gpo_action (checked_sensor, checked_action);
     if (rv == -1) {
         std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -2) {
         std::string err =  TRANSLATE_ME ("client->sendto () failed.");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -3) {
         std::string err =  TRANSLATE_ME ("client->recv () failed.");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -4) {
         std::string received = TRANSLATE_ME ("not a GPO asset");
         std::string expected =  TRANSLATE_ME ("GPO asset");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("request-param-bad", "sensor", received.c_str (), expected.c_str ());
     }
     else
     if (rv == -5) {
         std::string err =  TRANSLATE_ME ("required action is not applicable in current state.");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("precondition-failed", err.c_str ());
     }
     else
     if (rv == -6) {
         std::string received = TRANSLATE_ME ("invalid action");
         std::string expected = TRANSLATE_ME ("valid action");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("request-param-bad", "action", received.c_str (), expected.c_str ());
     }
     else
     if (rv == -7) {
         std::string err =  TRANSLATE_ME ("fty-asset-gpio returned malformed or unexpected message.");
+        log_error_audit ("Request CREATE gpo_action sensor %s FAILED", checked_sensor.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
+    { // proceed to output
+        log_info_audit ("Request CREATE gpo_action sensor %s SUCCESS", checked_sensor.c_str ());
 </%cpp>
 {}
+<%cpp>
+    }
+</%cpp>

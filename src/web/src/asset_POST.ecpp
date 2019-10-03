@@ -21,7 +21,7 @@
  * \file asset_POST.ecpp
  * \author Alena Chernikava <AlenaChernikava@Eaton.com>
  * \author Michal Vyskocil <MichalVyskocil@Eaton.com>
- * \brief Implementation of POST(create) operation on any asset
+ * \brief Implementation of POST (create) operation on any asset
  */
  #><%pre>
 #include <sys/types.h>
@@ -34,6 +34,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_asset.h>
 #include <fty_common_macros.h>
+#include <fty_common_rest_audit_log.h>
 
 </%pre>
 <%request scope="global">
@@ -46,6 +47,7 @@ bool database_ready;
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
         std::string err =  TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        log_error_audit ("Request CREATE asset FAILED");
         http_die ("internal-error", err.c_str ());
     }
 
@@ -53,7 +55,22 @@ bool database_ready;
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Admin,     "C"}
             };
-    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+    std::string audit_msg = std::string ("Request CREATE asset FAILED");
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
+
+    // cache the manipulated asset name
+    std::string item;
+    try {
+        auto item_pos1 = request.getBody ().find ("\"name\"");
+        auto item_pos2 = request.getBody ().find_first_of ('"', item_pos1 + strlen ("\"name\"") + 1);
+        auto item_pos3 = request.getBody ().find_first_of ('"', item_pos2 + 2);
+        item = request.getBody ().substr (item_pos2 + 1, item_pos3 - item_pos2 - 1);
+    }
+    catch (const std::exception& e) {
+        LOG_END_ABNORMAL (e);
+        log_error_audit ("Request CREATE asset <undefined> FAILED");
+        http_die ("bad-request-document", e.what ());
+    }
 
     // Read json, transform to csv, use existing functionality
     cxxtools::SerializationInfo si;
@@ -64,36 +81,42 @@ bool database_ready;
         deserializer.deserialize (si);
     }
     catch (const std::exception& e) {
-        LOG_END_ABNORMAL(e);
-        http_die ("bad-request-document", e.what());
+        LOG_END_ABNORMAL (e);
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die ("bad-request-document", e.what ());
     }
     shared::CsvMap cm;
     try{
-        cm = shared::CsvMap_from_serialization_info(si);
-        cm.setCreateUser(user.login());
-        cm.setCreateMode(CREATE_MODE_ONE_ASSET);
+        cm = shared::CsvMap_from_serialization_info (si);
+        cm.setCreateUser (user.login ());
+        cm.setCreateMode (CREATE_MODE_ONE_ASSET);
     }
     catch (const std::invalid_argument &e) {
-        log_error ("%s", e.what());
-        http_die ("bad-request-document", e.what());
+        log_error ("%s", e.what ());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die ("bad-request-document", e.what ());
     }
     catch (const std::exception& e) {
-        LOG_END_ABNORMAL(e);
+        LOG_END_ABNORMAL (e);
         std::string err =  TRANSLATE_ME ("See logs for more details");
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("internal-error", err.c_str ());
     }
 
-    if (cm.cols() == 0 || cm.rows() == 0) {
+    if (cm.cols () == 0 || cm.rows () == 0) {
         std::string err =  TRANSLATE_ME ("Cannot import empty document.");
-        http_die("bad-request-document", err.c_str ());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die ("bad-request-document", err.c_str ());
     }
     // in underlying functions like update_device
-    if (!cm.hasTitle("type")) {
+    if (!cm.hasTitle ("type")) {
         std::string err =  TRANSLATE_ME ("type");
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("request-param-required", err.c_str ());
     }
-    if (cm.hasTitle("id")) {
+    if (cm.hasTitle ("id")) {
         std::string err =  TRANSLATE_ME ("key 'id' is forbidden to be used");
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("bad-request-document", err.c_str ());
     }
 
@@ -109,32 +132,37 @@ bool database_ready;
 
         // this code can be executed in multiple threads -> agent's name should
         // be unique at the every moment
-        std::string agent_name = utils::generate_mlm_client_id("web.asset_post");
+        std::string agent_name = utils::generate_mlm_client_id ("web.asset_post");
         try{
             send_configure (row.first, row.second, agent_name);
         }
         catch (const std::runtime_error &e) {
-            log_error ("%s", e.what());
+            log_error ("%s", e.what ());
             std::string msg = TRANSLATE_ME ("Error during configuration sending of asset change notification. Consult system log.");
-            http_die ("internal-error", msg.c_str());
+            log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+            http_die ("internal-error", msg.c_str ());
         }
         // no unexpected errors was detected
         // process results
         std::pair<std::string,std::string> foo =  DBAssets::id_to_name_ext_name (row.first.id);
         if (foo.first.empty () && foo.second.empty ()) {
             std::string err =  TRANSLATE_ME ("Database failure");
+            log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
             http_die ("internal-error", err.c_str ());
         }
 </%cpp>
 {<$$ utils::json::jsonify ("id", foo.first) $>}
 <%cpp>
+        log_info_audit ("Request CREATE asset %s SUCCESS", item.c_str ());
         return HTTP_OK;
     }
     catch (const BiosError& e) {
-        http_die_idx(e.idx, e.what());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die_idx (e.idx, e.what ());
     }
     catch (const std::exception& e) {
-        LOG_END_ABNORMAL(e);
+        LOG_END_ABNORMAL (e);
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("internal-error", "");
     }
 }

@@ -36,6 +36,7 @@
 #include <fty_common.h>
 #include <fty_common_macros.h>
 #include <fty_common_db_asset.h>
+#include <fty_common_rest_audit_log.h>
 static
 int state_valid (const char *state) {
     assert (state);
@@ -58,6 +59,9 @@ bool database_ready;
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
         std::string err = TRANSLATE_ME ("Database is not ready yet, please try again after a while.");
+        if (request.getMethod () == "PUT") {
+            log_error_audit ("Request CREATE OR UPDATE alert ack FAILED");
+        }
         http_die ("internal-error", err.c_str ());
     }
 
@@ -65,12 +69,17 @@ bool database_ready;
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Admin,     "RU"}
             };
-    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+    std::string audit_msg;
+    if (request.getMethod () == "PUT")
+        audit_msg = std::string ("Request CREATE OR UPDATE alert ack FAILED");
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
 
 // checked input arguments
 std::string checked_rule_name;
 std::string checked_element_name; // after last change this is unicode name
 std::string checked_state;
+std::string rule_name = request.getArg ("rule_name");
+std::string element_name = request.getArg ("element_name");
 
 // ##################################################
 // BLOCK 1
@@ -80,8 +89,6 @@ std::string checked_state;
         http_die ("method-not-allowed", request.getMethod ().c_str ());
     }
 
-    std::string rule_name = request.getArg ("rule_name");
-    std::string element_name = request.getArg ("element_name");
     log_debug ("Request parameters - Initial tainted values received:\n\trule_name = '%s'\n\telement_name = '%s'\n",
                 rule_name.c_str (), element_name.c_str ());
 
@@ -99,6 +106,7 @@ std::string checked_state;
     catch (const std::exception& e) {
         log_debug ("Bad request document - invalid json: %s", e.what ());
         std::string err = TRANSLATE_ME ("Please check RFC-11 for valid json schema description.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("bad-request-document", err.c_str ());
     }
     log_debug ("state = '%s'", state.c_str ());
@@ -106,6 +114,7 @@ std::string checked_state;
     if (!state_valid (state.c_str ())) {
         log_debug ("State is not a recognized valid alert state.");
         std::string err = TRANSLATE_ME ("one of the following values [ ACTIVE | ACK-WIP | ACK-IGNORE | ACK-PAUSE | ACK-SILENCE ].");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("request-param-bad", "state", state.c_str (), err.c_str ());
     }
     else {
@@ -113,10 +122,12 @@ std::string checked_state;
     }
         http_errors_t errors;
         if (! check_asset_name ("element_name", element_name, errors)) {
+            log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
             http_die_error (errors);
         }
         checked_element_name = element_name;
         if (! check_alert_rule_name ("rule_name", rule_name, errors)) {
+            log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
             http_die_error (errors);
         }
         checked_rule_name = rule_name;
@@ -124,10 +135,11 @@ std::string checked_state;
 
 
 // connect to malamute
-MlmClientGuard client(mlm_client_new ());
+MlmClientGuard client (mlm_client_new ());
 if (!client) {
     log_fatal ("mlm_client_new () failed.");
     std::string err = TRANSLATE_ME ("mlm_client_new () failed.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 
@@ -139,6 +151,7 @@ if (rv == -1) {
     log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
                     MLM_ENDPOINT, 1000, client_name.c_str ());
     std::string err =  TRANSLATE_ME ("mlm_client_connect () failed.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 
@@ -147,16 +160,19 @@ zmsg_t *send_msg = zmsg_new ();
 if (!send_msg) {
     log_fatal ("zmsg_new () failed.");
     std::string err =  TRANSLATE_ME ("zmsg_new () failed.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 std::string asset_id;
 rv = DBAssets::extname_to_asset_name (checked_element_name, asset_id);
 if (rv == -1) {
     std::string msg_not_found = TRANSLATE_ME ("Cannot get asset ID for %s", checked_element_name.c_str ());
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("not-found", msg_not_found.c_str ());
 }
 if (rv == -2) {
     std::string err =  TRANSLATE_ME ("Database failure");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 zmsg_addstr (send_msg, checked_rule_name.c_str ());
@@ -169,14 +185,16 @@ if (mlm_client_sendto (client, AGENT_FTY_ALERT_LIST, "rfc-alerts-acknowledge", N
         AGENT_FTY_ALERT_LIST, "rfc-alerts-acknowledge", 1000);
     zmsg_destroy (&send_msg);
     std::string err =  TRANSLATE_ME ("mlm_client_sendto () failed.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 
 // wait for the right message or time-out
 ZmsgGuard recv_msg;
-ZpollerGuard poller(zpoller_new ( mlm_client_msgpipe (client), NULL));
+ZpollerGuard poller (zpoller_new ( mlm_client_msgpipe (client), NULL));
 if (!poller) {
     std::string err =  TRANSLATE_ME ("zpoller_new () failed.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 while (true) {
@@ -188,10 +206,12 @@ while (true) {
         if (zpoller_expired (poller)) {
             log_error ("zpoller_wait (timeout = 5000) timed out waiting for message.");
             std::string err =  TRANSLATE_ME ("Timed out waiting for message.");
+            log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
             http_die ("internal-error", err.c_str ());
         }
         log_error ("mlm_client_recv () failed.");
         std::string err =  TRANSLATE_ME ("mlm_client_recv () failed.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     if (streq (mlm_client_sender (client), AGENT_FTY_ALERT_LIST))
@@ -204,6 +224,7 @@ if (!streq (mlm_client_subject (client), "rfc-alerts-acknowledge")) {
     log_error ("Unexpected reply from '%s'. Subject expected = '%s', received = '%s'.",
         mlm_client_sender (client), "rfc-alerts-acknowledge", mlm_client_subject (client));
     std::string err =  TRANSLATE_ME ("Bad message.");
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error", err.c_str ());
 }
 // Check command. Can be OK or ERROR
@@ -213,18 +234,21 @@ if (streq (part, "OK")) {
     if (!part || !streq (part, checked_rule_name.c_str ())) {
         log_error ("Unexpected reply from '%s'. Expected OK/rule_name/element_name/state. Got OK/(null).", mlm_client_sender (client));
         std::string err =  TRANSLATE_ME ("Bad message.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     part = zmsg_popstr (recv_msg);
     if (!part || !streq (part, asset_id.c_str ())) {
         log_error ("Unexpected reply from '%s'. Expected OK/rule_name/element_name/state. Got OK/rule_name/(null).", mlm_client_sender (client));
         std::string err =  TRANSLATE_ME ("Bad message.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     part = zmsg_popstr (recv_msg);
     if (!part || !streq (part, checked_state.c_str ())) {
         log_error ("Unexpected reply from '%s'. Expected OK/rule_name/element_name/state. Got OK/rule_name/element_name/(null).", mlm_client_sender (client));
         std::string err =  TRANSLATE_ME ("Bad message.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("internal-error", err.c_str ());
     }
 // TODO: rfc-11 is not written yet, json format can change freely
@@ -236,6 +260,7 @@ if (streq (part, "OK")) {
     <$$ utils::json::jsonify ("state", checked_state) $>
 }
 <%cpp>
+    log_info_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s SUCCESS", rule_name.c_str (), element_name.c_str ());
     return HTTP_OK;
 }
 if (streq (part, "ERROR")) {
@@ -243,23 +268,27 @@ if (streq (part, "ERROR")) {
     if (!part) {
         log_error ("Unexpected reply from '%s'. Expected ERROR/reason. Got ERROR/(null).", mlm_client_sender (client));
         std::string err =  TRANSLATE_ME ("Bad message.");
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     if (streq (part, "NOT_FOUND")) {
         log_error ("Alert identified by rule_name = '%s' and element_name = '%s' does not exist.",
             checked_rule_name.c_str (), asset_id.c_str ());
         std::string msg_not_found = TRANSLATE_ME ("Alert identified by rule name = '%s' and element name = '%s'", checked_rule_name.c_str (), checked_element_name.c_str ());
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("not-found", msg_not_found.c_str ());
     }
     if (streq (part, "BAD_STATE")) {
         log_error ("Alert identified by rule_name = '%s' and element_name = '%s' can not change state to '%s'.",
             checked_rule_name.c_str (), checked_element_name.c_str (), checked_state.c_str ());
         std::string msg_param_conflict = TRANSLATE_ME ("Alert identified by rule name = '%s', element name = '%s' can not change state to '%s'.", checked_rule_name.c_str (), checked_element_name.c_str (), checked_state.c_str ());
+        log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
         http_die ("parameter-conflict", msg_param_conflict.c_str ());
     }
-    log_error ("%s", part.get());
-    std::string reason = part.get();
+    log_error ("%s", part.get ());
+    std::string reason = part.get ();
     std::string msg_unspecified = TRANSLATE_ME ("Error while setting state of alert identified by rule name = '%s', element = '%s' to '%s'", checked_rule_name.c_str (), checked_element_name.c_str (), reason.c_str ());
+    log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
     http_die ("internal-error",
         msg_unspecified.c_str ());
 }
@@ -267,5 +296,6 @@ if (streq (part, "ERROR")) {
 log_error ("Unexptected reply from  '%s'. Does not conform to rfc-evaluator-rules.",
     mlm_client_sender (client));
 std::string err =  TRANSLATE_ME ("Bad message.");
+log_error_audit ("Request CREATE OR UPDATE alert ack for rule %s and asset %s FAILED", rule_name.c_str (), element_name.c_str ());
 http_die ("internal-error", err.c_str ());
 </%cpp>

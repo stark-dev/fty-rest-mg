@@ -30,6 +30,7 @@
 #include <fty_log.h>
 
 #include <cxxtools/jsondeserializer.h>
+#include <fty_common_rest_audit_log.h>
 
 struct gpio_params_t {
     std::string part_number;
@@ -46,10 +47,10 @@ void operator>>= (const cxxtools::SerializationInfo& si, gpio_params_t &params)
 {
     si.getMember ("part_number") >>= params.part_number;
     si.getMember ("manufacturer") >>= params.manufacturer;
-    si.getMember("type") >>= params.type;
-    si.getMember("normal_state") >>= params.normal_state;
-    si.getMember("gpx_direction") >>= params.gpx_direction;
-    si.getMember("gpx_power_source") >>= params.gpx_power_source;
+    si.getMember ("type") >>= params.type;
+    si.getMember ("normal_state") >>= params.normal_state;
+    si.getMember ("gpx_direction") >>= params.gpx_direction;
+    si.getMember ("gpx_power_source") >>= params.gpx_power_source;
     si.getMember ("alarm_severity") >>= params.alarm_severity;
     si.getMember ("alarm_message") >>= params.alarm_message;
 }
@@ -137,7 +138,7 @@ add_gpio (std::string json)
     else
         return -5;
     zstr_free (&result);
-    zmsg_destroy(&resp);
+    zmsg_destroy (&resp);
     return 0;
 }
 </%pre>
@@ -149,43 +150,56 @@ UserInfo user;
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
             {BiosProfile::Admin,     "C"}
             };
-    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+    std::string audit_msg = std::string ("Request CREATE add_gpio FAILED");
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? (char *)nullptr : audit_msg.c_str ());
 
-    if (request.getMethod() != "POST") {
-        http_die("method-not-allowed", request.getMethod().c_str() );
+    if (request.getMethod () != "POST") {
+        http_die ("method-not-allowed", request.getMethod ().c_str () );
     }
 
     std::string json = request.getBody ();
+    auto item_pos1 = json.find ("\"part_number\"");
+    auto item_pos2 = json.find_first_of ('"', item_pos1 + strlen ("\"part_number\"") + 1);
+    auto item_pos3 = json.find_first_of ('"', item_pos2 + 2);
+    std::string item = json.substr (item_pos2 + 1, item_pos3 - item_pos2 - 1);
 
     if (json.empty ()) {
         std::string err =  TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("request-param-required", err.c_str ());
     }
 
     int rv = add_gpio (json);
     if (rv == -1) {
         std::string err = TRANSLATE_ME ("mlmpool.get () failed.");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -2) {
         std::string err = TRANSLATE_ME ("client->sendto () failed.");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -3) {
         std::string err = TRANSLATE_ME ("client->recv () failed.");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("internal-error", err.c_str ());
     }
     else
     if (rv == -4) {
         std::string err = TRANSLATE_ME ("<JSON object with keys part_number, manufacturer, type, normal_state, gpx_direction, gpx_power_source, alarm_message, alarm_severity>");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("request-param-required", err.c_str ());
     }
     else
     if (rv == -5) {
         std::string err = TRANSLATE_ME ("fty-sensor-gpio returned malformed or unexpected message.");
+        log_error_audit ("Request CREATE add_gpio part_number %s FAILED", item.c_str ());
         http_die ("internal-error", err.c_str ());
     }
-    else
+    else {
+        log_info_audit ("Request CREATE add_gpio part_number %s SUCCESS", item.c_str ());
+    }
 </%cpp>

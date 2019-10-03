@@ -32,6 +32,7 @@
 #include "shared/utils.h"
 #include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
+#include <fty_common_rest_audit_log.h>
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -43,7 +44,10 @@ UserInfo user;
             {BiosProfile::Dashboard, "R"},
             {BiosProfile::Admin,     "RU"}
             };
-    CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
+    std::string audit_msg;
+    if (request.getMethod () == "PUT")
+        audit_msg = std::string ("Request CREATE OR UPDATE http_proxy FAILED");
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
 
     // The file is formatted as is:
     //      http_proxy=<value>
@@ -57,13 +61,13 @@ UserInfo user;
     std::string path ("/etc/default/fty-proxy");
 
     // Process PUT first, so that we always read back the current content
-    if(request.getMethod() == "PUT") {
+    if (request.getMethod () == "PUT") {
         std::string proxy_file_content;
         std::string proxy_line;
 
         cxxtools::SerializationInfo si;
         try {
-            std::stringstream input (request.getBody(), std::ios_base::in);
+            std::stringstream input (request.getBody (), std::ios_base::in);
             cxxtools::JsonDeserializer deserializer (input);
             deserializer.deserialize (si);
             si.getMember ("url") >>= proxy_line;
@@ -71,6 +75,7 @@ UserInfo user;
         catch (const std::exception& e) {
             log_debug ("Bad request document - invalid json: %s", e.what ());
             std::string err =  TRANSLATE_ME ("Please check RFC-11 for valid json schema description.");
+            log_error_audit ("Request CREATE OR UPDATE http_proxy %s FAILED", proxy_line.c_str ());
             http_die ("bad-request-document", err.c_str ());
         }
         log_debug ("proxy_line = '%s'", proxy_line.c_str ());
@@ -86,6 +91,7 @@ UserInfo user;
         std::ofstream out_file (path);
         if (!out_file) {
             std::string err =  TRANSLATE_ME ("open HTTP proxy file for writing");
+            log_error_audit ("Request CREATE OR UPDATE http_proxy %s FAILED", proxy_line.c_str ());
             http_die ("internal-error", err.c_str ());
         }
 
@@ -96,21 +102,27 @@ UserInfo user;
         proxy_file_content += "export http_proxy https_proxy ftp_proxy\n";
 
         out_file << proxy_file_content;
-        out_file.close();
+        out_file.close ();
     }
 
     std::ifstream in_file (path);
     if (!in_file) {
         std::string err =  TRANSLATE_ME ("Cannot open HTTP proxy file for reading");
+        if (request.getMethod () == "PUT") {
+            log_error_audit ("Request CREATE OR UPDATE http_proxy %s FAILED", proxy_line.c_str ());
+        }
         http_die ("internal-error", err.c_str ());
     }
 
-    getline(in_file, proxy_line);
-    in_file.close();
+    getline (in_file, proxy_line);
+    in_file.close ();
 
-    if (!proxy_line.empty()) {
-        checked_http_proxy = proxy_line.substr(proxy_line.find("=") + 1);
-        checked_http_proxy.erase(std::remove(checked_http_proxy.begin(), checked_http_proxy.end(), '"'), checked_http_proxy.end());
+    if (!proxy_line.empty ()) {
+        checked_http_proxy = proxy_line.substr (proxy_line.find ("=") + 1);
+        checked_http_proxy.erase (std::remove (checked_http_proxy.begin (), checked_http_proxy.end (), '"'), checked_http_proxy.end ());
+    }
+    if (request.getMethod () == "PUT") {
+        log_info_audit ("Request CREATE OR UPDATE http_proxy %s SUCCESS", checked_http_proxy.c_str ());
     }
 </%cpp>
 {
