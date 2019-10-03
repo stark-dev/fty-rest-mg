@@ -1395,7 +1395,7 @@ std::pair<db_a_elmnt_t, persist::asset_operation>
     tntdb::Connection conn;
     std::string msg{"No connection to database"};
     try{
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
     }
     catch(...)
     {
@@ -1457,7 +1457,7 @@ void
     tntdb::Connection conn;
     std::string msg{TRANSLATE_ME ("No connection to database")};
     try{
-        conn = tntdb::connectCached(DBConn::url);
+        conn = tntdb::connect(DBConn::url);
     }
     catch(...)
     {

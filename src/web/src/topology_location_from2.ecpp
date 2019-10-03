@@ -67,7 +67,7 @@ bool database_ready;
     std::string checked_filter;
     std::string checked_feed_by;
     std::string checked_from;
-	tntdb::Connection conn = tntdb::connectCached (DBConn::url);
+	tntdb::Connection conn = tntdb::connect (DBConn::url);
 
     {
         std::string from = qparam.param("from");

@@ -97,7 +97,7 @@ db_reply <db_web_element_t>
     db_reply <db_web_element_t> ret;
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(DBConn::url);
+        tntdb::Connection conn = tntdb::connect(DBConn::url);
         log_debug ("connection was successful");
 
         auto basic_ret = DBAssets::select_asset_element_web_byId(conn, id);
@@ -222,7 +222,7 @@ db_reply <std::map <uint32_t, std::string> >
     log_debug ("subtypeid = %" PRIi16 " typeid = %" PRIi16, subtype_id, type_id);
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(DBConn::url);
+        tntdb::Connection conn = tntdb::connect(DBConn::url);
         ret = DBAssets::select_short_elements(conn, type_id, subtype_id);
         if ( ret.status == 0 )
             bios_error_idx(ret.rowid, ret.msg, "internal-error", "");
@@ -253,7 +253,7 @@ db_reply_t
     // we will ignore it and discover it by ourselves
 
     try{
-        tntdb::Connection conn = tntdb::connectCached(DBConn::url);
+        tntdb::Connection conn = tntdb::connect(DBConn::url);
 
         db_reply <db_web_basic_element_t> basic_info =
             DBAssets::select_asset_element_web_byId(conn, id);

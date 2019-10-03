@@ -35,31 +35,31 @@
 TEST_CASE("helper functions: convert_asset_to_monitor_old", "[db][convert_to_monitor]")
 {
     tntdb::Connection conn;
-    REQUIRE_NOTHROW (conn = tntdb::connectCached (url));
+    REQUIRE_NOTHROW (conn = tntdb::connect (url));
     tntdb::Value val;
     uint32_t id_asset = 0;
     uint32_t id_monitor = 0;
 
-    tntdb::Statement st = conn.prepareCached (
+    tntdb::Statement st = conn.prepare (
        "select id_asset_element from t_bios_asset_element where name = 'DC1'"
     );
     REQUIRE_NOTHROW (val = st.selectValue ());
     REQUIRE_NOTHROW (val.get (id_asset));
     REQUIRE_THROWS_AS(convert_asset_to_monitor_old (url.c_str(), id_asset), bios::NotFound );
 
-    st = conn.prepareCached(
+    st = conn.prepare(
        "select id_asset_element from t_bios_asset_element where name = 'ROW1'"
     );
     REQUIRE_NOTHROW (val = st.selectValue ());
     REQUIRE_NOTHROW (val.get (id_asset));
 
-    st = conn.prepareCached(
+    st = conn.prepare(
        "select id_asset_element from t_bios_asset_element where name = 'ups'"
     );
     REQUIRE_NOTHROW (val = st.selectValue ());
     REQUIRE_NOTHROW (val.get (id_asset));
 
-    st = conn.prepareCached (
+    st = conn.prepare (
        "select id_discovered_device from t_bios_discovered_device "
        "where name = 'select_device'"
     );
@@ -72,19 +72,19 @@ TEST_CASE("helper functions: convert_asset_to_monitor_old", "[db][convert_to_mon
 TEST_CASE("helper functions: convert_monitor_to_asset", "[db][convert_to_asset]")
 {
     tntdb::Connection conn;
-    REQUIRE_NOTHROW (conn = tntdb::connectCached(url));
+    REQUIRE_NOTHROW (conn = tntdb::connect(url));
     tntdb::Value val;
     uint32_t id_asset = 0;
     uint32_t id_monitor = 0;
 
-    tntdb::Statement st = conn.prepareCached (
+    tntdb::Statement st = conn.prepare (
        "select id_discovered_device from t_bios_discovered_device "
        "where name = 'select_device'"
     );
     REQUIRE_NOTHROW (val = st.selectValue ());
     REQUIRE_NOTHROW (val.get (id_monitor));
 
-    st = conn.prepareCached (
+    st = conn.prepare (
        "select id_asset_element from t_bios_asset_element where name = 'ups'"
     );
     REQUIRE_NOTHROW (val = st.selectValue ());

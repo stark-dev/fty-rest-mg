@@ -44,7 +44,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #1","[db][CRUD][insert][delete][ass
     log_info ("=============== ASSET EXT ATTRIBUTE DELETE/INSERT #1 NULL ->true, true->true ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     a_elmnt_id_t  asset_element_id = 1;  // it is written in crud_test.sql file
     const char   *value            = "What is this life if, full of care, we have no time to stand and stare";
@@ -109,7 +109,7 @@ TEST_CASE("asset ext attribute INSERT/DELETE #2","[db][CRUD][insert][delete][ass
     log_info ("=============== ASSET EXT ATTRIBUTE DELETE/INSERT #2 NULL -> false, false->false ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     a_elmnt_id_t  asset_element_id = 1;  // it is written in crud_test.sql file
     const char   *value            = "What is this life if, full of care, we have no time to stand and stare";
@@ -189,7 +189,7 @@ TEST_CASE("asset element INSERT/DELETE #3","[db][CRUD][insert][delete][asset_ele
     log_info ("=============== ASSET ELEMENT DELETE/INSERT #3 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     a_elmnt_id_t     parent_id       = 1;  // it is written in crud_test.sql file
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::ROOM;
@@ -248,7 +248,7 @@ TEST_CASE("into asset group INSERT/DELETE #5","[db][CRUD][insert][delete][grp_el
     log_info ("=============== ASSET ELEMENT INTO GROUP INSERT/DELETE #5 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     a_elmnt_id_t asset_element_id = 2; // it is written in crud_test.sql file
     a_elmnt_id_t asset_group_id = 3; // it is written in crud_test.sql file
@@ -292,7 +292,7 @@ TEST_CASE("into asset link INSERT/DELETE #6","[db][CRUD][insert][delete][asset_l
     log_info ("=============== ASSET LINK INSERT/DELETE #6 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     a_elmnt_id_t asset_element_id_src  = 4; // it is written in crud_test.sql file
     a_elmnt_id_t asset_element_id_dest = 5; // it is written in crud_test.sql file
@@ -344,7 +344,7 @@ TEST_CASE("dc unlockated INSERT/DELETE #7","[db][CRUD][insert][delete][dc][unloc
     log_info ("=============== dc INSERT/DELETE #7 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "DC_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::DATACENTER;
@@ -427,7 +427,7 @@ TEST_CASE("room unlocated INSERT/DELETE #8","[db][CRUD][insert][delete][unlockat
     log_info ("=============== room INSERT/DELETE #8 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "ROOM_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::ROOM;
@@ -498,7 +498,7 @@ TEST_CASE("row unlockated INSERT/DELETE #9","[db][CRUD][insert][delete][unlockat
     log_info ("=============== row INSERT/DELETE #9 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "ROW_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::ROW;
@@ -570,7 +570,7 @@ TEST_CASE("rack unlockated INSERT/DELETE #persist::asset_subtype::N_A","[db][CRU
     log_info ("=============== rack INSERT/DELETE #persist::asset_subtype::N_A ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "RACK_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::RACK;
@@ -654,7 +654,7 @@ TEST_CASE("group unlockated INSERT/DELETE #11","[db][CRUD][insert][delete][unloc
     log_info ("=============== group INSERT/DELETE #11 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "GROUP_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::GROUP;
@@ -727,7 +727,7 @@ TEST_CASE("device unlocated INSERT/DELETE #12","[db][CRUD][insert][delete][unloc
     log_info ("=============== device INSERT/DELETE #12 ==================");
 
     tntdb::Connection conn;
-    REQUIRE_NOTHROW ( conn = tntdb::connectCached(url) );
+    REQUIRE_NOTHROW ( conn = tntdb::connect(url) );
 
     const char      *name = "DEVICE_TEST";
     a_elmnt_tp_id_t  element_type_id = persist::asset_type::DEVICE;

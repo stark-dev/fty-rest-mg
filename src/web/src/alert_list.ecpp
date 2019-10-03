@@ -179,10 +179,10 @@ bool database_ready;
 std::map<std::string, int> desired_elements;
 tntdb::Connection connection;
 try {
-    connection = tntdb::connectCached (url);
+    connection = tntdb::connect (url);
 }
 catch (const tntdb::Error& e) {
-    log_error ("tntdb::connectCached (url = '%s') failed: %s.", url.c_str (), e.what ());
+    log_error ("tntdb::connect (url = '%s') failed: %s.", url.c_str (), e.what ());
     std::string err =  TRANSLATE_ME ("Connecting to database failed.");
     http_die ("internal-error", err.c_str ());
 }

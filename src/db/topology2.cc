@@ -205,7 +205,7 @@ s_topology2_devices_in_groups (
         " ORDER BY "
         "   asset_order ASC ";
 
-    tntdb::Statement st = conn.prepareCached (query);
+    tntdb::Statement st = conn.prepare (query);
 
     st.set ("id", item.id);
 
@@ -244,7 +244,7 @@ topology2_groups (
         " ON ext.id_asset_element=el.id_asset_element "
         " WHERE el2.name=:id "
         "       AND keytag=\"name\" ";
-    tntdb::Statement st = conn.prepareCached (query);
+    tntdb::Statement st = conn.prepare (query);
     st.set ("id", id);
 
     std::vector <Item> ret {};
@@ -270,7 +270,7 @@ is_power_device (tntdb::Connection &conn, std::string &asset_name)
                         "    id_subtype "
                         "FROM           "
                         "     t_bios_asset_element WHERE name=:asset_name";
-    tntdb::Statement st = conn.prepareCached (query);
+    tntdb::Statement st = conn.prepare (query);
     try {
         tntdb::Result res = st.set("asset_name", asset_name).select ();
         std::string subtype;
@@ -308,7 +308,7 @@ topology2_feed_by (
     const std::string& feed_by)
 {
     std::string query = "SELECT src_name, dest_name FROM v_bios_asset_link_topology WHERE id_asset_link_type = 1";
-    tntdb::Statement st = conn.prepareCached (query);
+    tntdb::Statement st = conn.prepare (query);
 
     NodeMap nm{};
 
@@ -446,7 +446,7 @@ topology2_from (
         "    INNER JOIN t_bios_asset_device_type AS v1 ON (v1.id_asset_device_type = t1.id_subtype) "
         "  WHERE t1.name=:from ";
 
-    tntdb::Statement st = conn.prepareCached (query);
+    tntdb::Statement st = conn.prepare (query);
 
     st.set ("from", from);
     return st.select ();
