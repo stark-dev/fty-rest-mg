@@ -1252,11 +1252,23 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         }
         else
         {
-            auto ret = update_device
-                (conn, m.id, iname.c_str(), type_id, parent_id,
-                 extattributes, "nonactive", priority, groups, links, asset_tag, errmsg, extattributesRO);
-            if ( ( ret ) || ( !errmsg.empty() ) ) {
-                throw std::invalid_argument(errmsg);
+            if (iname != "rackcontroller-0")
+            {
+                auto ret = update_device
+                    (conn, m.id, iname.c_str(), type_id, parent_id,
+                     extattributes, "nonactive", priority, groups, links, asset_tag, errmsg, extattributesRO);
+                if ( ( ret ) || ( !errmsg.empty() ) ) {
+                    throw std::invalid_argument(errmsg);
+                }
+            }
+            else
+            {
+                auto ret = update_device
+                    (conn, m.id, iname.c_str(), type_id, parent_id,
+                     extattributes, status.c_str(), priority, groups, links, asset_tag, errmsg, extattributesRO);
+                if ( ( ret ) || ( !errmsg.empty() ) ) {
+                    throw std::invalid_argument(errmsg);
+                }
             }
         }
     }
@@ -1281,14 +1293,28 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         }
         else
         {
-            // this is a transaction
-            auto ret = insert_device (conn, links, groups, ename.c_str(),
-                    parent_id, extattributes, subtype_id, subtype.c_str(), "nonactive",
-                    priority, asset_tag, extattributesRO);
-            if ( ret.status != 1 ) {
-                throw BiosError(ret.rowid, ret.msg);
+            if (subtype_id != rack_controller_id)
+            {
+                // this is a transaction
+                auto ret = insert_device (conn, links, groups, ename.c_str(),
+                        parent_id, extattributes, subtype_id, subtype.c_str(), "nonactive",
+                        priority, asset_tag, extattributesRO);
+                if ( ret.status != 1 ) {
+                    throw BiosError(ret.rowid, ret.msg);
+                }
+                m.id = ret.rowid;
             }
-            m.id = ret.rowid;
+            else
+            {
+                // this is a transaction
+                auto ret = insert_device (conn, links, groups, ename.c_str(),
+                        parent_id, extattributes, subtype_id, subtype.c_str(), status.c_str(),
+                        priority, asset_tag, extattributesRO);
+                if ( ret.status != 1 ) {
+                    throw BiosError(ret.rowid, ret.msg);
+                }
+                m.id = ret.rowid;
+            }
         }
     }
     rv = DBAssets::extname_to_asset_name (ename, m.name);
@@ -1297,7 +1323,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         bios_throw("internal-error", err.c_str ());
     }
 
-    if (type == "device" && status == "active")
+    if (type == "device" && status == "active" && subtype_id != rack_controller_id)
     {
         // check if we may activate the device
          try

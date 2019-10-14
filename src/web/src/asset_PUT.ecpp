@@ -82,26 +82,24 @@ bool database_ready;
         si.getMember ("type") >>= type;
 
         if ( si_id == NULL ) {
-            si.addMember ("id") <<= id;
+            si.addMember("id") <<= id;
         }
         else if (status  == "nonactive") {
             if (id == "rackcontroller-0"     ||
                 persist::is_container (type)){
                 log_debug ("Element %s cannot be inactivated.", si_id);
                 std::string err =  TRANSLATE_ME ("Inactivation of this asset");
-                log_error_audit ("Request CREATE OR UPDATE asset id %s FAILED", id.c_str ());
                 http_die ("action-forbidden", err.c_str ());
             }
         }
         else {
-            si_id->setValue (id);
+            si_id->setValue(id);
         }
     }
     catch (const std::exception& e) {
-        LOG_END_ABNORMAL (e);
-        std::string err = JSONIFY (e.what ());
-        log_error_audit ("Request CREATE OR UPDATE asset id %s FAILED", id.c_str ());
-        http_die ("bad-request-document", err.c_str ());
+        LOG_END_ABNORMAL(e);
+        std::string err = JSONIFY (e.what());
+        http_die("bad-request-document", err.c_str ());
     }
 
     try
