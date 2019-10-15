@@ -289,10 +289,9 @@ class _clonedcode_Compressor
 // journald logs export to logfile
 int exec_journalctl_command (const std::string& logfile)
 {
-    // 'www-data' user must be owned by 'systemd-journal' group,
-    // to let journalctl access journald files (see fty-core)
+    // 'www-data' user must be part of the 'systemd-journal' group, to let journalctl access journald files (see fty-core)
     // usermod -a -G systemd-journal www-data
-    // avoid wrapper usage /usr/libexec/bios/journalctl
+    // avoid using 42ty wrapper (/usr/libexec/bios/journalctl) by calling the real version from /bin
     std::string cmd;
     cmd = "/bin/journalctl -D /var/log/journal --no-pager";
     cmd.append(" -o cat"); // output mode
