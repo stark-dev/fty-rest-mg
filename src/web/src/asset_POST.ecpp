@@ -76,6 +76,7 @@ bool database_ready;
     }
 
     std::string asset_json (request.getBody());
+
     // Read json, transform to csv, use existing functionality
     cxxtools::SerializationInfo si;
     // read json a deserialize it
@@ -88,27 +89,6 @@ bool database_ready;
         LOG_END_ABNORMAL (e);
         log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("bad-request-document", e.what ());
-    }
-
-    try
-    {
-        fty::FullAsset asset;
-        si >>= asset;
-
-        if (asset.isPowerAsset () && asset.getStatusString() == "active")
-        {
-            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
-            fty::AssetActivator activationAccessor (client);
-            if (!activationAccessor.isActivable (asset_json))
-            {
-                throw new std::runtime_error ("Asset cannot be activated");
-            }
-        }
-    }
-    catch (const std::exception &e)
-    {
-        std::string err = JSONIFY (e.what());
-        http_die ("licensing-err", err.c_str ());
     }
 
     shared::CsvMap cm;
@@ -146,6 +126,41 @@ bool database_ready;
         http_die ("bad-request-document", err.c_str ());
     }
 
+    fty::FullAsset asset;
+    try
+    {
+        si >>= asset;
+    }
+    catch (const std::invalid_argument &e) {
+        log_error ("%s", e.what ());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die ("bad-input", e.what ());
+    }
+    catch (const std::exception &e) {
+        log_error ("%s", e.what ());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
+        http_die ("request-param-required", e.what ());
+    }
+
+    try
+    {
+        if (asset.isPowerAsset () && asset.getStatusString() == "active")
+        {
+            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+            fty::AssetActivator activationAccessor (client);
+            if (!activationAccessor.isActivable (asset_json))
+            {
+                std::string err = TRANSLATE_ME ("Asset cannot be activated");
+                throw new std::runtime_error (err);
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::string err = JSONIFY (e.what());
+        http_die ("licensing-err", err.c_str ());
+    }
+
     try {
         // actual insert - throws exceptions
         auto row = persist::process_one_asset (cm);
@@ -180,6 +195,7 @@ bool database_ready;
 {<$$ utils::json::jsonify ("id", foo.first) $>}
 <%cpp>
         log_info_audit ("Request CREATE asset %s SUCCESS", item.c_str ());
+        log_debug ("returning HTTP_OK");
         return HTTP_OK;
     }
     catch (const BiosError& e) {
