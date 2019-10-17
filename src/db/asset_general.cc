@@ -141,6 +141,7 @@ int
 int
     update_device
         (tntdb::Connection  &conn,
+         tntdb::Transaction &trans,
          a_elmnt_id_t     element_id,
          const char      *element_name,
          a_elmnt_tp_id_t  element_type_id,
@@ -155,8 +156,6 @@ int
          zhash_t      *extattributesRO)
 {
     LOG_START;
-
-    tntdb::Transaction trans(conn);
 
     int affected_rows = 0;
 
@@ -381,6 +380,7 @@ db_reply_t
 db_reply_t
     insert_device
        (tntdb::Connection &conn,
+        tntdb::Transaction &trans,
         std::vector <link_t> &links,
         std::set <a_elmnt_id_t> const &groups,
         const char    *element_name,
@@ -406,8 +406,6 @@ db_reply_t
     setlocale (LC_ALL, ""); // move this to main?
     std::string iname = utils::strip (persist::subtypeid_to_subtype (asset_device_type_id));
     log_debug ("  element_name = '%s/%s'", element_name, iname.c_str ());
-
-    tntdb::Transaction trans(conn);
 
     auto reply_insert1 = DBAssetsInsert::insert_into_asset_element
                         (conn, iname.c_str (), asset_type::DEVICE, parent_id,

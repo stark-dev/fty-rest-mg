@@ -703,6 +703,7 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
    // because id is definitely not an external attribute
     auto id_str = unused_columns.count("id") ? cm.get(row_i, "id") : "";
+    log_debug ("id_str = %s, rc_0 = %d", id_str.c_str (), rc_0);
     if (rc_0 != row_i && "rackcontroller-0" == id_str && rc_0 != std::numeric_limits<std::size_t>::max() ) {
         // we got RC-0 but it don't match "myself", change it to something else ("")
         log_debug("RC is marked as rackcontroller-0, but it's not myself");
@@ -1252,19 +1253,40 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         }
         else
         {
-            if (iname != "rackcontroller-0")
+            if (id_str != "rackcontroller-0")
             {
+                tntdb::Transaction trans(conn);
                 auto ret = update_device
-                    (conn, m.id, iname.c_str(), type_id, parent_id,
+                    (conn, trans, m.id, iname.c_str(), type_id, parent_id,
                      extattributes, "nonactive", priority, groups, links, asset_tag, errmsg, extattributesRO);
                 if ( ( ret ) || ( !errmsg.empty() ) ) {
                     throw std::invalid_argument(errmsg);
                 }
+
+                if (type == "device" && status == "active" && subtype_id != rack_controller_id)
+                {
+                    // check if we may activate the device
+                     try
+                     {
+                         std::string asset_json = getJsonAsset (NULL, m.id);
+                         mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+                         fty::AssetActivator activationAccessor (client);
+                         activationAccessor.activate (asset_json);
+                     }
+                     catch (const std::exception &e)
+                     {
+                         trans.rollback();
+                         std::string err = JSONIFY (e.what());
+                         bios_throw ("licensing-err", err.c_str ())
+                     }
+
+                }
             }
             else
             {
+                tntdb::Transaction trans(conn);
                 auto ret = update_device
-                    (conn, m.id, iname.c_str(), type_id, parent_id,
+                    (conn, trans, m.id, iname.c_str(), type_id, parent_id,
                      extattributes, status.c_str(), priority, groups, links, asset_tag, errmsg, extattributesRO);
                 if ( ( ret ) || ( !errmsg.empty() ) ) {
                     throw std::invalid_argument(errmsg);
@@ -1295,19 +1317,40 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         {
             if (subtype_id != rack_controller_id)
             {
+                tntdb::Transaction trans(conn);
                 // this is a transaction
-                auto ret = insert_device (conn, links, groups, ename.c_str(),
+                auto ret = insert_device (conn, trans, links, groups, ename.c_str(),
                         parent_id, extattributes, subtype_id, subtype.c_str(), "nonactive",
                         priority, asset_tag, extattributesRO);
                 if ( ret.status != 1 ) {
                     throw BiosError(ret.rowid, ret.msg);
                 }
                 m.id = ret.rowid;
+
+                if (type == "device" && status == "active" && subtype_id != rack_controller_id)
+                {
+                    // check if we may activate the device
+                     try
+                     {
+                         std::string asset_json = getJsonAsset (NULL, m.id);
+                         mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+                         fty::AssetActivator activationAccessor (client);
+                         activationAccessor.activate (asset_json);
+                     }
+                     catch (const std::exception &e)
+                     {
+                         trans.rollback();
+                         std::string err = JSONIFY (e.what());
+                         bios_throw ("licensing-err", err.c_str ())
+                     }
+
+                }
             }
             else
             {
                 // this is a transaction
-                auto ret = insert_device (conn, links, groups, ename.c_str(),
+                tntdb::Transaction trans(conn);
+                auto ret = insert_device (conn, trans, links, groups, ename.c_str(),
                         parent_id, extattributes, subtype_id, subtype.c_str(), status.c_str(),
                         priority, asset_tag, extattributesRO);
                 if ( ret.status != 1 ) {
@@ -1317,29 +1360,13 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
             }
         }
     }
+
     rv = DBAssets::extname_to_asset_name (ename, m.name);
     if (rv != 0) {
         std::string err = TRANSLATE_ME ("Database failure");
         bios_throw("internal-error", err.c_str ());
     }
 
-    if (type == "device" && status == "active" && subtype_id != rack_controller_id)
-    {
-        // check if we may activate the device
-         try
-         {
-             std::string asset_json = getJsonAsset (NULL, m.id);
-             mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
-             fty::AssetActivator activationAccessor (client);
-             activationAccessor.activate (asset_json);
-         }
-         catch (const std::exception &e)
-         {
-             std::string err = JSONIFY (e.what());
-             bios_throw ("licensing-err", err.c_str ())
-         }
-
-    }
     m.status = status;
     m.parent_id = parent_id;
     m.priority = priority;
