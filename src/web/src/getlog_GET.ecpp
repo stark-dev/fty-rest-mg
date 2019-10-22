@@ -402,7 +402,7 @@ UserInfo user;
 
         if (logfile == "") {
             log_error("Authorized request to download an unsupported log file was denied");
-            std::string expected = TRANSLATE_ME ("'messages', ... optionally with '.gz' or '.txt' extension");
+            std::string expected = TRANSLATE_ME ("'messages' optionally with '.gz' or '.txt' extension");
             http_die("request-param-bad", "logname",
                 ("'" + slogname_base + slogname_ext + "'").c_str(), expected.c_str());
         }
