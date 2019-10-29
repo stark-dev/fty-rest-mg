@@ -113,7 +113,7 @@ bool database_ready;
         {
             mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
             fty::AssetActivator activationAccessor (client);
-            if (!activationAccessor.isActivable (asset_json))
+            if (!activationAccessor.isActivable (asset))
             {
                 throw new std::runtime_error ("Asset cannot be activated");
             }
