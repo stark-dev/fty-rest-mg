@@ -91,6 +91,8 @@ This package contains shared library for fty-rest: common core rest api for 42it
 %post -n libfty_rest1 -p /sbin/ldconfig
 %postun -n libfty_rest1 -p /sbin/ldconfig
 
+# Note: pathnames below were customized to match the Makefile with legacy paths
+# and the .so file is delivered as part of main package for tntnet to find it
 %files -n libfty_rest1
 %defattr(-,root,root)
 %doc COPYING

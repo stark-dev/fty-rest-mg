@@ -88,6 +88,7 @@ bool database_ready;
             if (id == "rackcontroller-0"     ||
                 persist::is_container (type)){
                 log_debug ("Element %s cannot be inactivated.", si_id);
+                log_error_audit ("Request CREATE OR UPDATE asset id %s FAILED", id.c_str ());
                 std::string err =  TRANSLATE_ME ("Inactivation of this asset");
                 http_die ("action-forbidden", err.c_str ());
             }
@@ -98,6 +99,7 @@ bool database_ready;
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL(e);
+        log_error_audit ("Request CREATE OR UPDATE asset id %s FAILED", id.c_str ());
         std::string err = JSONIFY (e.what());
         http_die("bad-request-document", err.c_str ());
     }
@@ -120,6 +122,7 @@ bool database_ready;
     catch (const std::exception &e)
     {
         std::string err = JSONIFY (e.what());
+        log_error_audit ("Request CREATE OR UPDATE asset id %s FAILED", id.c_str ());
         http_die ("licensing-err", err.c_str ());
     }
 

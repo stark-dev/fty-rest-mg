@@ -850,25 +850,6 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
     auto subtype_id = local_SUBTYPES.find(subtype)->second;
     unused_columns.erase("sub_type");
 
-    // since we have all the data about the asset, licensing check could be done now
-    /*if (-1 != limitations.max_active_power_devices && "active" == status && TYPES.find("device")->second == type_id) {
-        std::string db_status = DBAssets::get_status_from_db (conn, id_str);
-        // limit applies only to assets that are attempted to be activated, but are disabled in database
-        // or to new assets, also may trigger in case of DB failure, but that's fine
-        if (db_status != "active") {
-            if ((SUBTYPES.find("epdu")->second == subtype_id
-                    || SUBTYPES.find("sts")->second == subtype_id
-                    || SUBTYPES.find("ups")->second == subtype_id
-                    || SUBTYPES.find("genset")->second == subtype_id
-                    || SUBTYPES.find("pdu")->second == subtype_id
-                    ) && DBAssets::get_active_power_devices (conn) + 1 > limitations.max_active_power_devices) {
-                std::string action = TRANSLATE_ME ("Asset handling");
-                std::string reason = TRANSLATE_ME ("Licensing maximum amount of active power devices limit reached");
-                bios_throw("action-forbidden", action.c_str (), reason.c_str ());
-            }
-        }
-    }*/
-
     // now we have read all basic information about element
     // if id is set, then it is right time to check what is going on in DB
     if ( !id_str.empty() )

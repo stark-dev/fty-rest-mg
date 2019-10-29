@@ -158,6 +158,7 @@ bool database_ready;
     catch (const std::exception &e)
     {
         std::string err = JSONIFY (e.what());
+        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("licensing-err", err.c_str ());
     }
 
@@ -195,7 +196,6 @@ bool database_ready;
 {<$$ utils::json::jsonify ("id", foo.first) $>}
 <%cpp>
         log_info_audit ("Request CREATE asset %s SUCCESS", item.c_str ());
-        log_debug ("returning HTTP_OK");
         return HTTP_OK;
     }
     catch (const BiosError& e) {
