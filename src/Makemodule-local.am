@@ -211,6 +211,7 @@ ECPPFILES= \
   web/src/topology_location_from.ecpp \
   web/src/topology_location_to.ecpp \
   web/src/topology_power.ecpp \
+  web/src/topology_xpower.ecpp \
   web/src/uptime.ecpp \
   web/src/security_removeheaders.ecpp \
   web/src/hw_capability.ecpp
