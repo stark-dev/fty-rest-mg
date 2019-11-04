@@ -48,6 +48,14 @@
     #include "cleanup.h"
     #include "shared/utilspp.h"
 #endif
+
+// set S if MSG popped frame (no memleak, S untouched if no msg frame)
+void zmsg_pop_s (zmsg_t *msg, std::string & s)
+{
+    char *aux = msg ? zmsg_popstr(msg) : NULL;
+    if (aux) s = aux;
+    zstr_free(&aux);
+}
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -165,36 +173,39 @@ bool database_ready;
         http_die ("internal-error", "request to client failed (timeout reached)");
     }
 
-    // resp. header
-    std::string rx_command = zmsg_popstr (resp);
-    std::string rx_asset_id = zmsg_popstr (resp);
-    std::string status = zmsg_popstr (resp);
+    // get resp. header
+    std::string rx_command, rx_asset_id, rx_status;
+    zmsg_pop_s(resp, rx_command);
+    zmsg_pop_s(resp, rx_asset_id);
+    zmsg_pop_s(resp, rx_status);
 
     if (rx_command != COMMAND) {
         char err[64];
-        snprintf(err, sizeof(err), "inconsistent command received (%s)", rx_command.c_str ());
+        snprintf(err, sizeof(err), "inconsistent command received ('%s')", rx_command.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
     if (rx_asset_id != asset_id) {
         char err[64];
-        snprintf(err, sizeof(err), "inconsistent assetID received (%s)", rx_asset_id.c_str ());
+        snprintf(err, sizeof(err), "inconsistent assetID received ('%s')", rx_asset_id.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
-    if (status != "OK") {
-        std::string reason = zmsg_popstr (resp);
+    if (rx_status != "OK") {
+        std::string reason;
+        zmsg_pop_s(resp, reason);
         char err[64];
-        snprintf(err, sizeof(err), "received %s (%s) status from client", status.c_str(), reason.c_str ());
+        snprintf(err, sizeof(err), "received %s status (reason: %s) from client", rx_status.c_str(), reason.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
 
     // result JSON payload
-    std::string json = zmsg_popstr (resp);
+    std::string json;
+    zmsg_pop_s(resp, json);
     if (json.empty()) {
         CLEANUP;
         log_error ("empty JSON payload");

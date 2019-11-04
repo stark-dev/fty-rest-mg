@@ -37,6 +37,14 @@
     #include "shared/utilspp.h"
 #endif
 
+// set S if MSG popped frame (no memleak, S untouched if no msg frame)
+void zmsg_pop_s (zmsg_t *msg, std::string & s)
+{
+    char *aux = msg ? zmsg_popstr(msg) : NULL;
+    if (aux) s = aux;
+    zstr_free(&aux);
+}
+
 // </%pre>
 
 namespace
@@ -88,14 +96,14 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
  {
   tnt::DataChunks data(rawData);
 
-#line 53 "./src/web/src/topology_xpower.ecpp"
+#line 61 "./src/web/src/topology_xpower.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 54 "./src/web/src/topology_xpower.ecpp"
+#line 62 "./src/web/src/topology_xpower.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 56 "./src/web/src/topology_xpower.ecpp"
+#line 64 "./src/web/src/topology_xpower.ecpp"
 
 {
     // verify server is ready
@@ -208,36 +216,39 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         http_die ("internal-error", "request to client failed (timeout reached)");
     }
 
-    // resp. header
-    std::string rx_command = zmsg_popstr (resp);
-    std::string rx_asset_id = zmsg_popstr (resp);
-    std::string status = zmsg_popstr (resp);
+    // get resp. header
+    std::string rx_command, rx_asset_id, rx_status;
+    zmsg_pop_s(resp, rx_command);
+    zmsg_pop_s(resp, rx_asset_id);
+    zmsg_pop_s(resp, rx_status);
 
     if (rx_command != COMMAND) {
         char err[64];
-        snprintf(err, sizeof(err), "inconsistent command received (%s)", rx_command.c_str ());
+        snprintf(err, sizeof(err), "inconsistent command received ('%s')", rx_command.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
     if (rx_asset_id != asset_id) {
         char err[64];
-        snprintf(err, sizeof(err), "inconsistent assetID received (%s)", rx_asset_id.c_str ());
+        snprintf(err, sizeof(err), "inconsistent assetID received ('%s')", rx_asset_id.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
-    if (status != "OK") {
-        std::string reason = zmsg_popstr (resp);
+    if (rx_status != "OK") {
+        std::string reason;
+        zmsg_pop_s(resp, reason);
         char err[64];
-        snprintf(err, sizeof(err), "received %s (%s) status from client", status.c_str(), reason.c_str ());
+        snprintf(err, sizeof(err), "received %s status (reason: %s) from client", rx_status.c_str(), reason.c_str ());
         CLEANUP;
         log_error (err);
         http_die ("internal-error", err);
     }
 
     // result JSON payload
-    std::string json = zmsg_popstr (resp);
+    std::string json;
+    zmsg_pop_s(resp, json);
     if (json.empty()) {
         CLEANUP;
         log_error ("empty JSON payload");
@@ -492,10 +503,10 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             }
             json.append ("}");
 
-#line 452 "./src/web/src/topology_xpower.ecpp"
+#line 463 "./src/web/src/topology_xpower.ecpp"
   reply.out() << ( json );
   reply.out() << data[0]; // \n
-#line 453 "./src/web/src/topology_xpower.ecpp"
+#line 464 "./src/web/src/topology_xpower.ecpp"
 
         }
         else {
