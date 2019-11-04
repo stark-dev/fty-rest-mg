@@ -75,6 +75,7 @@ BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
 BuildRequires:  fty-proto-devel >= 1.0.0
 BuildRequires:  fty_shm-devel >= 1.0.0
+BuildRequires:  fty-asset-activator-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
@@ -122,6 +123,7 @@ Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
 Requires:       fty-proto-devel >= 1.0.0
 Requires:       fty_shm-devel >= 1.0.0
+Requires:       fty-asset-activator-devel
 
 %description devel
 common core rest api for 42ity project development tools
