@@ -37,7 +37,7 @@
     #include "shared/utilspp.h"
 #endif
 
-// set S if MSG popped frame (no memleak, S untouched if no msg frame)
+// set S with MSG popped frame (no memleak, S untouched if no msg frame)
 void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
     char *aux = msg ? zmsg_popstr(msg) : NULL;
