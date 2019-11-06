@@ -37,13 +37,15 @@
     #include "shared/utilspp.h"
 #endif
 
-// set S with MSG popped frame (no memleak, S untouched if no msg frame)
+#ifdef __malamute_topology_power__
+// set S with MSG popped frame (no memleak, S untouched if NULL frame)
 void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
     char *aux = msg ? zmsg_popstr(msg) : NULL;
     if (aux) s = aux;
     zstr_free(&aux);
 }
+#endif
 
 // </%pre>
 
@@ -96,14 +98,14 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
  {
   tnt::DataChunks data(rawData);
 
-#line 61 "./src/web/src/topology_xpower.ecpp"
+#line 63 "./src/web/src/topology_xpower.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 62 "./src/web/src/topology_xpower.ecpp"
+#line 64 "./src/web/src/topology_xpower.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 64 "./src/web/src/topology_xpower.ecpp"
+#line 66 "./src/web/src/topology_xpower.ecpp"
 
 {
     // verify server is ready
@@ -503,10 +505,10 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             }
             json.append ("}");
 
-#line 463 "./src/web/src/topology_xpower.ecpp"
+#line 465 "./src/web/src/topology_xpower.ecpp"
   reply.out() << ( json );
   reply.out() << data[0]; // \n
-#line 464 "./src/web/src/topology_xpower.ecpp"
+#line 466 "./src/web/src/topology_xpower.ecpp"
 
         }
         else {

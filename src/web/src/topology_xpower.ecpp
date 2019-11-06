@@ -49,6 +49,7 @@
     #include "shared/utilspp.h"
 #endif
 
+#ifdef __malamute_topology_power__
 // set S with MSG popped frame (no memleak, S untouched if NULL frame)
 void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
@@ -56,6 +57,7 @@ void zmsg_pop_s (zmsg_t *msg, std::string & s)
     if (aux) s = aux;
     zstr_free(&aux);
 }
+#endif
 </%pre>
 <%request scope="global">
 UserInfo user;
