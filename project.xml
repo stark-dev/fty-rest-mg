@@ -568,6 +568,8 @@
     <class name = "web/src/topology_location_from" private = "1" selftest = "0">root object</class>
     <class name = "web/src/topology_location_to" private = "1" selftest = "0">root object</class>
     <class name = "web/src/topology_power" private = "1" selftest = "0">root object</class>
+
+    <class name = "web/src/topology_xlocation" private = "1" selftest = "0">root object</class>
     <class name = "web/src/topology_xpower" private = "1" selftest = "0">root object</class>
 
     <class name = "web/src/admin_passwd" private = "1" selftest = "0">root object</class>

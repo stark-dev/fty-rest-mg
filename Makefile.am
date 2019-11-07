@@ -149,6 +149,7 @@ EXTRA_DIST += \
     src/web/src/topology_location_from.h \
     src/web/src/topology_location_to.h \
     src/web/src/topology_power.h \
+    src/web/src/topology_xlocation.h \
     src/web/src/topology_xpower.h \
     src/web/src/admin_passwd.h \
     src/web/src/security_removeheaders.h \

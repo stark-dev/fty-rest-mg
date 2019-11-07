@@ -39,11 +39,11 @@
 
 #ifdef __malamute_topology_power__
 // set S with MSG popped frame (no memleak, S untouched if NULL frame)
-void zmsg_pop_s (zmsg_t *msg, std::string & s)
+static void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
-    char *aux = msg ? zmsg_popstr(msg) : NULL;
+    char *aux = msg ? zmsg_popstr (msg) : NULL;
     if (aux) s = aux;
-    zstr_free(&aux);
+    zstr_free (&aux);
 }
 #endif
 
@@ -123,7 +123,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
 #ifdef __malamute_topology_power__
-    const char *ADDRESS = AGENT_FTY_ASSET; // 42ty/fty-asset/asset-agent
+    const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "POWERCHAINS";
 
@@ -194,14 +194,16 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
         log_error ("mlm_pool.get () failed");
-        http_die ("internal-error", "connect to client failed");
+        std::string err =  TRANSLATE_ME("Connection to mlm client failed.");
+        http_die ("internal-error", err.c_str());
     }
 
     // set/send req, recv response
     zmsg_t *req = zmsg_new ();
     if (!req) {
         log_error ("zmsg_new () failed");
-        http_die ("internal-error", "zmsg alloc. failed");
+        std::string err =  TRANSLATE_ME("Memory allocation failed.");
+        http_die ("internal-error", err.c_str());
     }
 
     zmsg_addstr (req, COMMAND);
@@ -215,7 +217,8 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     if (!resp) {
         CLEANUP;
         log_error ("client->requestreply (timeout = '5') failed");
-        http_die ("internal-error", "request to client failed (timeout reached)");
+        std::string err =  TRANSLATE_ME("Request to mlm client failed (timeout reached).");
+        http_die ("internal-error", err.c_str());
     }
 
     // get resp. header
@@ -225,27 +228,24 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     zmsg_pop_s(resp, rx_status);
 
     if (rx_command != COMMAND) {
-        char err[64];
-        snprintf(err, sizeof(err), "inconsistent command received ('%s')", rx_command.c_str ());
         CLEANUP;
-        log_error (err);
-        http_die ("internal-error", err);
+        log_error ("inconsistent command received ('%s')", rx_command.c_str ());
+        std::string err =  TRANSLATE_ME("Inconsistent command received ('%s').", rx_command.c_str ());
+        http_die ("internal-error", err.c_str());
     }
     if (rx_asset_id != asset_id) {
-        char err[64];
-        snprintf(err, sizeof(err), "inconsistent assetID received ('%s')", rx_asset_id.c_str ());
         CLEANUP;
-        log_error (err);
-        http_die ("internal-error", err);
+        log_error ("inconsistent assetID received ('%s')", rx_asset_id.c_str ());
+        std::string err =  TRANSLATE_ME("Inconsistent assetID received ('%s').", rx_asset_id.c_str ());
+        http_die ("internal-error", err.c_str());
     }
     if (rx_status != "OK") {
         std::string reason;
         zmsg_pop_s(resp, reason);
-        char err[64];
-        snprintf(err, sizeof(err), "received %s status (reason: %s) from client", rx_status.c_str(), reason.c_str ());
         CLEANUP;
-        log_error (err);
-        http_die ("internal-error", err);
+        log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
+        std::string err =  TRANSLATE_ME("Received %s status (reason: %s) from mlm client.", rx_status.c_str(), reason.c_str ());
+        http_die ("internal-error", err.c_str());
     }
 
     // result JSON payload
@@ -254,11 +254,12 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     if (json.empty()) {
         CLEANUP;
         log_error ("empty JSON payload");
-        http_die ("internal-error", "result returned by client is empty");
+        std::string err =  TRANSLATE_ME("Received an empty JSON payload.");
+        http_die ("internal-error", err.c_str());
     }
     CLEANUP;
 
-    // set body (req. status is 200 OK)
+    // set body (status is 200 OK)
     reply.out () << json;
 
 #else //__malamute_topology_power__
@@ -505,10 +506,10 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             }
             json.append ("}");
 
-#line 465 "./src/web/src/topology_xpower.ecpp"
+#line 466 "./src/web/src/topology_xpower.ecpp"
   reply.out() << ( json );
   reply.out() << data[0]; // \n
-#line 466 "./src/web/src/topology_xpower.ecpp"
+#line 467 "./src/web/src/topology_xpower.ecpp"
 
         }
         else {
@@ -522,7 +523,6 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         http_die("internal-error", "");
     }
 #endif //__malamute_topology_power__
-
 }
 
   // <%/cpp>

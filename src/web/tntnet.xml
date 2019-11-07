@@ -450,10 +450,17 @@
       <method>GET</method>
     </mapping>
 
-    <!-- topology/xpower Jeff@work -->
+    <!-- topology jeff@work -->
+
     <mapping>
       <target>topology_xpower@libfty_rest</target>
       <url>^/api/v1/topology/xpower.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <mapping>
+      <target>topology_xlocation@libfty_rest</target>
+      <url>^/api/v1/topology/xlocation.*$</url>
       <method>GET</method>
     </mapping>
 
