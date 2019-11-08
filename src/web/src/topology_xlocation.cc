@@ -175,6 +175,9 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
                     http_die("request-param-bad", "recursive", recursive.c_str(), "'true'/'false'");
                 }
             }
+            else { // default
+                recursive = "false";
+            }
 
             // filter token, empty by default
             std::transform (filter.begin(), filter.end(), filter.begin(), ::tolower);
