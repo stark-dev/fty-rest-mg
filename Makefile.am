@@ -151,6 +151,7 @@ EXTRA_DIST += \
     src/web/src/topology_power.h \
     src/web/src/topology_xlocation.h \
     src/web/src/topology_xpower.h \
+    src/web/src/topology_xinput_power_chain.h \
     src/web/src/admin_passwd.h \
     src/web/src/security_removeheaders.h \
     src/web/src/hw_capability.h \

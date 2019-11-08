@@ -19,9 +19,9 @@
 #include <string>
 #include <exception>
 #include <czmq.h>
-#include <fty_common_rest_helpers.h>
 #include <fty_common.h>
 #include <fty_common_macros.h>
+#include <fty_common_rest_helpers.h>
 #include <fty_common_db.h>
 #include <fty_common_mlm_tntmlm.h>
 
@@ -166,6 +166,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             }
         }
         else { // parameter_name == "from"
+
             // recursive, boolean, false by default
             std::transform (recursive.begin(), recursive.end(), recursive.begin(), ::tolower);
             if (!recursive.empty()) {
@@ -173,9 +174,6 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
                     log_error("Boolean value expected ('%s')", recursive.c_str());
                     http_die("request-param-bad", "recursive", recursive.c_str(), "'true'/'false'");
                 }
-            }
-            else {
-                recursive = "false"; // default
             }
 
             // filter token, empty by default
@@ -213,16 +211,16 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             options = "{ ";
             options.append("\"filter\": \"").append(filter).append("\", ");
             options.append("\"feed_by\": \"").append(feed_by).append("\", ");
-            options.append("\"recursive\": ").append(recursive);
+            options.append("\"recursive\": ").append(recursive); // bool
             options.append(" }");
         }
     }
 
     // accept 'none' asset_id only for 'from' request
-    if (parameter_name != "from" && asset_id == "none") {
+    if (asset_id == "none" && parameter_name != "from") {
         log_error ("unexpected 'none' parameter");
-        std::string err = TRANSLATE_ME("Unexpected 'none' parameter");
-        http_die ("internal-error", err.c_str());
+        std::string err = TRANSLATE_ME("'none' parameter is not allowed with the '%s' request", parameter_name.c_str());
+        http_die("parameter-conflict", err.c_str ());
     }
 
     // check asset_id (except for 'none')
@@ -284,14 +282,14 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
 
     if (rx_command != COMMAND) {
         CLEANUP;
-        log_error ("inconsistent command received ('%s')", rx_command.c_str ());
-        std::string err =  TRANSLATE_ME("Inconsistent command received ('%s').", rx_command.c_str ());
+        log_error ("received inconsistent command ('%s')", rx_command.c_str ());
+        std::string err =  TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_asset_id != asset_id) {
         CLEANUP;
-        log_error ("inconsistent assetID received ('%s')", rx_asset_id.c_str ());
-        std::string err =  TRANSLATE_ME("Inconsistent assetID received ('%s').", rx_asset_id.c_str ());
+        log_error ("received inconsistent assetID ('%s')", rx_asset_id.c_str ());
+        std::string err =  TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_status != "OK") {
@@ -299,7 +297,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        std::string err =  TRANSLATE_ME("Received %s status (reason: %s) from mlm client.", rx_status.c_str(), reason.c_str ());
+        std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         http_die ("internal-error", err.c_str());
     }
 

@@ -186,14 +186,14 @@ bool database_ready;
 
     if (rx_command != COMMAND) {
         CLEANUP;
-        log_error ("inconsistent command received ('%s')", rx_command.c_str ());
-        std::string err =  TRANSLATE_ME("Inconsistent command received ('%s').", rx_command.c_str ());
+        log_error ("received inconsistent command ('%s')", rx_command.c_str ());
+        std::string err =  TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_asset_id != asset_id) {
         CLEANUP;
-        log_error ("inconsistent assetID received ('%s')", rx_asset_id.c_str ());
-        std::string err =  TRANSLATE_ME("Inconsistent assetID received ('%s').", rx_asset_id.c_str ());
+        log_error ("received inconsistent assetID ('%s')", rx_asset_id.c_str ());
+        std::string err =  TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_status != "OK") {
@@ -201,7 +201,7 @@ bool database_ready;
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        std::string err =  TRANSLATE_ME("Received %s status (reason: %s) from mlm client.", rx_status.c_str(), reason.c_str ());
+        std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         http_die ("internal-error", err.c_str());
     }
 

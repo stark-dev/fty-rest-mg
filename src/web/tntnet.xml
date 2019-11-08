@@ -450,7 +450,17 @@
       <method>GET</method>
     </mapping>
 
-    <!-- topology jeff@work -->
+    <!-- Get input power chain -->
+    <mapping>
+      <target>input_power_chain@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/topology/input_power_chain/(.+)$</url>
+      <args>
+        <id>$1</id>
+      </args>
+    </mapping>
+
+    <!-- topology_x jeff@work -->
 
     <mapping>
       <target>topology_xpower@libfty_rest</target>
@@ -464,11 +474,10 @@
       <method>GET</method>
     </mapping>
 
-    <!-- Get input power chain -->
     <mapping>
-      <target>input_power_chain@libfty_rest</target>
+      <target>topology_xinput_power_chain@libfty_rest</target>
       <method>GET</method>
-      <url>^/api/v1/topology/input_power_chain/(.+)$</url>
+      <url>^/api/v1/topology/xinput_power_chain/(.+)$</url>
       <args>
         <id>$1</id>
       </args>

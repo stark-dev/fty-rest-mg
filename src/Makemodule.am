@@ -86,6 +86,7 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/topology_power.cc \
     src/web/src/topology_xlocation.cc \
     src/web/src/topology_xpower.cc \
+    src/web/src/topology_xinput_power_chain.cc \
     src/web/src/admin_passwd.cc \
     src/web/src/security_removeheaders.cc \
     src/web/src/hw_capability.cc \

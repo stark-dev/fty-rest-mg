@@ -325,6 +325,10 @@ typedef struct _web_src_topology_xlocation_t web_src_topology_xlocation_t;
 typedef struct _web_src_topology_xpower_t web_src_topology_xpower_t;
 #define WEB_SRC_TOPOLOGY_XPOWER_T_DEFINED
 #endif
+#ifndef WEB_SRC_TOPOLOGY_XINPUT_POWER_CHAIN_T_DEFINED
+typedef struct _web_src_topology_xinput_power_chain_t web_src_topology_xinput_power_chain_t;
+#define WEB_SRC_TOPOLOGY_XINPUT_POWER_CHAIN_T_DEFINED
+#endif
 #ifndef WEB_SRC_ADMIN_PASSWD_T_DEFINED
 typedef struct _web_src_admin_passwd_t web_src_admin_passwd_t;
 #define WEB_SRC_ADMIN_PASSWD_T_DEFINED
@@ -415,6 +419,7 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/topology_power.h"
 #include "web/src/topology_xlocation.h"
 #include "web/src/topology_xpower.h"
+#include "web/src/topology_xinput_power_chain.h"
 #include "web/src/admin_passwd.h"
 #include "web/src/security_removeheaders.h"
 #include "web/src/hw_capability.h"
