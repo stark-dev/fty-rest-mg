@@ -182,8 +182,9 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
-        http_die ("internal-error", err.c_str());
+        //std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
+        //http_die ("internal-error", err.c_str());
+        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
     }
 
     // result JSON payload
@@ -196,6 +197,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         http_die ("internal-error", err.c_str());
     }
     CLEANUP;
+    #undef CLEANUP
 
     // set body (status is 200 OK)
     reply.out () << json;
