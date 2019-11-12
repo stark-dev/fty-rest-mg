@@ -14,11 +14,8 @@
 #include <stdexcept>
 
 // <%pre>
-#line 30 "./src/web/src/topology_xlocation.ecpp"
+#line 26 "./src/web/src/topology_xlocation.ecpp"
 
-#include <string>
-#include <exception>
-#include <czmq.h>
 #include <fty_common.h>
 #include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
@@ -81,14 +78,14 @@ _component_::~_component_()
 unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam)
  {
 
-#line 49 "./src/web/src/topology_xlocation.ecpp"
+#line 42 "./src/web/src/topology_xlocation.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 50 "./src/web/src/topology_xlocation.ecpp"
+#line 43 "./src/web/src/topology_xlocation.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 52 "./src/web/src/topology_xlocation.ecpp"
+#line 45 "./src/web/src/topology_xlocation.ecpp"
 
 {
     // verify server is ready
@@ -108,12 +105,12 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
+    //ftylog_setVeboseMode(ftylog_getInstance());
+    log_trace ("in %s", request.getUrl().c_str ());
+
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "LOCATION";
-
-    ftylog_setVeboseMode(ftylog_getInstance());
-    log_trace ("in %s", request.getUrl().c_str ());
 
     // get params
     std::string parameter_name;
@@ -166,20 +163,15 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             }
         }
         else { // parameter_name == "from"
-
-            // recursive, boolean, false by default
+            // recursive, boolean, 'false' by default
+            if (recursive.empty()) recursive = "false";
             std::transform (recursive.begin(), recursive.end(), recursive.begin(), ::tolower);
-            if (!recursive.empty()) {
-                if (recursive != "true" && recursive != "false") {
-                    log_error("Boolean value expected ('%s')", recursive.c_str());
-                    http_die("request-param-bad", "recursive", recursive.c_str(), "'true'/'false'");
-                }
-            }
-            else { // default
-                recursive = "false";
+            if (recursive != "true" && recursive != "false") {
+                log_error("Boolean value expected ('%s')", recursive.c_str());
+                http_die("request-param-bad", "recursive", recursive.c_str(), "'true'/'false'");
             }
 
-            // filter token, empty by default
+            // filter token, string, empty by default
             std::transform (filter.begin(), filter.end(), filter.begin(), ::tolower);
             if (!filter.empty ()) {
                 if (filter != "rooms"
@@ -191,7 +183,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
                 }
             }
 
-            // feed_by device, empty by default
+            // feed_by device, string, empty by default
             if (!feed_by.empty ()) {
                 if (filter != "devices") {
                     std::string err =  TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'");
@@ -226,7 +218,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         http_die("parameter-conflict", err.c_str ());
     }
 
-    // check asset_id (except for 'none')
+    // db checks (except if asset_id == 'none')
     if (asset_id != "none") {
         // asset_id valid?
         if (!persist::is_ok_name (asset_id.c_str ()) ) {

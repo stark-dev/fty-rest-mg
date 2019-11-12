@@ -87,6 +87,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
   // <%cpp>
 #line 44 "./src/web/src/topology_xinput_power_chain.ecpp"
 
+{
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
@@ -100,12 +101,12 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
+    //ftylog_setVeboseMode(ftylog_getInstance());
+    log_trace ("in %s", request.getUrl().c_str ());
+
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "INPUT_POWERCHAIN";
-
-    ftylog_setVeboseMode(ftylog_getInstance());
-    log_trace ("in %s", request.getUrl().c_str ());
 
     // get param, id of datacenter retrieved from url
     std::string asset_id = request.getArg ("id");
@@ -116,12 +117,19 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
 
     // db checks
     {
-        int64_t dbid = DBAssets::name_to_asset_id (asset_id);
-        if (dbid == -1) {
-            http_die ("element-not-found", asset_id.c_str ());
+        // asset_id valid?
+        if (!persist::is_ok_name (asset_id.c_str ()) ) {
+            std::string expected = TRANSLATE_ME("valid asset name");
+            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
         }
-        if (dbid == -2) {
-            std::string err =  TRANSLATE_ME("Connecting to database failed.");
+        // asset_id exist?
+        int64_t rv = DBAssets::name_to_asset_id (asset_id);
+        if (rv == -1) {
+            std::string expected = TRANSLATE_ME("existing asset name");
+            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+        }
+        if (rv == -2) {
+            std::string err =  TRANSLATE_ME("Connection to database failed.");
             http_die ("internal-error", err.c_str ());
         }
     }
@@ -201,6 +209,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
 
     // set body (status is 200 OK)
     reply.out () << json;
+}
 
   // <%/cpp>
   return HTTP_OK;
