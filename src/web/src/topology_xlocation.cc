@@ -14,7 +14,7 @@
 #include <stdexcept>
 
 // <%pre>
-#line 26 "./src/web/src/topology_xlocation.ecpp"
+#line 25 "./src/web/src/topology_xlocation.ecpp"
 
 #include <fty_common.h>
 #include <fty_common_macros.h>
@@ -78,20 +78,20 @@ _component_::~_component_()
 unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam)
  {
 
-#line 42 "./src/web/src/topology_xlocation.ecpp"
+#line 41 "./src/web/src/topology_xlocation.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 43 "./src/web/src/topology_xlocation.ecpp"
+#line 42 "./src/web/src/topology_xlocation.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 45 "./src/web/src/topology_xlocation.ecpp"
+#line 44 "./src/web/src/topology_xlocation.ecpp"
 
 {
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        std::string err =  TRANSLATE_ME("Database is not ready yet, please try again after a while.");
+        std::string err = TRANSLATE_ME("Database is not ready yet, please try again after a while.");
         http_die ("internal-error", err.c_str ());
     }
 
@@ -186,11 +186,11 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             // feed_by device, string, empty by default
             if (!feed_by.empty ()) {
                 if (filter != "devices") {
-                    std::string err =  TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'");
+                    std::string err = TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'");
                     http_die("parameter-conflict", err.c_str ());
                 }
                 if (asset_id == "none") {
-                    std::string err =  TRANSLATE_ME("Variable 'from' can not be 'none' if variable 'feed_by' is set.");
+                    std::string err = TRANSLATE_ME("Variable 'from' can not be 'none' if variable 'feed_by' is set.");
                     http_die("parameter-conflict", err.c_str ());
                 }
 
@@ -232,7 +232,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
         }
         if (rv == -2) {
-            std::string err =  TRANSLATE_ME("Connection to database failed.");
+            std::string err = TRANSLATE_ME("Connection to database failed.");
             http_die ("internal-error", err.c_str ());
         }
     }
@@ -241,7 +241,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
         log_error ("mlm_pool.get () failed");
-        std::string err =  TRANSLATE_ME("Connection to mlm client failed.");
+        std::string err = TRANSLATE_ME("Connection to mlm client failed.");
         http_die ("internal-error", err.c_str());
     }
 
@@ -249,7 +249,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     zmsg_t *req = zmsg_new ();
     if (!req) {
         log_error ("zmsg_new () failed");
-        std::string err =  TRANSLATE_ME("Memory allocation failed.");
+        std::string err = TRANSLATE_ME("Memory allocation failed.");
         http_die ("internal-error", err.c_str());
     }
 
@@ -265,7 +265,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     if (!resp) {
         CLEANUP;
         log_error ("client->requestreply (timeout = '5') failed");
-        std::string err =  TRANSLATE_ME("Request to mlm client failed (timeout reached).");
+        std::string err = TRANSLATE_ME("Request to mlm client failed (timeout reached).");
         http_die ("internal-error", err.c_str());
     }
 
@@ -278,13 +278,13 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     if (rx_command != COMMAND) {
         CLEANUP;
         log_error ("received inconsistent command ('%s')", rx_command.c_str ());
-        std::string err =  TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
+        std::string err = TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_asset_id != asset_id) {
         CLEANUP;
         log_error ("received inconsistent assetID ('%s')", rx_asset_id.c_str ());
-        std::string err =  TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
+        std::string err = TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_status != "OK") {
@@ -292,7 +292,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        //std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
+        //std::string err = TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         //http_die ("internal-error", err.c_str());
         http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
     }
@@ -303,7 +303,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     if (json.empty()) {
         CLEANUP;
         log_error ("empty JSON payload");
-        std::string err =  TRANSLATE_ME("Received an empty JSON payload.");
+        std::string err = TRANSLATE_ME("Received an empty JSON payload.");
         http_die ("internal-error", err.c_str());
     }
     CLEANUP;

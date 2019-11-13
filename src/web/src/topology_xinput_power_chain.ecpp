@@ -20,7 +20,7 @@
 /*!
  * \file topology_input_power_chain.ecpp
  * \author François-Régis Degott <FrancoisRegisDegott@Eaton.com>
- * \brief  process topology input powerchain request via 'asset-agent' mlm mailbox
+ * \brief  process topology input powerchain request via 'asset-agent'TOPOLOGY mailbox
  */
  #><%pre>
 #include <fty_common.h>
@@ -84,7 +84,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
             http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
         }
         if (rv == -2) {
-            std::string err =  TRANSLATE_ME("Connection to database failed.");
+            std::string err = TRANSLATE_ME("Connection to database failed.");
             http_die ("internal-error", err.c_str ());
         }
     }
@@ -96,7 +96,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     MlmClientPool::Ptr client = mlm_pool.get ();
     if (!client.getPointer ()) {
         log_error ("mlm_pool.get () failed");
-        std::string err =  TRANSLATE_ME("Connection to mlm client failed.");
+        std::string err = TRANSLATE_ME("Connection to mlm client failed.");
         http_die ("internal-error", err.c_str());
     }
 
@@ -104,7 +104,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     zmsg_t *req = zmsg_new ();
     if (!req) {
         log_error ("zmsg_new () failed");
-        std::string err =  TRANSLATE_ME("Memory allocation failed.");
+        std::string err = TRANSLATE_ME("Memory allocation failed.");
         http_die ("internal-error", err.c_str());
     }
 
@@ -118,7 +118,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     if (!resp) {
         CLEANUP;
         log_error ("client->requestreply (timeout = '5') failed");
-        std::string err =  TRANSLATE_ME("Request to mlm client failed (timeout reached).");
+        std::string err = TRANSLATE_ME("Request to mlm client failed (timeout reached).");
         http_die ("internal-error", err.c_str());
     }
 
@@ -131,13 +131,13 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     if (rx_command != COMMAND) {
         CLEANUP;
         log_error ("received inconsistent command ('%s')", rx_command.c_str ());
-        std::string err =  TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
+        std::string err = TRANSLATE_ME("Received inconsistent command ('%s').", rx_command.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_asset_id != asset_id) {
         CLEANUP;
         log_error ("received inconsistent assetID ('%s')", rx_asset_id.c_str ());
-        std::string err =  TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
+        std::string err = TRANSLATE_ME("Received inconsistent asset ID ('%s').", rx_asset_id.c_str ());
         http_die ("internal-error", err.c_str());
     }
     if (rx_status != "OK") {
@@ -145,7 +145,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        //std::string err =  TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
+        //std::string err = TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         //http_die ("internal-error", err.c_str());
         http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
     }
@@ -156,7 +156,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     if (json.empty()) {
         CLEANUP;
         log_error ("empty JSON payload");
-        std::string err =  TRANSLATE_ME("Received an empty JSON payload.");
+        std::string err = TRANSLATE_ME("Received an empty JSON payload.");
         http_die ("internal-error", err.c_str());
     }
     CLEANUP;
