@@ -76,8 +76,15 @@ bool database_ready;
         // not-empty count
         int ne_count = (from.empty()?0:1) + (to.empty()?0:1) + (filter_dc.empty()?0:1) + (filter_gr.empty()?0:1);
         if (ne_count != 1) {
-            std::string err = TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
-            http_die("parameter-conflict", err.c_str ());
+            log_error ("unexpected parameter (ne_count: %d)", ne_count);
+            if (ne_count == 0) {
+                std::string err = TRANSLATE_ME("'from', 'to', 'filter_dc' or 'filter_group'");
+                http_die("request-param-required", err.c_str ());
+            }
+            else {
+                std::string err = TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                http_die("parameter-conflict", err.c_str ());
+            }
         }
 
         if (!from.empty()) {
@@ -178,9 +185,9 @@ bool database_ready;
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
+        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
         //std::string err = TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         //http_die ("internal-error", err.c_str());
-        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
     }
 
     // result JSON payload

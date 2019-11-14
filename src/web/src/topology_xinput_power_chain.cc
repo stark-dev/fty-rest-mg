@@ -112,7 +112,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     std::string asset_id = request.getArg ("id");
     if (asset_id.empty ()) {
         std::string expected = TRANSLATE_ME("existing asset name");
-        http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+        http_die ("request-param-bad", "dc_id", asset_id.c_str (), expected.c_str ());
     }
 
     // db checks
@@ -120,13 +120,13 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         // asset_id valid?
         if (!persist::is_ok_name (asset_id.c_str ()) ) {
             std::string expected = TRANSLATE_ME("valid asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+            http_die ("request-param-bad", "dc_id", asset_id.c_str (), expected.c_str ());
         }
         // asset_id exist?
         int64_t rv = DBAssets::name_to_asset_id (asset_id);
         if (rv == -1) {
             std::string expected = TRANSLATE_ME("existing asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+            http_die ("request-param-bad", "dc_id", asset_id.c_str (), expected.c_str ());
         }
         if (rv == -2) {
             std::string err = TRANSLATE_ME("Connection to database failed.");
@@ -190,9 +190,9 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
+        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
         //std::string err = TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
         //http_die ("internal-error", err.c_str());
-        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
     }
 
     // result JSON payload
