@@ -733,6 +733,13 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         operation = persist::asset_operation::UPDATE;
     }
 
+    // store old asset for correct deactivation
+    std::string old_asset_json;
+    if (operation == persist::asset_operation::UPDATE)
+    {
+        old_asset_json = getJsonAsset (NULL, id);
+    }
+
     auto ename = cm.get(row_i, "name");
     if (ename.empty ()) {
         std::string received = TRANSLATE_ME ("empty value");
@@ -1246,12 +1253,13 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
                 if (type == "device" && status == "active" && subtype_id != rack_controller_id)
                 {
-                    // check if we may activate the device
+                    // deactivate and then  activate the device
                      try
                      {
                          std::string asset_json = getJsonAsset (NULL, m.id);
                          mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
                          fty::AssetActivator activationAccessor (client);
+                         activationAccessor.deactivate (old_asset_json);
                          activationAccessor.activate (asset_json);
                      }
                      catch (const std::exception &e)
