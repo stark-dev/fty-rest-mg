@@ -122,8 +122,7 @@ bool database_ready;
         // asset_id exist?
         int64_t rv = DBAssets::name_to_asset_id (asset_id);
         if (rv == -1) {
-            std::string expected = TRANSLATE_ME("existing asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+            http_die ("element-not-found", asset_id.c_str ());
         }
         if (rv == -2) {
             std::string err = TRANSLATE_ME("Connection to database failed.");
