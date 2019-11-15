@@ -229,7 +229,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        http_die ("request-param-bad", JSONIFY (reason.c_str ()).c_str ());
+        http_die ("request-param-bad", parameter_name.c_str(), asset_id.c_str(), JSONIFY (reason.c_str ()).c_str ());
     }
 
     // result JSON payload
