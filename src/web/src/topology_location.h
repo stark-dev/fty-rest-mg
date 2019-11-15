@@ -1,5 +1,5 @@
 /*  =========================================================================
-    web_src_topology_xpower - root object
+    web_src_topology_location - root object
 
     Copyright (C) 2014 - 2018 Eaton
 
@@ -19,21 +19,21 @@
     =========================================================================
 */
 
-#ifndef WEB_SRC_TOPOLOGY_XPOWER_H_INCLUDED
-#define WEB_SRC_TOPOLOGY_XPOWER_H_INCLUDED
+#ifndef WEB_SRC_TOPOLOGY_LOCATION_H_INCLUDED
+#define WEB_SRC_TOPOLOGY_LOCATION_H_INCLUDED
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  @interface
-//  Create a new web_src_topology_xpower
-FTY_REST_PRIVATE web_src_topology_xpower_t *
-    web_src_topology_xpower_new (void);
+//  Create a new web_src_topology_location
+FTY_REST_PRIVATE web_src_topology_location_t *
+    web_src_topology_location_new (void);
 
-//  Destroy the web_src_topology_xpower
+//  Destroy the web_src_topology_location
 FTY_REST_PRIVATE void
-    web_src_topology_xpower_destroy (web_src_topology_xpower_t **self_p);
+    web_src_topology_location_destroy (web_src_topology_location_t **self_p);
 
 
 //  @end

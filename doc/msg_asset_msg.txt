@@ -1,0 +1,1169 @@
+msg/asset_msg(3)
+================
+
+NAME
+----
+msg_asset_msg - Class for assets management protocol
+
+SYNOPSIS
+--------
+----
+//  Create a new asset_msg
+asset_msg_t *
+    asset_msg_new (int id);
+
+//  Destroy the asset_msg
+void
+    asset_msg_destroy (asset_msg_t **self_p);
+
+//  Parse a zmsg_t and decides whether it is asset_msg. Returns
+//  true if it is, false otherwise. Doesn't destroy or modify the
+//  original message.
+bool
+    is_asset_msg (zmsg_t *msg_p);
+
+//  Parse a asset_msg from zmsg_t. Returns a new object, or NULL if
+//  the message could not be parsed, or was NULL. Destroys msg and
+//  nullifies the msg reference.
+asset_msg_t *
+    asset_msg_decode (zmsg_t **msg_p);
+
+//  Encode asset_msg into zmsg and destroy it. Returns a newly created
+//  object or NULL if error. Use when not in control of sending the message.
+zmsg_t *
+    asset_msg_encode (asset_msg_t **self_p);
+
+//  Receive and parse a asset_msg from the socket. Returns new object,
+//  or NULL if error. Will block if there's no message waiting.
+asset_msg_t *
+    asset_msg_recv (void *input);
+
+//  Receive and parse a asset_msg from the socket. Returns new object,
+//  or NULL either if there was no input waiting, or the recv was interrupted.
+asset_msg_t *
+    asset_msg_recv_nowait (void *input);
+
+//  Send the asset_msg to the output, and destroy it
+int
+    asset_msg_send (asset_msg_t **self_p, void *output);
+
+//  Send the asset_msg to the output, and do not destroy it
+int
+    asset_msg_send_again (asset_msg_t *self, void *output);
+
+//  Encode the ELEMENT
+zmsg_t *
+    asset_msg_encode_element (
+        const char *name,
+        uint32_t location,
+        byte location_type,
+        byte type,
+        zhash_t *ext);
+
+//  Encode the DEVICE
+zmsg_t *
+    asset_msg_encode_device (
+        const char *device_type,
+        zlist_t *groups,
+        zlist_t *powers,
+        const char *ip,
+        const char *hostname,
+        const char *fqdn,
+        const char *mac,
+        zmsg_t *msg);
+
+//  Encode the GET_ELEMENT
+zmsg_t *
+    asset_msg_encode_get_element (
+        uint32_t element_id,
+        byte type);
+
+//  Encode the RETURN_ELEMENT
+zmsg_t *
+    asset_msg_encode_return_element (
+        uint32_t element_id,
+        zmsg_t *msg);
+
+//  Encode the UPDATE_ELEMENT
+zmsg_t *
+    asset_msg_encode_update_element (
+        uint32_t element_id,
+        zmsg_t *msg);
+
+//  Encode the INSERT_ELEMENT
+zmsg_t *
+    asset_msg_encode_insert_element (
+        zmsg_t *msg);
+
+//  Encode the DELETE_ELEMENT
+zmsg_t *
+    asset_msg_encode_delete_element (
+        uint32_t element_id,
+        byte type);
+
+//  Encode the OK
+zmsg_t *
+    asset_msg_encode_ok (
+        uint32_t element_id);
+
+//  Encode the FAIL
+zmsg_t *
+    asset_msg_encode_fail (
+        byte error_id);
+
+//  Encode the GET_ELEMENTS
+zmsg_t *
+    asset_msg_encode_get_elements (
+        byte type);
+
+//  Encode the RETURN_ELEMENTS
+zmsg_t *
+    asset_msg_encode_return_elements (
+        zhash_t *element_ids);
+
+//  Encode the GET_LOCATION_FROM
+zmsg_t *
+    asset_msg_encode_get_location_from (
+        uint32_t element_id,
+        byte recursive,
+        byte filter_type);
+
+//  Encode the GET_LOCATION_TO
+zmsg_t *
+    asset_msg_encode_get_location_to (
+        uint32_t element_id);
+
+//  Encode the RETURN_LOCATION_TO
+zmsg_t *
+    asset_msg_encode_return_location_to (
+        uint32_t element_id,
+        byte type,
+        const char *name,
+        const char *type_name,
+        zmsg_t *msg);
+
+//  Encode the RETURN_LOCATION_FROM
+zmsg_t *
+    asset_msg_encode_return_location_from (
+        uint32_t element_id,
+        byte type,
+        const char *name,
+        const char *type_name,
+        zframe_t *dcs,
+        zframe_t *rooms,
+        zframe_t *rows,
+        zframe_t *racks,
+        zframe_t *devices,
+        zframe_t *grps);
+
+//  Encode the GET_POWER_FROM
+zmsg_t *
+    asset_msg_encode_get_power_from (
+        uint32_t element_id);
+
+//  Encode the POWERCHAIN_DEVICE
+zmsg_t *
+    asset_msg_encode_powerchain_device (
+        uint32_t element_id,
+        const char *type_name,
+        const char *name);
+
+//  Encode the RETURN_POWER
+zmsg_t *
+    asset_msg_encode_return_power (
+        zframe_t *devices,
+        zlist_t *powers);
+
+//  Encode the GET_POWER_TO
+zmsg_t *
+    asset_msg_encode_get_power_to (
+        uint32_t element_id);
+
+//  Encode the GET_POWER_GROUP
+zmsg_t *
+    asset_msg_encode_get_power_group (
+        uint32_t element_id);
+
+//  Encode the GET_POWER_DATACENTER
+zmsg_t *
+    asset_msg_encode_get_power_datacenter (
+        uint32_t element_id);
+
+
+//  Send the ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_element (void *output,
+        const char *name,
+        uint32_t location,
+        byte location_type,
+        byte type,
+        zhash_t *ext);
+
+//  Send the DEVICE to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_device (void *output,
+        const char *device_type,
+        zlist_t *groups,
+        zlist_t *powers,
+        const char *ip,
+        const char *hostname,
+        const char *fqdn,
+        const char *mac,
+        zmsg_t *msg);
+
+//  Send the GET_ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_element (void *output,
+        uint32_t element_id,
+        byte type);
+
+//  Send the RETURN_ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_return_element (void *output,
+        uint32_t element_id,
+        zmsg_t *msg);
+
+//  Send the UPDATE_ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_update_element (void *output,
+        uint32_t element_id,
+        zmsg_t *msg);
+
+//  Send the INSERT_ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_insert_element (void *output,
+        zmsg_t *msg);
+
+//  Send the DELETE_ELEMENT to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_delete_element (void *output,
+        uint32_t element_id,
+        byte type);
+
+//  Send the OK to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_ok (void *output,
+        uint32_t element_id);
+
+//  Send the FAIL to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_fail (void *output,
+        byte error_id);
+
+//  Send the GET_ELEMENTS to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_elements (void *output,
+        byte type);
+
+//  Send the RETURN_ELEMENTS to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_return_elements (void *output,
+        zhash_t *element_ids);
+
+//  Send the GET_LOCATION_FROM to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_location_from (void *output,
+        uint32_t element_id,
+        byte recursive,
+        byte filter_type);
+
+//  Send the GET_LOCATION_TO to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_location_to (void *output,
+        uint32_t element_id);
+
+//  Send the RETURN_LOCATION_TO to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_return_location_to (void *output,
+        uint32_t element_id,
+        byte type,
+        const char *name,
+        const char *type_name,
+        zmsg_t *msg);
+
+//  Send the RETURN_LOCATION_FROM to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_return_location_from (void *output,
+        uint32_t element_id,
+        byte type,
+        const char *name,
+        const char *type_name,
+        zframe_t *dcs,
+        zframe_t *rooms,
+        zframe_t *rows,
+        zframe_t *racks,
+        zframe_t *devices,
+        zframe_t *grps);
+
+//  Send the GET_POWER_FROM to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_power_from (void *output,
+        uint32_t element_id);
+
+//  Send the POWERCHAIN_DEVICE to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_powerchain_device (void *output,
+        uint32_t element_id,
+        const char *type_name,
+        const char *name);
+
+//  Send the RETURN_POWER to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_return_power (void *output,
+        zframe_t *devices,
+        zlist_t *powers);
+
+//  Send the GET_POWER_TO to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_power_to (void *output,
+        uint32_t element_id);
+
+//  Send the GET_POWER_GROUP to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_power_group (void *output,
+        uint32_t element_id);
+
+//  Send the GET_POWER_DATACENTER to the output in one step
+//  WARNING, this call will fail if output is of type ZMQ_ROUTER.
+int
+    asset_msg_send_get_power_datacenter (void *output,
+        uint32_t element_id);
+
+//  Duplicate the asset_msg message
+asset_msg_t *
+    asset_msg_dup (asset_msg_t *self);
+
+//  Print contents of message to stdout
+void
+    asset_msg_print (asset_msg_t *self);
+
+//  Get/set the message routing id
+zframe_t *
+    asset_msg_routing_id (asset_msg_t *self);
+void
+    asset_msg_set_routing_id (asset_msg_t *self, zframe_t *routing_id);
+
+//  Get the asset_msg id and printable command
+int
+    asset_msg_id (asset_msg_t *self);
+void
+    asset_msg_set_id (asset_msg_t *self, int id);
+const char *
+    asset_msg_command (asset_msg_t *self);
+
+//  Get/set the name field
+const char *
+    asset_msg_name (asset_msg_t *self);
+void
+    asset_msg_set_name (asset_msg_t *self, const char *format, ...);
+
+//  Get/set the location field
+uint32_t
+    asset_msg_location (asset_msg_t *self);
+void
+    asset_msg_set_location (asset_msg_t *self, uint32_t location);
+
+//  Get/set the location_type field
+byte
+    asset_msg_location_type (asset_msg_t *self);
+void
+    asset_msg_set_location_type (asset_msg_t *self, byte location_type);
+
+//  Get/set the type field
+byte
+    asset_msg_type (asset_msg_t *self);
+void
+    asset_msg_set_type (asset_msg_t *self, byte type);
+
+//  Get/set the ext field
+zhash_t *
+    asset_msg_ext (asset_msg_t *self);
+//  Get the ext field and transfer ownership to caller
+zhash_t *
+    asset_msg_get_ext (asset_msg_t *self);
+//  Set the ext field, transferring ownership from caller
+void
+    asset_msg_set_ext (asset_msg_t *self, zhash_t **ext_p);
+
+//  Get/set a value in the ext dictionary
+const char *
+    asset_msg_ext_string (asset_msg_t *self,
+        const char *key, const char *default_value);
+uint64_t
+    asset_msg_ext_number (asset_msg_t *self,
+        const char *key, uint64_t default_value);
+void
+    asset_msg_ext_insert (asset_msg_t *self,
+        const char *key, const char *format, ...);
+size_t
+    asset_msg_ext_size (asset_msg_t *self);
+
+//  Get/set the device_type field
+const char *
+    asset_msg_device_type (asset_msg_t *self);
+void
+    asset_msg_set_device_type (asset_msg_t *self, const char *format, ...);
+
+//  Get/set the groups field
+zlist_t *
+    asset_msg_groups (asset_msg_t *self);
+//  Get the groups field and transfer ownership to caller
+zlist_t *
+    asset_msg_get_groups (asset_msg_t *self);
+//  Set the groups field, transferring ownership from caller
+void
+    asset_msg_set_groups (asset_msg_t *self, zlist_t **groups_p);
+
+//  Iterate through the groups field, and append a groups value
+const char *
+    asset_msg_groups_first (asset_msg_t *self);
+const char *
+    asset_msg_groups_next (asset_msg_t *self);
+void
+    asset_msg_groups_append (asset_msg_t *self, const char *format, ...);
+size_t
+    asset_msg_groups_size (asset_msg_t *self);
+
+//  Get/set the powers field
+zlist_t *
+    asset_msg_powers (asset_msg_t *self);
+//  Get the powers field and transfer ownership to caller
+zlist_t *
+    asset_msg_get_powers (asset_msg_t *self);
+//  Set the powers field, transferring ownership from caller
+void
+    asset_msg_set_powers (asset_msg_t *self, zlist_t **powers_p);
+
+//  Iterate through the powers field, and append a powers value
+const char *
+    asset_msg_powers_first (asset_msg_t *self);
+const char *
+    asset_msg_powers_next (asset_msg_t *self);
+void
+    asset_msg_powers_append (asset_msg_t *self, const char *format, ...);
+size_t
+    asset_msg_powers_size (asset_msg_t *self);
+
+//  Get/set the ip field
+const char *
+    asset_msg_ip (asset_msg_t *self);
+void
+    asset_msg_set_ip (asset_msg_t *self, const char *format, ...);
+
+//  Get/set the hostname field
+const char *
+    asset_msg_hostname (asset_msg_t *self);
+void
+    asset_msg_set_hostname (asset_msg_t *self, const char *format, ...);
+
+//  Get/set the fqdn field
+const char *
+    asset_msg_fqdn (asset_msg_t *self);
+void
+    asset_msg_set_fqdn (asset_msg_t *self, const char *format, ...);
+
+//  Get/set the mac field
+const char *
+    asset_msg_mac (asset_msg_t *self);
+void
+    asset_msg_set_mac (asset_msg_t *self, const char *format, ...);
+
+//  Get a copy of the msg field
+zmsg_t *
+    asset_msg_msg (asset_msg_t *self);
+//  Get the msg field and transfer ownership to caller
+zmsg_t *
+    asset_msg_get_msg (asset_msg_t *self);
+//  Set the msg field, transferring ownership from caller
+void
+    asset_msg_set_msg (asset_msg_t *self, zmsg_t **msg_p);
+
+//  Get/set the element_id field
+uint32_t
+    asset_msg_element_id (asset_msg_t *self);
+void
+    asset_msg_set_element_id (asset_msg_t *self, uint32_t element_id);
+
+//  Get/set the error_id field
+byte
+    asset_msg_error_id (asset_msg_t *self);
+void
+    asset_msg_set_error_id (asset_msg_t *self, byte error_id);
+
+//  Get/set the element_ids field
+zhash_t *
+    asset_msg_element_ids (asset_msg_t *self);
+//  Get the element_ids field and transfer ownership to caller
+zhash_t *
+    asset_msg_get_element_ids (asset_msg_t *self);
+//  Set the element_ids field, transferring ownership from caller
+void
+    asset_msg_set_element_ids (asset_msg_t *self, zhash_t **element_ids_p);
+
+//  Get/set a value in the element_ids dictionary
+const char *
+    asset_msg_element_ids_string (asset_msg_t *self,
+        const char *key, const char *default_value);
+uint64_t
+    asset_msg_element_ids_number (asset_msg_t *self,
+        const char *key, uint64_t default_value);
+void
+    asset_msg_element_ids_insert (asset_msg_t *self,
+        const char *key, const char *format, ...);
+size_t
+    asset_msg_element_ids_size (asset_msg_t *self);
+
+//  Get/set the recursive field
+byte
+    asset_msg_recursive (asset_msg_t *self);
+void
+    asset_msg_set_recursive (asset_msg_t *self, byte recursive);
+
+//  Get/set the filter_type field
+byte
+    asset_msg_filter_type (asset_msg_t *self);
+void
+    asset_msg_set_filter_type (asset_msg_t *self, byte filter_type);
+
+//  Get/set the type_name field
+const char *
+    asset_msg_type_name (asset_msg_t *self);
+void
+    asset_msg_set_type_name (asset_msg_t *self, const char *format, ...);
+
+//  Get a copy of the dcs field
+zframe_t *
+    asset_msg_dcs (asset_msg_t *self);
+//  Get the dcs field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_dcs (asset_msg_t *self);
+//  Set the dcs field, transferring ownership from caller
+void
+    asset_msg_set_dcs (asset_msg_t *self, zframe_t **frame_p);
+
+//  Get a copy of the rooms field
+zframe_t *
+    asset_msg_rooms (asset_msg_t *self);
+//  Get the rooms field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_rooms (asset_msg_t *self);
+//  Set the rooms field, transferring ownership from caller
+void
+    asset_msg_set_rooms (asset_msg_t *self, zframe_t **frame_p);
+
+//  Get a copy of the rows field
+zframe_t *
+    asset_msg_rows (asset_msg_t *self);
+//  Get the rows field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_rows (asset_msg_t *self);
+//  Set the rows field, transferring ownership from caller
+void
+    asset_msg_set_rows (asset_msg_t *self, zframe_t **frame_p);
+
+//  Get a copy of the racks field
+zframe_t *
+    asset_msg_racks (asset_msg_t *self);
+//  Get the racks field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_racks (asset_msg_t *self);
+//  Set the racks field, transferring ownership from caller
+void
+    asset_msg_set_racks (asset_msg_t *self, zframe_t **frame_p);
+
+//  Get a copy of the devices field
+zframe_t *
+    asset_msg_devices (asset_msg_t *self);
+//  Get the devices field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_devices (asset_msg_t *self);
+//  Set the devices field, transferring ownership from caller
+void
+    asset_msg_set_devices (asset_msg_t *self, zframe_t **frame_p);
+
+//  Get a copy of the grps field
+zframe_t *
+    asset_msg_grps (asset_msg_t *self);
+//  Get the grps field and transfer ownership to caller
+zframe_t *
+    asset_msg_get_grps (asset_msg_t *self);
+//  Set the grps field, transferring ownership from caller
+void
+    asset_msg_set_grps (asset_msg_t *self, zframe_t **frame_p);
+
+//  Self test of this class
+int
+    asset_msg_test (bool verbose);
+Please add '@interface' section in './../src/msg/asset_msg.cc'.
+----
+
+DESCRIPTION
+-----------
+
+asset_msg - assets management protocol
+
+Please add '@discuss' section in './../src/msg/asset_msg.cc'.
+
+EXAMPLE
+-------
+.From msg/asset_msg_test method
+----
+//  Simple create/destroy test
+asset_msg_t *self = asset_msg_new (0);
+assert (self);
+asset_msg_destroy (&self);
+
+//  Create pair of sockets we can send through
+zsock_t *input = zsock_new (ZMQ_ROUTER);
+assert (input);
+zsock_connect (input, "inproc://selftest-asset_msg");
+
+zsock_t *output = zsock_new (ZMQ_DEALER);
+assert (output);
+zsock_bind (output, "inproc://selftest-asset_msg");
+
+//  Encode/send/decode and verify each message type
+int instance;
+asset_msg_t *copy;
+self = asset_msg_new (ASSET_MSG_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_name (self, "Life is short but Now lasts for ever");
+asset_msg_set_location (self, 123);
+asset_msg_set_location_type (self, 123);
+asset_msg_set_type (self, 123);
+asset_msg_ext_insert (self, "Name", "Brutus");
+asset_msg_ext_insert (self, "Age", "%d", 43);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
+    assert (asset_msg_location (self) == 123);
+    assert (asset_msg_location_type (self) == 123);
+    assert (asset_msg_type (self) == 123);
+    assert (asset_msg_ext_size (self) == 2);
+    assert (streq (asset_msg_ext_string (self, "Name", "?"), "Brutus"));
+    assert (asset_msg_ext_number (self, "Age", 0) == 43);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_DEVICE);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_device_type (self, "Life is short but Now lasts for ever");
+asset_msg_groups_append (self, "Name: %s", "Brutus");
+asset_msg_groups_append (self, "Age: %d", 43);
+asset_msg_powers_append (self, "Name: %s", "Brutus");
+asset_msg_powers_append (self, "Age: %d", 43);
+asset_msg_set_ip (self, "Life is short but Now lasts for ever");
+asset_msg_set_hostname (self, "Life is short but Now lasts for ever");
+asset_msg_set_fqdn (self, "Life is short but Now lasts for ever");
+asset_msg_set_mac (self, "Life is short but Now lasts for ever");
+zmsg_t *device_msg = zmsg_new ();
+asset_msg_set_msg (self, &device_msg);
+zmsg_addstr (asset_msg_msg (self), "Hello, World");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (streq (asset_msg_device_type (self), "Life is short but Now lasts for ever"));
+    assert (asset_msg_groups_size (self) == 2);
+    assert (streq (asset_msg_groups_first (self), "Name: Brutus"));
+    assert (streq (asset_msg_groups_next (self), "Age: 43"));
+    assert (asset_msg_powers_size (self) == 2);
+    assert (streq (asset_msg_powers_first (self), "Name: Brutus"));
+    assert (streq (asset_msg_powers_next (self), "Age: 43"));
+    assert (streq (asset_msg_ip (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_hostname (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_fqdn (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_mac (self), "Life is short but Now lasts for ever"));
+    assert (zmsg_size (asset_msg_msg (self)) == 1);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_type (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (asset_msg_type (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_RETURN_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+zmsg_t *return_element_msg = zmsg_new ();
+asset_msg_set_msg (self, &return_element_msg);
+zmsg_addstr (asset_msg_msg (self), "Hello, World");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (zmsg_size (asset_msg_msg (self)) == 1);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_UPDATE_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+zmsg_t *update_element_msg = zmsg_new ();
+asset_msg_set_msg (self, &update_element_msg);
+zmsg_addstr (asset_msg_msg (self), "Hello, World");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (zmsg_size (asset_msg_msg (self)) == 1);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_INSERT_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+zmsg_t *insert_element_msg = zmsg_new ();
+asset_msg_set_msg (self, &insert_element_msg);
+zmsg_addstr (asset_msg_msg (self), "Hello, World");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (zmsg_size (asset_msg_msg (self)) == 1);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_DELETE_ELEMENT);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_type (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (asset_msg_type (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_OK);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_FAIL);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_error_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_error_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_ELEMENTS);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_type (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_type (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_RETURN_ELEMENTS);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_element_ids_insert (self, "Name", "Brutus");
+asset_msg_element_ids_insert (self, "Age", "%d", 43);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_ids_size (self) == 2);
+    assert (streq (asset_msg_element_ids_string (self, "Name", "?"), "Brutus"));
+    assert (asset_msg_element_ids_number (self, "Age", 0) == 43);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_LOCATION_FROM);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_recursive (self, 123);
+asset_msg_set_filter_type (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (asset_msg_recursive (self) == 123);
+    assert (asset_msg_filter_type (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_LOCATION_TO);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_RETURN_LOCATION_TO);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_type (self, 123);
+asset_msg_set_name (self, "Life is short but Now lasts for ever");
+asset_msg_set_type_name (self, "Life is short but Now lasts for ever");
+zmsg_t *return_location_to_msg = zmsg_new ();
+asset_msg_set_msg (self, &return_location_to_msg);
+zmsg_addstr (asset_msg_msg (self), "Hello, World");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (asset_msg_type (self) == 123);
+    assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_type_name (self), "Life is short but Now lasts for ever"));
+    assert (zmsg_size (asset_msg_msg (self)) == 1);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_RETURN_LOCATION_FROM);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_type (self, 123);
+asset_msg_set_name (self, "Life is short but Now lasts for ever");
+asset_msg_set_type_name (self, "Life is short but Now lasts for ever");
+zframe_t *return_location_from_dcs = zframe_new ("Captcha Diem", 12);
+asset_msg_set_dcs (self, &return_location_from_dcs);
+zframe_t *return_location_from_rooms = zframe_new ("Captcha Diem", 12);
+asset_msg_set_rooms (self, &return_location_from_rooms);
+zframe_t *return_location_from_rows = zframe_new ("Captcha Diem", 12);
+asset_msg_set_rows (self, &return_location_from_rows);
+zframe_t *return_location_from_racks = zframe_new ("Captcha Diem", 12);
+asset_msg_set_racks (self, &return_location_from_racks);
+zframe_t *return_location_from_devices = zframe_new ("Captcha Diem", 12);
+asset_msg_set_devices (self, &return_location_from_devices);
+zframe_t *return_location_from_grps = zframe_new ("Captcha Diem", 12);
+asset_msg_set_grps (self, &return_location_from_grps);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (asset_msg_type (self) == 123);
+    assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_type_name (self), "Life is short but Now lasts for ever"));
+    assert (zframe_streq (asset_msg_dcs (self), "Captcha Diem"));
+    assert (zframe_streq (asset_msg_rooms (self), "Captcha Diem"));
+    assert (zframe_streq (asset_msg_rows (self), "Captcha Diem"));
+    assert (zframe_streq (asset_msg_racks (self), "Captcha Diem"));
+    assert (zframe_streq (asset_msg_devices (self), "Captcha Diem"));
+    assert (zframe_streq (asset_msg_grps (self), "Captcha Diem"));
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_POWER_FROM);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_POWERCHAIN_DEVICE);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+asset_msg_set_type_name (self, "Life is short but Now lasts for ever");
+asset_msg_set_name (self, "Life is short but Now lasts for ever");
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    assert (streq (asset_msg_type_name (self), "Life is short but Now lasts for ever"));
+    assert (streq (asset_msg_name (self), "Life is short but Now lasts for ever"));
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_RETURN_POWER);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+zframe_t *return_power_devices = zframe_new ("Captcha Diem", 12);
+asset_msg_set_devices (self, &return_power_devices);
+asset_msg_powers_append (self, "Name: %s", "Brutus");
+asset_msg_powers_append (self, "Age: %d", 43);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (zframe_streq (asset_msg_devices (self), "Captcha Diem"));
+    assert (asset_msg_powers_size (self) == 2);
+    assert (streq (asset_msg_powers_first (self), "Name: Brutus"));
+    assert (streq (asset_msg_powers_next (self), "Age: 43"));
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_POWER_TO);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_POWER_GROUP);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+self = asset_msg_new (ASSET_MSG_GET_POWER_DATACENTER);
+
+//  Check that _dup works on empty message
+copy = asset_msg_dup (self);
+assert (copy);
+asset_msg_destroy (&copy);
+
+asset_msg_set_element_id (self, 123);
+//  Send twice from same object
+asset_msg_send_again (self, output);
+asset_msg_send (&self, output);
+
+for (instance = 0; instance < 2; instance++) {
+    self = asset_msg_recv (input);
+    assert (self);
+    assert (asset_msg_routing_id (self));
+
+    assert (asset_msg_element_id (self) == 123);
+    asset_msg_destroy (&self);
+}
+
+zsock_destroy (&input);
+zsock_destroy (&output);
+----

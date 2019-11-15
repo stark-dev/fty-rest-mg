@@ -19,9 +19,6 @@ nobase_pkginclude_HEADERS = \
 
 if ENABLE_DRAFTS
 nobase_pkginclude_HEADERS += \
-    db/topology2.h \
-    msg/asset_msg.h \
-    msg/common_msg.h \
     shared/augtool.h \
     shared/cidr.h \
     shared/configure_inform.h \
@@ -35,7 +32,6 @@ nobase_pkginclude_HEADERS += \
     shared/utils_json.h \
     web/src/asset_computed_impl.h \
     web/src/iface.h \
-    web/src/location_helpers.h \
     web/src/sse.h
 
 endif

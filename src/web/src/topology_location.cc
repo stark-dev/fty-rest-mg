@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// ./src/web/src/topology_xpower.cc.cpp
+// ./src/web/src/topology_location.cc.cpp
 // generated with ecppc
 //
 
@@ -14,7 +14,7 @@
 #include <stdexcept>
 
 // <%pre>
-#line 25 "./src/web/src/topology_xpower.ecpp"
+#line 25 "./src/web/src/topology_location.ecpp"
 
 #include <fty_common.h>
 #include <fty_common_macros.h>
@@ -47,7 +47,7 @@ class _component_ : public tnt::EcppComponent
     unsigned operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam);
 };
 
-static tnt::ComponentFactoryImpl<_component_> Factory("topology_xpower");
+static tnt::ComponentFactoryImpl<_component_> Factory("topology_location");
 
 // <%shared>
 // </%shared>
@@ -78,28 +78,31 @@ _component_::~_component_()
 unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam)
  {
 
-#line 41 "./src/web/src/topology_xpower.ecpp"
+#line 41 "./src/web/src/topology_location.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 42 "./src/web/src/topology_xpower.ecpp"
+#line 42 "./src/web/src/topology_location.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 44 "./src/web/src/topology_xpower.ecpp"
+#line 44 "./src/web/src/topology_location.ecpp"
 
 {
     // verify server is ready
     if (!database_ready) {
         log_debug ("Database is not ready yet.");
-        std::string err = TRANSLATE_ME("Database is not ready yet, please try again in a while.");
+        std::string err = TRANSLATE_ME("Database is not ready yet, please try again after a while.");
         http_die ("internal-error", err.c_str ());
     }
 
+    // Sanity check end
+
+    // ##################################################
     // check user permissions
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
-        {BiosProfile::Dashboard, "R"},
-        {BiosProfile::Admin,     "R"}
-    };
+            {BiosProfile::Dashboard, "R"},
+            {BiosProfile::Admin,     "R"}
+            };
     CHECK_USER_PERMISSIONS_OR_DIE (PERMISSIONS);
 
     //ftylog_setVeboseMode(ftylog_getInstance());
@@ -107,7 +110,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
 
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
-    const char *COMMAND = "POWERCHAINS";
+    const char *COMMAND = "LOCATION";
 
     // get params
     std::string parameter_name;
@@ -115,18 +118,16 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     {
         std::string from = qparam.param("from");
         std::string to = qparam.param("to");
-        std::string filter_dc = qparam.param("filter_dc");
-        std::string filter_gr = qparam.param("filter_group");
 
         // not-empty count
-        int ne_count = (from.empty()?0:1) + (to.empty()?0:1) + (filter_dc.empty()?0:1) + (filter_gr.empty()?0:1);
+        int ne_count = (from.empty()?0:1) + (to.empty()?0:1);
         if (ne_count != 1) {
             log_error ("unexpected parameter (ne_count: %d)", ne_count);
             if (ne_count == 0) {
-                http_die("request-param-required", "from/to/filter_dc/filter_group");
+                http_die("request-param-required", "from/to");
             }
             else {
-                std::string err = TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
+                std::string err = TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to'");
                 http_die("parameter-conflict", err.c_str ());
             }
         }
@@ -139,35 +140,101 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
             parameter_name = "to";
             asset_id = to;
         }
-        else if (!filter_dc.empty()) {
-            parameter_name = "filter_dc";
-            asset_id = filter_dc;
-        }
-        else if (!filter_gr.empty()) {
-            parameter_name = "filter_group";
-            asset_id = filter_gr;
-        }
         else {
             log_error ("unexpected parameter");
-            http_die ("internal-error", "unexpected parameter");
+            std::string err = TRANSLATE_ME("Unexpected parameter");
+            http_die ("internal-error", err.c_str());
         }
     }
 
     log_trace ("%s, parameter_name: '%s', asset_id: '%s'",
         request.getUrl().c_str (), parameter_name.c_str (), asset_id.c_str ());
 
-    // db checks
+    // get options (depend on parameter_name)
+    std::string options;
     {
+        std::string filter = qparam.param("filter");
+        std::string feed_by = qparam.param("feed_by");
+        std::string recursive = qparam.param("recursive");
+
+        if (parameter_name == "to") {
+            // not-empty count
+            int ne_count = (filter.empty()?0:1) + (feed_by.empty()?0:1) + (recursive.empty()?0:1);
+
+            if (ne_count != 0) {
+                log_error("No option allowed by location/to request");
+                std::string err = TRANSLATE_ME("No additonal parameter is allowed with parameter 'to'");
+                http_die("parameter-conflict", err.c_str ());
+            }
+        }
+        else { // parameter_name == "from"
+            // recursive, boolean, 'false' by default
+            if (recursive.empty()) recursive = "false";
+            std::transform (recursive.begin(), recursive.end(), recursive.begin(), ::tolower);
+            if (recursive != "true" && recursive != "false") {
+                log_error("Boolean value expected ('%s')", recursive.c_str());
+                http_die("request-param-bad", "recursive", recursive.c_str(), "'true'/'false'");
+            }
+
+            // filter token, string, empty by default
+            std::transform (filter.begin(), filter.end(), filter.begin(), ::tolower);
+            if (!filter.empty ()) {
+                if (filter != "rooms"
+                    && filter != "rows"
+                    && filter != "racks"
+                    && filter != "devices"
+                    && filter != "groups") {
+                    http_die("request-param-bad", "filter", filter.c_str(), "'rooms'/'rows'/'racks'/'groups'/'devices'");
+                }
+            }
+
+            // feed_by device, string, empty by default
+            if (!feed_by.empty ()) {
+                if (filter != "devices") {
+                    std::string err = TRANSLATE_ME("Variable 'feed_by' can be specified only with 'filter=devices'");
+                    http_die("parameter-conflict", err.c_str ());
+                }
+                if (asset_id == "none") {
+                    std::string err = TRANSLATE_ME("Variable 'from' can not be 'none' if variable 'feed_by' is set.");
+                    http_die("parameter-conflict", err.c_str ());
+                }
+
+                //persist::is_power_device coded in db/topology2.cc
+                //tntdb::Connection conn = tntdb::connect (DBConn::url);
+                //if (!persist::is_power_device (conn, feed_by)) {
+                //    std::string expected = TRANSLATE_ME("must be a power device.");
+                //    http_die("request-param-bad", "feed_by", feed_by.c_str (), expected.c_str ());
+                //}
+            }
+
+            // set options (json paylaod)
+            options = "{ ";
+            options.append("\"filter\": \"").append(filter).append("\", ");
+            options.append("\"feed_by\": \"").append(feed_by).append("\", ");
+            options.append("\"recursive\": ").append(recursive); // bool
+            options.append(" }");
+        }
+    }
+
+    // accept 'none' asset_id only for 'from' request
+    if (asset_id == "none" && parameter_name != "from") {
+        log_error ("unexpected 'none' parameter");
+        std::string err = TRANSLATE_ME("'none' parameter is not allowed with the '%s' request", parameter_name.c_str());
+        http_die("parameter-conflict", err.c_str ());
+    }
+
+    // db checks (except if asset_id == 'none')
+    if (asset_id != "none") {
         // asset_id valid?
         if (!persist::is_ok_name (asset_id.c_str ()) ) {
             std::string expected = TRANSLATE_ME("valid asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+            http_die ("request-param-bad", parameter_name.c_str(), asset_id.c_str (), expected.c_str ());
         }
         // asset_id exist?
         int64_t rv = DBAssets::name_to_asset_id (asset_id);
         if (rv == -1) {
             std::string err = TRANSLATE_ME("existing asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), err.c_str ());
+            http_die ("request-param-bad", parameter_name.c_str(), asset_id.c_str (), err.c_str ());
         }
         if (rv == -2) {
             std::string err = TRANSLATE_ME("Connection to database failed.");
@@ -194,6 +261,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     zmsg_addstr (req, COMMAND);
     zmsg_addstr (req, parameter_name.c_str ());
     zmsg_addstr (req, asset_id.c_str ());
+    if (!options.empty()) zmsg_addstr (req, options.c_str ());
     zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, 5, &req);
     zmsg_destroy (&req);
 

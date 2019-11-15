@@ -1,0 +1,27 @@
+db/topology2(3)
+===============
+
+NAME
+----
+db_topology2 - Class for no title found
+
+SYNOPSIS
+--------
+----
+Please add '@interface' section in './../include/db/topology2.h'.
+Please add '@interface' section in './../src/db/topology2.cc'.
+----
+
+DESCRIPTION
+-----------
+
+Please add '@header' section in './../src/db/topology2.cc'.
+
+Please add '@discuss' section in './../src/db/topology2.cc'.
+
+EXAMPLE
+-------
+.From db/topology2_test method
+----
+Please add '@selftest' section in './../src/db/topology2.cc'.
+----

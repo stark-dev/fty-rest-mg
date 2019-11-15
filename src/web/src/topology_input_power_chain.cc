@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////
-// ./src/web/src/topology_xinput_power_chain.cc.cpp
+// ./src/web/src/topology_input_power_chain.cc.cpp
 // generated with ecppc
 //
 
@@ -14,7 +14,7 @@
 #include <stdexcept>
 
 // <%pre>
-#line 25 "./src/web/src/topology_xinput_power_chain.ecpp"
+#line 25 "./src/web/src/topology_input_power_chain.ecpp"
 
 #include <fty_common.h>
 #include <fty_common_macros.h>
@@ -47,7 +47,7 @@ class _component_ : public tnt::EcppComponent
     unsigned operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam);
 };
 
-static tnt::ComponentFactoryImpl<_component_> Factory("topology_xinput_power_chain");
+static tnt::ComponentFactoryImpl<_component_> Factory("topology_input_power_chain");
 
 // <%shared>
 // </%shared>
@@ -78,14 +78,14 @@ _component_::~_component_()
 unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam)
  {
 
-#line 41 "./src/web/src/topology_xinput_power_chain.ecpp"
+#line 41 "./src/web/src/topology_input_power_chain.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 42 "./src/web/src/topology_xinput_power_chain.ecpp"
+#line 42 "./src/web/src/topology_input_power_chain.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 44 "./src/web/src/topology_xinput_power_chain.ecpp"
+#line 44 "./src/web/src/topology_input_power_chain.ecpp"
 
 {
     // verify server is ready

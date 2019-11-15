@@ -26,19 +26,11 @@
 #ifndef SRC_INCLUDE_CLEANUP_H__
 #define SRC_INCLUDE_CLEANUP_H__
 
-// TODO: Later we will move this to configure
-#define LEGACY_PROTOCOL 1
-
 #include <czmq.h>
 #include <malamute.h>
 #include "ymsg.h"
 #include "app.h"
 #include "bios_agent.h"
-
-#ifdef LEGACY_PROTOCOL
-#include "msg/asset_msg.h"
-#include "msg/common_msg.h"
-#endif
 
 #ifndef __GNUC__
 #error Please use a compiler supporting attribute cleanup
@@ -47,6 +39,7 @@
 static inline void _destroy_zmsg (zmsg_t **self_p) {
     zmsg_destroy (self_p);
 }
+
 static inline void _destroy_ymsg (ymsg_t **self_p) {
     ymsg_destroy (self_p);
 }
@@ -59,17 +52,6 @@ static inline void _destroy_bios_agent (bios_agent_t **self_p) {
     bios_agent_destroy (self_p);
 }
 
-#ifdef LEGACY_PROTOCOL
-static inline void _destroy_asset_msg (asset_msg_t **self_p) {
-    asset_msg_destroy (self_p);
-}
-
-static inline void _destroy_common_msg (common_msg_t **self_p) {
-    common_msg_destroy (self_p);
-}
-
-#endif
-
 static inline void _destroy_zactor (zactor_t **self_p) {
     zactor_destroy (self_p);
 }
@@ -77,7 +59,6 @@ static inline void _destroy_zactor (zactor_t **self_p) {
 static inline void _destroy_zchunk (zchunk_t **self_p) {
     zchunk_destroy (self_p);
 }
-
 
 static inline void _destroy_zframe (zframe_t **self_p) {
     zframe_destroy (self_p);
@@ -126,11 +107,6 @@ static inline void _destroy_mlm_client (mlm_client_t **self_p) {
 #define _scoped_ymsg_t          _cleanup_(_destroy_ymsg) ymsg_t
 #define _scoped_app_t           _cleanup_(_destroy_app) app_t
 #define _scoped_bios_agent_t    _cleanup_(_destroy_bios_agent) bios_agent_t
-
-#ifdef LEGACY_PROTOCOL
-#define _scoped_asset_msg_t     _cleanup_(_destroy_asset_msg) asset_msg_t
-#define _scoped_common_msg_t    _cleanup_(_destroy_common_msg) common_msg_t
-#endif
 
 #define _scoped_zactor_t    _cleanup_(_destroy_zactor) zactor_t
 #define _scoped_zchunk_t    _cleanup_(_destroy_zchunk) zchunk_t

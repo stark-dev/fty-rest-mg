@@ -11,12 +11,6 @@
 *.xml7
 
 # Ignore the source doc texts generated from program sources
-db_topology2.txt
-db_topology2.doc
-msg_asset_msg.txt
-msg_asset_msg.doc
-msg_common_msg.txt
-msg_common_msg.doc
 shared_augtool.txt
 shared_augtool.doc
 shared_cidr.txt
@@ -43,8 +37,6 @@ web_src_asset_computed_impl.txt
 web_src_asset_computed_impl.doc
 web_src_iface.txt
 web_src_iface.doc
-web_src_location_helpers.txt
-web_src_location_helpers.doc
 web_src_sse.txt
 web_src_sse.doc
 db/bios-csv.txt
