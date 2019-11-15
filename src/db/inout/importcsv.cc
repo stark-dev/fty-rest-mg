@@ -1251,16 +1251,19 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
                     throw std::invalid_argument(errmsg);
                 }
 
-                if (type == "device" && status == "active" && subtype_id != rack_controller_id)
+                if (type == "device" && subtype_id != rack_controller_id)
                 {
                     // deactivate and then  activate the device
                      try
                      {
-                         std::string asset_json = getJsonAsset (NULL, m.id);
                          mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
                          fty::AssetActivator activationAccessor (client);
                          activationAccessor.deactivate (old_asset_json);
-                         activationAccessor.activate (asset_json);
+                         if (status == "active")
+                         {
+                            std::string asset_json = getJsonAsset (NULL, m.id);
+                            activationAccessor.activate (asset_json);
+                         }
                      }
                      catch (const std::exception &e)
                      {
