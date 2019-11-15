@@ -123,8 +123,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         if (ne_count != 1) {
             log_error ("unexpected parameter (ne_count: %d)", ne_count);
             if (ne_count == 0) {
-                std::string err = TRANSLATE_ME("'from', 'to', 'filter_dc' or 'filter_group'");
-                http_die("request-param-required", err.c_str ());
+                http_die("request-param-required", "from/to/filter_dc/filter_group");
             }
             else {
                 std::string err = TRANSLATE_ME("Only one parameter can be specified at once: 'from' or 'to' or 'filter_dc' or 'filter_group'");
@@ -167,8 +166,8 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         // asset_id exist?
         int64_t rv = DBAssets::name_to_asset_id (asset_id);
         if (rv == -1) {
-            std::string expected = TRANSLATE_ME("existing asset name");
-            http_die ("request-param-bad", "id", asset_id.c_str (), expected.c_str ());
+            std::string err = TRANSLATE_ME("existing asset name");
+            http_die ("request-param-bad", "id", asset_id.c_str (), err.c_str ());
         }
         if (rv == -2) {
             std::string err = TRANSLATE_ME("Connection to database failed.");
@@ -230,9 +229,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         zmsg_pop_s(resp, reason);
         CLEANUP;
         log_error ("received %s status (reason: %s) from mlm client", rx_status.c_str(), reason.c_str ());
-        http_die ("internal-error", JSONIFY (reason.c_str ()).c_str ());
-        //std::string err = TRANSLATE_ME("Received %s status (reason: %s).", rx_status.c_str(), reason.c_str ());
-        //http_die ("internal-error", err.c_str());
+        http_die ("request-param-bad", JSONIFY (reason.c_str ()).c_str ());
     }
 
     // result JSON payload
