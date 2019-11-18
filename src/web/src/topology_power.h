@@ -22,24 +22,4 @@
 #ifndef WEB_SRC_TOPOLOGY_POWER_H_INCLUDED
 #define WEB_SRC_TOPOLOGY_POWER_H_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-//  @interface
-//  Create a new web_src_topology_power
-FTY_REST_PRIVATE web_src_topology_power_t *
-    web_src_topology_power_new (void);
-
-//  Destroy the web_src_topology_power
-FTY_REST_PRIVATE void
-    web_src_topology_power_destroy (web_src_topology_power_t **self_p);
-
-
-//  @end
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif

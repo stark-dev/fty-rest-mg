@@ -20,7 +20,7 @@
 /*!
  * \file topology_input_power_chain.ecpp
  * \author François-Régis Degott <FrancoisRegisDegott@Eaton.com>
- * \brief  process topology input powerchain request via 'asset-agent'TOPOLOGY mailbox
+ * \brief  process topology input powerchain request via 'asset-agent' TOPOLOGY mailbox
  */
  #><%pre>
 #include <fty_common.h>

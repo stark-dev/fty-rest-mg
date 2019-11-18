@@ -22,24 +22,4 @@
 #ifndef WEB_SRC_TOPOLOGY_INPUT_POWER_CHAIN_H_INCLUDED
 #define WEB_SRC_TOPOLOGY_INPUT_POWER_CHAIN_H_INCLUDED
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-//  @interface
-//  Create a new web_src_topology_input_power_chain
-FTY_REST_PRIVATE web_src_topology_input_power_chain_t *
-    web_src_topology_input_power_chain_new (void);
-
-//  Destroy the web_src_topology_input_power_chain
-FTY_REST_PRIVATE void
-    web_src_topology_input_power_chain_destroy (web_src_topology_input_power_chain_t **self_p);
-
-
-//  @end
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif
