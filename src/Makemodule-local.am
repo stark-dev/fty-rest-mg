@@ -640,6 +640,8 @@ test_db_asset_crud_CPPFLAGS = \
 test_db_asset_crud_LDFLAGS = \
 			${tntdb_LIBS} ${cxxtools_LIBS} ${cidr_LIBS} ${czmq_LIBS}
 
+
+#### total power tests
 cibin_programs += 	test-totalpower
 
 test_totalpower_SOURCES = \

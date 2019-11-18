@@ -199,7 +199,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
                     http_die("parameter-conflict", err.c_str ());
                 }
 
-                //persist::is_power_device coded in db/topology2.cc
+                //persist::is_power_device was coded in db/topology2.cc
                 //tntdb::Connection conn = tntdb::connect (DBConn::url);
                 //if (!persist::is_power_device (conn, feed_by)) {
                 //    std::string expected = TRANSLATE_ME("must be a power device.");
@@ -207,7 +207,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
                 //}
             }
 
-            // set options (json paylaod)
+            // set options (json payload)
             options = "{ ";
             options.append("\"filter\": \"").append(filter).append("\", ");
             options.append("\"feed_by\": \"").append(feed_by).append("\", ");

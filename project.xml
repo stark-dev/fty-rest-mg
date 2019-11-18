@@ -452,8 +452,8 @@
     <class name = "db/asset_general" private = "1" selftest = "0" />
 
     <header name = "db/dbhelpers" private = "0" />
-    <header name = "db/types" private = "0" />
     <class name = "db/inout" private = "1" selftest = "0" />
+    <header name = "db/types" private = "0" />
 
     <class name = "db/inout/exportcsv" private = "1" selftest = "0" />
     <class name = "db/inout/importcsv" private = "1" selftest = "0" />
