@@ -95,8 +95,6 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
         http_die ("internal-error", err.c_str ());
     }
 
-    // Sanity check end
-
     // ##################################################
     // check user permissions
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
