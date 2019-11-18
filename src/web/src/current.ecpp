@@ -348,7 +348,8 @@ std::vector<uint32_t> asset_ids;
         {
             // BIOS-951 -- begin
             cxxtools::RegexSMatch s;
-            if (persist::is_epdu (asset.item.subtype_id) &&
+            if ( (persist::is_epdu (asset.item.subtype_id) ||
+                persist::is_ups (asset.item.subtype_id)) &&
                 outlet_properties_re.match (one_measurement.first, s)) {
 
                 if (outlet_properties.count (s.get (3)) == 0)
