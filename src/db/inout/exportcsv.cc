@@ -418,11 +418,14 @@ void
           return;
         }
         a_elmnt_id_t id_parent_num = 0;
+        int parent_typeid = -1;
         std::string location;
         r["id_parent"].get(id_parent_num);
+        r["id_parent_type"].get(parent_typeid);
         std::pair<std::string,std::string> location_names = DBAssets::id_to_name_ext_name (id_parent_num);
         location = location_names.second;
         std::string location_id = location_names.first;
+        std::string location_type = typeid_to_type(parent_typeid);
 
         // 2.1      select all extended attributes
         std::map <std::string, std::pair<std::string, bool> > ext_attrs;
@@ -465,6 +468,7 @@ void
         if(!location.empty()) {
           si_asset.addMember("location_uri") <<= "/api/v1/asset/" + location_id;
           si_asset.addMember("location_id") <<= location_id;
+          si_asset.addMember("location_type") <<= location_type;
         }
         si_asset.addMember("location") <<= location;
 
