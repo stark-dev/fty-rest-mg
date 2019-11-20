@@ -457,7 +457,7 @@ libpriv_utils_la_SOURCES = 	\
 				src/shared/configure_inform.cc \
 				include/shared/configure_inform.h \
 				src/shared/magic.cc \
-				include/bios_magic.h
+				include/bios_magic.h \
 				include/shared/data.h \
 				src/shared/data.cc \
 				include/web/src/asset_computed_impl.h \
