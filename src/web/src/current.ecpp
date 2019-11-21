@@ -1,6 +1,6 @@
 <#
  #
- # Copyright (C) 2015 - 2018 Eaton
+ # Copyright (C) 2015 - 2019 Eaton
  #
  # This program is free software; you can redistribute it and/or modify
  # it under the terms of the GNU General Public License as published by
@@ -72,12 +72,14 @@ s_os2string(
 }
 
 struct OutletProperties {
+    double power;
     double realpower;
     double current;
     double voltage;
     std::string status;
 
     OutletProperties ():
+        power (NAN),
         realpower (NAN),
         current (NAN),
         voltage (NAN),
@@ -85,6 +87,9 @@ struct OutletProperties {
     {};
 
     void put (const std::string &key, double value) {
+        if (key == "power")
+            power = value;
+        else
         if (key == "realpower")
             realpower = value;
         else
@@ -100,6 +105,8 @@ struct OutletProperties {
 
     std::string toJson () const {
         std::string ret = "{";
+        ret += utils::json::jsonify ("power", power);
+        ret += ", ";
         ret += utils::json::jsonify ("realpower", realpower);
         ret += ", ";
         ret += utils::json::jsonify ("current", current);
@@ -166,7 +173,7 @@ std::vector<uint32_t> asset_ids;
 
 
 {
-    cxxtools::Regex outlet_properties_re {"(realpower|current|voltage|status).(outlet).([0-9]+)"};
+    cxxtools::Regex outlet_properties_re {"(power|realpower|current|voltage|status).(outlet).([0-9]+)"};
 
 
     if (asset_ids.empty()) {
@@ -341,7 +348,8 @@ std::vector<uint32_t> asset_ids;
         {
             // BIOS-951 -- begin
             cxxtools::RegexSMatch s;
-            if (persist::is_epdu (asset.item.subtype_id) &&
+            if ( (persist::is_epdu (asset.item.subtype_id) ||
+                persist::is_ups (asset.item.subtype_id)) &&
                 outlet_properties_re.match (one_measurement.first, s)) {
 
                 if (outlet_properties.count (s.get (3)) == 0)
@@ -372,6 +380,7 @@ std::vector<uint32_t> asset_ids;
             for (const auto &it : outlet_properties) {
                 cxxtools::SerializationInfo& siOutletProperties = sioutlets.addMember(it.first);
 
+                siOutletProperties.addMember("power") <<= it.second.power;
                 siOutletProperties.addMember("realpower") <<= it.second.realpower;
                 siOutletProperties.addMember("current") <<= it.second.current;
                 siOutletProperties.addMember("voltage") <<= it.second.voltage;
