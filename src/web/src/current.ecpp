@@ -375,7 +375,8 @@ std::vector<uint32_t> asset_ids;
         }
 
         // BIOS-951 -- begin
-        if (persist::is_epdu (asset.item.subtype_id)) {
+        if (persist::is_epdu (asset.item.subtype_id) ||
+            persist::is_ups (asset.item.subtype_id)) {
             cxxtools::SerializationInfo& sioutlets = siJson.addMember("outlets");
             for (const auto &it : outlet_properties) {
                 cxxtools::SerializationInfo& siOutletProperties = sioutlets.addMember(it.first);
