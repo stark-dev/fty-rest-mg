@@ -29,12 +29,11 @@
 #include <fty_common_db.h>
 #include <fty_common_mlm_tntmlm.h>
 
-// set S with MSG popped frame (no memleak, S untouched if NULL frame)
+// set S with MSG popped frame (S unchanged if NULL frame)
 static void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
     char *aux = msg ? zmsg_popstr (msg) : NULL;
-    if (aux) s = aux;
-    zstr_free (&aux);
+    if (aux) { s = aux; zstr_free (&aux); }
 }
 </%pre>
 <%request scope="global">
@@ -64,6 +63,7 @@ bool database_ready;
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "LOCATION";
+    const int TIMEOUT = 5; // seconds
 
     // get params
     std::string parameter_name;
@@ -89,14 +89,9 @@ bool database_ready;
             parameter_name = "from";
             asset_id = from;
         }
-        else if (!to.empty()) {
+        else { // !to.empty()
             parameter_name = "to";
             asset_id = to;
-        }
-        else {
-            log_error ("unexpected parameter");
-            std::string err = TRANSLATE_ME("Unexpected parameter");
-            http_die ("internal-error", err.c_str());
         }
     }
 
@@ -159,7 +154,8 @@ bool database_ready;
                     http_die("parameter-conflict", err.c_str ());
                 }
 
-                //persist::is_power_device was coded in db/topology2.cc
+                // persist::is_power_device was coded in db/topology2.cc
+                // this check is done forward by the fty-asset TOPOLOGY service
                 //tntdb::Connection conn = tntdb::connect (DBConn::url);
                 //if (!persist::is_power_device (conn, feed_by)) {
                 //    std::string expected = TRANSLATE_ME("must be a power device.");
@@ -168,16 +164,16 @@ bool database_ready;
             }
 
             // set options (json payload)
-            options = "{ ";
-            options.append("\"filter\": \"").append(filter).append("\", ");
-            options.append("\"feed_by\": \"").append(feed_by).append("\", ");
-            options.append("\"recursive\": ").append(recursive); // bool
-            options.append(" }");
+            options = "{";
+            options += "\"filter\": \"" + filter  + "\", ";
+            options += "\"feed_by\": \"" + feed_by + "\", ";
+            options += "\"recursive\": " + recursive; // bool
+            options += "}";
         }
     }
 
     // accept 'none' asset_id only for 'from' request
-    if (asset_id == "none" && parameter_name != "from") {
+    if ((asset_id == "none") && (parameter_name != "from")) {
         log_error ("unexpected 'none' parameter");
         std::string err = TRANSLATE_ME("'none' parameter is not allowed with the '%s' request", parameter_name.c_str());
         http_die("parameter-conflict", err.c_str ());
@@ -222,14 +218,14 @@ bool database_ready;
     zmsg_addstr (req, parameter_name.c_str ());
     zmsg_addstr (req, asset_id.c_str ());
     if (!options.empty()) zmsg_addstr (req, options.c_str ());
-    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, 5, &req);
+    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, TIMEOUT, &req);
     zmsg_destroy (&req);
 
     #define CLEANUP { zmsg_destroy (&resp); }
 
     if (!resp) {
         CLEANUP;
-        log_error ("client->requestreply (timeout = '5') failed");
+        log_error ("client->requestreply (timeout = %d s) failed", TIMEOUT);
         std::string err = TRANSLATE_ME("Request to mlm client failed (timeout reached).");
         http_die ("internal-error", err.c_str());
     }

@@ -29,12 +29,11 @@
 #include <fty_common_db.h>
 #include <fty_common_mlm_tntmlm.h>
 
-// set S with MSG popped frame (no memleak, S untouched if NULL frame)
+// set S with MSG popped frame (S unchanged if NULL frame)
 static void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
     char *aux = msg ? zmsg_popstr (msg) : NULL;
-    if (aux) s = aux;
-    zstr_free (&aux);
+    if (aux) { s = aux; zstr_free (&aux); }
 }
 </%pre>
 <%request scope="global">
@@ -62,6 +61,7 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "INPUT_POWERCHAIN";
+    const int TIMEOUT = 5; // seconds
 
     // get param, id of datacenter retrieved from url
     std::string asset_id = request.getArg ("id");
@@ -109,14 +109,14 @@ static void zmsg_pop_s (zmsg_t *msg, std::string & s)
 
     zmsg_addstr (req, COMMAND);
     zmsg_addstr (req, asset_id.c_str ());
-    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, 5, &req);
+    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, TIMEOUT, &req);
     zmsg_destroy (&req);
 
     #define CLEANUP { zmsg_destroy (&resp); }
 
     if (!resp) {
         CLEANUP;
-        log_error ("client->requestreply (timeout = '5') failed");
+        log_error ("client->requestreply (timeout = %d s) failed", TIMEOUT);
         std::string err = TRANSLATE_ME("Request to mlm client failed (timeout reached).");
         http_die ("internal-error", err.c_str());
     }

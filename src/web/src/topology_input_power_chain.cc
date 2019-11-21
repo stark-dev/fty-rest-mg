@@ -22,12 +22,11 @@
 #include <fty_common_db.h>
 #include <fty_common_mlm_tntmlm.h>
 
-// set S with MSG popped frame (no memleak, S untouched if NULL frame)
+// set S with MSG popped frame (S unchanged if NULL frame)
 static void zmsg_pop_s (zmsg_t *msg, std::string & s)
 {
     char *aux = msg ? zmsg_popstr (msg) : NULL;
-    if (aux) s = aux;
-    zstr_free (&aux);
+    if (aux) { s = aux; zstr_free (&aux); }
 }
 
 // </%pre>
@@ -78,14 +77,14 @@ _component_::~_component_()
 unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& reply, tnt::QueryParams& qparam)
  {
 
-#line 41 "./src/web/src/topology_input_power_chain.ecpp"
+#line 40 "./src/web/src/topology_input_power_chain.ecpp"
   typedef UserInfo user_type;
   TNT_REQUEST_GLOBAL_VAR(user_type, user, "UserInfo user", ());   // <%request> UserInfo user
-#line 42 "./src/web/src/topology_input_power_chain.ecpp"
+#line 41 "./src/web/src/topology_input_power_chain.ecpp"
   typedef bool database_ready_type;
   TNT_REQUEST_GLOBAL_VAR(database_ready_type, database_ready, "bool database_ready", ());   // <%request> bool database_ready
   // <%cpp>
-#line 44 "./src/web/src/topology_input_power_chain.ecpp"
+#line 43 "./src/web/src/topology_input_power_chain.ecpp"
 
 {
     // verify server is ready
@@ -107,6 +106,7 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
     const char *ADDRESS = AGENT_FTY_ASSET; // "asset-agent" 42ty/fty-asset
     const char *SUBJECT = "TOPOLOGY";
     const char *COMMAND = "INPUT_POWERCHAIN";
+    const int TIMEOUT = 5; // seconds
 
     // get param, id of datacenter retrieved from url
     std::string asset_id = request.getArg ("id");
@@ -154,14 +154,14 @@ unsigned _component_::operator() (tnt::HttpRequest& request, tnt::HttpReply& rep
 
     zmsg_addstr (req, COMMAND);
     zmsg_addstr (req, asset_id.c_str ());
-    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, 5, &req);
+    zmsg_t *resp = client->requestreply (ADDRESS, SUBJECT, TIMEOUT, &req);
     zmsg_destroy (&req);
 
     #define CLEANUP { zmsg_destroy (&resp); }
 
     if (!resp) {
         CLEANUP;
-        log_error ("client->requestreply (timeout = '5') failed");
+        log_error ("client->requestreply (timeout = %d s) failed", TIMEOUT);
         std::string err = TRANSLATE_ME("Request to mlm client failed (timeout reached).");
         http_die ("internal-error", err.c_str());
     }
