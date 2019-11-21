@@ -424,35 +424,22 @@
       </args>
     </mapping>
 
-    <mapping>
-      <target>topology_location_from2@libfty_rest</target>
-      <url>^/api/v1/topology/location.*$</url>
-      <method>GET</method>
-    </mapping>
+    <!-- topology -->
 
-    <!-- topology/location -->
-    <mapping>
-      <target>topology_location_from@libfty_rest</target>
-      <url>^/api/v1/topology/location.*$</url>
-      <method>GET</method>
-    </mapping>
-
-    <mapping>
-      <target>topology_location_to@libfty_rest</target>
-      <url>^/api/v1/topology/location.*$</url>
-      <method>GET</method>
-    </mapping>
-
-    <!-- topology/power -->
     <mapping>
       <target>topology_power@libfty_rest</target>
       <url>^/api/v1/topology/power.*$</url>
       <method>GET</method>
     </mapping>
 
-    <!-- Get input power chain -->
     <mapping>
-      <target>input_power_chain@libfty_rest</target>
+      <target>topology_location@libfty_rest</target>
+      <url>^/api/v1/topology/location.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <mapping>
+      <target>topology_input_power_chain@libfty_rest</target>
       <method>GET</method>
       <url>^/api/v1/topology/input_power_chain/(.+)$</url>
       <args>

@@ -90,7 +90,6 @@ EXTRA_DIST += \
     src/db/inout/exportcsv.h \
     src/db/inout/importcsv.h \
     src/persist/assetcrud.h \
-    src/persist/assettopology.h \
     src/persist/dbhelpers.h \
     src/persist/monitor.h \
     src/persist/persist_error.h \
@@ -130,7 +129,6 @@ EXTRA_DIST += \
     src/web/src/getlog_GET.h \
     src/web/src/gpo_action.h \
     src/web/src/info.h \
-    src/web/src/input_power_chain.h \
     src/web/src/json.h \
     src/web/src/license.h \
     src/web/src/license_POST.h \
@@ -151,10 +149,9 @@ EXTRA_DIST += \
     src/web/src/systemctl.h \
     src/web/src/time.h \
     src/web/src/uptime.h \
-    src/web/src/topology_location_from2.h \
-    src/web/src/topology_location_from.h \
-    src/web/src/topology_location_to.h \
+    src/web/src/topology_location.h \
     src/web/src/topology_power.h \
+    src/web/src/topology_input_power_chain.h \
     src/web/src/admin_passwd.h \
     src/web/src/security_removeheaders.h \
     src/web/src/hw_capability.h \

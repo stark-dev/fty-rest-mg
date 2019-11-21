@@ -57,10 +57,6 @@ typedef struct _db_inout_importcsv_t db_inout_importcsv_t;
 typedef struct _persist_assetcrud_t persist_assetcrud_t;
 #define PERSIST_ASSETCRUD_T_DEFINED
 #endif
-#ifndef PERSIST_ASSETTOPOLOGY_T_DEFINED
-typedef struct _persist_assettopology_t persist_assettopology_t;
-#define PERSIST_ASSETTOPOLOGY_T_DEFINED
-#endif
 #ifndef PERSIST_DBHELPERS_T_DEFINED
 typedef struct _persist_dbhelpers_t persist_dbhelpers_t;
 #define PERSIST_DBHELPERS_T_DEFINED
@@ -217,10 +213,6 @@ typedef struct _web_src_gpo_action_t web_src_gpo_action_t;
 typedef struct _web_src_info_t web_src_info_t;
 #define WEB_SRC_INFO_T_DEFINED
 #endif
-#ifndef WEB_SRC_INPUT_POWER_CHAIN_T_DEFINED
-typedef struct _web_src_input_power_chain_t web_src_input_power_chain_t;
-#define WEB_SRC_INPUT_POWER_CHAIN_T_DEFINED
-#endif
 #ifndef WEB_SRC_JSON_T_DEFINED
 typedef struct _web_src_json_t web_src_json_t;
 #define WEB_SRC_JSON_T_DEFINED
@@ -301,21 +293,17 @@ typedef struct _web_src_time_t web_src_time_t;
 typedef struct _web_src_uptime_t web_src_uptime_t;
 #define WEB_SRC_UPTIME_T_DEFINED
 #endif
-#ifndef WEB_SRC_TOPOLOGY_LOCATION_FROM2_T_DEFINED
-typedef struct _web_src_topology_location_from2_t web_src_topology_location_from2_t;
-#define WEB_SRC_TOPOLOGY_LOCATION_FROM2_T_DEFINED
-#endif
-#ifndef WEB_SRC_TOPOLOGY_LOCATION_FROM_T_DEFINED
-typedef struct _web_src_topology_location_from_t web_src_topology_location_from_t;
-#define WEB_SRC_TOPOLOGY_LOCATION_FROM_T_DEFINED
-#endif
-#ifndef WEB_SRC_TOPOLOGY_LOCATION_TO_T_DEFINED
-typedef struct _web_src_topology_location_to_t web_src_topology_location_to_t;
-#define WEB_SRC_TOPOLOGY_LOCATION_TO_T_DEFINED
+#ifndef WEB_SRC_TOPOLOGY_LOCATION_T_DEFINED
+typedef struct _web_src_topology_location_t web_src_topology_location_t;
+#define WEB_SRC_TOPOLOGY_LOCATION_T_DEFINED
 #endif
 #ifndef WEB_SRC_TOPOLOGY_POWER_T_DEFINED
 typedef struct _web_src_topology_power_t web_src_topology_power_t;
 #define WEB_SRC_TOPOLOGY_POWER_T_DEFINED
+#endif
+#ifndef WEB_SRC_TOPOLOGY_INPUT_POWER_CHAIN_T_DEFINED
+typedef struct _web_src_topology_input_power_chain_t web_src_topology_input_power_chain_t;
+#define WEB_SRC_TOPOLOGY_INPUT_POWER_CHAIN_T_DEFINED
 #endif
 #ifndef WEB_SRC_ADMIN_PASSWD_T_DEFINED
 typedef struct _web_src_admin_passwd_t web_src_admin_passwd_t;
@@ -340,7 +328,6 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "db/inout/exportcsv.h"
 #include "db/inout/importcsv.h"
 #include "persist/assetcrud.h"
-#include "persist/assettopology.h"
 #include "persist/dbhelpers.h"
 #include "persist/monitor.h"
 #include "persist/persist_error.h"
@@ -380,7 +367,6 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/getlog_GET.h"
 #include "web/src/gpo_action.h"
 #include "web/src/info.h"
-#include "web/src/input_power_chain.h"
 #include "web/src/json.h"
 #include "web/src/license.h"
 #include "web/src/license_POST.h"
@@ -401,10 +387,9 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "web/src/systemctl.h"
 #include "web/src/time.h"
 #include "web/src/uptime.h"
-#include "web/src/topology_location_from2.h"
-#include "web/src/topology_location_from.h"
-#include "web/src/topology_location_to.h"
+#include "web/src/topology_location.h"
 #include "web/src/topology_power.h"
+#include "web/src/topology_input_power_chain.h"
 #include "web/src/admin_passwd.h"
 #include "web/src/security_removeheaders.h"
 #include "web/src/hw_capability.h"

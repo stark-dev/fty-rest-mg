@@ -96,12 +96,6 @@
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
 #ifdef FTY_REST_BUILD_DRAFT_API
-typedef struct _db_topology2_t db_topology2_t;
-#define DB_TOPOLOGY2_T_DEFINED
-typedef struct _msg_asset_msg_t msg_asset_msg_t;
-#define MSG_ASSET_MSG_T_DEFINED
-typedef struct _msg_common_msg_t msg_common_msg_t;
-#define MSG_COMMON_MSG_T_DEFINED
 typedef struct _shared_augtool_t shared_augtool_t;
 #define SHARED_AUGTOOL_T_DEFINED
 typedef struct _shared_cidr_t shared_cidr_t;
@@ -128,8 +122,6 @@ typedef struct _web_src_asset_computed_impl_t web_src_asset_computed_impl_t;
 #define WEB_SRC_ASSET_COMPUTED_IMPL_T_DEFINED
 typedef struct _web_src_iface_t web_src_iface_t;
 #define WEB_SRC_IFACE_T_DEFINED
-typedef struct _web_src_location_helpers_t web_src_location_helpers_t;
-#define WEB_SRC_LOCATION_HELPERS_T_DEFINED
 typedef struct _web_src_sse_t web_src_sse_t;
 #define WEB_SRC_SSE_T_DEFINED
 #endif // FTY_REST_BUILD_DRAFT_API
@@ -148,9 +140,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "db/dbhelpers.h"
 #include "db/types.h"
 #ifdef FTY_REST_BUILD_DRAFT_API
-#include "db/topology2.h"
-#include "msg/asset_msg.h"
-#include "msg/common_msg.h"
 #include "shared/augtool.h"
 #include "shared/cidr.h"
 #include "shared/configure_inform.h"
@@ -164,7 +153,6 @@ typedef struct _web_src_sse_t web_src_sse_t;
 #include "shared/utils_json.h"
 #include "web/src/asset_computed_impl.h"
 #include "web/src/iface.h"
-#include "web/src/location_helpers.h"
 #include "web/src/sse.h"
 #endif // FTY_REST_BUILD_DRAFT_API
 

@@ -19,7 +19,6 @@ src_libfty_rest_la_SOURCES = \
     src/db/inout/exportcsv.cc \
     src/db/inout/importcsv.cc \
     src/persist/assetcrud.cc \
-    src/persist/assettopology.cc \
     src/persist/dbhelpers.cc \
     src/persist/monitor.cc \
     src/persist/persist_error.cc \
@@ -59,7 +58,6 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/getlog_GET.cc \
     src/web/src/gpo_action.cc \
     src/web/src/info.cc \
-    src/web/src/input_power_chain.cc \
     src/web/src/json.cc \
     src/web/src/license.cc \
     src/web/src/license_POST.cc \
@@ -80,10 +78,9 @@ src_libfty_rest_la_SOURCES = \
     src/web/src/systemctl.cc \
     src/web/src/time.cc \
     src/web/src/uptime.cc \
-    src/web/src/topology_location_from2.cc \
-    src/web/src/topology_location_from.cc \
-    src/web/src/topology_location_to.cc \
+    src/web/src/topology_location.cc \
     src/web/src/topology_power.cc \
+    src/web/src/topology_input_power_chain.cc \
     src/web/src/admin_passwd.cc \
     src/web/src/security_removeheaders.cc \
     src/web/src/hw_capability.cc \
@@ -91,9 +88,6 @@ src_libfty_rest_la_SOURCES = \
 
 if ENABLE_DRAFTS
 src_libfty_rest_la_SOURCES += \
-    src/db/topology2.cc \
-    src/msg/asset_msg.cc \
-    src/msg/common_msg.cc \
     src/shared/augtool.cc \
     src/shared/cidr.cc \
     src/shared/configure_inform.cc \
@@ -107,7 +101,6 @@ src_libfty_rest_la_SOURCES += \
     src/shared/utils_json.cc \
     src/web/src/asset_computed_impl.cc \
     src/web/src/iface.cc \
-    src/web/src/location_helpers.cc \
     src/web/src/sse.cc
 
 endif
