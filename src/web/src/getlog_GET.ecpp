@@ -333,6 +333,7 @@ UserInfo user;
     } logsData [] = {
         { "messages",       "/var/log/messages" },
         { "www-audit",      "/var/log/tntnet/www-audit.log" },
+        { "mass-mgr-audit", "/var/log/etn-mass-management.audit.log" },
         { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log" },
         { "journald",       "/tmp/journald.log" }, // gen. by journalctl
         { "ALL",            "/tmp/getlog_all.tar" }, // archive, all logfiles above
