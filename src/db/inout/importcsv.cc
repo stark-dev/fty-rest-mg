@@ -733,11 +733,11 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
         operation = persist::asset_operation::UPDATE;
     }
 
-    // store old asset for correct deactivation
-    std::string old_asset_json;
+    // store old asset status for correct deactivation
+    std::string old_asset_status;
     if (operation == persist::asset_operation::UPDATE)
     {
-        old_asset_json = getJsonAsset (NULL, id);
+        old_asset_status = DBAssets::get_status_from_db_helper (id_str);
     }
 
     auto ename = cm.get(row_i, "name");
@@ -1253,25 +1253,38 @@ static std::pair<db_a_elmnt_t, persist::asset_operation>
 
                 if (type == "device" && subtype_id != rack_controller_id)
                 {
-                    // deactivate and then  activate the device
-                     try
-                     {
-                         mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
-                         fty::AssetActivator activationAccessor (client);
-                         activationAccessor.deactivate (old_asset_json);
-                         if (status == "active")
-                         {
+                    if (status == "active")
+                    {
+                        try
+                        {
+                            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+                            fty::AssetActivator activationAccessor (client);
                             std::string asset_json = getJsonAsset (NULL, m.id);
                             activationAccessor.activate (asset_json);
-                         }
-                     }
-                     catch (const std::exception &e)
-                     {
-                         trans.rollback();
-                         std::string err = JSONIFY (e.what());
-                         bios_throw ("licensing-err", err.c_str ())
-                     }
-
+                        }
+                        catch (const std::exception &e)
+                        {
+                            trans.rollback();
+                            std::string err = JSONIFY (e.what());
+                            bios_throw ("licensing-err", err.c_str ())
+                        }
+                    }
+                    else if (old_asset_status == "active" && status == "nonactive")
+                    {
+                        try
+                        {
+                            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+                            fty::AssetActivator activationAccessor (client);
+                            std::string asset_json = getJsonAsset (NULL, m.id);
+                            activationAccessor.deactivate (asset_json);
+                        }
+                        catch (const std::exception &e)
+                        {
+                            trans.rollback();
+                            std::string err = JSONIFY (e.what());
+                            bios_throw ("licensing-err", err.c_str ())
+                        }
+                    }
                 }
             }
             else
