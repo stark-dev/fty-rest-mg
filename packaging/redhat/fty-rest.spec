@@ -64,15 +64,13 @@ BuildRequires:  cxxtools-devel
 BuildRequires:  tntnet-devel
 BuildRequires:  tntdb-devel
 BuildRequires:  file-devel
-BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-db-devel
 BuildRequires:  fty-common-rest-devel
-BuildRequires:  malamute-devel >= 1.0.0
-BuildRequires:  openssl-devel
 BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
+BuildRequires:  malamute-devel
 BuildRequires:  fty-proto-devel >= 1.0.0
 BuildRequires:  fty_shm-devel >= 1.0.0
 BuildRequires:  fty-asset-activator-devel
@@ -114,15 +112,13 @@ Requires:       cxxtools-devel
 Requires:       tntnet-devel
 Requires:       tntdb-devel
 Requires:       file-devel
-Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
 Requires:       fty-common-db-devel
 Requires:       fty-common-rest-devel
-Requires:       malamute-devel >= 1.0.0
-Requires:       openssl-devel
 Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
+Requires:       malamute-devel
 Requires:       fty-proto-devel >= 1.0.0
 Requires:       fty_shm-devel >= 1.0.0
 Requires:       fty-asset-activator-devel
