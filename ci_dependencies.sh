@@ -46,7 +46,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libsodium.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -81,7 +82,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -113,7 +116,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libzmq.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -148,7 +152,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -180,7 +186,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/czmq.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -215,7 +222,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -247,7 +256,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libcidr.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -282,7 +292,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -314,7 +326,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/cxxtools.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -349,7 +362,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -381,7 +396,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/tntnet.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -416,7 +432,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -448,7 +466,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/tntdb.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     cd ./tntdb
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
@@ -484,7 +503,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -516,7 +537,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/libmagic.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -551,7 +573,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
     CONFIG_OPTS+=("--with-libmagic=yes")
 fi
 else
@@ -586,7 +610,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-logging.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -621,7 +646,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -653,7 +680,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -688,7 +716,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -720,7 +750,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-db.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -755,7 +786,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -787,7 +820,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-rest.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -822,7 +856,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -854,7 +890,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-mlm.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -889,7 +926,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -931,7 +970,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/zeromq/malamute.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -966,7 +1006,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -998,7 +1040,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-proto.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -1033,7 +1076,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -1065,7 +1110,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-shm.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -1100,7 +1146,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -1132,7 +1180,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-asset-activator $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -1167,7 +1216,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -1199,7 +1250,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-messagebus.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -1234,7 +1286,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
@@ -1266,7 +1320,8 @@ else
             $CI_TIME git clone --quiet --depth 1 https://github.com/42ity/fty-common-dto.git $FOLDER_NAME
         fi
     fi
-    cd "./$FOLDER_NAME"
+    echo "Entering in ${PWD}/${FOLDER_NAME}"
+    cd "./${FOLDER_NAME}"
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
         git --no-pager log --oneline -n1
@@ -1301,7 +1356,9 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
+    echo "Leaving in ${PWD}"
     cd "${BASE_PWD}"
+    echo "Now in ${PWD}"
 fi
 fi
 
