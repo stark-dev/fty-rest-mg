@@ -333,9 +333,10 @@ UserInfo user;
     } logsData [] = {
         { "messages",       "/var/log/messages" },
         { "www-audit",      "/var/log/tntnet/www-audit.log" },
+        { "mass-mgr-audit", "/var/log/etn-mass-management.audit.log" },
         { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log" },
         { "journald",       "/tmp/journald.log" }, // gen. by journalctl
-        { "ALL",            "/tmp/getlog_all.tar" }, // archive,all logfiles above
+        { "ALL",            "/tmp/getlog_all.tar" }, // archive, all logfiles above
         { "", "" } // term
     };
 
@@ -471,7 +472,8 @@ UserInfo user;
             std::string tar; tar.append("/bin/tar cf ").append(logfile).append(" ").append(tmpdir).append("/*");
 
             remove(logfile.c_str());
-            system(rmdir.c_str());
+            int r = system(rmdir.c_str());
+            if (r != 0) { log_warning("%s (r: %d)", rmdir.c_str(), r); }
 
             // build the cp command to copy all logfiles in tmpdir
             std::string journald_logfile;
@@ -493,7 +495,7 @@ UserInfo user;
             }
             cp.append(" ").append(tmpdir);
 
-            int r = system(mkdir.c_str());
+            r = system(mkdir.c_str());
             log_debug("%s (r: %d)", mkdir.c_str(), r);
             if (r != 0) {
                 remove(journald_logfile.c_str());
@@ -505,7 +507,7 @@ UserInfo user;
             r = system(cp.c_str());
             log_debug("%s (r: %d)", cp.c_str(), r);
             if (r != 0) {
-                system(rmdir.c_str());
+                if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
                 remove(journald_logfile.c_str());
                 log_error ("%s failed (r: %d)", cp.c_str(), r);
                 std::string err = "cp command has failed.";
@@ -514,7 +516,7 @@ UserInfo user;
 
             r = system(tar.c_str());
             log_debug("%s (r: %d)", tar.c_str(), r);
-            system(rmdir.c_str());
+            if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
             remove(journald_logfile.c_str());
             if (r != 0) {
                 if (delete_logfile) remove(logfile.c_str());
