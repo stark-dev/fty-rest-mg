@@ -56,13 +56,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'libsodium' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'libsodium' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'libsodium' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -82,7 +82,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -126,13 +126,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'libzmq' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'libzmq' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'libzmq' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -152,7 +152,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -196,13 +196,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'czmq' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'czmq' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'czmq' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -222,7 +222,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -266,13 +266,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'cidr' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'cidr' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'cidr' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -292,7 +292,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -336,13 +336,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'cxxtools' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'cxxtools' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'cxxtools' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -362,7 +362,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -406,13 +406,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'tntnet' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'tntnet' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'tntnet' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -432,7 +432,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -477,13 +477,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'tntdb' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'tntdb' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'tntdb' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -503,7 +503,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -547,13 +547,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'magic' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'magic' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'magic' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -573,7 +573,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
     CONFIG_OPTS+=("--with-libmagic=yes")
@@ -620,13 +620,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-logging' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-logging' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-logging' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -646,7 +646,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -690,13 +690,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -716,7 +716,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -760,13 +760,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-db' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-db' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-db' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -786,7 +786,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -830,13 +830,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-rest' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-rest' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-rest' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -856,7 +856,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -900,13 +900,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-mlm' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-mlm' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-mlm' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -926,7 +926,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -980,13 +980,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'malamute' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'malamute' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'malamute' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1006,7 +1006,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -1050,13 +1050,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-proto' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-proto' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-proto' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1076,7 +1076,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -1120,13 +1120,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty_shm' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty_shm' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty_shm' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1146,7 +1146,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -1190,13 +1190,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-asset-activator' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-asset-activator' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-asset-activator' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1216,7 +1216,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -1260,13 +1260,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-messagebus' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-messagebus' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-messagebus' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1286,7 +1286,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
@@ -1330,13 +1330,13 @@ else
         DEFAULT_BRANCH="`git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'`"
         if [ "x$REQUESTED_BRANCH" = "x" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-dto' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         elif [ "x$PROPAGATED_BRANCH" = "x$DEFAULT_BRANCH" ]; then
             echo "`date`: INFO: Building prerequisites of 'fty-common-dto' using ci_dependencies.sh the default branch..." >&2
-            source ./ci_dependencies.sh
+            ($CI_TIME source ./ci_dependencies.sh)
         else
             echo "`date`: INFO: Building prerequisites of 'fty-common-dto' using ci_dependencies.sh $PROPAGATED_BRANCH branch..." >&2
-            source ./ci_dependencies.sh $PROPAGATED_BRANCH
+            ($CI_TIME source ./ci_dependencies.sh $PROPAGATED_BRANCH)
         fi
     fi
     if [ -e autogen.sh ]; then
@@ -1356,7 +1356,7 @@ else
     $CI_TIME ./configure "${CONFIG_OPTS[@]}"
     $CI_TIME make -j4
     $CI_TIME make install
-    echo "Leaving in ${PWD}"
+    echo "Leaving from ${PWD}"
     cd "${BASE_PWD}"
     echo "Now in ${PWD}"
 fi
