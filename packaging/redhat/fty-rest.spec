@@ -51,11 +51,7 @@ BuildRequires:  systemd-devel
 BuildRequires:  systemd
 %{?systemd_requires}
 BuildRequires:  xmlto
-# Note that with current implementation of zproject use-cxx-gcc-4-9 option,
-# this effectively hardcodes the use of specifically 4.9, not allowing for
-# "4.9 or newer".
-BuildRequires:  devtoolset-3-gcc devtoolset-3-gcc-c++
-BuildRequires:  gcc-c++ >= 4.9.0
+BuildRequires:  gcc-c++
 BuildRequires:  libsodium-devel
 BuildRequires:  zeromq-devel
 BuildRequires:  czmq-devel >= 3.0.2
@@ -64,15 +60,13 @@ BuildRequires:  cxxtools-devel
 BuildRequires:  tntnet-devel
 BuildRequires:  tntdb-devel
 BuildRequires:  file-devel
-BuildRequires:  log4cplus-devel
 BuildRequires:  fty-common-logging-devel
 BuildRequires:  fty-common-devel
 BuildRequires:  fty-common-db-devel
 BuildRequires:  fty-common-rest-devel
-BuildRequires:  malamute-devel >= 1.0.0
-BuildRequires:  openssl-devel
 BuildRequires:  fty-common-mlm-devel
 BuildRequires:  cyrus-sasl-devel
+BuildRequires:  malamute-devel
 BuildRequires:  fty-proto-devel >= 1.0.0
 BuildRequires:  fty_shm-devel >= 1.0.0
 BuildRequires:  fty-asset-activator-devel
@@ -114,15 +108,13 @@ Requires:       cxxtools-devel
 Requires:       tntnet-devel
 Requires:       tntdb-devel
 Requires:       file-devel
-Requires:       log4cplus-devel
 Requires:       fty-common-logging-devel
 Requires:       fty-common-devel
 Requires:       fty-common-db-devel
 Requires:       fty-common-rest-devel
-Requires:       malamute-devel >= 1.0.0
-Requires:       openssl-devel
 Requires:       fty-common-mlm-devel
 Requires:       cyrus-sasl-devel
+Requires:       malamute-devel
 Requires:       fty-proto-devel >= 1.0.0
 Requires:       fty_shm-devel >= 1.0.0
 Requires:       fty-asset-activator-devel
