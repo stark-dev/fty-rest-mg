@@ -669,6 +669,8 @@ db_reply_t
         return reply_delete6;
     }
 
+    trans.commit();
+
     // make the device inactive last
     if (!asset_json.empty())
     {
@@ -691,7 +693,6 @@ db_reply_t
         }
     }
 
-    trans.commit();
     LOG_END;
     reply_delete6.msg = JSONIFY(reply_delete6.msg.c_str ());
     return reply_delete6;
