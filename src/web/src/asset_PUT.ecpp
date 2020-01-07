@@ -115,7 +115,7 @@ bool database_ready;
             fty::AssetActivator activationAccessor (client);
             if (!activationAccessor.isActivable (asset))
             {
-                throw new std::runtime_error ("Asset cannot be activated");
+                throw std::runtime_error ("Asset cannot be activated");
             }
         }
     }

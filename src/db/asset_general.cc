@@ -632,28 +632,6 @@ db_reply_t
     LOG_START;
     tntdb::Transaction trans(conn);
 
-    // make the device inactive first
-    if (!asset_json.empty())
-    {
-        db_reply_t ret = db_reply_new ();
-        try
-        {
-            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
-            fty::AssetActivator activationAccessor (client);
-            activationAccessor.deactivate (asset_json);
-        }
-        catch (const std::exception &e)
-        {
-            log_error ("Error during asset deactivation - %s", e.what());
-            ret.status        = 0;
-            ret.errtype       = DB_ERR;
-            ret.errsubtype    = DB_ERROR_INTERNAL;
-            ret.msg           = e.what();
-            LOG_END_ABNORMAL(e);
-            return ret;
-        }
-    }
-
     auto reply_delete2 = DBAssetsDelete::delete_asset_element_from_asset_groups (conn, element_id);
     if ( reply_delete2.status == 0 )
     {
@@ -692,6 +670,29 @@ db_reply_t
     }
 
     trans.commit();
+
+    // make the device inactive last
+    if (!asset_json.empty())
+    {
+        db_reply_t ret = db_reply_new ();
+        try
+        {
+            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
+            fty::AssetActivator activationAccessor (client);
+            activationAccessor.deactivate (asset_json);
+        }
+        catch (const std::exception &e)
+        {
+            log_error ("Error during asset deactivation - %s", e.what());
+            ret.status        = 0;
+            ret.errtype       = DB_ERR;
+            ret.errsubtype    = DB_ERROR_INTERNAL;
+            ret.msg           = e.what();
+            LOG_END_ABNORMAL(e);
+            return ret;
+        }
+    }
+
     LOG_END;
     reply_delete6.msg = JSONIFY(reply_delete6.msg.c_str ());
     return reply_delete6;
