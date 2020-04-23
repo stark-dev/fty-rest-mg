@@ -2,7 +2,7 @@
 #    fty-rest - Common core REST API for 42ity project
 #    NOTE: This file was customized after generation, be sure to keep it
 #
-#    Copyright (C) 2014 - 2018 Eaton
+#    Copyright (C) 2014 - 2020 Eaton
 #
 #    This program is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
