@@ -236,6 +236,8 @@ src/web/src/current.cc
 src/web/src/datacenter_indicators.cc
 src/web/src/topology_location_from.cc
 src/web/src/topology_location_to.cc
+src/web/src/topology_input_power_chain.cc
+src/web/src/topology_location.cc
 src/web/src/topology_power.cc
 src/web/src/rack_total.cc
 src/web/src/sysinfo.cc
