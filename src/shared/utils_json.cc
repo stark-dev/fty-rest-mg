@@ -191,6 +191,8 @@ std::string getJsonAlert(tntdb::Connection connection, fty_proto_t *alert)
   json += utils::json::jsonify("state", fty_proto_state(alert)) + ",";
   json += utils::json::jsonify("severity", fty_proto_severity(alert)) + ",";
   json += utils::json::jsonify("description", fty_proto_description(alert));
+  const char* md = fty_proto_metadata(alert); //assume json object payload if !empty
+  json += "," + utils::json::jsonify("metadata", ((md && (*md)) ? md : "{}"));
   json += "}";
 
   return json;
