@@ -287,15 +287,20 @@ class _clonedcode_Compressor
 }; // class _clonedcode_Compressor
 
 // journald logs export to logfile
-int exec_journalctl_command (const std::string& logfile)
+int exec_journalctl_command (const std::string& logfile, bool truncate = true, bool extensive = false)
 {
     // 'www-data' user must be part of the 'systemd-journal' group, to let journalctl access journald files (see fty-core)
     // usermod -a -G systemd-journal www-data
     // avoid using 42ty wrapper (/usr/libexec/bios/journalctl) by calling the real version from /bin
     std::string cmd;
-    cmd = "/bin/journalctl -D /var/log/journal --no-pager";
+    cmd = "/bin/journalctl -D /var/log/journal --no-pager -l";
     cmd.append(" -o cat"); // output mode
-    cmd.append(" --since \"3 hours ago\" --until \"now\"");
+    if (extensive) {
+        cmd.append(" -x");
+    }
+    if (truncate) {
+        cmd.append(" --since \"3 hours ago\" --until \"now\"");
+    }
     cmd.append(" > ").append(logfile);
 
     log_debug("running journalctl command to generate %s", logfile.c_str());
@@ -337,6 +342,7 @@ UserInfo user;
         { "mass-mgr-audit", "/var/log/etn-mass-management.audit.log", true },
         { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log", true },
         { "journald",       "/tmp/journald.log", false }, // gen. by journalctl
+        { "journald-all",   "/tmp/journald-all.log", false }, // gen. by journalctl
         { "ALL",            "/tmp/getlog_all.tar", false }, // archive, all logfiles above
         { "", "" } // term
     };
@@ -490,9 +496,16 @@ UserInfo user;
                     continue;
 
                 if (logsData[i].baseName == "journald") {
-                    // build logfile using journalctl export
+                    // build logfile using journalctl export for last 3hrs
                     journald_logfile = logsData[i].filePath;
                     int r = exec_journalctl_command(logsData[i].filePath);
+                    if (r != 0) continue; // anyway
+                }
+
+                if (logsData[i].baseName == "journald-all") {
+                    // build logfile using journalctl export
+                    journald_logfile = logsData[i].filePath;
+                    int r = exec_journalctl_command(logsData[i].filePath, false, true);
                     if (r != 0) continue; // anyway
                 }
 
@@ -538,8 +551,20 @@ UserInfo user;
             delete_logfile = true;
             remove(logfile.c_str());
 
-            // build logfile using journalctl export
+            // build logfile using journalctl export truncated for last 3hrs
             int r = exec_journalctl_command(logfile);
+            if (r != 0) {
+                if (delete_logfile) remove(logfile.c_str());
+                std::string err = "journalctl command has failed.";
+                http_die( "internal-error", err.c_str ());
+            }
+        }
+        else if (logname_base == "journald-all") {
+            delete_logfile = true;
+            remove(logfile.c_str());
+
+            // build logfile using journalctl export
+            int r = exec_journalctl_command(logfile, false, true);
             if (r != 0) {
                 if (delete_logfile) remove(logfile.c_str());
                 std::string err = "journalctl command has failed.";
