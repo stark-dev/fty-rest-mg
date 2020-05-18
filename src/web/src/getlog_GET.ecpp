@@ -294,9 +294,10 @@ int exec_journalctl_command (const std::string& logfile, bool truncate = true, b
     // avoid using 42ty wrapper (/usr/libexec/bios/journalctl) by calling the real version from /bin
     std::string cmd;
     cmd = "/bin/journalctl -D /var/log/journal --no-pager -l";
-    cmd.append(" -o cat"); // output mode
     if (extensive) {
         cmd.append(" -x");
+    } else {
+        cmd.append(" -o cat"); // shorter output mode
     }
     if (truncate) {
         cmd.append(" --since \"3 hours ago\" --until \"now\"");
