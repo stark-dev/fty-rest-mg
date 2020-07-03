@@ -90,6 +90,7 @@ EXTRA_DIST += \
     src/persist/monitor.h \
     src/persist/persist_error.h \
     src/shared/magic.h \
+    src/shared/messagebus_utils.h \
     src/web/src/add_gpio.h \
     src/web/src/admin_iface.h \
     src/web/src/admin_ifaces.h \

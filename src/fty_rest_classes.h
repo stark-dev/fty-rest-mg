@@ -29,6 +29,16 @@
 //  Platform definitions, must come first
 #include "platform.h"
 
+//  Asserts check the invariants of methods. If they're not
+//  fulfilled the program should fail fast. Therefore enforce them!
+#ifdef NDEBUG
+  #undef NDEBUG
+  #include <assert.h>
+  #define NDEBUG
+#else
+  #include <assert.h>
+#endif
+
 //  External API
 #include "../include/fty_rest.h"
 
@@ -72,6 +82,10 @@ typedef struct _persist_persist_error_t persist_persist_error_t;
 #ifndef SHARED_MAGIC_T_DEFINED
 typedef struct _shared_magic_t shared_magic_t;
 #define SHARED_MAGIC_T_DEFINED
+#endif
+#ifndef SHARED_MESSAGEBUS_UTILS_T_DEFINED
+typedef struct _shared_messagebus_utils_t shared_messagebus_utils_t;
+#define SHARED_MESSAGEBUS_UTILS_T_DEFINED
 #endif
 #ifndef WEB_SRC_ADD_GPIO_T_DEFINED
 typedef struct _web_src_add_gpio_t web_src_add_gpio_t;
@@ -332,6 +346,7 @@ typedef struct _web_src_hw_capability_t web_src_hw_capability_t;
 #include "persist/monitor.h"
 #include "persist/persist_error.h"
 #include "shared/magic.h"
+#include "shared/messagebus_utils.h"
 #include "web/src/add_gpio.h"
 #include "web/src/admin_iface.h"
 #include "web/src/admin_ifaces.h"
