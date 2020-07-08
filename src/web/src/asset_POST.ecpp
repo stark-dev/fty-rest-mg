@@ -30,10 +30,14 @@
 #include <cxxtools/jsondeserializer.h>
 #include <cxxtools/serializationinfo.h>
 #include "shared/configure_inform.h"
-#include "src/db/inout.h"
+#include "shared/messagebus_utils.h"
+#include "db/inout.h"
+#include <fty_asset_dto.h>
+#include <asset/conversion/json.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_asset.h>
 #include <fty_common_macros.h>
+#include <fty_common_messagebus.h>
 #include <fty_common_rest_audit_log.h>
 #include <fty_asset_activator.h>
 
@@ -80,16 +84,22 @@ bool database_ready;
     // Read json, transform to csv, use existing functionality
     cxxtools::SerializationInfo si;
     // read json a deserialize it
+    fty::Asset asset;
     try {
+        using namespace fty::conversion;
         std::stringstream input (asset_json, std::ios_base::in);
         cxxtools::JsonDeserializer deserializer (input);
         deserializer.deserialize (si);
+
+        si >>= asset;
     }
     catch (const std::exception& e) {
         LOG_END_ABNORMAL (e);
         log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
         http_die ("bad-request-document", e.what ());
     }
+
+    std::string assetJson = fty::conversion::toJson(asset);
 
     shared::CsvMap cm;
     try{
@@ -126,45 +136,9 @@ bool database_ready;
         http_die ("bad-request-document", err.c_str ());
     }
 
-    fty::FullAsset asset;
-    try
-    {
-        si >>= asset;
-    }
-    catch (const std::invalid_argument &e) {
-        log_error ("%s", e.what ());
-        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
-        http_die ("bad-input", e.what ());
-    }
-    catch (const std::exception &e) {
-        log_error ("%s", e.what ());
-        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
-        http_die ("request-param-required", e.what ());
-    }
-
-    try
-    {
-        if (asset.isPowerAsset() && asset.getStatusString() == "active")
-        {
-            mlm::MlmSyncClient client (AGENT_FTY_ASSET, AGENT_ASSET_ACTIVATOR);
-            fty::AssetActivator activationAccessor (client);
-            if (!activationAccessor.isActivable (asset))
-            {
-                std::string err = TRANSLATE_ME ("Asset cannot be activated");
-                throw std::runtime_error (err);
-            }
-        }
-    }
-    catch (const std::exception &e)
-    {
-        std::string err = JSONIFY (e.what());
-        log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());
-        http_die ("licensing-err", err.c_str ());
-    }
-
     try {
         // actual insert - throws exceptions
-        auto row = persist::process_one_asset (cm);
+        auto resp = sendRequest("CREATE", assetJson);
 
         // here we are -> insert was successful
         // ATTENTION:  1. sending messages is "hidden functionality" from user
@@ -176,7 +150,7 @@ bool database_ready;
         // be unique at the every moment
         std::string agent_name = utils::generate_mlm_client_id ("web.asset_post");
         try{
-            send_configure (row.first, row.second, agent_name);
+            send_configure(std::vector<fty::Asset>{asset}, FTY_PROTO_ASSET_OP_CREATE, agent_name);
         }
         catch (const std::runtime_error &e) {
             log_error ("%s", e.what ());
@@ -186,7 +160,7 @@ bool database_ready;
         }
         // no unexpected errors was detected
         // process results
-        std::pair<std::string,std::string> foo =  DBAssets::id_to_name_ext_name (row.first.id);
+        std::pair<std::string,std::string> foo =  std::make_pair(asset.getInternalName(), asset.getExtEntry("name"));
         if (foo.first.empty () && foo.second.empty ()) {
             std::string err =  TRANSLATE_ME ("Database failure");
             log_error_audit ("Request CREATE asset %s FAILED", item.c_str ());

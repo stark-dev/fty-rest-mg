@@ -17,3 +17,4 @@
    fty-rest -> fty-asset-activator;
    fty-rest -> fty-common-messagebus;
    fty-rest -> fty-common-dto;
+   fty-rest -> fty-asset;

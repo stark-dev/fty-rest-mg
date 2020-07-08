@@ -25,6 +25,7 @@
 
 #include <fty_proto.h>
 #include <fty_common_db_dbpath.h>
+#include <asset/conversion/proto.h>
 #include <fty_common_db_asset_insert.h>
 #include <fty_common.h>
 #include <fty_common_mlm_utils.h>
@@ -178,4 +179,74 @@ void
         const std::string &agent_name)
 {
     send_configure(std::vector<std::pair<db_a_elmnt_t,persist::asset_operation>>{row}, agent_name);
+}
+
+void
+    send_configure (
+        const std::vector<fty::Asset>& assets,
+        const std::string &operation,
+        const std::string &agent_name)
+{
+    mlm_client_t *client = mlm_client_new();
+
+    if ( client == NULL ) {
+        throw std::runtime_error(" mlm_client_new () failed.");
+    }
+    int r = mlm_client_connect (client, MLM_ENDPOINT, 1000, agent_name.c_str ());
+    if ( r == -1 ) {
+        mlm_client_destroy (&client);
+        throw std::runtime_error(" mlm_client_connect () failed.");
+    }
+
+    r = mlm_client_set_producer (client, FTY_PROTO_STREAM_ASSETS);
+    if ( r == -1 ) {
+        mlm_client_destroy (&client);
+        throw std::runtime_error(" mlm_client_set_producer () failed.");
+    }
+    tntdb::Connection conn = tntdb::connect (DBConn::url);
+    for (const fty::Asset& asset : assets) {
+
+        std::string subject = asset.getAssetType();
+        subject.append (".");
+        subject.append (asset.getAssetSubtype());
+        subject.append ("@");
+        subject.append (asset.getInternalName());
+
+        fty_proto_t *proto = fty::conversion::toFtyProto(asset, operation);
+
+        zhash_t *aux;
+        zhash_autofree(aux);
+        
+        zhash_t *ext;
+        zhash_autofree(ext);
+
+        aux = fty_proto_get_aux(proto);
+        ext = fty_proto_get_ext(proto);
+
+        zmsg_t *msg = fty_proto_encode_asset (
+                aux,
+                asset.getInternalName().c_str(),
+                operation.c_str(),
+                ext);
+        
+        r = mlm_client_send (client, subject.c_str (), &msg);
+        if ( r != 0 ) {
+            mlm_client_destroy (&client);
+            throw std::runtime_error("mlm_client_send () failed.");
+        }
+
+        zhash_destroy (&aux);
+        zhash_destroy (&ext);
+
+        // ask fty-asset to republish so we would get UUID
+        if (operation == FTY_PROTO_ASSET_OP_CREATE ||
+            operation == FTY_PROTO_ASSET_OP_UPDATE) {
+            zmsg_t *republish = zmsg_new ();
+            zmsg_addstr (republish, asset.getInternalName().c_str ());
+            mlm_client_sendto (client, "asset-agent", "REPUBLISH", NULL, 5000, &republish);
+        }
+    }
+
+    zclock_sleep (500); // ensure that everything was send before we destroy the client
+    mlm_client_destroy (&client);
 }

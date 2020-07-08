@@ -29,10 +29,11 @@ AM_CPPFLAGS = \
     ${fty_asset_activator_CFLAGS} \
     ${fty_common_messagebus_CFLAGS} \
     ${fty_common_dto_CFLAGS} \
+    ${fty_asset_CFLAGS} \
     -D__STDC_FORMAT_MACROS \
     -I$(srcdir)/include
 
-project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_common_logging_LIBS} ${fty_common_LIBS} ${fty_common_db_LIBS} ${fty_common_rest_LIBS} ${fty_common_mlm_LIBS} ${libsasl2_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${fty_shm_LIBS} ${fty_asset_activator_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS}
+project_libs = ${libsodium_LIBS} ${libzmq_LIBS} ${czmq_LIBS} ${cidr_LIBS} ${cxxtools_LIBS} ${tntnet_LIBS} ${tntdb_LIBS} ${magic_LIBS} ${fty_common_logging_LIBS} ${fty_common_LIBS} ${fty_common_db_LIBS} ${fty_common_rest_LIBS} ${fty_common_mlm_LIBS} ${libsasl2_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${fty_shm_LIBS} ${fty_asset_activator_LIBS} ${fty_common_messagebus_LIBS} ${fty_common_dto_LIBS} ${fty_asset_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -73,6 +74,7 @@ EXTRA_DIST += \
     Findfty_asset_activator.cmake \
     Findfty_common_messagebus.cmake \
     Findfty_common_dto.cmake \
+    Findfty_asset.cmake \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \
     builds/cmake/Config.cmake.in \

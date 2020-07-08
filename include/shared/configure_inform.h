@@ -27,6 +27,7 @@ with this program; if not, write to the Free Software Foundation, Inc.,
 
 #include "db/dbhelpers.h"
 #include <fty_common.h>
+#include <fty_asset_dto.h>
 #include <fty_common_db.h>
 
 void
@@ -44,4 +45,10 @@ void
 void
     send_configure (
         const std::pair<db_a_elmnt_t, persist::asset_operation> &row,
+        const std::string &agent_name);
+
+void
+    send_configure (
+        const std::vector<fty::Asset>& assets,
+        const std::string &operation,
         const std::string &agent_name);

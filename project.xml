@@ -164,6 +164,11 @@
         test = "fty_common_dto_selftest"
         />
 
+    <use project = "fty-asset" libname = "libfty_asset" header = "fty-asset.h"
+        repository = "https://github.com/42ity/fty-asset.git"
+        test = "fty_asset_server_test"
+        />
+
     <header name = "app"  />
     <header name = "bios_agent" />
     <header name = "bios_agentpp" />

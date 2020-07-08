@@ -19,27 +19,32 @@
     =========================================================================
 */
 
-#ifndef SHARED_MESSAGEBUS_UTILS_H_INCLUDED
-#define SHARED_MESSAGEBUS_UTILS_H_INCLUDED
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <string>
+#include <fty_userdata_dto.h>
+#include <fty_common_messagebus.h>
 
-//  @interface
-//  Create a new shared_messagebus_utils
-FTY_REST_PRIVATE shared_messagebus_utils_t *
-    shared_messagebus_utils_new (void);
+#define END_POINT "ipc://@/malamute"
+#define AGENT_NAME "fty-rest"
+#define AGENT_NAME_REQUEST_DESTINATION "asset-agent-ng"
+#define MSG_QUEUE_NAME "FTY.Q.ASSET.QUERY"
+#define DEFAULT_TIME_OUT 70
 
-//  Destroy the shared_messagebus_utils
-FTY_REST_PRIVATE void
-    shared_messagebus_utils_destroy (shared_messagebus_utils_t **self_p);
+/**
+ * Send a request and wait reply in synchronous mode.
+ * @param subject Request subject
+ * @param userData User data to send
+ * @return The Reply or MessageBusException when a time out occurs.
+ */
+dto::UserData sendRequest (const std::string &action,
+                           const std::string &userData);
 
-
-//  @end
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
+/**
+ * Utility to split a string with a delimiter into a string vector.
+ * @param input string
+ * @param delimiter 
+ * @return A list of string splited.
+ */
+std::vector<std::string> splitString (const std::string input,
+                                      const char delimiter);

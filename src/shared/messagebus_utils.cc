@@ -26,41 +26,59 @@
 @end
 */
 
-#include "fty_rest_classes.h"
+#include "messagebus_utils.h"
 
-//  Structure of our class
+#include <cxxtools/serializationinfo.h>
+#include <cxxtools/jsonserializer.h>
+#include <cxxtools/jsondeserializer.h>
 
-struct _shared_messagebus_utils_t {
-    int filler;     //  Declare class properties here
-};
-
-
-//  --------------------------------------------------------------------------
-//  Create a new shared_messagebus_utils
-
-shared_messagebus_utils_t *
-shared_messagebus_utils_new (void)
+/**
+ * Send a request and wait reply in synchronous mode.
+ * @param subject
+ * @param userData
+ * @return The Reply or MessageBusException when a time out occurs.
+ */
+dto::UserData sendRequest (const std::string &action,
+                           const std::string &userData)
 {
-    shared_messagebus_utils_t *self = (shared_messagebus_utils_t *) zmalloc (sizeof (shared_messagebus_utils_t));
-    assert (self);
-    //  Initialize class properties here
-    return self;
+    // Client id
+    std::string clientId = messagebus::getClientId (AGENT_NAME);
+    std::unique_ptr<messagebus::MessageBus> requester (
+      messagebus::MlmMessageBus (END_POINT, clientId));
+    requester->connect ();
+
+    // Build message
+    messagebus::Message msg;
+
+    msg.userData ().push_back (userData);
+    msg.metaData ().emplace (messagebus::Message::SUBJECT, action);
+    msg.metaData ().emplace (messagebus::Message::FROM, clientId);
+    msg.metaData ().emplace (messagebus::Message::TO,
+                             AGENT_NAME_REQUEST_DESTINATION);
+    msg.metaData ().emplace (messagebus::Message::CORRELATION_ID,
+                             messagebus::generateUuid ());
+    // Send request
+    messagebus::Message resp =
+      requester->request (MSG_QUEUE_NAME, msg, DEFAULT_TIME_OUT);
+    // Return the data response
+    return resp.userData ();
 }
 
-
-//  --------------------------------------------------------------------------
-//  Destroy the shared_messagebus_utils
-
-void
-shared_messagebus_utils_destroy (shared_messagebus_utils_t **self_p)
+/**
+ * Utility to split a string with a delimiter into a string vector.
+ * @param input string
+ * @param delimiter
+ * @return A list of string splited.
+ */
+std::vector<std::string> splitString (const std::string input,
+                                      const char delimiter)
 {
-    assert (self_p);
-    if (*self_p) {
-        shared_messagebus_utils_t *self = *self_p;
-        //  Free class properties here
-        //  Free object itself
-        free (self);
-        *self_p = NULL;
+    std::vector<std::string> resultList;
+    std::stringstream ss (input);
+
+    std::string token;
+    while (std::getline (ss, token, delimiter)) {
+        resultList.push_back (token);
     }
+    return resultList;
 }
-
