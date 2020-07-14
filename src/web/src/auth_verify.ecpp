@@ -89,6 +89,7 @@ if(!checked_access_token.empty()) {
                     defaultval = false;
                 }
             }
+            log_debug ("Defaulting reauth-happened flag to: %s", defaultval ? "true" : "false");
             user.reauthDefault (defaultval);
         } // if reauth flag was not definitely set yet; else don't waste time
     } else {
