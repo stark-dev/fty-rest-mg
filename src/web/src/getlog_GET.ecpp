@@ -40,6 +40,10 @@
 #include "grp.h"
 #include "pwd.h"
 
+// For checking the systemd journal directory
+#include <dirent.h>
+#include <errno.h>
+
 // Code snatched and adapted from TNTNET source codebase including :
 // tntnet-sources/framework/common/httpreply.cpp
 // and tntnet-sources/framework/common/tnt/cstream.h
@@ -293,7 +297,23 @@ int exec_journalctl_command (const std::string& logfile, bool truncate = true, b
     // usermod -a -G systemd-journal www-data
     // avoid using 42ty wrapper (/usr/libexec/bios/journalctl) by calling the real version from /bin
     std::string cmd;
-    cmd = "/bin/journalctl -D /var/log/journal --no-pager -l";
+
+    // IPCs do not store journal on flash to avoid its wear, so here we
+    // pick one of two possible locations expected for the bundled product.
+    // No fatal deal if the chosen one is empty or missing => HTTP-500.
+    std::string dirname = "/var/log/journal";
+    DIR* dirobj = opendir(dirname.c_str());
+    if (dirobj) {
+        closedir(dirobj);
+    } else if (ENOENT == errno) {
+        // Missing first choice, sort of expected, nothing to log
+        dirname = "/run/log/journal";
+    } else {
+        log_debug("Failed to access '%s/' which seems to exist, will try another");
+        dirname = "/run/log/journal";
+    }
+
+    cmd = "/bin/journalctl -D " + dirname + " --no-pager -l";
     if (extensive) {
         cmd.append(" -x");
     } else {
