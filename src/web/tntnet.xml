@@ -40,7 +40,7 @@
     <mapping>
       <target>static@tntnet</target>
       <pathinfo>./$1</pathinfo>
-      <url>^/((assets|[a-z]|[A-Z]).*)</url>
+      <url>^/((assets|[a-z]|[A-Z]|[0-9]).*)</url>
     </mapping>
     <mapping>
       <target>static@tntnet</target>
