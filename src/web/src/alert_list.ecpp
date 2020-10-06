@@ -147,13 +147,15 @@ bool database_ready;
                 http_die ("request-param-bad", "recursive", msg1.c_str (), msg2.c_str ());
             }
 
-        /*if (!asset.empty ())
+        if (!asset.empty ())
         {
             if (!persist::is_ok_name (asset.c_str ()))
             {
-                http_die ("request-param-bad", asset.c_str ());
+                std::string msg1 = TRANSLATE_ME ("value '%s'", asset.c_str ());
+                std::string msg2 = TRANSLATE_ME ("a valide asset");
+                http_die ("request-param-bad", "asset", msg1.c_str(), msg2.c_str());
             }
-        }*/
+        }
 
         checked_state = state;
         checked_asset = asset;
