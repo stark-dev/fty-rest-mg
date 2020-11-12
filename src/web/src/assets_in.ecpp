@@ -79,7 +79,7 @@ Assets
             [&asset_id, &connection](const std::string& value)
             {
                 std::string capability = std::string("capability.") + value;
-                return DBAssets::count_asset_keytag(connection, capability, "yes", asset_id) > 0;
+                return DBAssets::has_asset_keytag_value(connection, capability, "yes", asset_id) > 0;
             }
         );
         // add element if no capabilities present or if capabilites present and all of them not found
