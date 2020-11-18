@@ -201,9 +201,10 @@ if (streq (part, "LIST")) {
     while (part) {
         
         const char *internalCat = "\"CAT_INTERNAL\"";
+        const char *automationCat = "\"CAT_AUTOMATION\"";
 
         //we need to serialize the section
-        if (strstr(part, internalCat) == nullptr) {
+        if ((strstr(part, internalCat) == nullptr) && (strstr(part, automationCat) == nullptr)) {
 
             std::string data(part.get());
             //log_debug ("Part: %s \n\n", data.c_str());
