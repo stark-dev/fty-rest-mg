@@ -66,18 +66,32 @@ Assets
         a_elmnt_id_t container,
         const std::vector<a_elmnt_tp_id_t> &types,
         const std::vector<a_elmnt_stp_id_t> &subtypes,
+        const std::vector<std::string> &capabilities,
         const std::string &without,
         const std::string &status
     )
 {
     Assets result;
-    auto func = [&result](const tntdb::Row& row) {
-        result.emplace_back(
-            row.getValue("name").getString(),
-            DBAssets::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
-            persist::typeid_to_type (row.getValue("type_id").getInt()),
-            utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() ))
+    auto func = [&result, &capabilities, &connection](const tntdb::Row& row) {
+        int asset_id = row.getValue("asset_id").getUnsigned32();
+        // search capabilities if present in filter
+        auto it_cap = std::find_if_not(capabilities.begin(), capabilities.end(),
+            [&asset_id, &connection](const std::string& value)
+            {
+                std::string capability = std::string("capability.") + value;
+                return DBAssets::has_asset_keytag_value(connection, capability, "yes", asset_id) > 0;
+            }
         );
+        // add element if no capabilities present or if capabilites present and all of them not found
+        if (capabilities.size() == 0 || it_cap == capabilities.end())
+        {
+            result.emplace_back(
+                row.getValue("name").getString(),
+                DBAssets::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
+                persist::typeid_to_type (row.getValue("type_id").getInt()),
+                utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() ))
+            );
+        }
     };
     int rv;
     if (container)
@@ -118,6 +132,7 @@ bool database_ready;
     // checked parameters
     std::vector<a_elmnt_stp_id_t> checked_subtypes;
     std::vector<a_elmnt_tp_id_t> checked_types;
+    std::vector<std::string> checked_capabilities;
     a_elmnt_id_t checked_id = 0;
     std::string without = "";
     std::string status = "";
@@ -134,6 +149,7 @@ bool database_ready;
         std::string in = qparam.param("in");
         std::string type = qparam.param("type");
         std::string sub_type = qparam.param("sub_type");
+        std::string capability = qparam.param("capability");
         without = qparam.param("without");
         status = qparam.param("status");
         details = qparam.param("details");
@@ -168,6 +184,10 @@ bool database_ready;
                 checked_types.push_back(type_id);
             }
         }
+        // checked capability
+        if( !capability.empty() ) {
+            cxxtools::split(',', capability, std::back_inserter(checked_capabilities));
+        }
         // convert the id from string to number
         http_errors_t errors;
         if (in_parameter_present &&  !check_element_identifier ("in", in, checked_id, errors) ) {
@@ -193,7 +213,7 @@ bool database_ready;
     // do the stuff
     Assets assets;
     try {
-        assets = assets_in_container(connection, checked_id, checked_types, checked_subtypes, without, status);
+        assets = assets_in_container(connection, checked_id, checked_types, checked_subtypes, checked_capabilities, without, status);
     } catch (std::exception &e) {
         std::string err = JSONIFY (e.what());
         http_die ("internal-error", err.c_str ());
