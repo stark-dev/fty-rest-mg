@@ -330,6 +330,7 @@ TNTNET_PIECES = \
 	20_common_basics.xml \
 	50_main_api_start.xml \
 	51_asset_api_fty-rest.xml \
+	60_main_api_until_eula.xml \
 	89_main_api_end.xml \
 	99_end.xml
 
