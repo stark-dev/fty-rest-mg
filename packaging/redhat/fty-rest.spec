@@ -166,7 +166,7 @@ find %{buildroot} -name '*.la' | xargs rm -f
 %{_prefix}/libexec/%{name}/testpass.sh
 #%{_datadir}/%{name}/.git_details-fty-rest
 %{_datadir}/bios/.git_details-fty-rest
-%{_datadir}/%{name}/examples/tntnet.xml.example
+%{_datadir}/%{name}/examples/*.xml.example
 %if 0%{?suse_version} > 0
 # The validator is pickier in OpenSUSE build targets
 %dir %{_libdir}

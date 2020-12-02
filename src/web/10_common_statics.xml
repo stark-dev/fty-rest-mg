@@ -1,0 +1,65 @@
+    <!-- Global variables setup regarding server status -->
+    <mapping>
+      <target>server_status@libfty_rest</target>
+    </mapping>
+
+    <!-- Everything SSL only -->
+    <mapping>
+      <target>ssl_redirect@libfty_rest</target>
+    </mapping>
+    <!-- Set reply default and security HTTP header -->
+    <mapping>
+      <target>security_headers@libfty_rest</target>
+      <args>
+          <!-- default headers -->
+          <Cache-Control>no-store</Cache-Control>
+          <Pragma>no-cache</Pragma>
+          <!-- security headers -->
+          <X-XSS-Protection>1</X-XSS-Protection>
+          <X-Content-Type-Options>nosniff</X-Content-Type-Options>
+      </args>
+    </mapping>
+    <!-- Unset security HTTP header for specific mapping -->
+    <mapping>
+      <target>security_removeheaders@libfty_rest</target>
+      <url>\.(ttf|otf|eot|woff)$</url>
+      <args>
+          <Cache-Control/>
+          <Pragma/>
+      </args>
+    </mapping>
+    <!-- Serve static files -->
+    <mapping>
+      <target>static@tntnet</target>
+      <pathinfo>./$1</pathinfo>
+      <url>^/((assets|[a-z]|[A-Z]|[0-9]).*)</url>
+    </mapping>
+    <mapping>
+      <target>static@tntnet</target>
+      <pathinfo>./index.html</pathinfo>
+      <url>^/$</url>
+    </mapping>
+    <mapping>
+      <target>static@tntnet</target>
+      <pathinfo>./favicon.ico</pathinfo>
+      <url>^/favicon.ico</url>
+    </mapping>
+    <mapping>
+      <target>static@tntnet</target>
+      <pathinfo>/usr/share/common-licenses/Eaton-EULA</pathinfo>
+      <url>^/legal/Eaton-EULA</url>
+    </mapping>
+    <mapping>
+      <target>static@tntnet</target>
+      <pathinfo>/usr/share/doc/$1</pathinfo>
+      <url>^/legal/(.*)$</url>
+    </mapping>
+
+    <!-- Make sure everybody speaks json from now on -->
+    <mapping>
+      <target>json@libfty_rest</target>
+    </mapping>
+    <!-- Get the access Token to make it easier to handle it later. -->
+    <mapping>
+      <target>find_access_token@libfty_rest</target>
+    </mapping>
