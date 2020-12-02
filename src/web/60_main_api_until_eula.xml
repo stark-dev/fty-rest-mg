@@ -39,6 +39,10 @@
         must work on a freshly deployed server before the user sets it up -
         i.e. whatever is needed to get and pass the EULA license wizard,
         and/or to discover, monitor and manage the new deployment centrally.
+        Note that part of EULA acceptance is creation of the database schema.
+        Code for REST API of components that "expect" the database, assets,
+        etc. to exist without gracefully handling their absolute non-existence,
+        should go after this line!
       -->
     <mapping>
       <target>license@libfty_rest</target>
