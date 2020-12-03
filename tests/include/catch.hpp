@@ -1531,7 +1531,7 @@ namespace Catch {
                 expr; \
                 __catchResult.captureResult( Catch::ResultWas::DidntThrowException ); \
             } \
-            catch( exceptionType ) { \
+            catch( const exceptionType& ) { \
                 __catchResult.captureResult( Catch::ResultWas::Ok ); \
             } \
             catch( ... ) { \
