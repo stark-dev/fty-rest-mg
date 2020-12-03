@@ -1,0 +1,205 @@
+    <!-- Enforce processing of supported extensions by using this order: -->
+    <!-- Download as... (attachment with a filename) -->
+    <mapping>
+      <target>getlog_GET@libfty_rest</target>
+      <url>^/api/v1/admin/getlog/(.*)\.(gz|txt)$</url>
+      <method>GET</method>
+      <args>
+        <logname_base>$1</logname_base>
+        <logname_ext>.$2</logname_ext>
+      </args>
+    </mapping>
+
+    <!-- List supported lognames and extensions at the base URL -->
+    <mapping>
+      <target>getlog_GET@libfty_rest</target>
+      <url>^/api/v1/admin/getlog$</url>
+      <method>GET</method>
+      <args>
+        <list_lognames>yes</list_lognames>
+      </args>
+    </mapping>
+
+    <!-- Display log raw in the browser -->
+    <mapping>
+      <target>getlog_GET@libfty_rest</target>
+      <url>^/api/v1/admin/getlog/(.*)$</url>
+      <method>GET</method>
+      <args>
+        <logname_base>$1</logname_base>
+        <logname_ext></logname_ext>
+      </args>
+    </mapping>
+
+    <!-- topology -->
+
+    <mapping>
+      <target>topology_power@libfty_rest</target>
+      <url>^/api/v1/topology/power.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <mapping>
+      <target>topology_location@libfty_rest</target>
+      <url>^/api/v1/topology/location.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <mapping>
+      <target>topology_input_power_chain@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/topology/input_power_chain/(.+)$</url>
+      <args>
+        <id>$1</id>
+      </args>
+    </mapping>
+
+    <!-- Current meassurements -->
+    <mapping>
+      <target>current@libfty_rest</target>
+      <url>^/api/v1/metric/current.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <!-- rack consumption -->
+    <mapping>
+      <target>rack_total@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/metric/computed/rack_total.*$</url>
+    </mapping>
+
+    <!-- datacenter indicators -->
+    <mapping>
+      <target>datacenter_indicators@libfty_rest</target>
+      <url>^/api/v1/metric/computed/datacenter_indicators.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <!-- uptime -->
+    <mapping>
+      <target>uptime@libfty_rest</target>
+      <url>^/api/v1/metric/computed/uptime.*$</url>
+    </mapping>
+
+    <!-- Make sure we have malamute connection -->
+    <!-- Currently doesn't work, needs to be debugged
+    <mapping>
+      <target>agent@libfty_rest</target>
+    </mapping> -->
+
+    <!-- Average GET -->
+    <mapping>
+      <target>average@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/metric/computed/average/csv.*$</url>
+      <args>
+        <csv>yes</csv>
+      </args>
+    </mapping>
+
+    <mapping>
+      <target>average@libfty_rest</target>
+      <method>GET</method>
+      <url>^/api/v1/metric/computed/average.*$</url>
+      <args>
+        <csv>no</csv>
+      </args>
+    </mapping>
+
+    <!-- admin/config -->
+    <mapping>
+        <target>config@libfty_rest</target>
+        <url>^/api/v1/admin/config.*$</url>
+    </mapping>
+
+    <!-- POST admin/scan -->
+    <mapping>
+      <target>scan_run@libfty_rest</target>
+      <url>^/api/v1/admin/scan.*$</url>
+      <method>POST</method>
+    </mapping>
+
+    <!-- GET admin/scan -->
+    <mapping>
+      <target>scan_progress@libfty_rest</target>
+      <url>^/api/v1/admin/scan.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <!-- DELETE admin/scan -->
+    <mapping>
+        <target>scan_run@libfty_rest</target>
+        <url>^/api/v1/admin/scan.*$</url>
+        <method>DELETE</method>
+    </mapping>
+
+    <!-- POST admin/confscan -->
+    <mapping>
+      <target>conf_scan@libfty_rest</target>
+      <url>^/api/v1/admin/confscan.*$</url>
+      <method>POST</method>
+    </mapping>
+
+    <!-- GET admin/confscan -->
+    <mapping>
+      <target>conf_scan@libfty_rest</target>
+      <url>^/api/v1/admin/confscan.*$</url>
+      <method>GET</method>
+    </mapping>
+
+    <!-- GET admin/gpio -->
+    <mapping>
+        <method>GET</method>
+        <target>list_gpio@libfty_rest</target>
+        <url>^/api/v1/admin/gpio$</url>
+    </mapping>
+
+    <!-- POST admin/gpio -->
+    <mapping>
+        <method>POST</method>
+        <target>add_gpio@libfty_rest</target>
+        <url>^/api/v1/admin/gpio/?$</url>
+    </mapping>
+
+    <!-- POST admin/gpo -->
+    <mapping>
+        <method>POST</method>
+        <target>gpo_action@libfty_rest</target>
+        <url>^/api/v1/admin/gpo</url>
+        <args>
+            <sensor>$1</sensor>
+            <action>$2</action>
+         </args>
+    </mapping>
+
+    <!-- GET admin/hw_capability -->
+    <mapping>
+      <target>hw_capability@libfty_rest</target>
+      <url>^/api/v1/admin/hw_capability/(.*)$</url>
+      <method>GET</method>
+      <args>
+        <id>$1</id>
+      </args>
+    </mapping>
+
+    <!-- POST admin/email/test -->
+    <mapping>
+        <target>email_test@libfty_rest</target>
+        <url>^/api/v1/admin/email[/_]test.*$</url>
+    <method>POST</method>
+    </mapping>
+
+    <!-- POST admin/email/feedback -->
+    <mapping>
+        <target>email_feedback@libfty_rest</target>
+        <url>^/api/v1/admin/email/feedback.*$</url>
+        <method>POST</method>
+    </mapping>
+
+    <!-- POST admin/email/cpre -->
+    <mapping>
+        <target>email_vote@libfty_rest</target>
+        <url>^/api/v1/admin/email/vote.*$</url>
+        <method>POST</method>
+    </mapping>
+
