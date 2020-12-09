@@ -140,6 +140,12 @@ FTY_DISCOVERY_DEFAULT_VALUES_PARENT = ""
 FTY_DISCOVERY_DEFAULT_VALUES_LINK_SRC = ""
     filepath = "/etc/fty-discovery/fty-discovery.cfg"
     treepath = "defaultValuesLinks/0/src"
+FTY_DISCOVERY_SCANS_DISABLED = ""
+    filepath = "/etc/fty-discovery/fty-discovery.cfg"
+    treepath = "disabled/scans_disabled"
+FTY_DISCOVERY_IPS_DISABLED = ""
+    filepath = "/etc/fty-discovery/fty-discovery.cfg"
+    treepath = "disabled/scans_disabled"
 
 # fty-discovery parameters
 FTY_DISCOVERY_DUMP_POOL = ""
