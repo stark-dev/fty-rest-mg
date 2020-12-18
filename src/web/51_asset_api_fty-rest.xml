@@ -2,7 +2,7 @@
     <!-- list of asset by container -->
     <mapping>
       <target>assets_in@libfty_rest</target>
-      <url>^/api/v1/assets$</url>
+      <url>^/api/v1/assets($|/$)</url>
     </mapping>
 
     <!-- Counters on asset-->
