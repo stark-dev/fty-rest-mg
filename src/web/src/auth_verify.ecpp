@@ -43,6 +43,14 @@ UserInfo user;
 std::string gaccess_token;
 </%request>
 <%cpp>
+
+    // do nothing if user is yet authenticated
+    if (user.profile() != BiosProfile::Anonymous)
+    {
+        /* Go on to next module in tntnet.xml */
+        return DECLINED;
+    }
+
 std::string checked_access_token;
 {
     // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
