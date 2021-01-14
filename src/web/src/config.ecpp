@@ -146,6 +146,9 @@ FTY_DISCOVERY_SCANS_DISABLED = ""
 FTY_DISCOVERY_IPS_DISABLED = ""
     filepath = "/etc/fty-discovery/fty-discovery.cfg"
     treepath = "disabled/scans_disabled"
+FTY_DISCOVERY_PROTOCOLS = ""
+    filepath = "/etc/fty-discovery/fty-discovery.cfg"
+    treepath = "discovery/protocols"
 
 # fty-discovery parameters
 FTY_DISCOVERY_DUMP_POOL = ""
