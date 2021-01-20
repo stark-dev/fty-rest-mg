@@ -183,12 +183,6 @@ ETN_GRAPHITE_ACTIVATE = ""
     treepath = "configuration/activated"
 
 # etn-automation
-ETN_AUTOMATION_POLICY_TIMEOUT = ""
-    filepath = "/etc/fty/etn-automation.cfg"
-    treepath = "policy/global_timeout"
-ETN_AUTOMATION_TASK_TIMEOUT = ""
-    filepath = "/etc/fty/etn-automation.cfg"
-    treepath = "policy/task_timeout"
 ETN_AUTOMATION_NOTIF_EMAIL = ""
     filepath = "/etc/fty/etn-automation.cfg"
     treepath = "notifications"
