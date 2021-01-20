@@ -597,27 +597,6 @@ test_cidr_CPPFLAGS = 	$(AM_CPPFLAGS) ${cidr_CPPFLAGS} \
 				-I$(abs_top_srcdir)/tests/include/
 test_cidr_LDFLAGS =	${cidr_LIBS}
 
-
-check_PROGRAMS += 	test-csv
-
-test_csv_SOURCES = \
-				include/shared/csv.h \
-				tests/shared/test-csv.cc
-
-test_csv_LDADD = \
-				libpriv-utils.la \
-				libpriv-test-run.la
-
-test_csv_CPPFLAGS =		$(AM_CPPFLAGS) \
-				-I$(abs_top_srcdir)/src \
-				-I$(abs_top_srcdir)/src/persist \
-				-I$(abs_top_srcdir)/src/msg \
-				-I$(abs_top_srcdir)/tests/include
-
-test_csv_LDFLAGS =		${cxxtools_LIBS} ${tntdb_LIBS} ${malamute_LIBS} ${fty_proto_LIBS} ${fty_common_mlm_LIBS}
-
-EXTRA_DIST +=	$(srcdir)/tests/shared/*.csv
-
 #----------------------------------------------------------------------
 #                        CI tests
 #----------------------------------------------------------------------

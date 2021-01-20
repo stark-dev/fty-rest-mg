@@ -420,7 +420,11 @@ void
         a_elmnt_id_t id_parent_num = 0;
         std::string location;
         r["id_parent"].get(id_parent_num);
-        std::pair<std::string,std::string> location_names = DBAssets::id_to_name_ext_name (id_parent_num);
+        std::pair<std::string,std::string> location_names;
+        if (id_parent_num > 0) {
+            // Protect against invalid IDs.
+            location_names = DBAssets::id_to_name_ext_name (id_parent_num);
+        }
         location = location_names.second;
         std::string location_id = location_names.first;
 
