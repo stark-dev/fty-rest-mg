@@ -332,6 +332,19 @@ int exec_journalctl_command (const std::string& logfile, bool truncate = true, b
     return r;
 }
 
+// ps logs export to logfile
+int exec_ps_command (const std::string& logfile)
+{
+    std::string cmd = "/bin/ps -edf > " + logfile;
+
+    log_debug("running ps command to generate %s", logfile.c_str());
+    int r = system(cmd.c_str());
+    if (r != 0) log_error("ps command returns %d ", r);
+    else log_debug("ps command returns %d ", r);
+
+    return r;
+}
+
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -365,6 +378,7 @@ UserInfo user;
         { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log", true },
         { "journald",       "/tmp/journald.log", false }, // gen. by journalctl
         { "journald-all",   "/tmp/journald-all.log", false }, // gen. by journalctl
+        { "processes",      "/tmp/processes.log", false }, // gen. by ps
         { "ALL",            "/tmp/getlog_all.tar", false }, // archive, all logfiles above
         { "", "", false } // term
     };
@@ -529,6 +543,17 @@ UserInfo user;
                     int r = exec_journalctl_command(logsData[i].filePath, false, true);
                     if (r != 0) continue; // anyway
                 }
+                else if (logsData[i].baseName == "processes") {
+                    // build logfile using ps export
+                    temp_logfiles.push_back(logsData[i].filePath);
+                    int r = exec_ps_command(logsData[i].filePath);
+                    if (r != 0) continue; // anyway
+                }
+                else if (!logsData[i].isRealFile) {
+                    // logfile missed?
+                    log_error("'%s' logfile not processed", logsData[i].baseName.c_str());
+                    continue; // anyway
+                }
 
                 // append only if file exist
                 if (access(logsData[i].filePath.c_str(), F_OK) != -1)
@@ -536,6 +561,7 @@ UserInfo user;
             }
             cp.append(" ").append(tmpdir);
 
+            // build logfiles receipt directory
             r = system(mkdir.c_str());
             log_debug("%s (r: %d)", mkdir.c_str(), r);
             if (r != 0) {
@@ -545,6 +571,7 @@ UserInfo user;
                 http_die( "internal-error", err.c_str ());
             }
 
+            // copy logfiles
             r = system(cp.c_str());
             log_debug("%s (r: %d)", cp.c_str(), r);
             if (r != 0) {
@@ -555,6 +582,7 @@ UserInfo user;
                 http_die( "internal-error", err.c_str ());
             }
 
+            // make archive
             r = system(tar.c_str());
             log_debug("%s (r: %d)", tar.c_str(), r);
 
@@ -594,6 +622,24 @@ UserInfo user;
                 std::string err = "journalctl command has failed.";
                 http_die( "internal-error", err.c_str ());
             }
+        }
+        else if (logname_base == "processes") {
+            delete_logfile = true;
+            remove(logfile.c_str());
+
+            // build logfile using ps export
+            int r = exec_ps_command(logfile);
+            if (r != 0) {
+                if (delete_logfile) remove(logfile.c_str());
+                std::string err = "ps command has failed.";
+                http_die( "internal-error", err.c_str ());
+            }
+        }
+        else if (!logname_isRealFile) {
+            // logfile missed?
+            std::string err = "'" + logname_base + "' logfile not processed.";
+            log_error("%s", err.c_str());
+            http_die( "internal-error", err.c_str ());
         }
 
         // here logfile exist
