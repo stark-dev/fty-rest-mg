@@ -390,6 +390,9 @@ UserInfo user;
     std::string logname_ext;
     bool logname_isRealFile = false; // Return HTTP-404 or HTTP-500 if not found?
 
+    bool encrypt = true;
+    std::string encrypt_passphrase = "passphrase";
+
     try {
         // get args
         std::string slogname_base = request.getArg ("logname_base");
@@ -644,6 +647,31 @@ UserInfo user;
 
         // here logfile exist
 
+        // logfile encryption (optional)
+        if (encrypt) {
+            if (encrypt_passphrase.empty()) {
+                std::string err = "encryption passphrase is empty";
+                log_error("%s", err.c_str());
+                http_die( "internal-error", err.c_str ());
+            }
+
+            // we use 7-Zip for encryption
+            std::string crypted_logfile = logfile + ".7z";
+            std::string cmd = "/usr/bin/7z a -p'" + encrypt_passphrase + "' " + crypted_logfile + " " + logfile;
+            int r = system(cmd.c_str());
+            log_debug("7z/crypt %s to %s (r: %d)", logfile.c_str(), crypted_logfile.c_str(), r);
+            if (r != 0) {
+                if (delete_logfile) remove(logfile.c_str());
+                log_error ("%s failed (r: %d)", cmd.c_str(), r);
+                std::string err = "7z command has failed.";
+                http_die( "internal-error", err.c_str ());
+            }
+            // new generated logfile
+            if (delete_logfile) remove(logfile.c_str());
+            logfile = crypted_logfile;
+            delete_logfile = true;
+        }
+
         // read logfile (fileContent)
         std::string fileContent;
         {
@@ -662,10 +690,10 @@ UserInfo user;
         // cleanup generated logfile
         if (delete_logfile) remove(logfile.c_str());
 
-        // reply
+        // build reply
 
         if ((logname_ext == "") || (logname_ext == ".txt")) { // plaintext
-            content_filename += ".txt";
+            content_filename += encrypt ? ".txt.7z" : ".txt";
 
             reply.setContentType("text/plain;charset=UTF-8"); // TODO: Is it ASCII? Check rsyslog
             reply.setHeader(tnt::httpheader::contentDisposition,
@@ -680,9 +708,11 @@ UserInfo user;
             return HTTP_OK;
         }
         else { // compressed .gz
-            logname_ext = ".gz";
-            if (logname_base == "ALL") content_filename += ".tar.gz";
-            else content_filename += ".txt.gz";
+            if (logname_base == "ALL") content_filename += ".tar";
+            else content_filename += ".txt";
+
+            logname_ext = encrypt ? ".7z" : ".gz";
+            content_filename += logname_ext;
 
             // compress (need the whole content) //NOTE: compressor << ifstream?
             _clonedcode_Compressor compressor;
@@ -779,7 +809,8 @@ UserInfo user;
         // TODO: Use (define?) a dedicated exception class; maybe employ bios_throw
         if (logname_isRealFile && std::string{e.what()}.find( TRANSLATE_ME ("Could not open requested logfile: ") ) != std::string::npos) {
             http_die ("not-found", logname_base.c_str());
-        } else {
+        }
+        else {
             std::string err =  TRANSLATE_ME ("Exception caught. Please check logs for more details.");
             http_die ("internal-error", err.c_str ());
         }
