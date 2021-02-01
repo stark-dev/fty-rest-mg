@@ -366,7 +366,7 @@ UserInfo user;
         { "journald",       "/tmp/journald.log", false }, // gen. by journalctl
         { "journald-all",   "/tmp/journald-all.log", false }, // gen. by journalctl
         { "ALL",            "/tmp/getlog_all.tar", false }, // archive, all logfiles above
-        { "", "" } // term
+        { "", "", false } // term
     };
 
     std::string message;
@@ -511,7 +511,7 @@ UserInfo user;
             if (r != 0) { log_warning("%s (r: %d)", rmdir.c_str(), r); }
 
             // build the cp command to copy all logfiles in tmpdir
-            std::string journald_logfile;
+            std::vector<std::string> temp_logfiles;
             std::string cp = "cp"; // cp all logs in tmpdir
             for (int i = 0; !logsData[i].baseName.empty(); ++i) {
                 if (logsData[i].baseName == "ALL")
@@ -519,14 +519,13 @@ UserInfo user;
 
                 if (logsData[i].baseName == "journald") {
                     // build logfile using journalctl export for last 3hrs
-                    journald_logfile = logsData[i].filePath;
+                    temp_logfiles.push_back(logsData[i].filePath);
                     int r = exec_journalctl_command(logsData[i].filePath);
                     if (r != 0) continue; // anyway
                 }
-
-                if (logsData[i].baseName == "journald-all") {
+                else if (logsData[i].baseName == "journald-all") {
                     // build logfile using journalctl export
-                    journald_logfile = logsData[i].filePath;
+                    temp_logfiles.push_back(logsData[i].filePath);
                     int r = exec_journalctl_command(logsData[i].filePath, false, true);
                     if (r != 0) continue; // anyway
                 }
@@ -540,7 +539,7 @@ UserInfo user;
             r = system(mkdir.c_str());
             log_debug("%s (r: %d)", mkdir.c_str(), r);
             if (r != 0) {
-                remove(journald_logfile.c_str());
+                for (auto& file : temp_logfiles) { remove(file.c_str()); }
                 log_error ("%s failed (r: %d)", mkdir.c_str(), r);
                 std::string err = "mkdir command has failed.";
                 http_die( "internal-error", err.c_str ());
@@ -550,7 +549,7 @@ UserInfo user;
             log_debug("%s (r: %d)", cp.c_str(), r);
             if (r != 0) {
                 if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
-                remove(journald_logfile.c_str());
+                for (auto& file : temp_logfiles) { remove(file.c_str()); }
                 log_error ("%s failed (r: %d)", cp.c_str(), r);
                 std::string err = "cp command has failed.";
                 http_die( "internal-error", err.c_str ());
@@ -558,8 +557,11 @@ UserInfo user;
 
             r = system(tar.c_str());
             log_debug("%s (r: %d)", tar.c_str(), r);
+
+            // cleanup
             if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
-            remove(journald_logfile.c_str());
+            for (auto& file : temp_logfiles) { remove(file.c_str()); }
+
             if (r != 0) {
                 if (delete_logfile) remove(logfile.c_str());
                 log_error ("%s failed (r: %d)", tar.c_str(), r);
