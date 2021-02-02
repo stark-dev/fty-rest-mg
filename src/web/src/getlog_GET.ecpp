@@ -369,29 +369,24 @@ UserInfo user;
     struct {
         std::string baseName;
         std::string filePath;
-        bool isRealFile;
+        bool isRealFile; // existing vs. generated live
     } logsData [] = {
         { "messages",       "/var/log/messages", true },
         { "verify-fs",      "/var/log/verify-fs.log", true },
         { "www-audit",      "/var/log/tntnet/www-audit.log", true },
+        { "alarms-audit",   "/var/log/alarms-audit/alarms-audit.log", true },
         { "mass-mgr-audit", "/var/log/etn-mass-management.audit.log", true },
         { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log", true },
         { "journald",       "/tmp/journald.log", false }, // gen. by journalctl
         { "journald-all",   "/tmp/journald-all.log", false }, // gen. by journalctl
         { "processes",      "/tmp/processes.log", false }, // gen. by ps
         { "ALL",            "/tmp/getlog_all.tar", false }, // archive, all logfiles above
-        { "", "", false } // term
     };
-
-    std::string message;
 
     // Parsed, trusted values (if populated)
     std::string logname_base;
     std::string logname_ext;
     bool logname_isRealFile = false; // Return HTTP-404 or HTTP-500 if not found?
-
-    bool encrypt = true;
-    std::string encrypt_passphrase = "passphrase";
 
     try {
         // get args
@@ -399,19 +394,25 @@ UserInfo user;
         std::string slogname_ext = request.getArg ("logname_ext");
         std::string slist_lognames = request.getArg ("list_lognames");
 
-        message = "getlog_GET got args: logname_base='" + slogname_base \
-            + "' logname_ext='" + slogname_ext \
-            + "' list_lognames='" + slist_lognames + "'";
-        log_info("%s", message.c_str() );
+        std::string encrypt_passphrase = request.getArg ("passphrase");
+        if (encrypt_passphrase.empty()) encrypt_passphrase = "7z";
+
+        {
+            std::string msg = "getlog_GET got args: logname_base='" + slogname_base \
+                + "' logname_ext='" + slogname_ext \
+                + "' list_lognames='" + slist_lognames + "'";
+            log_info("%s", msg.c_str() );
+        }
 
         if (slist_lognames == "yes") {
             reply.out() << "{ \"getlog-supports\": {"; // open object
 
             // basenames (collection)
             reply.out() << " \"logname_base\": ["; // open array
-            for (int i = 0; !logsData[i].baseName.empty(); ++i) {
-                if (i != 0) reply.out() << ", ";
-                reply.out() << "\"" + logsData[i].baseName + "\"";
+            bool first = true;
+            for (auto& data : logsData) {
+                if (!first) { reply.out() << ", "; } else first = false;
+                reply.out() << "\"" + data.baseName + "\"";
             }
             reply.out() << "],"; // close
 
@@ -445,12 +446,13 @@ UserInfo user;
 
         // check basename
         std::string logfile = ""; // full path
-        for (int i = 0; !logsData[i].baseName.empty(); ++i) {
-            if (logname_base == logsData[i].baseName) {
-                logfile = logsData[i].filePath;
-                logname_isRealFile = logsData[i].isRealFile;
-                break;
-            }
+        for (auto& data : logsData) {
+            if (logname_base != data.baseName)
+                continue;
+
+            logfile = data.filePath;
+            logname_isRealFile = data.isRealFile;
+            break;
         }
 
         if (logfile == "") {
@@ -460,57 +462,17 @@ UserInfo user;
                 ("'" + slogname_base + slogname_ext + "'").c_str(), expected.c_str());
         }
 
+        const bool encrypt = !encrypt_passphrase.empty();
+        if (!encrypt) {
+            log_error("Authorized request to download an unsupported log file was denied");
+            std::string expected = TRANSLATE_ME ("'passphrase' fulfilled");
+            http_die("request-param-bad", "passphrase",
+                "'passphrase' empty", expected.c_str());
+        }
+
         // We have a definite officially supported request, try to fulfill it
         log_debug("%s", ("Posting logfile extension '" + logname_ext \
             + "' (MIME type '" + reply.getContentType() + "') - initial").c_str() );
-
-        // Prepare strings for Content-Disposition: header
-        // Requests with a valid extension are downloads; without - plaintext shown in browser
-
-        std::string content_disposition = "inline";
-        if (!logname_ext.empty()) {
-            content_disposition = "attachment";
-        }
-
-        std::string content_filename = logname_base;
-        {   // Scope away some temporary variables
-            struct utsname u;
-            time_t t;
-
-            if (uname (&u) == -1) {
-                log_error ("uname() failed: '%s'", strerror (errno));
-            }
-            else {
-                content_filename.append("_");
-                content_filename.append(u.nodename);
-            }
-
-            t = time(NULL);
-            if ( t == (time_t)-1 ) {
-                log_error ("time(NULL) failed: '%s'", strerror (errno));
-            }
-            else {
-                // ASSUMPTION: time_t is an integer type (usually is long int)
-                // or otherwise can convert to std::string
-
-                char buf[21] = {0x00};
-                int r = calendar_to_datetime(time(NULL), buf, 21);
-                if (r != 0) {
-                    log_error ("Failed to convert timestamp");
-                }
-                else {
-                    // replace colons ':' by dash '-'
-                    // prevents http://latkin.org/blog/2016/07/20/
-                    //      git-for-windows-accidentally-creates-ntfs-alternate-data-streams/
-                    // for our Windows users
-                    for (char* c = strchr(buf, ':'); c != NULL; c = strchr(c, ':'))
-                        { *c = '-'; c++; }
-
-                    content_filename.append("_");
-                    content_filename.append(buf);
-                }
-            }
-        }
 
         bool delete_logfile = false; // for post cleanup
 
@@ -518,53 +480,54 @@ UserInfo user;
             // make a tar archive (logfile) owning *all* logfiles
             delete_logfile = true;
 
-            std::string tmpdir = "/tmp/IPM2-logs";
-            std::string mkdir; mkdir.append("mkdir ").append(tmpdir);
-            std::string rmdir; rmdir.append("rm -fr ").append(tmpdir);
-            std::string tar; tar.append("/bin/tar cf ").append(logfile).append(" ").append(tmpdir).append("/*");
+            std::string targetdir = "/tmp/IPM2-logs";
+            std::string mkdir; mkdir.append("mkdir -p ").append(targetdir);
+            std::string rmdir; rmdir.append("rm -fr ").append(targetdir);
+            std::string tar; tar.append("/bin/tar cf ").append(logfile).append(" -C /tmp/ IPM2-logs");
 
+            // pre cleanup
             remove(logfile.c_str());
             int r = system(rmdir.c_str());
             if (r != 0) { log_warning("%s (r: %d)", rmdir.c_str(), r); }
 
-            // build the cp command to copy all logfiles in tmpdir
+            // build the cp command to copy all logfiles in targetdir
             std::vector<std::string> temp_logfiles;
-            std::string cp = "cp"; // cp all logs in tmpdir
-            for (int i = 0; !logsData[i].baseName.empty(); ++i) {
-                if (logsData[i].baseName == "ALL")
+            std::string cp = "cp"; // cp all logs
+            for (auto& data : logsData) {
+                if (data.baseName == "ALL")
                     continue;
 
-                if (logsData[i].baseName == "journald") {
+                if (data.baseName == "journald") {
                     // build logfile using journalctl export for last 3hrs
-                    temp_logfiles.push_back(logsData[i].filePath);
-                    int r = exec_journalctl_command(logsData[i].filePath);
+                    temp_logfiles.push_back(data.filePath);
+                    int r = exec_journalctl_command(data.filePath);
                     if (r != 0) continue; // anyway
                 }
-                else if (logsData[i].baseName == "journald-all") {
+                else if (data.baseName == "journald-all") {
                     // build logfile using journalctl export
-                    temp_logfiles.push_back(logsData[i].filePath);
-                    int r = exec_journalctl_command(logsData[i].filePath, false, true);
+                    temp_logfiles.push_back(data.filePath);
+                    int r = exec_journalctl_command(data.filePath, false, true);
                     if (r != 0) continue; // anyway
                 }
-                else if (logsData[i].baseName == "processes") {
+                else if (data.baseName == "processes") {
                     // build logfile using ps export
-                    temp_logfiles.push_back(logsData[i].filePath);
-                    int r = exec_ps_command(logsData[i].filePath);
+                    temp_logfiles.push_back(data.filePath);
+                    int r = exec_ps_command(data.filePath);
                     if (r != 0) continue; // anyway
                 }
-                else if (!logsData[i].isRealFile) {
-                    // logfile missed?
-                    log_error("'%s' logfile not processed", logsData[i].baseName.c_str());
+                else if (!data.isRealFile) {
+                    // gen. logfile missed?
+                    log_error("'%s' logfile not processed", data.baseName.c_str());
                     continue; // anyway
                 }
 
                 // append only if file exist
-                if (access(logsData[i].filePath.c_str(), F_OK) != -1)
-                    { cp.append(" ").append(logsData[i].filePath); }
+                if (access(data.filePath.c_str(), F_OK) != -1)
+                    { cp.append(" ").append(data.filePath); }
             }
-            cp.append(" ").append(tmpdir);
+            cp.append(" ").append(targetdir);
 
-            // build logfiles receipt directory
+            // build target directory
             r = system(mkdir.c_str());
             log_debug("%s (r: %d)", mkdir.c_str(), r);
             if (r != 0) {
@@ -574,7 +537,7 @@ UserInfo user;
                 http_die( "internal-error", err.c_str ());
             }
 
-            // copy logfiles
+            // copy logfiles in target dir.
             r = system(cp.c_str());
             log_debug("%s (r: %d)", cp.c_str(), r);
             if (r != 0) {
@@ -585,7 +548,7 @@ UserInfo user;
                 http_die( "internal-error", err.c_str ());
             }
 
-            // make archive
+            // archive target dir.
             r = system(tar.c_str());
             log_debug("%s (r: %d)", tar.c_str(), r);
 
@@ -639,7 +602,7 @@ UserInfo user;
             }
         }
         else if (!logname_isRealFile) {
-            // logfile missed?
+            // gen. logfile missed?
             std::string err = "'" + logname_base + "' logfile not processed.";
             log_error("%s", err.c_str());
             http_die( "internal-error", err.c_str ());
@@ -649,7 +612,8 @@ UserInfo user;
 
         // logfile encryption (optional)
         if (encrypt) {
-            if (encrypt_passphrase.empty()) {
+            if (encrypt_passphrase.empty()) { //secure
+                if (delete_logfile) remove(logfile.c_str());
                 std::string err = "encryption passphrase is empty";
                 log_error("%s", err.c_str());
                 http_die( "internal-error", err.c_str ());
@@ -690,6 +654,46 @@ UserInfo user;
         // cleanup generated logfile
         if (delete_logfile) remove(logfile.c_str());
 
+        // Reply - prepare strings for Content-Disposition: header
+        // Requests with a valid extension are downloads; without - plaintext shown in browser
+
+        const std::string content_disposition = logname_ext.empty() ? "inline" : "attachment";
+
+        std::string content_filename = logname_base;
+        {
+            struct utsname u;
+            if (uname (&u) == -1) {
+                log_error ("uname() failed: '%s'", strerror (errno));
+            }
+            else {
+                content_filename.append("_").append(u.nodename);
+            }
+
+            time_t t = time(NULL);
+            if ( t == (time_t)-1 ) {
+                log_error ("time(NULL) failed: '%s'", strerror (errno));
+            }
+            else {
+                // ASSUMPTION: time_t is an integer type (usually is long int)
+                // or otherwise can convert to std::string
+
+                char buf[21] = {0x00};
+                int r = calendar_to_datetime(time(NULL), buf, 21);
+                if (r != 0) {
+                    log_error ("Failed to convert timestamp");
+                }
+                else {
+                    // replace colons ':' by dash '-' for our Windows users,
+                    // prevents http://latkin.org/blog/2016/07/20/
+                    //      git-for-windows-accidentally-creates-ntfs-alternate-data-streams/
+                    for (char* c = strchr(buf, ':'); c != NULL; c = strchr(c, ':'))
+                        { *c = '-'; c++; }
+
+                    content_filename.append("_").append(buf);
+                }
+            }
+        }
+
         // build reply
 
         if ((logname_ext == "") || (logname_ext == ".txt")) { // plaintext
@@ -705,7 +709,6 @@ UserInfo user;
                 ("Posting logfile extension '" + logname_ext \
                 + "' (MIME type '" + reply.getContentType() + "') in mode " \
                 + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str());
-            return HTTP_OK;
         }
         else { // compressed .gz
             if (logname_base == "ALL") content_filename += ".tar";
@@ -743,8 +746,9 @@ UserInfo user;
                 ("Posting logfile extension '" + logname_ext \
                 + "' (MIME type '" + reply.getContentType() + "') in mode " \
                 + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str());
-            return HTTP_OK;
         }
+
+        return HTTP_OK;
     }
     catch (const std::exception& e) {
         // NOTE: In case of errors, this may conflict with Content-Type header
@@ -752,68 +756,70 @@ UserInfo user;
         // it in the end.
 
         {   // More debug, copied from `man getgrouplist` samples and my tntnet patch
-            struct group *gr;
             gid_t curgid = getgid();
             gid_t curegid = getegid();
             uid_t curuid = getuid();
             uid_t cureuid = geteuid();
 
-            message = "Current webserver runs as: UID=" + std::to_string(curuid) +
+            std::string msg = "Current webserver runs as: UID=" + std::to_string(curuid) +
                 " (EUID=" + std::to_string(cureuid) + "), " +
                 " GID=" + std::to_string(curgid) +
                 " (EGID=" + std::to_string(curegid) + ")";
-            log_debug("%s", message.c_str());
+            log_debug("%s", msg.c_str());
 
             int ngroups = getgroups(0, NULL);
-            message = "Can not report about supplementary groups at the moment";
-            message += ": getgroups() returned ";
-            message += std::to_string(ngroups);
+            msg = "Can not report about supplementary groups at the moment";
+            msg += ": getgroups() returned ";
+            msg += std::to_string(ngroups);
             if (ngroups > 0) {
                 gid_t *groups = (gid_t *)malloc(ngroups * sizeof(gid_t));
                 if (groups != NULL) {
-                    if ( (ngroups = getgroups(ngroups, groups)) > 0 ) {
-                        message = "Supplementary Groups (";
-                        message += std::to_string(ngroups);
-                        message += " total): [ ";
+                    ngroups = getgroups(ngroups, groups);
+                    if (ngroups > 0) {
+                        msg = "Supplementary Groups (";
+                        msg += std::to_string(ngroups);
+                        msg += " total): [ ";
 
                         for (int j = 0; j < ngroups; j++) {
-                            if (j>0)
-                                message.append(", ");
-                            message += std::to_string(groups[j]);
+                            if (j > 0) msg += ", ";
+                            msg += std::to_string(groups[j]);
 
-                            gr = getgrgid(groups[j]);
-                            if (gr != NULL)
-                                message += " (";
-                                message += gr->gr_name;
-                                message += ")";
+                            struct group *gr = getgrgid(groups[j]);
+                            if (gr != NULL) {
+                                msg += " (" + std::string(gr->gr_name) + ")";
+                            }
                         }
-                        message.append("]");
+                        msg += "]";
                     }
                     else {
-                        message += " but second getgroups() failed and returned ";
-                        message += std::to_string(ngroups);
+                        msg += " but second getgroups() failed and returned ";
+                        msg += std::to_string(ngroups);
                     }
                     free (groups);
                 }
                 else {
-                    message += " but malloc() failed";
+                    msg += " but malloc() failed";
                 }
             }
-            log_debug("%s", message.c_str());
+            log_debug("%s", msg.c_str());
+
+            msg = "Exception caught: " + std::string(e.what ());
+            log_error ("%s", msg.c_str ());
         }
 
         reply.resetContent();
-        message.assign ("Exception caught: ").append (e.what ());
-        log_error ("%s", message.c_str ());
 
         // TODO: Use (define?) a dedicated exception class; maybe employ bios_throw
         if (logname_isRealFile && std::string{e.what()}.find( TRANSLATE_ME ("Could not open requested logfile: ") ) != std::string::npos) {
             http_die ("not-found", logname_base.c_str());
         }
         else {
-            std::string err =  TRANSLATE_ME ("Exception caught. Please check logs for more details.");
+            std::string err = TRANSLATE_ME ("Exception caught. Please check logs for more details.");
             http_die ("internal-error", err.c_str ());
         }
     }
 
+    // normally never reached
+    std::string err = TRANSLATE_ME ("Unexpected ending.");
+    http_die ("internal-error", err.c_str ());
 </%cpp>
