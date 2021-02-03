@@ -34,6 +34,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_macros.h>
 #include <fty_common_mlm_subprocess.h>
+#include <cxxtools/jsondeserializer.h>
 #include "shared/utils.h"
 
 // For debugging server credentials in error-reports below
@@ -296,7 +297,6 @@ int exec_journalctl_command (const std::string& logfile, bool truncate = true, b
     // 'www-data' user must be part of the 'systemd-journal' group, to let journalctl access journald files (see fty-core)
     // usermod -a -G systemd-journal www-data
     // avoid using 42ty wrapper (/usr/libexec/bios/journalctl) by calling the real version from /bin
-    std::string cmd;
 
     // IPCs do not store journal on flash to avoid its wear, so here we
     // pick one of two possible locations expected for the bundled product.
@@ -305,18 +305,21 @@ int exec_journalctl_command (const std::string& logfile, bool truncate = true, b
     DIR* dirobj = opendir(dirname.c_str());
     if (dirobj) {
         closedir(dirobj);
-    } else if (ENOENT == errno) {
+    }
+    else if (ENOENT == errno) {
         // Missing first choice, sort of expected, nothing to log
         dirname = "/run/log/journal";
-    } else {
+    }
+    else {
         log_debug("Failed to access '%s/' which seems to exist, will try another");
         dirname = "/run/log/journal";
     }
 
-    cmd = "/bin/journalctl -D " + dirname + " --no-pager -l";
+    std::string cmd = "/bin/journalctl -D " + dirname + " --no-pager -l";
     if (extensive) {
         cmd.append(" -x");
-    } else {
+    }
+    else {
         cmd.append(" -o cat"); // shorter output mode
     }
     if (truncate) {
@@ -351,6 +354,12 @@ UserInfo user;
 </%request>
 <%cpp>
 
+//#define _GETLOG_TEST_
+#undef _GETLOG_TEST_
+#ifdef _GETLOG_TEST_
+    #pragma message "=== _GETLOG_TEST_ defined ==="
+#endif
+
     // permission check
     static const std::map <BiosProfile, std::string> PERMISSIONS = {
         {BiosProfile::Admin, "R"}
@@ -365,23 +374,33 @@ UserInfo user;
     // e.g. exports from journalctl, so logNAME and logFILE are logically and
     // maybe functionally different beasts below...
 
-    // supported (baseName, filePath, isRealFile) tuples
+    // archive bits def.
+    enum {
+        bFULL = 1 << 0L, // full archive
+        bFNCT = 1 << 1L, // functional archive (maintenance report)
+    };
+
+    // supported (baseName, archBitmask, isRealFile, filePath) tuples
     struct {
         std::string baseName;
-        std::string filePath;
-        bool isRealFile; // existing vs. generated live
-    } logsData [] = {
-        { "messages",       "/var/log/messages", true },
-        { "verify-fs",      "/var/log/verify-fs.log", true },
-        { "www-audit",      "/var/log/tntnet/www-audit.log", true },
-        { "alarms-audit",   "/var/log/app-audit/alarms-audit.log", true },
-        { "metrics-audit",  "/var/log/app-audit/metrics-audit.log", true },
-        { "mass-mgr-audit", "/var/log/etn-mass-management/etn-mass-management.audit.log", true },
-        { "emc4j-audit",    "/var/log/etn-emc4j-ipm2/karaf.log", true },
-        { "journald",       "/tmp/journald.log", false }, // gen. by journalctl
-        { "journald-all",   "/tmp/journald-all.log", false }, // gen. by journalctl
-        { "processes",      "/tmp/processes.log", false }, // gen. by ps
-        { "ALL",            "/tmp/getlog_all.tar", false }, // archive, all logfiles above
+        int archBitmask; // archive membership
+        bool isRealFile; // existing vs. command export
+        std::string filePath; // fs access
+    } const logsData[] = {
+    // logfiles
+        { "messages",       bFULL,         true,  "/var/log/messages" },
+        { "verify-fs",      bFULL,         true,  "/var/log/verify-fs.log" },
+        { "www-audit",      bFULL | bFNCT, true,  "/var/log/tntnet/www-audit.log" },
+        { "alarms-audit",   bFULL | bFNCT, true,  "/var/log/app-audit/alarms-audit.log" },
+        { "metrics-audit",  bFULL | bFNCT, true,  "/var/log/app-audit/metrics-audit.log" },
+        { "mass-mgr-audit", bFULL | bFNCT, true,  "/var/log/etn-mass-management/etn-mass-management.audit.log" },
+        { "emc4j-audit",    bFULL | bFNCT, true,  "/var/log/etn-emc4j-ipm2/karaf.log" },
+        { "journald",       bFULL | bFNCT, false, "/tmp/journald.log" },     // journalctl export
+        { "journald-all",   bFULL,         false, "/tmp/journald-all.log" }, // journalctl export
+        { "processes",      bFULL | bFNCT, false, "/tmp/processes.log" },    // ps export
+    // archives
+        { "FULL", 0, false, "/tmp/log_full.tar" }, // full archive, bFULL logfiles above
+        { "FNCT", 0, false, "/tmp/log_fnct.tar" }, // functional archive, bFNCT logfiles above
     };
 
     // Parsed, trusted values (if populated)
@@ -394,9 +413,6 @@ UserInfo user;
         std::string slogname_base = request.getArg ("logname_base");
         std::string slogname_ext = request.getArg ("logname_ext");
         std::string slist_lognames = request.getArg ("list_lognames");
-
-        std::string encrypt_passphrase = request.getArg ("passphrase");
-        if (encrypt_passphrase.empty()) encrypt_passphrase = "7z";
 
         {
             std::string msg = "getlog_GET got args: logname_base='" + slogname_base \
@@ -427,9 +443,15 @@ UserInfo user;
             return HTTP_OK;
         }
 
+        // backward compat. 'ALL' becomes 'FULL'
+        if (slogname_base == "ALL") slogname_base = "FULL";
+
+#ifdef _GETLOG_TEST_
         //debug mode & test
         //ftylog_setVeboseMode(ftylog_getInstance());
-        //slogname_base = "ALL"; slogname_ext = ".gz";
+        //slogname_base = "FULL"; slogname_ext = ".gz";
+        //slogname_base = "FNCT"; slogname_ext = ".gz";
+#endif
 
         logname_base = slogname_base;
         logname_ext = slogname_ext;
@@ -463,12 +485,26 @@ UserInfo user;
                 ("'" + slogname_base + slogname_ext + "'").c_str(), expected.c_str());
         }
 
-        const bool encrypt = !encrypt_passphrase.empty();
-        if (!encrypt) {
+        // get passphrase for emcryption (req. body)
+        std::string encrypt_passphrase;
+        try {
+            cxxtools::SerializationInfo si;
+            std::istringstream input(request.getBody());
+            cxxtools::JsonDeserializer deserializer(input);
+            deserializer.deserialize(si);
+            si.getMember("passphrase", encrypt_passphrase);
+        }
+        catch (...) {
+            encrypt_passphrase.clear();
+        }
+#ifdef _GETLOG_TEST_
+        if (encrypt_passphrase.empty()) encrypt_passphrase = "7z"; //test
+#endif
+
+        if (encrypt_passphrase.empty()) {
             log_error("Authorized request to download an unsupported log file was denied");
             std::string expected = TRANSLATE_ME ("'passphrase' fulfilled");
-            http_die("request-param-bad", "passphrase",
-                "'passphrase' empty", expected.c_str());
+            http_die("request-param-bad", "passphrase", "''", expected.c_str());
         }
 
         // We have a definite officially supported request, try to fulfill it
@@ -477,26 +513,31 @@ UserInfo user;
 
         bool delete_logfile = false; // for post cleanup
 
-        if (logname_base == "ALL") {
-            // make a tar archive (logfile) owning *all* logfiles
+        if ((logname_base == "FULL") || (logname_base == "FNCT")) {
+            // make a tar archive (logfile) owning a set of logfiles
             delete_logfile = true;
 
-            std::string targetdir = "/tmp/IPM2-logs";
-            std::string mkdir; mkdir.append("mkdir -p ").append(targetdir);
-            std::string rmdir; rmdir.append("rm -fr ").append(targetdir);
-            std::string tar; tar.append("/bin/tar cf ").append(logfile).append(" -C /tmp/ IPM2-logs");
+            const std::string targetdir = "/tmp/IPM2-logs";
+            const std::string mkdir("mkdir -p " + targetdir);
+            const std::string rmdir("rm -fr " + targetdir);
+            const std::string tar("/bin/tar cf " + logfile + " -C /tmp/ IPM2-logs");
 
             // pre cleanup
             remove(logfile.c_str());
             int r = system(rmdir.c_str());
             if (r != 0) { log_warning("%s (r: %d)", rmdir.c_str(), r); }
 
-            // build the cp command to copy all logfiles in targetdir
+            // choose archive bit for logfiles membership
+            const int archBit = (logname_base == "FULL") ? bFULL : bFNCT;
+
+            // build the cp command to copy logfiles in targetdir
             std::vector<std::string> temp_logfiles;
-            std::string cp = "cp"; // cp all logs
+            std::string cp = "cp"; // cp logfiles
             for (auto& data : logsData) {
-                if (data.baseName == "ALL")
-                    continue;
+                if ((data.baseName == "FULL") || (data.baseName == "FNCT"))
+                    continue; // no archive treatment
+                if ((data.archBitmask & archBit) == 0)
+                    continue; // out of archive
 
                 if (data.baseName == "journald") {
                     // build logfile using journalctl export for last 3hrs
@@ -564,7 +605,7 @@ UserInfo user;
                 http_die( "internal-error", err.c_str ());
             }
 
-            // here logfile is created (tar archive)
+            // here logfile is created (archive)
         }
         else if (logname_base == "journald") {
             delete_logfile = true;
@@ -612,15 +653,16 @@ UserInfo user;
         // here logfile exist
 
         // logfile encryption (optional)
-        if (encrypt) {
-            if (encrypt_passphrase.empty()) { //secure
+        bool encrypted = false;
+        if (!encrypt_passphrase.empty()) {
+            /**if (encrypt_passphrase.empty()) { //secure
                 if (delete_logfile) remove(logfile.c_str());
                 std::string err = "encryption passphrase is empty";
                 log_error("%s", err.c_str());
                 http_die( "internal-error", err.c_str ());
-            }
+            }**/
 
-            // we use 7-Zip for encryption
+            // we use 7-Zip (p7zip) for encryption
             std::string crypted_logfile = logfile + ".7z";
             std::string cmd = "/usr/bin/7z a -p'" + encrypt_passphrase + "' " + crypted_logfile + " " + logfile;
             int r = system(cmd.c_str());
@@ -635,6 +677,7 @@ UserInfo user;
             if (delete_logfile) remove(logfile.c_str());
             logfile = crypted_logfile;
             delete_logfile = true;
+            encrypted = true;
         }
 
         // read logfile (fileContent)
@@ -698,7 +741,7 @@ UserInfo user;
         // build reply
 
         if ((logname_ext == "") || (logname_ext == ".txt")) { // plaintext
-            content_filename += encrypt ? ".txt.7z" : ".txt";
+            content_filename += encrypted ? ".txt.7z" : ".txt";
 
             reply.setContentType("text/plain;charset=UTF-8"); // TODO: Is it ASCII? Check rsyslog
             reply.setHeader(tnt::httpheader::contentDisposition,
@@ -712,10 +755,11 @@ UserInfo user;
                 + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str());
         }
         else { // compressed .gz
-            if (logname_base == "ALL") content_filename += ".tar";
+            if (logname_base == "FULL") content_filename += ".tar";
+            else if (logname_base == "FNCT") content_filename += ".tar";
             else content_filename += ".txt";
 
-            logname_ext = encrypt ? ".7z" : ".gz";
+            logname_ext = encrypted ? ".7z" : ".gz";
             content_filename += logname_ext;
 
             // compress (need the whole content) //NOTE: compressor << ifstream?
