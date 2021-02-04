@@ -494,7 +494,7 @@ UserInfo user;
         // get passphrase for maintenace mode arch. encryption
         std::string encrypt_passphrase;
         if (logname_isArchive && (logname_base == "FCT")) {
-            const char* p = getenv("MAINTENACE_MODE_ARCHIVE_PASSPHRASE");
+            const char* p = getenv("MAINTENANCE_MODE_ARCHIVE_PASSPHRASE");
             if (p) {
                 encrypt_passphrase = std::string(p);
             }
