@@ -27,9 +27,13 @@ sudo cp -f $libname_src $libname_bios
 
 if [ -d "src/web" ];
 then
-  #echo "cp xml files in /etc/tntnet/bios.d"
-  #ls src/web/*xml
-  #sudo cp src/web/*xml /etc/tntnet/bios.d
+  echo "cp bios xml files in /etc/tntnet/bios.d"
+  cd src/web
+  # 99_end.xml (template) make tntnet-ExecStartPre.sh fail - excluded
+  bios_xml=$(ls ??_*.xml | grep -v "99_end.xml")
+  echo $bios_xml
+  ##sudo cp $bios_xml /etc/tntnet/bios.d
+  cd -
 fi
 
 echo "restart tntnet@bios"
