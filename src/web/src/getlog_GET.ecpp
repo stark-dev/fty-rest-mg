@@ -348,6 +348,20 @@ int exec_ps_command (const std::string& logfile)
     return r;
 }
 
+// curl http req. export to logfile
+int exec_curl_command (const std::string& method, const std::string& url, const std::string& logfile)
+{
+    //std::string cmd = "/usr/bin/curl -sS -k -X " + method + " '" + url + "' > " + logfile + " 2>&1";
+    std::string cmd = "/usr/bin/curl -sS -k -o " + logfile + " -X " + method + " '" + url + "'";
+
+    log_debug("running curl command to generate %s", logfile.c_str());
+    int r = system(cmd.c_str());
+    if (r != 0) log_error("curl command returns %d ", r);
+    else log_debug("curl command returns %d ", r);
+
+    return r;
+}
+
 </%pre>
 <%request scope="global">
 UserInfo user;
@@ -377,8 +391,8 @@ UserInfo user;
 
     // archive bits def.
     enum {
-        bALL = 1 << 0L, // full archive
-        bFCT = 1 << 1L, // functional archive (maintenance report)
+        bALL = 1 << 0L, // full archive (maintenance report)
+        bFCT = 1 << 1L, // functional archive (client report)
     };
 
     // supported (baseName, archBitmask, isRealFile, filePath) tuples
@@ -389,16 +403,19 @@ UserInfo user;
         std::string filePath; // fs access
     } const logsData[] = {
     // logfiles
-        { "messages",       bALL,        true,  "/var/log/messages" },
-        { "verify-fs",      bALL,        true,  "/var/log/verify-fs.log" },
         { "www-audit",      bALL | bFCT, true,  "/var/log/tntnet/www-audit.log" },
         { "alarms-audit",   bALL | bFCT, true,  "/var/log/app-audit/alarms-audit.log" },
         { "metrics-audit",  bALL | bFCT, true,  "/var/log/app-audit/metrics-audit.log" },
         { "mass-mgr-audit", bALL | bFCT, true,  "/var/log/etn-mass-management/etn-mass-management.audit.log" },
         { "emc4j-audit",    bALL | bFCT, true,  "/var/log/etn-emc4j-ipm2/karaf.log" },
-        { "journald",       bALL | bFCT, false, "/tmp/journald.log" },     // journalctl export
+        { "verify-fs",      bALL | bFCT, true,  "/var/log/verify-fs.log" },
+        { "messages",       bALL,        true,  "/var/log/messages" },
+        { "emc4j-bundle",   bALL,        false, "/tmp/etn-emc4j-bundle.log" },
+        { "emc4j-jdbc",     bALL,        false, "/tmp/etn-emc4j-jdbc.log" },
+        { "emc4j-http",     bALL,        false, "/tmp/etn-emc4j-http.log" },
+        { "journald",       bALL,        false, "/tmp/journald.log" },     // journalctl export
         { "journald-all",   bALL,        false, "/tmp/journald-all.log" }, // journalctl export
-        { "processes",      bALL | bFCT, false, "/tmp/processes.log" },    // ps export
+        { "processes",      bALL,        false, "/tmp/processes.log" },    // ps export
     // archives (archBitmask *must* be 0)
         { "ALL", 0, false, "/tmp/log_all.tar" }, // full archive, bALL logfiles above
         { "FCT", 0, false, "/tmp/log_fct.tar" }, // functional archive, bFCT logfiles above
@@ -447,7 +464,7 @@ UserInfo user;
         }
 
 #ifdef _GETLOG_TEST_
-        //ftylog_setVeboseMode(ftylog_getInstance());
+        ftylog_setVeboseMode(ftylog_getInstance());
         //slogname_base = "ALL";
         //slogname_base = "FCT";
         //slogname_ext = ".gz";
@@ -491,23 +508,30 @@ UserInfo user;
         log_debug("%s", ("Posting logfile extension '" + logname_ext \
             + "' (MIME type '" + reply.getContentType() + "') - initial").c_str() );
 
-        // get passphrase for functional arch. encryption
+        // get passphrase for full arch. encryption
         std::string encrypt_passphrase;
-        if (logname_isArchive && (logname_base == "FCT")) {
+        if (logname_isArchive && (logname_base == "ALL")) {
             const char* p = getenv("MAINTENANCE_REPORT_ARCHIVE_PASSPHRASE");
             if (p) {
                 encrypt_passphrase = std::string(p);
             }
             if (encrypt_passphrase.empty()) {
-                log_warning("Maintenance report arch. passphrase is empty");
-                encrypt_passphrase = "sevenZ";
                 //http_die("internal-error", "Maintenance report arch. passphrase is empty");
+                //continue anyway
+                log_warning("Maintenance report arch. passphrase is empty");
+                encrypt_passphrase = "7z4u!";
             }
         }
 
 #ifdef _GETLOG_TEST_
-        //if (logname_isArchive) encrypt_passphrase = "7z"; // test
+        if (logname_isArchive && (logname_base == "ALL")) encrypt_passphrase = "7z"; // test
 #endif
+
+        //emc4j/karaf curl requests
+        const std::string EMC4J_KARAF("http://localhost:8181/jolokia/read/org.apache.karaf");
+        const std::string EMC4J_KARAF_BUNDLE(EMC4J_KARAF + ":type=bundle,name=root/Bundles");
+        const std::string EMC4J_KARAF_JDBC(EMC4J_KARAF + ":type=jdbc,name=root");
+        const std::string EMC4J_KARAF_HTTP(EMC4J_KARAF + ":type=http,name=root");
 
         bool delete_logfile = false; // for post cleanup
 
@@ -547,22 +571,34 @@ UserInfo user;
                 if (data.isRealFile) {
                     // nothing to do
                 }
-                else if (data.baseName == "journald") {
-                    // build logfile using journalctl export for last 3hrs
+                else if ((data.baseName == "journald")
+                        || (data.baseName == "journald-all")) {
+                    // build logfile using journalctl export truncated for last 3hrs
+                    // or not truncated (-all)
+                    int r = -1;
                     temp_logfiles.push_back(data.filePath);
-                    int r = exec_journalctl_command(data.filePath);
-                    if (r != 0) continue; // anyway
-                }
-                else if (data.baseName == "journald-all") {
-                    // build logfile using journalctl export
-                    temp_logfiles.push_back(data.filePath);
-                    int r = exec_journalctl_command(data.filePath, false, true);
+                    if (data.baseName == "journald") // truncated
+                        { r = exec_journalctl_command(data.filePath); }
+                    else // -all
+                        { r = exec_journalctl_command(data.filePath, false, true); }
                     if (r != 0) continue; // anyway
                 }
                 else if (data.baseName == "processes") {
                     // build logfile using ps export
                     temp_logfiles.push_back(data.filePath);
                     int r = exec_ps_command(data.filePath);
+                    if (r != 0) continue; // anyway
+                }
+                else if ((data.baseName == "emc4j-bundle")
+                        || (data.baseName == "emc4j-jdbc")
+                        || (data.baseName == "emc4j-http")) {
+                    // build logfile using curl export
+                    std::string url;
+                    if (data.baseName == "emc4j-bundle") url = EMC4J_KARAF_BUNDLE;
+                    else if (data.baseName == "emc4j-jdbc") url = EMC4J_KARAF_JDBC;
+                    else url = EMC4J_KARAF_HTTP; // emc4j-http
+                    temp_logfiles.push_back(data.filePath);
+                    int r = exec_curl_command("GET", url, data.filePath);
                     if (r != 0) continue; // anyway
                 }
                 else {
@@ -615,24 +651,18 @@ UserInfo user;
 
             // here logfile is created (archive)
         }
-        else if (logname_base == "journald") {
+        else if ((logname_base == "journald")
+                || (logname_base == "journald-all")) {
             delete_logfile = true;
             remove(logfile.c_str());
 
             // build logfile using journalctl export truncated for last 3hrs
-            int r = exec_journalctl_command(logfile);
-            if (r != 0) {
-                if (delete_logfile) remove(logfile.c_str());
-                std::string err = "journalctl command has failed.";
-                http_die( "internal-error", err.c_str ());
-            }
-        }
-        else if (logname_base == "journald-all") {
-            delete_logfile = true;
-            remove(logfile.c_str());
-
-            // build logfile using journalctl export
-            int r = exec_journalctl_command(logfile, false, true);
+            // or not truncated (-all)
+            int r = -1;
+            if (logname_base == "journald")
+                { r = exec_journalctl_command(logfile); }
+            else // -all
+                { r = exec_journalctl_command(logfile, false, true); }
             if (r != 0) {
                 if (delete_logfile) remove(logfile.c_str());
                 std::string err = "journalctl command has failed.";
@@ -648,6 +678,23 @@ UserInfo user;
             if (r != 0) {
                 if (delete_logfile) remove(logfile.c_str());
                 std::string err = "ps command has failed.";
+                http_die( "internal-error", err.c_str ());
+            }
+        }
+        else if ((logname_base == "emc4j-bundle")
+                || (logname_base == "emc4j-jdbc")
+                || (logname_base == "emc4j-http")) {
+            delete_logfile = true;
+            remove(logfile.c_str());
+            // build logfile using curl export
+            std::string url;
+            if (logname_base == "emc4j-bundle") url = EMC4J_KARAF_BUNDLE;
+            else if (logname_base == "emc4j-jdbc") url = EMC4J_KARAF_JDBC;
+            else url = EMC4J_KARAF_HTTP; // emc4j-http
+            int r = exec_curl_command("GET", url, logfile);
+            if (r != 0) {
+                if (delete_logfile) remove(logfile.c_str());
+                std::string err = "curl command has failed.";
                 http_die( "internal-error", err.c_str ());
             }
         }
