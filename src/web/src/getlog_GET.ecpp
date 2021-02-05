@@ -491,16 +491,17 @@ UserInfo user;
         log_debug("%s", ("Posting logfile extension '" + logname_ext \
             + "' (MIME type '" + reply.getContentType() + "') - initial").c_str() );
 
-        // get passphrase for maintenace mode arch. encryption
+        // get passphrase for functional arch. encryption
         std::string encrypt_passphrase;
         if (logname_isArchive && (logname_base == "FCT")) {
-            const char* p = getenv("MAINTENACE_MODE_ARCHIVE_PASSPHRASE");
+            const char* p = getenv("MAINTENANCE_REPORT_ARCHIVE_PASSPHRASE");
             if (p) {
                 encrypt_passphrase = std::string(p);
             }
             if (encrypt_passphrase.empty()) {
-                log_warning("Maintenance report passphrase is empty");
-                //http_die("internal-error", "Maintenance report passphrase is empty");
+                log_warning("Maintenance report arch. passphrase is empty");
+                encrypt_passphrase = "sevenZ";
+                //http_die("internal-error", "Maintenance report arch. passphrase is empty");
             }
         }
 

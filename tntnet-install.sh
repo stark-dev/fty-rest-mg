@@ -27,8 +27,8 @@ sudo cp -f $libname_src $libname_bios
 
 if [ -d "src/web" ];
 then
-  echo "cp xml files in /etc/tntnet/bios.d"
-  ls src/web/*xml
+  #echo "cp xml files in /etc/tntnet/bios.d"
+  #ls src/web/*xml
   #sudo cp src/web/*xml /etc/tntnet/bios.d
 fi
 
