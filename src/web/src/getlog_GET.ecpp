@@ -722,7 +722,7 @@ UserInfo user;
         // here baseName_logfile exist
 
         // encrypt logfile (optional)
-        bool isEncrypted = false;
+        bool is7zEncrypted = false;
         if (baseName_doEncryption) {
             // get passphrase for encryption
             std::string passphrase;
@@ -746,7 +746,7 @@ UserInfo user;
             std::string crypted_logfile = baseName_logfile + ".7z";
             std::string cmd = "/usr/bin/7z a -p'" + passphrase + "' " + crypted_logfile + " " + baseName_logfile;
             int r = system(cmd.c_str());
-            //log_debug("7z/crypt %s (r: %d)", crypted_logfile.c_str(), r);
+            log_debug("7z/crypt %s (r: %d)", crypted_logfile.c_str(), r);
             if (r != 0) {
                 if (deleteLogfile) remove(baseName_logfile.c_str());
                 remove(crypted_logfile.c_str());
@@ -759,7 +759,7 @@ UserInfo user;
             if (deleteLogfile) remove(baseName_logfile.c_str());
             baseName_logfile = crypted_logfile;
             deleteLogfile = true;
-            isEncrypted = true;
+            is7zEncrypted = true;
         }
 
         // read logfile (fileContent)
@@ -769,7 +769,7 @@ UserInfo user;
             if (!in) {
                 if (deleteLogfile) remove(baseName_logfile.c_str());
                 // This exception string is processed below to return HTTP-404 and not HTTP-500
-                throw std::runtime_error(TRANSLATE_ME ("Could not open requested logfile: ") + baseName_logfile);
+                throw std::runtime_error(TRANSLATE_ME("Could not open requested logfile: ") + baseName_logfile);
             }
             std::ostringstream out;
             out << in.rdbuf();
@@ -790,7 +790,7 @@ UserInfo user;
 
         if (baseName_ext.empty() || (baseName_ext == ".txt")) { // plaintext
             replyContentFilename += baseName_isArchive ? ".tar" : ".txt";
-            if (isEncrypted) replyContentFilename += ".7z";
+            if (is7zEncrypted) replyContentFilename += ".7z";
 
             reply.setContentType("text/plain;charset=UTF-8"); // TODO: Is it ASCII? Check rsyslog
             reply.setHeader(tnt::httpheader::contentDisposition,
@@ -798,26 +798,28 @@ UserInfo user;
             reply.out() << fileContent;
         }
         else { // ".gz"
-            baseName_ext = isEncrypted ? ".7z" : ".gz";
+            baseName_ext = is7zEncrypted ? ".7z" : ".gz";
 
             replyContentFilename += baseName_isArchive ? ".tar" : ".txt";
             replyContentFilename += baseName_ext;
 
-            if (!isEncrypted) { // .gz
+            if (!is7zEncrypted) { // .gz
                 // compress the whole content //NOTE: compressor << ifstream?
                 _clonedcode_Compressor compressor;
                 compressor.init();
                 compressor.compress(fileContent.data(), fileContent.size());
                 compressor.finalize();
 
-                //{
-                //    std::ostringstream gzsize;
-                //    gzsize << compressor.zsize();
-                //    std::ostringstream msg;
-                //    msg << "gzipped '" << baseName << "' body " << fileContent.size() \
-                //        << " bytes to " << gzsize.str() << " bytes";
-                //    log_debug("%s", msg.str().c_str());
-                //}
+#ifdef _GETLOG_TEST_
+                {
+                    std::ostringstream gzsize;
+                    gzsize << compressor.zsize();
+                    std::ostringstream msg;
+                    msg << "gzipped '" << baseName << "' body " << fileContent.size() \
+                        << " bytes to " << gzsize.str() << " bytes";
+                    log_debug("%s", msg.str().c_str());
+                }
+#endif
 
                 // replace fileContent
                 fileContent = compressor.str();
@@ -900,22 +902,22 @@ UserInfo user;
             log_debug("%s", msg.c_str());
 
             msg = "Exception caught: " + std::string(e.what ());
-            log_error ("%s", msg.c_str ());
+            log_error("%s", msg.c_str ());
         }
 
         reply.resetContent();
 
         // TODO: Use (define?) a dedicated exception class; maybe employ bios_throw
-        if (baseName_isRealFile && std::string{e.what()}.find( TRANSLATE_ME ("Could not open requested logfile: ") ) != std::string::npos) {
-            http_die ("not-found", baseName.c_str());
+        if (baseName_isRealFile && std::string{e.what()}.find( TRANSLATE_ME("Could not open requested logfile: ") ) != std::string::npos) {
+            http_die("not-found", baseName.c_str());
         }
         else {
-            std::string err = TRANSLATE_ME ("Exception caught. Please check logs for more details.");
-            http_die ("internal-error", err.c_str ());
+            std::string err = TRANSLATE_ME("Exception caught. Please check logs for more details.");
+            http_die("internal-error", err.c_str ());
         }
     }
 
     // normally never reached
-    std::string err = TRANSLATE_ME ("Unexpected ending.");
-    http_die ("internal-error", err.c_str ());
+    std::string err = TRANSLATE_ME("Unexpected ending.");
+    http_die("internal-error", err.c_str ());
 </%cpp>
