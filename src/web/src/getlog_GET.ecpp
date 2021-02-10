@@ -419,7 +419,7 @@ int process_basename_export (const std::string& basename, const std::string& log
         // build logfile using ps export
         int r = exec_ps_command(logfile);
         if (r != 0) {
-            errMsg = "ps command has failed.";
+            errMsg = "ps command has failed (basename: " + basename + ")";
             return -1;
         }
     }
@@ -433,7 +433,7 @@ int process_basename_export (const std::string& basename, const std::string& log
         else // journald-all
             { r = exec_journalctl_command(logfile, false, true); }
         if (r != 0) {
-            errMsg = "journalctl command has failed.";
+            errMsg = "journalctl command has failed (basename: " + basename + ")";
             return -1;
         }
     }
@@ -454,7 +454,7 @@ int process_basename_export (const std::string& basename, const std::string& log
         // build logfile using curl export
         int r = exec_curl_command("GET", url, logfile);
         if (r != 0) {
-            errMsg = "curl command has failed.";
+            errMsg = "curl command has failed (basename: " + basename + ")";
             return -1;
         }
     }
@@ -541,9 +541,9 @@ UserInfo user;
         std::string in_logname_ext = request.getArg ("logname_ext");
 
 #ifdef _GETLOG_TEST_
-        ftylog_setVeboseMode(ftylog_getInstance());
+        ftylog_setVerboseMode(ftylog_getInstance());
         //in_list_lognames = "yes";
-        //in_logname_base = "ALL"; //in_logname_base = "FCT";
+        //in_logname_base = "ALL"; //in_logname_base = "FCT"; //in_logname_base = "journald-all";
         //in_logname_ext = ".gz"; //in_logname_ext = ".txt"; //in_logname_ext = "";
 #endif
 
@@ -637,7 +637,7 @@ UserInfo user;
 
             // build the cp command to copy logfiles in targetdir
             std::vector<std::string> temp_logfiles;
-            std::string cp = "cp"; // cp logfiles
+            std::string cp; // cp logfiles
             for (auto& data : logsData) {
                 if ((data.archBitmask & baseName_archiveBit) == 0)
                     continue; // logfile out of archive, or archive itself
@@ -647,16 +647,23 @@ UserInfo user;
                     int r = process_basename_export(data.baseName, data.filePath, err);
                     temp_logfiles.push_back(data.filePath);
                     if (r != 0) {
-                        log_warning(err.c_str());
+                        log_warning("%s", err.c_str());
                         continue; // anyway
                     }
                 }
 
-                // append only if file exist
-                if (access(data.filePath.c_str(), F_OK) != -1)
-                    { cp.append(" ").append(data.filePath); }
+                // cp command: append only if file exist
+                if (access(data.filePath.c_str(), F_OK) != -1) {
+                    if (cp.empty()) cp = "cp";
+                    cp.append(" ").append(data.filePath);
+                }
             }
-            cp.append(" ").append(targetdir);
+            if (cp.empty()) {
+                log_warning("'%s' archive is empty", baseName.c_str());
+            }
+            else {
+                cp.append(" ").append(targetdir);
+            }
 
             // build target directory
             r = system(mkdir.c_str());
@@ -669,14 +676,16 @@ UserInfo user;
             }
 
             // copy logfiles in target dir.
-            r = system(cp.c_str());
-            log_debug("%s (r: %d)", cp.c_str(), r);
-            if (r != 0) {
-                if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
-                for (auto& file : temp_logfiles) { remove(file.c_str()); }
-                log_error ("%s failed (r: %d)", cp.c_str(), r);
-                std::string err = "cp command has failed.";
-                http_die( "internal-error", err.c_str ());
+            if (!cp.empty()) {
+                r = system(cp.c_str());
+                log_debug("%s (r: %d)", cp.c_str(), r);
+                if (r != 0) {
+                    if (0 != system(rmdir.c_str())) { log_warning("'%s' failed", rmdir.c_str()); }
+                    for (auto& file : temp_logfiles) { remove(file.c_str()); }
+                    log_error ("%s failed (r: %d)", cp.c_str(), r);
+                    std::string err = "cp command has failed.";
+                    http_die( "internal-error", err.c_str ());
+                }
             }
 
             // archive target dir.
@@ -713,7 +722,7 @@ UserInfo user;
         // here baseName_logfile exist
 
         // encrypt logfile (optional)
-        bool isEncrypted = false;
+        bool is7zEncrypted = false;
         if (baseName_doEncryption) {
             // get passphrase for encryption
             std::string passphrase;
@@ -723,7 +732,7 @@ UserInfo user;
             }
             if (passphrase.empty()) { // fallback
                 log_warning("Env. variable for encryption passphrase is not set");
-                log_warning("Use default encryption passphrase for '%s'", baseName.c_str());
+                log_warning("Use default encryption passphrase for basename '%s'", baseName.c_str());
                 passphrase = "7z4u!";
             }
             if (passphrase.empty()) {
@@ -737,12 +746,12 @@ UserInfo user;
             std::string crypted_logfile = baseName_logfile + ".7z";
             std::string cmd = "/usr/bin/7z a -p'" + passphrase + "' " + crypted_logfile + " " + baseName_logfile;
             int r = system(cmd.c_str());
-            //log_debug("7z/crypt %s to %s (r: %d)", baseName_logfile.c_str(), crypted_logfile.c_str(), r);
+            log_debug("7z/crypt %s (r: %d)", crypted_logfile.c_str(), r);
             if (r != 0) {
                 if (deleteLogfile) remove(baseName_logfile.c_str());
                 remove(crypted_logfile.c_str());
                 std::string err = "7z/crypt command has failed for basename '" + baseName + "'.";
-                log_error ("%s", err.c_str());
+                log_error("%s", err.c_str());
                 http_die( "internal-error", err.c_str ());
             }
 
@@ -750,7 +759,7 @@ UserInfo user;
             if (deleteLogfile) remove(baseName_logfile.c_str());
             baseName_logfile = crypted_logfile;
             deleteLogfile = true;
-            isEncrypted = true;
+            is7zEncrypted = true;
         }
 
         // read logfile (fileContent)
@@ -760,12 +769,12 @@ UserInfo user;
             if (!in) {
                 if (deleteLogfile) remove(baseName_logfile.c_str());
                 // This exception string is processed below to return HTTP-404 and not HTTP-500
-                throw std::runtime_error(TRANSLATE_ME ("Could not open requested logfile: ") + baseName_logfile);
+                throw std::runtime_error(TRANSLATE_ME("Could not open requested logfile: ") + baseName_logfile);
             }
             std::ostringstream out;
             out << in.rdbuf();
             in.close();
-            fileContent = out.str ();
+            fileContent = out.str();
         }
 
         // cleanup logfile
@@ -781,54 +790,60 @@ UserInfo user;
 
         if (baseName_ext.empty() || (baseName_ext == ".txt")) { // plaintext
             replyContentFilename += baseName_isArchive ? ".tar" : ".txt";
-            if (isEncrypted) replyContentFilename += ".7z";
+            if (is7zEncrypted) replyContentFilename += ".7z";
 
             reply.setContentType("text/plain;charset=UTF-8"); // TODO: Is it ASCII? Check rsyslog
             reply.setHeader(tnt::httpheader::contentDisposition,
                 replyContentDisposition + "; filename=\"" + replyContentFilename + "\"", true);
             reply.out() << fileContent;
-            fileContent.clear();
-
-            log_debug("%s", \
-                ("Posting logfile extension '" + baseName_ext \
-                + "' (MIME type '" + reply.getContentType() + "') in mode " \
-                + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str());
         }
         else { // ".gz"
-            baseName_ext = isEncrypted ? ".7z" : ".gz";
+            baseName_ext = is7zEncrypted ? ".7z" : ".gz";
 
             replyContentFilename += baseName_isArchive ? ".tar" : ".txt";
             replyContentFilename += baseName_ext;
 
-            // compress (need the whole content) //NOTE: compressor << ifstream?
-            _clonedcode_Compressor compressor;
-            compressor.init();
-            compressor.compress(fileContent.data(), fileContent.size());
-            compressor.finalize();
+            if (!is7zEncrypted) { // .gz
+                // compress the whole content //NOTE: compressor << ifstream?
+                _clonedcode_Compressor compressor;
+                compressor.init();
+                compressor.compress(fileContent.data(), fileContent.size());
+                compressor.finalize();
 
-            std::ostringstream ozsize;
-            ozsize << compressor.zsize();
-            {
-                std::ostringstream msg;
-                msg << "gzipped '" << baseName \
-                    << "' body "  << fileContent.size() \
-                    << " bytes to " << ozsize.str() << " bytes";
-                log_debug("%s", msg.str().c_str());
+#ifdef _GETLOG_TEST_
+                {
+                    std::ostringstream gzsize;
+                    gzsize << compressor.zsize();
+                    std::ostringstream msg;
+                    msg << "gzipped '" << baseName << "' body " << fileContent.size() \
+                        << " bytes to " << gzsize.str() << " bytes";
+                    log_debug("%s", msg.str().c_str());
+                }
+#endif
+
+                // replace fileContent
+                fileContent = compressor.str();
+                compressor.clear();
             }
-            fileContent.clear();
+            else {
+                // 7z native compression
+            }
 
             tnt::MimeDb mimeDb("/etc/mime.types");
             reply.setContentType(mimeDb.getMimetype(baseName + baseName_ext));
-            reply.setHeader(tnt::httpheader::contentLength, ozsize.str(), true);
+            reply.setHeader(tnt::httpheader::contentLength, std::to_string(fileContent.size()), true);
             reply.setHeader(tnt::httpheader::contentDisposition,
                 replyContentDisposition + "; filename=\"" + replyContentFilename + "\"", true);
-            reply.out() << compressor.str();
-            compressor.clear();
+            reply.out() << fileContent;
+        }
 
-            log_debug("%s", \
-                ("Posting logfile extension '" + baseName_ext \
-                + "' (MIME type '" + reply.getContentType() + "') in mode " \
-                + reply.getHeader(tnt::httpheader::contentDisposition) + " - done").c_str());
+        fileContent.clear();
+
+        {
+            std::string msg = "Posting logfile extension '" + baseName_ext
+                + "' (MIME '" + reply.getContentType() + "') in mode '"
+                + reply.getHeader(tnt::httpheader::contentDisposition) + "' - done";
+            log_debug("%s", msg.c_str());
         }
 
         return HTTP_OK;
@@ -887,22 +902,22 @@ UserInfo user;
             log_debug("%s", msg.c_str());
 
             msg = "Exception caught: " + std::string(e.what ());
-            log_error ("%s", msg.c_str ());
+            log_error("%s", msg.c_str ());
         }
 
         reply.resetContent();
 
         // TODO: Use (define?) a dedicated exception class; maybe employ bios_throw
-        if (baseName_isRealFile && std::string{e.what()}.find( TRANSLATE_ME ("Could not open requested logfile: ") ) != std::string::npos) {
-            http_die ("not-found", baseName.c_str());
+        if (baseName_isRealFile && std::string{e.what()}.find( TRANSLATE_ME("Could not open requested logfile: ") ) != std::string::npos) {
+            http_die("not-found", baseName.c_str());
         }
         else {
-            std::string err = TRANSLATE_ME ("Exception caught. Please check logs for more details.");
-            http_die ("internal-error", err.c_str ());
+            std::string err = TRANSLATE_ME("Exception caught. Please check logs for more details.");
+            http_die("internal-error", err.c_str ());
         }
     }
 
     // normally never reached
-    std::string err = TRANSLATE_ME ("Unexpected ending.");
-    http_die ("internal-error", err.c_str ());
+    std::string err = TRANSLATE_ME("Unexpected ending.");
+    http_die("internal-error", err.c_str ());
 </%cpp>
