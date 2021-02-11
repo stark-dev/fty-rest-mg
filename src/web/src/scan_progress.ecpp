@@ -116,6 +116,12 @@ get_scan_progress (std::string &output)
             output.append(discovered_sts);
             output.append("\"");
 
+            ZstrGuard discovered_sensors (zmsg_popstr (resp));
+            if(!discovered_sensors) return -5;
+            output.append ("\"sensors-discovered\" : \"");
+            output.append(discovered_sensors);
+            output.append("\"");
+
             output.append("}");
         }
         else if (streq (result, "ERROR")) {
