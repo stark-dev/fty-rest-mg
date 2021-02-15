@@ -114,7 +114,7 @@ get_scan_progress (std::string &output)
             if(!discovered_sts) return -5;
             output.append ("\"sts-discovered\" : \"");
             output.append(discovered_sts);
-            output.append("\"");
+            output.append("\",");
 
             ZstrGuard discovered_sensors (zmsg_popstr (resp));
             if(!discovered_sensors) return -5;
