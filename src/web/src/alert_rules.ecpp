@@ -101,10 +101,15 @@ if (!client) {
 std::string client_name = utils::generate_mlm_client_id ("web.alert_rules");
 log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
-int rv = mlm_client_connect (client, MLM_ENDPOINT, 1000, client_name.c_str ());
+int connect_timeout = 1000; // ms
+int rv = mlm_client_connect (client, MLM_ENDPOINT, connect_timeout, client_name.c_str ());
+if (rv == -1) { // if failed, retry with larger timeout
+    connect_timeout += 1000;
+    rv = mlm_client_connect (client, MLM_ENDPOINT, connect_timeout, client_name.c_str ());
+}
 if (rv == -1) {
     log_fatal ("mlm_client_connect (endpoint = '%s', timeout = '%d', address = '%s') failed.",
-                    MLM_ENDPOINT, 1000, client_name.c_str ());
+                    MLM_ENDPOINT, connect_timeout, client_name.c_str ());
     std::string err =  TRANSLATE_ME ("mlm_client_connect () failed.");
     log_error_audit ("Request %s alert rule named %s FAILED", request.getMethod () == "POST" ? "CREATE" : "CREATE OR UPDATE", name.c_str ());
     http_die ("internal-error", err.c_str ());

@@ -63,11 +63,11 @@ get_scan_progress (std::string &output)
         return -2;
     }
 
-    ZmsgGuard resp(client->recv (zuuid_str_canonical (uuid), 5));
+    ZmsgGuard resp(client->recv (zuuid_str_canonical (uuid), 20));
     zuuid_destroy (&uuid);
     if (!resp)
     {
-        log_fatal ("info: client->recv (timeout = '5') returned NULL");
+        log_fatal ("info: client->recv (timeout = '20') returned NULL");
         return -3;
     }
 
@@ -114,6 +114,12 @@ get_scan_progress (std::string &output)
             if(!discovered_sts) return -5;
             output.append ("\"sts-discovered\" : \"");
             output.append(discovered_sts);
+            output.append("\",");
+
+            ZstrGuard discovered_sensors (zmsg_popstr (resp));
+            if(!discovered_sensors) return -5;
+            output.append ("\"sensors-discovered\" : \"");
+            output.append(discovered_sensors);
             output.append("\"");
 
             output.append("}");

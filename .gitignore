@@ -278,6 +278,7 @@ src/web/src/asset_actions_POST.cc
 src/web/src/asset_counter_GET.cc
 
 tntnet.xml.example
+*.xml.example
 !src/web/tntnet.xml
 tntnet.xml
 

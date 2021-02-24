@@ -45,6 +45,7 @@ Build-Depends: debhelper (>= 9),
     libfty-asset-activator-dev,
     libfty-common-messagebus-dev,
     libfty-common-dto-dev,
+    libfty-asset-activator-dev,
     asciidoc-base | asciidoc, xmlto,
     dh-autoreconf
 
@@ -102,7 +103,7 @@ Depends:
     libcidr0,
     tntnet-runtime,
     malamute,
-    libsnmp30,
+    libsnmp30 | libsnmp40,
     cracklib-runtime,
     ipc-data
 Recommends: msmtp, nut
