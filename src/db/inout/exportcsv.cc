@@ -40,6 +40,7 @@
 #include <fty_common_db_asset.h>
 #include "dbtypes.h"
 #include "shared/utilspp.h"
+#include "shared/data.h"
 
 namespace persist {
 
@@ -383,6 +384,7 @@ std::string getOutletNumber(const std::string &extAttributeName)
 void
     export_asset_json (std::ostream& out, std::set<std::string>* listElements)
 {
+    asset_manager asset_mgr;
     // 0.) tntdb connection
     tntdb::Connection conn;
     std::string msg{"no connection to database"};
@@ -404,7 +406,7 @@ void
     // 2. FOR EACH ROW from v_web_asset_element / t_bios_asset_element do ...
     std::function<void(const tntdb::Row&)>
         process_v_web_asset_element_row_json \
-        = [&conn, &si, &msg, listElements](const tntdb::Row& r)
+        = [&conn, &si, &msg, &asset_mgr, listElements](const tntdb::Row& r)
     {
         a_elmnt_id_t id_num = 0;
         std::string id;
@@ -471,6 +473,13 @@ void
           si_asset.addMember("location_id") <<= location_id;
         }
         si_asset.addMember("location") <<= location;
+
+        if (id_parent_num > 0) {
+            auto parentAsset = asset_mgr.get_item1(id_parent_num);
+            si_asset.addMember("location_type") <<= parentAsset.item.basic.subtype_name;
+        } else {
+            si_asset.addMember("location_type") <<= "";
+        }
 
         //TODO : groups
         cxxtools::SerializationInfo& si_asset_groups = si_asset.addMember("groups");
