@@ -34,7 +34,8 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_macros.h>
 #include <fty_common_mlm_subprocess.h>
-//#include <cxxtools/jsondeserializer.h>
+#include <cxxtools/serializationinfo.h>
+#include <cxxtools/jsondeserializer.h>
 #include "shared/utils.h"
 
 // For debugging server credentials in error-reports below
@@ -726,18 +727,39 @@ UserInfo user;
         if (baseName_doEncryption) {
             // get passphrase for encryption
             std::string passphrase;
-            const char* p = getenv("MAINTENANCE_REPORT_ARCHIVE_PASSPHRASE");
-            if (p) {
-                passphrase = std::string(p);
+            {
+                const std::string path_name("/usr/share/bios/maintenance-report-conf.json");
+                try {
+                    std::ifstream in(path_name);
+                    in.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+                    cxxtools::JsonDeserializer deserializer(in);
+                    cxxtools::SerializationInfo si;
+                    deserializer.deserialize(si);
+
+                    std::string version; // read but not processed
+                    if (!si.getMember("version", version)) {
+                        throw std::runtime_error("'version' member is missing");
+                    }
+                    if (!si.getMember("passphrase", passphrase)) {
+                        throw std::runtime_error("'passphrase' member is missing");
+                    }
+                }
+                catch (const std::ifstream::failure& e) {
+                    log_error("Exception reading %s (%s)", path_name.c_str(), e.what());
+                }
+                catch (const std::exception& e) {
+                    log_error("Std exception reading %s (%s)", path_name.c_str(), e.what());
+                }
             }
+
             if (passphrase.empty()) { // fallback
-                log_warning("Env. variable for encryption passphrase is not set");
+                log_warning("Encryption passphrase is not set");
                 log_warning("Use default encryption passphrase for basename '%s'", baseName.c_str());
                 passphrase = "7z4u!";
             }
             if (passphrase.empty()) {
                 if (deleteLogfile) remove(baseName_logfile.c_str());
-                std::string err = "Encryption passphrase is empty for basename '" + baseName + "'.";
+                std::string err = "Encryption passphrase is undefined for basename '" + baseName + "'.";
                 log_error("%s", err.c_str());
                 http_die("internal-error", err.c_str());
             }
