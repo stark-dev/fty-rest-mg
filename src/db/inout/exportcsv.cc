@@ -476,7 +476,7 @@ void
 
         if (id_parent_num > 0) {
             auto parentAsset = asset_mgr.get_item1(id_parent_num);
-            si_asset.addMember("location_type") <<= parentAsset.item.basic.subtype_name;
+            si_asset.addMember("location_type") <<= parentAsset.item.basic.type_name;
         } else {
             si_asset.addMember("location_type") <<= "";
         }
