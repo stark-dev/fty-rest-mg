@@ -250,7 +250,7 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
 
     // Get informations from database
     auto parentAsset = asset_mgr.get_item1(tmp.item.basic.parent_id);
-    json += utils::json::jsonify("location_type", parentAsset.item.basic.subtype_name) + ",";
+    json += utils::json::jsonify("location_type", parentAsset.item.basic.type_name) + ",";
   }
   else
   {
