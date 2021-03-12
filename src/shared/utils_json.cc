@@ -405,6 +405,10 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       if (attrName == "name")
         continue;
 
+      // filter location_type (already present)
+      if (attrName == "location_type")
+        continue;
+
       auto &attrValue = oneExt.second.first;
       auto isReadOnly = oneExt.second.second;
       if (r_outlet_label.match(attrName))

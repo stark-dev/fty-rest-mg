@@ -577,6 +577,10 @@ void
         //Print extended attributes
         for (const auto& k : ext_attrs) {
           if(k.first != "name" && (k.first.compare(0, t_ip.length(), t_ip) != 0)) {
+            // filter location_type (already present)
+            if (k.first == "location_type")
+              continue;
+
             //We don't want info use in outlets
             if (r_outlet_label.match(k.first))
             {
