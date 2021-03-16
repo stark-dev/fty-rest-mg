@@ -43,69 +43,77 @@ UserInfo user;
 std::string gaccess_token;
 </%request>
 <%cpp>
-std::string checked_access_token;
-{
-    // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
-    //       this is where the token is actually verified and user info
-    //       fill'ed
 
-    // sanitize check
-    std::string access_token = gaccess_token;
-    check_regex_text_or_die ("access_token", access_token, checked_access_token, "^[-/._~+/a-z0-9]{0,255}={0,10}$");
-    // sanitize check end
-}
+    // handle not authenticated user only
+    if (user.profile() == BiosProfile::Anonymous)
+    {
+        std::string checked_access_token;
+        {
+            // NOTE: auth_verify is not limited by CHECK_USER_PERMISSIONS_OR_DIE
+            //       this is where the token is actually verified and user info
+            //       fill'ed
 
-/* We can get the token from header, or from GET or POST request args */
-if(!checked_access_token.empty()) {
-    long int uid;
-    long int tme;
-    long int gid;
-    char *user_name;
-    BiosProfile profile = tokens::get_instance()->verify_token(checked_access_token,&tme, &uid, &gid, &user_name);
+            // sanitize check
+            std::string access_token = gaccess_token;
+            check_regex_text_or_die ("access_token", access_token, checked_access_token, "^[-/._~+/a-z0-9]{0,255}={0,10}$");
+            // sanitize check end
+        }
 
-    if (profile != BiosProfile::Anonymous) {
-        user.profile (profile);
-        user.uid (uid);
-        user.gid (gid);
-        user.login (user_name);
-        delete[] user_name; user_name = NULL;
+        /* We can get the token from header, or from GET or POST request args */
+        if (!checked_access_token.empty()) {
+            long int uid = 0;
+            long int tme = 0;
+            long int gid = 0;
+            char *user_name = NULL;
+            BiosProfile profile = tokens::get_instance()->verify_token(checked_access_token,&tme, &uid, &gid, &user_name);
 
-        // Some of our code expects re-authentication for sensitive requests,
-        // if implemented by a third-party extended authentication module that
-        // would handle auth token processing and verification with higher
-        // priority than this code. In builds using *this* module, default to
-        // pretending the re-auth happened successfully if the session is OK.
-        if (!user.reauthInitialized()) {
-            const char *envvar = getenv("REAUTH_FALLBACK_DEFAULT");
+            if (profile != BiosProfile::Anonymous) {
+                user.profile (profile); // authenticated
+                user.uid (uid);
+                user.gid (gid);
+                user.login (user_name);
+                delete[] user_name; user_name = NULL;
 
-            // The hardcoded default in absence of envvar or invalid value in
-            // it - allows sensitive components to work with a valid token and
-            // no reauth implementation (passed from third-party servlets).
-            bool defaultval = true;
-            if ( envvar != NULL) {
-                if ( (!strncasecmp("TRUE", envvar, 4)) || (!strncasecmp("YES", envvar, 3)) || (!strncasecmp("ON", envvar, 2)) || (!strncasecmp("1", envvar, 1)) ) {
-                    defaultval = true;
-                } else if ( (!strncasecmp("FALSE", envvar, 5)) || (!strncasecmp("NO", envvar, 2)) || (!strncasecmp("OFF", envvar, 3)) || (!strncasecmp("0", envvar, 1)) ) {
-                    defaultval = false;
-                }
+                // Some of our code expects re-authentication for sensitive requests,
+                // if implemented by a third-party extended authentication module that
+                // would handle auth token processing and verification with higher
+                // priority than this code. In builds using *this* module, default to
+                // pretending the re-auth happened successfully if the session is OK.
+                if (!user.reauthInitialized()) {
+                    const char *envvar = getenv("REAUTH_FALLBACK_DEFAULT");
+
+                    // The hardcoded default in absence of envvar or invalid value in
+                    // it - allows sensitive components to work with a valid token and
+                    // no reauth implementation (passed from third-party servlets).
+                    bool defaultval = true;
+                    if ( envvar != NULL) {
+                        if ( (!strncasecmp("TRUE", envvar, 4)) || (!strncasecmp("YES", envvar, 3)) || (!strncasecmp("ON", envvar, 2)) || (!strncasecmp("1", envvar, 1)) ) {
+                            defaultval = true;
+                        } else if ( (!strncasecmp("FALSE", envvar, 5)) || (!strncasecmp("NO", envvar, 2)) || (!strncasecmp("OFF", envvar, 3)) || (!strncasecmp("0", envvar, 1)) ) {
+                            defaultval = false;
+                        }
+                    }
+                    log_debug ("Defaulting reauth-happened flag to: %s", defaultval ? "true" : "false");
+                    user.reauthDefault (defaultval);
+                } // if reauth flag was not definitely set yet; else don't waste time
             }
-            log_debug ("Defaulting reauth-happened flag to: %s", defaultval ? "true" : "false");
-            user.reauthDefault (defaultval);
-        } // if reauth flag was not definitely set yet; else don't waste time
-    } else {
+        }
+    }
+
+    // finally die if user is not authenticated
+    if (user.profile() == BiosProfile::Anonymous)
+    {
         http_die("not-authorized", "");
     }
-}
 
 #ifdef DEBUG
-    reply.setHeader( (std::string)"X-Auth-Token-Presented: ",
-                "\"" + checked_access_token + "\"" );
+    reply.setHeader( std::string("X-Auth-Token-Presented: "), "\"" + gaccess_token + "\"" );
 
     std::ostringstream os;
     os << "access_auth_level=\"" << static_cast<int> (user.profile ()) << "\"";
-    reply.setHeader( (std::string)"X-Auth-Verify: ", os.str() );
+    reply.setHeader( std::string("X-Auth-Verify: "), os.str() );
 #endif // DEBUG
 
-/* Go on to next module in tntnet.xml */
-return DECLINED;
+    // Go on to next module in bios.xml
+    return DECLINED;
 </%cpp>
