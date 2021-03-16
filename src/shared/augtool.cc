@@ -27,6 +27,9 @@
 #include <string>
 #include <functional>
 #include <cxxtools/split.h>
+#include <mutex>
+#include <thread>
+#include <chrono>
 
 #include "shared/augtool.h"
 
@@ -72,13 +75,14 @@ std::string augtool::get_cmd_out(std::string cmd, bool key_value,
 std::string augtool::get_cmd_out_raw(std::string command) {
     std::string ret;
     bool err = false;
-    mux.lock();
+
+    std::lock_guard<std::mutex> lock(mux);
+
     if(command.empty() || command.back() != '\n')
         command += "\n";
     if(::write(prc->getStdin(), command.c_str(), command.length()) < 1)
         err = true;
     ret = MlmSubprocess::wait_read_all(prc->getStdout());
-    mux.unlock();
     return err ? "" : ret;
 }
 
@@ -88,10 +92,9 @@ void augtool::run_cmd(std::string cmd) {
 
 void augtool::clear() {
     static std::mutex clear_mux;
-    clear_mux.lock();
+    std::lock_guard<std::mutex> lock(clear_mux);
     run_cmd("");
     run_cmd("load");
-    clear_mux.unlock();
 }
 
 augtool* augtool::get_instance() {
@@ -100,12 +103,16 @@ augtool* augtool::get_instance() {
     std::string nil;
 
     // Initialization of augtool subprocess if needed
-    in_mux.lock();
+    std::lock_guard<std::mutex> lock(in_mux);
+
     if(inst.prc == NULL) {
         MlmSubprocess::Argv exe = { "sudo", "augtool", "-S", "-I/usr/share/fty/lenses", "-e" };
         inst.prc = new MlmSubprocess::SubProcess(exe,
                                                  MlmSubprocess::SubProcess::STDOUT_PIPE |
                                                  MlmSubprocess::SubProcess::STDIN_PIPE);
+
+        //sleep to ensure augeas is launched
+        std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     if(!inst.prc->isRunning()) {
         inst.prc->run();
@@ -116,7 +123,6 @@ augtool* augtool::get_instance() {
             return NULL;
         }
     }
-    in_mux.unlock();
     inst.clear();
     return &inst;
 }
