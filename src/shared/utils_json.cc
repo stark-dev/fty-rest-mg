@@ -247,10 +247,15 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
     json += utils::json::jsonify("location_uri", "/api/v1/asset/" + parent_name) + ",";
     json += utils::json::jsonify("location_id", parent_name) + ",";
     json += utils::json::jsonify("location", ext_parent_name) + ",";
+
+    // Get informations from database
+    auto parentAsset = asset_mgr.get_item1(tmp.item.basic.parent_id);
+    json += utils::json::jsonify("location_type", parentAsset.item.basic.type_name) + ",";
   }
   else
   {
     json += "\"location\":\"\",";
+    json += "\"location_type\":\"\",";
   }
 
   json += "\"groups\": [";
@@ -398,6 +403,10 @@ std::string getJsonAsset(mlm_client_t * clientMlm, int64_t elemId)
       auto &attrName = oneExt.first;
 
       if (attrName == "name")
+        continue;
+
+      // filter location_type (already present)
+      if (attrName == "location_type")
         continue;
 
       auto &attrValue = oneExt.second.first;
