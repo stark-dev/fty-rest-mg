@@ -512,8 +512,9 @@ UserInfo user;
         { "alarms-audit",   bALL | bFCT, true,  "/var/log/app-audit/alarms-audit.log" },
         { "metrics-audit",  bALL | bFCT, true,  "/var/log/app-audit/metrics-audit.log" },
         { "mass-mgr-audit", bALL | bFCT, true,  "/var/log/etn-mass-management/etn-mass-management.audit.log" },
-        { "emc4j-audit",    bALL       , true,  "/var/log/etn-emc4j-ipm2/karaf.log" },
         { "verify-fs",      bALL | bFCT, true,  "/var/log/verify-fs.log" },
+        { "emc4j-audit",    bALL,        true,  "/var/log/etn-emc4j-ipm2/karaf.log" },
+        { "release",        bALL,        true,  "/etc/release-details.json" },
         { "messages",       bALL,        true,  "/var/log/messages" },
         { "emc4j-bundle",   bALL,        false, "/tmp/etn-emc4j-bundle.log" },  // curl export
         { "emc4j-jdbc",     bALL,        false, "/tmp/etn-emc4j-jdbc.log" },
