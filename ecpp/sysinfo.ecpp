@@ -53,7 +53,7 @@
 #include <fty_common_mlm_subprocess.h>
 
 #include "shared/utils.h"
-//CMake: #include "platform.h"
+//CMake: #include "platform.h" //built by configure
 
 //CMake: #include "git_details_override.h"
 //CMake: see src/Makemodule-local.am  HAVE_PACKAGE_GIT HAVE_PACKAGE_BUILD_HOST...
@@ -61,7 +61,7 @@
 //CMake: no automake
 #ifndef PACKAGE
     #define PACKAGE "fty-rest"
-    #define PACKAGE_VERSION "Unknown"
+    #define PACKAGE_VERSION "1.0.0"
     #define PACKAGE_BUGREPORT "Unknown"
     #define PACKAGE_URL "Unknown"
 #endif
