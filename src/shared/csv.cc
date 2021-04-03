@@ -29,7 +29,7 @@
 #include <fty_common_macros.h>
 
 #include "shared/csv.h"
-#include "../persist/assetcrud.h"
+#include "persist/assetcrud.h"
 
 namespace shared {
 

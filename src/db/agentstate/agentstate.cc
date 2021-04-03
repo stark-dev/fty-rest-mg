@@ -18,14 +18,14 @@
  *
  */
 
-#include "agentstate.h"
-
 #include <tntdb/row.h>
 #include <tntdb/error.h>
 #include <inttypes.h>
 
 #include <fty_common_db_dbpath.h>
 #include <fty_common.h>
+
+#include "db/agentstate/agentstate.h"
 #include "shared/utils.h"
 
 namespace persist {

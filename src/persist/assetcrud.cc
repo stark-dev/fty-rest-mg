@@ -35,9 +35,9 @@
 #include <fty_common.h>
 #include <fty_common_macros.h>
 
-#include "assetcrud.h"
-#include "monitor.h"
-#include "persist_error.h"
+#include "persist/assetcrud.h"
+#include "persist/monitor.h"
+#include "persist/persist_error.h"
 #include "cleanup.h"
 
 zlist_t* select_asset_device_links_all(tntdb::Connection &conn,
