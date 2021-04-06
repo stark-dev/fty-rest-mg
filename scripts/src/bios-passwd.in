@@ -33,8 +33,8 @@ set -e
 export PATH=
 export LC_ALL=C
 #hack for Makefile.am and make distcheck
-export PROG=@libexecdir@/@PACKAGE@/bios-passwd
-[ -z "${TESTPASS-}" ] && TESTPASS="@libexecdir@/@PACKAGE@/testpass.sh"
+export PROG=@CMAKE_INSTALL_FULL_LIBEXECDIR@/@PROJECT_NAME@/bios-passwd
+[ -z "${TESTPASS-}" ] && TESTPASS="@CMAKE_INSTALL_FULL_LIBEXECDIR@/@PROJECT_NAME@/testpass.sh"
 
 die() {
     echo "${@}" >&2

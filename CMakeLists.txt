@@ -51,6 +51,12 @@ fty_ecppbuilder(
     ${ETN_IPM2_REST_ECPP_FILES}
 )
 
+# bios-csv
+add_subdirectory(bios-csv)
+
+# scripts
+add_subdirectory(scripts)
+
 # Tests
 #add_subdirectory(tests)
 
