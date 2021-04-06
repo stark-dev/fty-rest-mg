@@ -6,6 +6,9 @@ project(fty_rest
   DESCRIPTION "Common core REST API for 42ity project"
   LANGUAGES CXX)
 
+# Workaround '-' vs '_'
+set(PROJECT_NAME_HYPHEN fty-rest)
+
 ##############################################################################################################
 find_package(fty-cmake PATHS ${CMAKE_BINARY_DIR}/fty-cmake)
 ##############################################################################################################
@@ -20,7 +23,6 @@ etn_target(shared ${PROJECT_NAME}
     fty-cmake-rest
     cidr
     magic
-    sasl2
     cxxtools
     tntnet
     tntdb
@@ -71,17 +73,17 @@ set(MAPPING_FILES
 )
 foreach(file ${MAPPING_FILES})
   set(f ${PROJECT_SOURCE_DIR}/resources/${file})
-  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/tntnet/bios.d/)
+  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/tntnet/bios.d/)
 endforeach()
 
-# Install tntnet mapping files examples in usr/share/bios/examples
+# Install tntnet mapping files examples in usr/share/fty-rest/examples
 # tntnet.xml.example: concat of all mapping files
 set(TNTNET_XML_EXAMPLE ${PROJECT_BINARY_DIR}/tntnet.xml.example)
 foreach(file ${MAPPING_FILES})
   set(f ${PROJECT_SOURCE_DIR}/resources/${file})
-  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bios/examples/ RENAME ${file}.example)
+  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME_HYPHEN}/examples/ RENAME ${file}.example)
   # cat f in TNTNET_XML_EXAMPLE
   file(READ ${f} aux)
   file(APPEND ${TNTNET_XML_EXAMPLE} "${aux}")
 endforeach()
-install(FILES ${TNTNET_XML_EXAMPLE} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bios/examples/)
+install(FILES ${TNTNET_XML_EXAMPLE} DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME_HYPHEN}/examples/)
