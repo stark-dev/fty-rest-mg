@@ -57,8 +57,31 @@ add_subdirectory(bios-csv)
 # scripts
 add_subdirectory(scripts)
 
-# Tests
-#add_subdirectory(tests)
+# Install tntnet mapping files in etc/tntnet/bios.d/
+# Files, in order
+set(MAPPING_FILES
+  00_start.xml
+  10_common_statics.xml
+  20_common_basics.xml
+  50_main_api_start.xml
+  51_asset_api_fty-rest.xml
+  60_main_api_until_eula.xml
+  89_main_api_end.xml
+  99_end.xml
+)
+foreach(file ${MAPPING_FILES})
+  set(f ${PROJECT_SOURCE_DIR}/resources/${file})
+  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/tntnet/bios.d/)
+endforeach()
 
-# Install tntnet mapping files
-#install(FILES resources/55_etn-mass-management-rest.xml DESTINATION ${CMAKE_INSTALL_SYSCONFDIR}/tntnet/bios.d/)
+# Install tntnet mapping files examples in usr/share/bios/examples
+# tntnet.xml.example: concat of all mapping files
+set(TNTNET_XML_EXAMPLE ${PROJECT_BINARY_DIR}/tntnet.xml.example)
+foreach(file ${MAPPING_FILES})
+  set(f ${PROJECT_SOURCE_DIR}/resources/${file})
+  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bios/examples/ RENAME ${file}.example)
+  # cat f in TNTNET_XML_EXAMPLE
+  file(READ ${f} aux)
+  file(APPEND ${TNTNET_XML_EXAMPLE} "${aux}")
+endforeach()
+install(FILES ${TNTNET_XML_EXAMPLE} DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/bios/examples/)
