@@ -29,18 +29,6 @@ save.xml
 *.app
 core
 
-# Distcheck workspace and archives
-fty-rest-*/
-fty-rest-*.tar.gz
-fty-rest-*.zip
-libfty-rest-*.zip
-libfty-rest-*.tar*
-
-# Man pages
-doc/*.1
-doc/*.3
-doc/*.7
-
 # autoconf files
 .git_details*
 
@@ -90,63 +78,6 @@ bindings/qt/selftest/selftest
 *.bnf
 .#*
 *.pid
-
-# At least at this time, we do not deliver files under "fty-rest" .deb
-# It is a metapackage to satisfy simple installation of OS image with
-# recipes that also fulfill legacy code wording
-packaging/debian/fty-rest.install
-packaging/debian/fty-rest.manpages
-
-# Generated files and build products
-INSTALL*.html
-CONTRIB*.html
-Makefile.in
-Makefile
-!Makefile.am
-bios_web.la
-check-builddeps.py
-bios-qa
-Installation
-ut_result.log
-
-db_dump
-fty-inventory
-legacy-asset
-
-fty_rest_selftest
-test-agents
-test-api
-test-cidr
-test-csv
-test-loadcsv
-test-db2
-test-log
-test-subprocess
-test-utils
-test-utils-plusplus
-test-utils-web
-test-dbtopology
-test-web
-test-web-helpers
-test-libbiosapiut
-test-db-asset-crud
-test-autoconfig
-test-tntmlm
-test-totalpower
-agent-inventory
-agent-autoconfig
-generate_measurement
-warranty-metric
-bios-csv
-
-tests/junit
-tests/run_tntnet_make.env
-
-cppcheck.supp
-cppcheck.xml
-
-tools/bios-passwd
-!tools/bios-passwd.in
 
 # Netbeans directory
 nbproject/
