@@ -97,13 +97,13 @@ std::string gaccess_token;
                     user.reauthDefault (defaultval);
                 } // if reauth flag was not definitely set yet; else don't waste time
             }
-        }
-    }
 
-    // finally die if user is not authenticated
-    if (user.profile() == BiosProfile::Anonymous)
-    {
-        http_die("not-authorized", "");
+            // finally die if access_token is not authenticated
+            if (user.profile() == BiosProfile::Anonymous)
+            {
+                http_die("not-authorized", "");
+            }
+        }
     }
 
 #ifdef DEBUG
