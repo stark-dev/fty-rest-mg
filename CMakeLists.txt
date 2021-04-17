@@ -41,7 +41,7 @@ etn_target(shared ${PROJECT_NAME}
 )
 
 # Get the ecpp
-file(GLOB ETN_IPM2_REST_ECPP_FILES
+file(GLOB ECPP_FILES
   ecpp/*.ecpp
 )
 
@@ -50,7 +50,7 @@ fty_ecppbuilder(
   TARGET ${PROJECT_NAME}
   WORKDIR src
   ECPP
-    ${ETN_IPM2_REST_ECPP_FILES}
+    ${ECPP_FILES}
 )
 
 # bios-csv
@@ -77,7 +77,7 @@ foreach(file ${MAPPING_FILES})
 endforeach()
 
 # Install tntnet mapping files examples in usr/share/fty-rest/examples
-# tntnet.xml.example: concat of all mapping files
+# tntnet.xml.example: concat of all mapping files *in order*
 set(TNTNET_XML_EXAMPLE ${PROJECT_BINARY_DIR}/tntnet.xml.example)
 foreach(file ${MAPPING_FILES})
   set(f ${PROJECT_SOURCE_DIR}/resources/${file})
