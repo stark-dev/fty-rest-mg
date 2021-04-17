@@ -152,28 +152,28 @@ UserInfo user;
     std::string output;
     int rv = get_scan_progress (output);
     if (rv == -1) {
-        std::string err =  TRANSLATE_ME ("mlmpool.get () failed.");
-        http_die ("internal-error", err.c_str ());
+        log_error("mlmpool.get () failed.");
+        http_die ("internal-error", TRANSLATE_ME("Automatic discovery service not available"));
     }
     else
     if (rv == -2) {
-        std::string err =  TRANSLATE_ME ("client->sendto () failed.");
-        http_die ("internal-error", err.c_str ());
+        log_error("client->sendto () failed.");
+        http_die ("internal-error", TRANSLATE_ME("Automatic discovery service not available"));
     }
     else
     if (rv == -3) {
-        std::string err =  TRANSLATE_ME ("client->recv () failed.");
-        http_die ("internal-error", err.c_str ());
+        log_error("client->recv () failed.");
+        http_die ("internal-error", TRANSLATE_ME("Automatic discovery service not available"));
     }
     else
     if (rv == -4) {
-        std::string err =  TRANSLATE_ME ("fty-discovery returned error.");
-        http_die ("internal-error", err.c_str ());
+        log_error("fty-discovery returned error.");
+        http_die ("internal-error", TRANSLATE_ME("Automatic discovery service not available"));
     }
     else
     if (rv == -5) {
-        std::string err =  TRANSLATE_ME ("fty-discovery returned malformed or unexpected message.");
-        http_die ("internal-error", err.c_str ());
+        log_error("fty-discovery returned malformed or unexpected message.");
+        http_die ("internal-error", TRANSLATE_ME("Automatic discovery service not available"));
     }
     else
 </%cpp>
