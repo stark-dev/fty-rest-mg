@@ -60,7 +60,7 @@ add_subdirectory(bios-csv)
 add_subdirectory(scripts)
 
 # Install tntnet mapping files in etc/tntnet/bios.d/
-# Files, in order
+# Files, *in order*
 set(MAPPING_FILES
   00_start.xml
   10_common_statics.xml
@@ -71,16 +71,19 @@ set(MAPPING_FILES
   89_main_api_end.xml
   99_end.xml
 )
+
 foreach(file ${MAPPING_FILES})
-  set(f ${PROJECT_SOURCE_DIR}/resources/${file})
-  install(FILES ${f} DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/tntnet/bios.d/)
+  set(f_in ${PROJECT_SOURCE_DIR}/resources/${file})
+  set(f_out ${PROJECT_BINARY_DIR}/resources/${file})
+  configure_file(${f_in} ${f_out} @ONLY)
+  install(FILES ${f_out} DESTINATION ${CMAKE_INSTALL_FULL_SYSCONFDIR}/tntnet/bios.d/)
 endforeach()
 
 # Install tntnet mapping files examples in usr/share/fty-rest/examples
 # tntnet.xml.example: concat of all mapping files *in order*
 set(TNTNET_XML_EXAMPLE ${PROJECT_BINARY_DIR}/tntnet.xml.example)
 foreach(file ${MAPPING_FILES})
-  set(f ${PROJECT_SOURCE_DIR}/resources/${file})
+  set(f ${PROJECT_BINARY_DIR}/resources/${file})
   install(FILES ${f} DESTINATION ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME_HYPHEN}/examples/ RENAME ${file}.example)
   # cat f in TNTNET_XML_EXAMPLE
   file(READ ${f} aux)
