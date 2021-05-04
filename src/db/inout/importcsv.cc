@@ -43,11 +43,11 @@
 #include <fty_common_mlm_sync_client.h>
 #include <fty_asset_activator.h>
 
-#include "../../persist/assetcrud.h"
+#include "persist/assetcrud.h"
 #include "cleanup.h"
-#include "../asset_general.h"
+#include "db/asset_general.h"
 #include "db/dbhelpers.h"
-#include "../inout.h"
+#include "db/inout.h"
 #include "shared/utils.h"
 #include "shared/utils_json.h"
 #include "shared/utilspp.h"
@@ -1603,7 +1603,7 @@ void
                     failRows.insert(std::make_pair(row_i + 1, warningMessages));
                     log_error ("row %zu imported with issue: %s", row_i, warningMessages.c_str());
                 }
-                
+
                 somethingProcessed = true;
                 processedRows.insert (row_i);
             }

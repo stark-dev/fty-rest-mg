@@ -28,6 +28,7 @@
  * \author Jim Klimov <EvgenyKlimov@Eaton.com>
  * \brief Not yet documented file
  */
+
 #include <algorithm>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_rest.h>
@@ -37,7 +38,7 @@
 #include "shared/data.h"
 #include "shared/utils_json.h"
 
-#include "../db/asset_general.h"
+#include "db/asset_general.h"
 
 static std::vector<std::tuple <a_elmnt_id_t, std::string, std::string, std::string>>
 s_get_parents (tntdb::Connection &conn, a_elmnt_id_t id)
