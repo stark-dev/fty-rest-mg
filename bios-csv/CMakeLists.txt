@@ -9,31 +9,12 @@ set(EXE_NAME "bios-csv")
 
 # Build exe
 etn_target(exe ${EXE_NAME}
-  SOURCES
-    bios-csv.cc
-    ../src/*.cc
-  INCLUDE_DIRS
-    ../include
-  USES
-    fty-cmake-rest
-    cidr
-    magic
-    sasl2
-    cxxtools
-    tntnet
-    tntdb
-    czmq
-    mlm
-    fty_proto
-    fty_shm
-    fty_asset_activator
-    fty_common
-    fty_common_logging
-    fty_common_rest
-    fty_common_db
-    fty_common_mlm
-    fty_common_messagebus
-    fty_common_dto
+    SOURCES
+        bios-csv.cc
+    INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../src
+    USES
+        ${PROJECT_NAME}-lib
 )
 
 # Install usr/libexec/fty-rest/bios-csv

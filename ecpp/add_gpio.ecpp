@@ -25,7 +25,7 @@
  #><%pre>
 #include <string>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_rest.h>
 #include <fty_log.h>
 
@@ -85,8 +85,8 @@ int
 add_gpio (std::string json)
 {
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ())
+    auto client = mlm_pool.get();
+    if (!client)
     {
         log_fatal ("add_gpio: mlm_pool.get () failed.");
         return -1;
@@ -151,7 +151,7 @@ UserInfo user;
             {BiosProfile::Admin,     "C"}
             };
     std::string audit_msg = std::string ("Request CREATE add_gpio FAILED");
-    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? (char *)nullptr : audit_msg.c_str ());
+    CHECK_USER_PERMISSIONS_OR_DIE_AUDIT (PERMISSIONS, audit_msg.empty () ? nullptr : audit_msg.c_str ());
 
     if (request.getMethod () != "POST") {
         http_die ("method-not-allowed", request.getMethod ().c_str () );

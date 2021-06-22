@@ -37,7 +37,7 @@
 
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_asset.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_asset_types.h>
 #include <fty_common_macros.h>
 #include <fty_common_utf8.h>
@@ -58,7 +58,7 @@ static const std::map<std::string, const std::string> PARAM_TO_SRC = {
 
 static double
 s_total_rack_power(
-    MlmClientPool::Ptr client,
+    MlmClient* /*client*/,
     const std::string& src,
     const std::string& name)
 {
@@ -215,8 +215,8 @@ std::string checked_arg2;
 
     // ##################################################
     // connect to malamute
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ()) {
+    auto client = mlm_pool.get();
+    if (!client) {
         log_fatal ("mlm_pool.get () failed");
         std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
         http_die ("internal-error", err.c_str ());
@@ -243,11 +243,11 @@ std::string checked_arg2;
             std::string err =  TRANSLATE_ME ("Connecting to database failed.");
             http_die ("internal-error", err.c_str ());
         }
-        auto it = allRacksShort.item.find(dbid);
+        auto it = allRacksShort.item.find(uint32_t(dbid));
         if (it == allRacksShort.item.end()) {
             http_die ("element-not-found", item.c_str ());
         }
-       std::pair <std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (dbid);
+       std::pair <std::string,std::string> asset_names = DBAssets::id_to_name_ext_name (uint32_t(dbid));
        if (asset_names.first.empty () && asset_names.second.empty ()) {
            std::string err =  TRANSLATE_ME ("Database failure");
            http_die ("internal-error", err.c_str ());

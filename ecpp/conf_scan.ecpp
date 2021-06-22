@@ -25,7 +25,7 @@
  #><%pre>
 #include <string>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_rest_helpers.h>
 #include <cxxtools/jsondeserializer.h>
 #include <fty_common_rest_audit_log.h>
@@ -130,8 +130,8 @@ int
 set_confscan (std::string json)
 {
      // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ()) {
+    auto client = mlm_pool.get();
+    if (!client) {
         log_fatal ("set_confscan: mlm_pool.get () failed.");
         return -1;
     }
@@ -203,8 +203,8 @@ get_confscan (std::string &output)
     output.clear ();
 
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ())
+    auto client = mlm_pool.get();
+    if (!client)
     {
         log_fatal ("get_confscan: mlm_pool.get () failed.");
         return -1;

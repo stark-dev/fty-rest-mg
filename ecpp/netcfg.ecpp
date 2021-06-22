@@ -37,7 +37,6 @@
 #include "shared/cidr.h"
 #include "web/src/iface.h"
 #include <fty_common_macros.h>
-#include <fty_common_mlm_subprocess.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_audit_log.h>
 
@@ -133,12 +132,12 @@ std::string checked_iface;
         }
         http_die ("request-param-required", "iface");
     }
-    std::string audit_msg;
+    std::string audit_msg1;
     if (request.getMethod () == "PUT") {
-        audit_msg = std::string ("Request CREATE OR UPDATE netcfg FAILED");
+        audit_msg1 = std::string ("Request CREATE OR UPDATE netcfg FAILED");
     }
     check_regex_text_or_die_audit ("iface", iface, checked_iface, "^[[:alpha:]][[:alnum:]]{0,14}$",
-            audit_msg.empty () ? nullptr : audit_msg.c_str ());
+            audit_msg1.empty () ? nullptr : audit_msg1.c_str ());
 }
 
 // Where is the tree reflecting the interface?
@@ -323,10 +322,10 @@ if (request.getMethod() == "PUT")
     cxxtools::split (" ", dnsRawData, std::inserter (dnsSet, dnsSet.end()));
 
     std::string dnsStr;
-    for (auto ip : dnsSet)
+    for (auto ip1 : dnsSet)
     {
         dnsStr += "\"";
-        dnsStr += ip;
+        dnsStr += ip1;
         dnsStr += "\"";
         dnsStr += ",";
     }

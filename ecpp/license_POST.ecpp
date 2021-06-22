@@ -39,8 +39,8 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_filesystem.h>
-#include <fty_common_mlm_subprocess.h>
 #include <fty_common_rest_audit_log.h>
+#include <fty/process.h>
 
 </%pre>
 <%request scope="global">
@@ -90,7 +90,7 @@ bool database_ready;
         log_error_audit ("Request CREATE license FAILED");
         http_die ("internal-error", err.c_str ());
     }
-    uint64_t tme = ::time (NULL);
+    uint64_t tme = uint64_t(::time (NULL));
     fprintf (f, "%s\n%" PRIu64 "\n%s\n", current_license_version, tme, user.login ().c_str ());
     fclose (f);
     log_debug ("License: version='%s',tme='%" PRIu64 "',user='%s')",
@@ -126,23 +126,22 @@ bool database_ready;
         // processing completes - and the lines are all timestamped
         // at that moment. This makes investigation of how long the
         // start-db-services and related activities took very hard.
-        uint64_t tme_start = ::time (NULL);
+        uint64_t tme_start = uint64_t(::time (NULL));
         log_info ("Starting db service, timestamp=%" PRIu64 " ..." , tme_start);
-        MlmSubprocess::Argv proc_cmd {"/usr/libexec/fty/start-db-services"};
         std::string proc_out, proc_err;
 
         // due to some OS circumstances, the script can sometimes block
         // while calling the /bin/systemctl and is eventually killed,
         // even though the actual services of our product have started
         // long before this; so even if it failed - try to use the DB...
-        int rv_svc = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
-        uint64_t tme_finish = ::time (NULL);
+        auto rv_svc = fty::Process::run("/usr/libexec/fty/start-db-services", {}, proc_out, proc_err);
+        uint64_t tme_finish = uint64_t(::time (NULL));
         log_info ("Starting db service completed, timestamp=%" PRIu64 " (duration=%" PRIu64 "), exit-code=%i ..." ,
-            tme_finish, (tme_finish - tme_start), rv_svc);
-        if (rv_svc != 0) {
+            tme_finish, (tme_finish - tme_start), *rv_svc);
+        if (!rv_svc || *rv_svc != 0) {
             log_error ("Starting of start-db-services have failed. Consult system logs");
             log_error ("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                "/usr/libexec/fty/start-db-services", rv_svc, proc_out.c_str (), proc_err.c_str ());
+                "/usr/libexec/fty/start-db-services", *rv_svc, proc_out.c_str (), proc_err.c_str ());
             if (rv_svc > 0) {
                 std::string err =  TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs");
                 log_error_audit ("Request CREATE license FAILED");
@@ -152,17 +151,17 @@ bool database_ready;
             // subprocess timeout handling - fall through to try using DB
 
             {
-                MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-engine"};
+                fty::Process::Arguments proc_cmd {"systemctl", "list-ipm-units", "--active", "fty-db-engine"};
                 // This should get our "systemctl" wrapper via PATH
-                std::string proc_out, proc_err;
+                std::string proc_out1, proc_err1;
 
-                int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
+                auto rv = fty::Process::run("sudo", proc_cmd, proc_out1, proc_err1);
 
-                if (rv != 0) {
+                if (*rv != 0) {
                     std::string message;
                     message = "`sudo systemctl list-ipm-units --active fty-db-engine`"
                         " failed (service is not currently active). Return value = '"
-                        + std::to_string (rv) + "', stderr = '" + proc_err + "'." ;
+                        + std::to_string (*rv) + "', stderr = '" + proc_err1 + "'." ;
                     log_error ("%s", message.c_str ());
                     std::string err =  TRANSLATE_ME ("Database software service is not running");
                     log_error_audit ("Request CREATE license FAILED");
@@ -174,13 +173,13 @@ bool database_ready;
             }
 
             {
-                MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "list-ipm-units", "--active", "fty-db-init"};
+                fty::Process::Arguments proc_cmd {"systemctl", "list-ipm-units", "--active", "fty-db-init"};
                 // This should get our "systemctl" wrapper via PATH
-                std::string proc_out, proc_err;
+                std::string proc_out1, proc_err1;
 
-                int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
+                auto rv = fty::Process::run("sudo", proc_cmd, proc_out1, proc_err1);
 
-                if (rv != 0) {
+                if (*rv != 0) {
                     std::string message;
                     message = "`sudo systemctl list-ipm-units --active fty-db-init`"
                         " failed (service is not currently active). Return value = '"
@@ -197,7 +196,7 @@ bool database_ready;
         }
 
         // once done, check environment files for accessing the database
-        uint64_t tme_started = ::time (NULL);
+        uint64_t tme_started = uint64_t(::time (NULL));
         log_info ("db services were started by timestamp=%" PRIu64 ", re-reading password ...", tme_started);
         int rv_dbcred = DBConn::dbreadcredentials ();
         if (!rv_dbcred) {
@@ -214,7 +213,7 @@ bool database_ready;
     } else {
         // enforce reload of credentials, e.g. if timely service startup
         // had failed previously but the system has caught up by now
-        uint64_t tme_started = ::time (NULL);
+        uint64_t tme_started = uint64_t(::time (NULL));
         log_info ("db services were already started and set up before timestamp=%" PRIu64 ", re-reading password just in case ...", tme_started);
         if (!DBConn::dbreadcredentials ()) {
             std::string err =  TRANSLATE_ME ("Database password file is missing");
@@ -257,7 +256,7 @@ bool database_ready;
     log_info ("license was accepted, db services were started, db credentials were refreshed");
     log_debug ("Current DB URL is: %s", DBConn::url.c_str ());
 
-    uint64_t tme_dbcheck = ::time (NULL);
+    uint64_t tme_dbcheck = uint64_t(::time (NULL));
     log_info ("Making sure webserver can already connect to database after timestamp=%" PRIu64 " ...", tme_dbcheck);
     // Note: if we earlier failed to dbreadcredentials () and have no envvars
     // set in the tntnet process now (DB_USER, DB_PASSWD), the mysql/mariadb
@@ -286,14 +285,14 @@ bool database_ready;
     } catch (std::exception &e) {
         // TODO: Check/evaluate accessibility of /run namespace and
         // restart myself like `kill (getpid ())` if there are issues?
-        uint64_t tme_dbfail = ::time (NULL);
+        uint64_t tme_dbfail = uint64_t(::time (NULL));
         log_error ("Database connection test failed at timestamp=%" PRIu64 ": %s", tme_dbfail, e.what ());
         database_ready = false;
         std::string err =  TRANSLATE_ME ("Database connection test failed");
         log_error_audit ("Request CREATE license FAILED");
         http_die ("internal-error", err.c_str ());
     }
-    uint64_t tme_dbconnok = ::time (NULL);
+    uint64_t tme_dbconnok = uint64_t(::time (NULL));
     log_info ("Successfully checked that webserver can connect to database after timestamp=%" PRIu64 " ...", tme_dbconnok);
     log_info_audit ("Request CREATE license SUCCESS");
 }

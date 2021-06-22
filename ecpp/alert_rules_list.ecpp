@@ -88,7 +88,7 @@ bool database_ready;
 
 // connect to malamute
 MlmClientGuard client(mlm_client_new ());
-if (!client) {
+if (!client.get()) {
     log_fatal ("mlm_client_new() failed.");
     std::string err =  TRANSLATE_ME ("mlm_client_new() failed.");
     http_die ("internal-error", err.c_str ());
@@ -142,7 +142,7 @@ if (!poller) {
     http_die ("internal-error", err.c_str ());
 }
 while (true) {
-    zsock_t *which = (zsock_t *) zpoller_wait (poller, 5000);
+    zsock_t *which = static_cast<zsock_t*>(zpoller_wait(poller, 5000));
     if (which) {
         recv_msg = mlm_client_recv (client);
     }

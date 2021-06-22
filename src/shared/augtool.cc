@@ -26,7 +26,7 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include <cxxtools/split.h>
+#include <fty/string-utils.h>
 #include <mutex>
 #include <thread>
 #include <chrono>
@@ -39,10 +39,9 @@ std::string augtool::get_cmd_out(std::string cmd, bool key_value,
                                  std::string sep,
                                  std::function<bool(std::string)> filter) {
     std::string in = get_cmd_out_raw(cmd);
-    std::vector<std::string> spl;
+    std::vector<std::string> spl = fty::split(in, "\n");
     bool not_first = false;
     std::string out;
-    cxxtools::split("\n", in, std::back_inserter(spl));
     if(spl.size() >= 3) {
         spl.erase(spl.begin());
         spl.pop_back();
@@ -80,9 +79,9 @@ std::string augtool::get_cmd_out_raw(std::string command) {
 
     if(command.empty() || command.back() != '\n')
         command += "\n";
-    if(::write(prc->getStdin(), command.c_str(), command.length()) < 1)
+    if(!prc->write(command))
         err = true;
-    ret = MlmSubprocess::wait_read_all(prc->getStdout());
+    ret = prc->readAllStandardOutput();
     return err ? "" : ret;
 }
 
@@ -106,18 +105,15 @@ augtool* augtool::get_instance() {
     std::lock_guard<std::mutex> lock(in_mux);
 
     if(inst.prc == NULL) {
-        MlmSubprocess::Argv exe = { "sudo", "augtool", "-S", "-I/usr/share/fty/lenses", "-e" };
-        inst.prc = new MlmSubprocess::SubProcess(exe,
-                                                 MlmSubprocess::SubProcess::STDOUT_PIPE |
-                                                 MlmSubprocess::SubProcess::STDIN_PIPE);
+        inst.prc = new fty::Process("sudo", {"augtool", "-S", "-I/usr/share/fty/lenses", "-e"});
 
         //sleep to ensure augeas is launched
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }
-    if(!inst.prc->isRunning()) {
+    if(!inst.prc->exists()) {
         inst.prc->run();
         nil = inst.get_cmd_out_raw("help");
-        if(!inst.prc->isRunning() || nil.find("match") == nil.npos) {
+        if(!inst.prc->exists() || nil.find("match") == nil.npos) {
             delete inst.prc;
             inst.prc = NULL;
             return NULL;

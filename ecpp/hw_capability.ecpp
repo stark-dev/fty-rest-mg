@@ -24,7 +24,7 @@
  */
  #><%pre>
 #include <string>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_macros.h>
 
@@ -56,8 +56,8 @@ int
 get_hw_capability (const char *type, std::string &res, std::string& errstr)
 {
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ())
+    auto client = mlm_pool.get();
+    if (!client)
     {
         errstr = TRANSLATE_ME ("mlm_pool.get () failed.");
         log_fatal ("hw_capability: mlm_pool.get () failed.");

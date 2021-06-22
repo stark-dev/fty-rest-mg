@@ -175,7 +175,7 @@ static double
 
     double val = NAN;
     if ( value_average != 0 ) {
-        val = round( (value_actual - value_average ) / ( value_average ) * 1000.0f ) / 10.0f ;
+        val = round( (value_actual - value_average ) / ( value_average ) * 1000.0 ) / 10.0 ;
     }
     return val;
 }
@@ -294,11 +294,11 @@ bool database_ready;
             std::string err =  TRANSLATE_ME ("Connecting to database failed.");
             http_die ("internal-error", err.c_str ());
         }
-        auto it = allDcsShort.item.find ((uint32_t) dbid);
+        auto it = allDcsShort.item.find (uint32_t(dbid));
         if (it == allDcsShort.item.end()) {
             http_die ("element-not-found", item.c_str ());
         }
-        DCIDs.push_back (dbid);
+        DCIDs.push_back(uint32_t(dbid));
         DCNames.push_back (it->second);
     }
 
@@ -461,9 +461,9 @@ bool database_ready;
                 // ACE: "nan" should never appear, but system doesn't agree with us
                 // If double value is "nan" -> then actually we do not have value
                 // JSON do not accept "nan", but "null"
-                std::string data = row.second;
-                std::transform(data.begin(), data.end(), data.begin(), ::tolower); // who know if it would be NaN or nan or ...
-                json += "\"" + row.first + "\":" + ( data == "nan" ? "null" : row.second );
+                std::string data1 = row.second;
+                std::transform(data1.begin(), data1.end(), data1.begin(), ::tolower); // who know if it would be NaN or nan or ...
+                json += "\"" + row.first + "\":" + ( data1 == "nan" ? "null" : row.second );
                 json += ",";
             }
         }

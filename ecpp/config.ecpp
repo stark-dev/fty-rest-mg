@@ -492,7 +492,7 @@ UserInfo user;
         if (request.isMethodPOST ()) {
             log_error_audit ("Request CREATE config FAILED");
         }
-        http_die_idx (e.idx, e.what ());
+        http_die_idx(int64_t(e.idx), e.what ());
     }
     catch (const cxxtools::SerializationError &e) {
         if (request.isMethodPOST ()) {

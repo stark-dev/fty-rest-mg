@@ -47,10 +47,9 @@
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_defs.h>
 #include <fty_common_db_asset.h>
-#include <fty_common_mlm_tntmlm.h>
 #include <fty_common.h>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_subprocess.h>
+#include <fty/process.h>
 
 #include "shared/utils.h"
 //CMake: #include "platform.h" //built by configure
@@ -144,7 +143,7 @@ get_installation_date (
             int64_t i64 = std::stoll (installation_date);
             // TODO: we should probably check for time_t max/min, but hey!... ;)
             char chtmp[64];
-            if (calendar_to_datetime (static_cast<time_t>(i64), chtmp, 64) == -1) {
+            if (calendar_to_datetime (i64, chtmp, 64) == -1) {
                 installation_date = "N/A - Error retrieving installation date";
                 throw std::runtime_error ("calendar_to_datetime () failed.");
             }
@@ -175,11 +174,11 @@ sysinfo_detail (
     output += "{\n"
     "\t\"operating-system\" : {\n";
 
-    std::string container_info;
+    std::string container_info, err;
     {
         log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-c\"}') starting");
-        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-c"}, container_info, 0, 100);
-        log_debug ("MlmSubprocess::output2 finished with return value == '%" PRIi32"'", rv);
+        auto rv = fty::Process::run("/usr/bin/systemd-detect-virt", {"-c"}, container_info, err);
+        log_debug ("MlmSubprocess::output2 finished with return value == '%" PRIi32"'", *rv);
 
         size_t output_len = container_info.length();
         if (rv != 0 && output_len<2) {
@@ -197,8 +196,8 @@ sysinfo_detail (
     std::string hypervisor_info;
     {
         log_debug ("MlmSubprocess::output2 (args = '{\"/usr/bin/systemd-detect-virt\", \"-v\"}') starting");
-        int rv = MlmSubprocess::output2 ({"/usr/bin/systemd-detect-virt", "-v"}, hypervisor_info, 0, 100);
-        log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
+        auto rv = fty::Process::run("/usr/bin/systemd-detect-virt", {"-v"}, hypervisor_info, err);
+        log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", *rv);
 
         size_t output_len = hypervisor_info.length();
         if (rv != 0 && output_len<2) {
@@ -419,24 +418,21 @@ sysinfo_detail (
     if (profile == BiosProfile::Admin) {
         std::string dpkg_output;
         std::string dpkg_error;
-        int rv_dpkg = -1;
         bool dpkg_error_printed = false;
         int skipped_dpkg_lines = -1; // count lines that we could not parse, but expected to
 
-        {
-            log_debug ("MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') starting");
-            rv_dpkg = MlmSubprocess::output ({"dpkg", "--list"}, dpkg_output, dpkg_error, 0, 100);
-            log_debug ("MlmSubprocess::output () finished with return value == '%" PRIi32"'", rv_dpkg);
-            if (rv_dpkg != 0) {
-                log_error (
-                    "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') failed; "
-                    "return code == '%" PRIi32"'\n"
-                    "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                    rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
-                dpkg_error_printed = true;
-                dpkg_output.clear ();
-            }
-        } // end of `dpkg` callout
+        log_debug ("MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') starting");
+        auto rv_dpkg = fty::Process::run("dpkg", {"--list"}, dpkg_output, dpkg_error);
+        log_debug ("MlmSubprocess::output () finished with return value == '%" PRIi32"'", *rv_dpkg);
+        if (rv_dpkg != 0) {
+            log_error (
+                "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') failed; "
+                "return code == '%" PRIi32"'\n"
+                "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
+                *rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+            dpkg_error_printed = true;
+            dpkg_output.clear ();
+        }
 
         if (!dpkg_output.empty ()) {
             bool proceed_loop = true;
@@ -453,7 +449,7 @@ sysinfo_detail (
                         "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
                         "earlier returned code == '%" PRIi32"'\n"
                         "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                        rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                        *rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
                     dpkg_error_printed = true;
                 }
                 proceed_loop = false;
@@ -529,7 +525,7 @@ sysinfo_detail (
                                 "MlmSubprocess::output (args = '{\"dpkg\", \"--list\"}') "
                                 "earlier returned code == '%" PRIi32"'\n"
                                 "===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
-                                rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
+                                *rv_dpkg, dpkg_output.c_str(), dpkg_error.c_str() );
                             dpkg_error_printed = true;
                         }
                         skipped_dpkg_lines++;
@@ -552,7 +548,7 @@ sysinfo_detail (
                 output += "\t\t\"dpkg-errored\": true\n";
 
                 output += ",\t\t";
-                output += utils::json::jsonify ("dpkg-return-code", std::to_string(rv_dpkg) );
+                output += utils::json::jsonify ("dpkg-return-code", std::to_string(*rv_dpkg) );
                 output += "\n";
 
                 output += ",\t\t";
@@ -574,11 +570,11 @@ sysinfo_detail (
         } // end of 'packages' json listing
 
         try {
-            std::string unitstate_output;
+            std::string unitstate_output, err1;
 
             log_debug ("MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') starting");
-            int rv = MlmSubprocess::output2 ({"sudo", "systemctl", "list-json"}, unitstate_output, 0, 100);
-            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
+            auto rv = fty::Process::run("sudo", {"systemctl", "list-json"}, unitstate_output, err1);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", *rv);
             if (rv != 0) {
                 std::string message =
                     "MlmSubprocess::output2 (args = '{\"sudo\", \"systemctl\", \"list-json\"}') failed; ";
@@ -619,11 +615,11 @@ sysinfo_detail (
         // for human reading - so passing the native text output
         // is good enough here.
         try {
-            std::string diskstate_output;
+            std::string diskstate_output, err1;
 
             log_debug ("MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') starting");
-            int rv = MlmSubprocess::output2 ({"df", "-k"}, diskstate_output, 0, 100);
-            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
+            auto rv = fty::Process::run("df", {"-k"}, diskstate_output, err1);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", *rv);
             if (rv != 0) {
                 std::string message =
                     TRANSLATE_ME ("MlmSubprocess::output2 (args = '{\"df\", \"-k\"}') failed; ");
@@ -646,11 +642,11 @@ sysinfo_detail (
 
         // Same comment as above regarding native output pass-through.
         try {
-            std::string diskstate_output;
+            std::string diskstate_output, err1;
 
             log_debug ("MlmSubprocess::output2 (args = '{\"mount\"}') starting");
-            int rv = MlmSubprocess::output2 ({"mount"}, diskstate_output, 0, 100);
-            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", rv);
+            auto rv = fty::Process::run("mount", {}, diskstate_output, err1);
+            log_debug ("MlmSubprocess::output2 () finished with return value == '%" PRIi32"'", *rv);
             if (rv != 0) {
                 std::string message =
                     TRANSLATE_ME ("MlmSubprocess::output2 (args = '{\"mount\"}') failed; ");

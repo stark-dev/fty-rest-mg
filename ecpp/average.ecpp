@@ -42,7 +42,7 @@
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
 #include <fty_common_db_asset.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 
 #include "shared/utils.h"
 #include "shared/utilspp.h"
@@ -166,12 +166,12 @@ bool database_ready;
     else {
         // check value of relative parameter
         std::transform (checked_relative.begin (), checked_relative.end (), checked_relative.begin (), ::tolower);
-        int64_t now = (int64_t) time (NULL);
+        int64_t now = time(NULL);
         if (!relative_to_unixtime (checked_relative, now, st)) {
             std::string expected = TRANSLATE_ME ("one of the following values: '24h', '7d', '30d'.");
             http_die ("request-param-bad", "relative", std::string ("'").append (checked_relative).append ("'").c_str (), expected.c_str ());
         }
-        end = (int64_t) time (NULL);
+        end = time(NULL);
     }
 
     log_debug ("st = '%" PRIi64"', end = '%" PRIi64"'", st, end);
@@ -221,8 +221,8 @@ bool database_ready;
         http_die ("internal-error", err.c_str ());
     }
     // connect to malamute
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ()) {
+    auto client = mlm_pool.get();
+    if (!client) {
         log_fatal ("mlm_pool.get () failed.");
         std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
         http_die ("internal-error", err.c_str ());
@@ -310,7 +310,7 @@ bool database_ready;
                     char *value = zmsg_popstr (recv_msg);
                     if (!got_timestamps)
                         csv_data [0].push_back (timestamp);
-                    csv_data [i+1].push_back (value);
+                    csv_data [size_t(i)+1].push_back (value);
                     zstr_free (&value);
                     zstr_free (&timestamp);
                 }
@@ -328,7 +328,7 @@ bool database_ready;
         element_ename = std::regex_replace(element_ename, std::regex("( |\t)"), "_");
 
         std::string export_file_name = "export_" + checked_start_ts + "_" + checked_end_ts + "_" + checked_step + "_" + checked_source + "_" + element_ename + ".csv";
-        reply.setHeader (tnt::httpheader::contentDisposition, std::string ("attachment; filename=\"" + export_file_name + "\"").c_str ());
+        reply.setHeader (tnt::httpheader::contentDisposition, ("attachment; filename=\"" + export_file_name + "\"").c_str ());
         reply.setContentType ("text/csv;charset=UTF-8");
         cxxtools::CsvSerializer serializer (reply.out ());
         serializer.serialize (csv_data);

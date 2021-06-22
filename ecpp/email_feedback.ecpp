@@ -27,11 +27,10 @@
 #include <fty_common_macros.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_utils_web.h>
-#include <fty_common_mlm_tntmlm.h>
-#include <fty_common_mlm_subprocess.h>
 #include <fty_common_mlm_guards.h>
 #include <fty_common_agents.h>
 #include <fty_common_utf8.h>
+#include <fty_common_mlm_pool.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fstream>
@@ -59,10 +58,10 @@ s_smtp_GET_message (
     zmsg_addstr (msg, message);
 
     zhash_t *headers = zhash_new ();
-    zhash_insert (headers, "Reply-To", (void*) reply);
-    zhash_insert (headers, "X-Eaton-IPC-uuid", (void*) zuuid_str_canonical (uuid));
-    zhash_insert (headers, "X-Eaton-IPC-context", (void*) context);
-    zhash_insert (headers, "X-Eaton-IPC-participate-in-feedback", (void*) (participate ? "yes" : "no"));
+    zhash_insert (headers, "Reply-To", const_cast<char*>(reply));
+    zhash_insert (headers, "X-Eaton-IPC-uuid", const_cast<char*>(zuuid_str_canonical (uuid)));
+    zhash_insert (headers, "X-Eaton-IPC-context", const_cast<char*>(context));
+    zhash_insert (headers, "X-Eaton-IPC-participate-in-feedback", const_cast<char*>(participate ? "yes" : "no"));
     utils::email::x_headers (headers);
 
     zframe_t *frame = zhash_pack (headers);
@@ -192,7 +191,7 @@ UserInfo user;
         std::string _stimeout = qparam.param ("_timeout");
 
         try {
-            _timeout = std::stoi (_stimeout);
+            _timeout = uint32_t(std::stoi(_stimeout));
         }
         catch (const std::exception& e) {
             //pass
@@ -216,13 +215,13 @@ UserInfo user;
     off_t max_size = s_max_attachment_size ();
     for (const auto& it: mp) {
 
-        current_size += it.getSize ();
+        current_size += off_t(it.getSize());
         if (current_size > max_size) {
             s_rm_rf (paths, &temp_dir);
             std::string err =
                 TRANSLATE_ME ("Attachment size limit (%jd) have been exceeded (%jd)",
-                (intmax_t) max_size,
-                (intmax_t) current_size
+                max_size,
+                current_size
                 );
             log_error_audit ("Request CREATE email_feedback FAILED");
             http_die ("internal-error", err.c_str ());
@@ -253,8 +252,8 @@ UserInfo user;
     }
 
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ()) {
+    auto client = mlm_pool.get();
+    if (!client) {
         log_fatal ("Error: mlm_pool.get () failed.");
         s_rm_rf (paths, &temp_dir);
         std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");

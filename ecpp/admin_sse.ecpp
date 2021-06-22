@@ -79,11 +79,11 @@ bool database_ready;
             std::string err = TRANSLATE_ME ("Connecting to database failed.");
             http_die ("internal-error", err.c_str ());
     }
-    log_debug ("datacenter id = '%" PRIu32 "'.", (uint32_t) dbid);
+    log_debug ("datacenter id = '%" PRIu32 "'.", uint32_t(dbid));
 
     Sse sseManager;
     sseManager.setDatacenter(dc);
-    sseManager.setDatacenterId((uint32_t) dbid);
+    sseManager.setDatacenterId(uint32_t(dbid));
 
     try {
         sseManager.setConnection(tntdb::connect (DBConn::url));
@@ -189,7 +189,7 @@ bool database_ready;
         }
 
         // wait for the right message or time-out
-        zsock_t *which = (zsock_t *) zpoller_wait (sseManager.getPoller(), 10000);
+        zsock_t *which = static_cast<zsock_t*>(zpoller_wait(sseManager.getPoller(), 10000));
         zmsg_t *recv_msg = NULL;
         if (which == sseManager.getPipe())
             recv_msg = sseManager.getMessageFromMlm();

@@ -198,7 +198,7 @@ if (!poller) {
     http_die ("internal-error", err.c_str ());
 }
 while (true) {
-    zsock_t *which = (zsock_t *) zpoller_wait (poller, 5000);
+    zsock_t *which = static_cast<zsock_t*>(zpoller_wait(poller, 5000));
     if (which) {
         recv_msg = mlm_client_recv (client);
     }

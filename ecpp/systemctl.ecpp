@@ -26,8 +26,6 @@
  #><%pre>
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/jsondeserializer.h>
-#include <cxxtools/split.h>
-#include <cxxtools/posix/commandoutput.h>
 
 #include <stdexcept>
 #include <vector>
@@ -35,9 +33,10 @@
 #include <cstring>
 #include <algorithm>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_subprocess.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_rest_audit_log.h>
+#include <fty/process.h>
+#include <fty/string-utils.h>
 
 bool
 is_GET_operation (const std::string& operation)
@@ -67,22 +66,21 @@ is_POST_operation (const std::string& operation)
 bool
 systemctl_service_status (const std::string& service_name, std::string& load, std::string& active, std::string& unit_file, std::string& sub)
 {
-    MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", "show", service_name,
-                           "-p", "LoadState", "-p", "ActiveState", "-p", "UnitFileState", "-p", "SubState"};
-    std::string proc_out, proc_err;
+    fty::Process proc("sudo", {"systemctl", "show", service_name,
+                       "-p", "LoadState", "-p", "ActiveState", "-p", "UnitFileState", "-p", "SubState"});
+    proc.run();
 
-    int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
+    auto rv = proc.wait();
 
-    if (rv != 0) {
+    if (!rv || *rv != 0) {
         std::string message;
         message = "`sudo systemctl show " + service_name + " -p LoadState -p ActiveState "
-                  "-p UnitFileState -p SubState` failed. Return value = '" + std::to_string (rv) + "', stderr = '" + proc_err + "'.";
+                  "-p UnitFileState -p SubState` failed. Return value = '" + std::to_string (*rv) + "', stderr = '" + proc.readAllStandardError() + "'.";
         log_error ("%s", message.c_str ());
         return false;
     }
 
-    std::vector<std::string> tokens;
-    cxxtools::split ("\n", proc_out, std::back_inserter (tokens));
+    std::vector<std::string> tokens = fty::split(proc.readAllStandardOutput(), "\n");
     for (const auto& item: tokens) {
         if (item.empty ()) {
             continue;
@@ -179,7 +177,7 @@ UserInfo user;
         if (request.getMethod () == "POST")
         {
             if (request.getBody ().empty ()) {
-                std::string msg = std::string (TRANSLATE_ME ("Expected json document")) + "  { \"service_name\" : \"<service_name>\" }." + std::string (TRANSLATE_ME (" Received empty request document."));
+                std::string msg = TRANSLATE_ME ("Expected json document") + "  { \"service_name\" : \"<service_name>\" }." + TRANSLATE_ME (" Received empty request document.");
                 if (request.getMethod () == "POST") {
                     log_error_audit ("Request EXECUTE systemctl %s %s FAILED", checked_operation.c_str (), service_name.c_str ());
                 }
@@ -301,12 +299,11 @@ UserInfo user;
     }
 
     {
-        MlmSubprocess::Argv proc_cmd {"sudo", "systemctl", checked_operation, checked_service_name};
-        std::string proc_out, proc_err;
+        fty::Process proc("sudo", {"systemctl", checked_operation, checked_service_name});
+        proc.run();
+        auto rv = proc.wait();
 
-        int rv = MlmSubprocess::simple_output (proc_cmd, proc_out, proc_err);
-
-        if (rv != 0) {
+        if (!rv || *rv != 0) {
             std::string message;
             // Use our wrapper from PATH of the web-server,
             // so allowing management of only our services

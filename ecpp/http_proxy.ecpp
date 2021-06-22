@@ -63,7 +63,6 @@ UserInfo user;
     // Process PUT first, so that we always read back the current content
     if (request.getMethod () == "PUT") {
         std::string proxy_file_content;
-        std::string proxy_line;
 
         cxxtools::SerializationInfo si;
         try {

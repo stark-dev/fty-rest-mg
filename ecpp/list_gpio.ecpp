@@ -25,7 +25,7 @@
  #><%pre>
 #include <string>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_rest_helpers.h>
 
 
@@ -113,8 +113,8 @@ get_list (std::string &output)
     output.clear();
 
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ())
+    auto client = mlm_pool.get();
+    if (!client)
     {
         log_fatal ("list_gpio: mlm_pool.get () failed.");
         return -1;
@@ -141,10 +141,10 @@ get_list (std::string &output)
     char *result = zmsg_popstr (resp);
     if (result) {
         if (streq (result, "OK")) {
-            int rv = s_handle_response (resp, output);
+            int rv1 = s_handle_response (resp, output);
             zstr_free (&result);
             zmsg_destroy(&resp);
-            return rv;
+            return rv1;
         }
         else {
             zstr_free (&result);

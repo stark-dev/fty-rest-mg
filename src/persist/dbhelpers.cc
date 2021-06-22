@@ -30,7 +30,7 @@
 #include <fty_common.h>
 #include <fty_log.h>
 
-#include "persist/dbhelpers.h"
+#include "db/dbhelpers.h"
 #include "persist/persist_error.h"
 
 

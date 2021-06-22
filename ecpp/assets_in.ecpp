@@ -74,7 +74,7 @@ Assets
 {
     Assets result;
     auto func = [&result, &capabilities, &connection](const tntdb::Row& row) {
-        int asset_id = row.getValue("asset_id").getUnsigned32();
+        uint32_t asset_id = row.getValue("asset_id").getUnsigned32();
         // search capabilities if present in filter
         auto it_cap = std::find_if_not(capabilities.begin(), capabilities.end(),
             [&asset_id, &connection](const std::string& value)
@@ -89,8 +89,8 @@ Assets
             result.emplace_back(
                 row.getValue("name").getString(),
                 DBAssets::id_to_name_ext_name (row.getValue("asset_id").getUnsigned32()).second,
-                persist::typeid_to_type (row.getValue("type_id").getInt()),
-                utils::strip (persist::subtypeid_to_subtype( row.getValue("subtype_id").getInt() ))
+                persist::typeid_to_type(uint16_t(row.getValue("type_id").getInt())),
+                utils::strip(persist::subtypeid_to_subtype(uint16_t(row.getValue("subtype_id").getInt())))
             );
         }
     };
@@ -228,7 +228,6 @@ bool database_ready;
       persist::export_asset_json (reply.out (), &listElements);
     } else {
       cxxtools::JsonSerializer serializer(reply.out ());
-      serializer.inputUtf8(true);
       serializer.beautify(true);
       serializer.serialize(assets).finish();
     }

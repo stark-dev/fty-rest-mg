@@ -25,7 +25,7 @@
  #><%pre>
 #include <string>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_tntmlm.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_mlm_guards.h>
 #include <fty_common_rest_helpers.h>
 
@@ -45,8 +45,8 @@ get_scan_progress (std::string &output)
     output.clear();
 
     // connect to mlm client
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ())
+    auto client = mlm_pool.get();
+    if (!client)
     {
         log_fatal ("scan_progress: mlm_pool.get () failed.");
         return -1;

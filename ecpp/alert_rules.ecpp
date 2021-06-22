@@ -101,7 +101,7 @@ if (!client) {
 std::string client_name = utils::generate_mlm_client_id ("web.alert_rules");
 log_debug ("malamute client name = '%s'.", client_name.c_str ());
 
-int connect_timeout = 1000; // ms
+uint32_t connect_timeout = 1000; // ms
 int rv = mlm_client_connect (client, MLM_ENDPOINT, connect_timeout, client_name.c_str ());
 if (rv == -1) { // if failed, retry with larger timeout
     connect_timeout += 1000;
@@ -157,7 +157,7 @@ if (!poller) {
 }
 
 while (true) {
-    zsock_t *which = (zsock_t *) zpoller_wait (poller, 5000);
+    zsock_t *which = static_cast<zsock_t*>(zpoller_wait (poller, 5000));
     if (which) {
         recv_msg = mlm_client_recv (client);
     }

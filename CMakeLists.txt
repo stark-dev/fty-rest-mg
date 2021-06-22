@@ -10,34 +10,49 @@ project(fty_rest
 set(PROJECT_NAME_HYPHEN fty-rest)
 
 ##############################################################################################################
-find_package(fty-cmake PATHS ${CMAKE_BINARY_DIR}/fty-cmake)
+find_package(fty-cmake      PATHS ${CMAKE_BINARY_DIR}/fty-cmake)
+find_package(fty-cmake-rest PATHS ${CMAKE_BINARY_DIR}/fty-cmake-rest)
+resolve_lib(tntnet)
 ##############################################################################################################
+
+etn_target(static ${PROJECT_NAME}-lib
+    SOURCES
+        src/*.cc
+        src/*.h
+    INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+    FLAGS
+        -Wno-format-nonliteral
+    USES
+        fty-cmake-rest
+        fty-utils
+        cidr
+        magic
+        cxxtools
+        tntnet
+        tntdb
+        czmq
+        z
+        mlm
+        fty_proto
+        fty_shm
+        fty_asset_activator
+        fty_common
+        fty_common_logging
+        fty_common_rest
+        fty_common_db
+        fty_common_mlm
+        fty_common_messagebus
+        fty_common_dto
+    PRIVATE
+)
 
 # Define the servlet
 etn_target(shared ${PROJECT_NAME}
-  SOURCES
-    src/*.cc
-  INCLUDE_DIRS
-    include
-  USES
-    fty-cmake-rest
-    cidr
-    magic
-    cxxtools
-    tntnet
-    tntdb
-    czmq
-    mlm
-    fty_proto
-    fty_shm
-    fty_asset_activator
-    fty_common
-    fty_common_logging
-    fty_common_rest
-    fty_common_db
-    fty_common_mlm
-    fty_common_messagebus
-    fty_common_dto
+    INCLUDE_DIRS
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+    USES
+        ${PROJECT_NAME}-lib
 )
 
 # Get the ecpp

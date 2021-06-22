@@ -33,7 +33,6 @@
 #include <tnt/mimedb.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_macros.h>
-#include <fty_common_mlm_subprocess.h>
 #include <cxxtools/serializationinfo.h>
 #include <cxxtools/jsondeserializer.h>
 #include "shared/utils.h"
@@ -75,7 +74,7 @@ class _clonedcode_cstreambuf : public std::streambuf
 
     size_type size() const
     { return _chunks.size() == 0 ? 0
-           : (_chunks.size() - 1) * _chunksize + pptr() - _chunks.back(); }
+           : size_t((_chunks.size() - 1) * _chunksize + pptr() - _chunks.back()); }
 
     size_type chunksize(size_type n) const
     {
@@ -204,7 +203,7 @@ void _clonedcode_cstreambuf::rollback(size_type n)
     _chunks.resize(c + 1);
 
     setp(_chunks[c], _chunks[c] + _chunksize);
-    pbump(n % _chunksize);
+    pbump(int(n % _chunksize));
   }
 }
 
@@ -217,10 +216,10 @@ std::string _clonedcode_ocstream::str() const
   return ret;
 }
 
-void _clonedcode_ocstream::output(std::ostream& out) const
+void _clonedcode_ocstream::output(std::ostream& _out) const
 {
   for (unsigned n = 0; n < chunkcount(); ++n)
-    out.write(chunk(n), chunksize(n));
+    _out.write(chunk(n), std::streamsize(chunksize(n)));
 }
 
 class _clonedcode_Compressor
@@ -258,7 +257,7 @@ class _clonedcode_Compressor
         {
           _deflator.end();
 
-          uint32_t u = _crc;
+          uint32_t u = uint32_t(_crc);
           _zbody.put(static_cast<char>(u & 0xFF));
           _zbody.put(static_cast<char>((u >>= 8) & 0xFF));
           _zbody.put(static_cast<char>((u >>= 8) & 0xFF));
@@ -306,7 +305,7 @@ std::string build_content_filename(const std::string& baseName)
     }
 
     time_t t = time(NULL);
-    if ( t == (time_t)-1 ) {
+    if ( t == time_t(-1)) {
         log_error ("time(NULL) failed: '%s'", strerror (errno));
     }
     else {
@@ -646,9 +645,9 @@ UserInfo user;
 
                 if (!data.isRealFile) { // exported logfiles
                     std::string err;
-                    int r = process_basename_export(data.baseName, data.filePath, err);
+                    int r1 = process_basename_export(data.baseName, data.filePath, err);
                     temp_logfiles.push_back(data.filePath);
-                    if (r != 0) {
+                    if (r1 != 0) {
                         log_warning("%s", err.c_str());
                         continue; // anyway
                     }
@@ -830,7 +829,7 @@ UserInfo user;
                 // compress the whole content //NOTE: compressor << ifstream?
                 _clonedcode_Compressor compressor;
                 compressor.init();
-                compressor.compress(fileContent.data(), fileContent.size());
+                compressor.compress(fileContent.data(), uint32_t(fileContent.size()));
                 compressor.finalize();
 
 #ifdef _GETLOG_TEST_
@@ -893,7 +892,7 @@ UserInfo user;
             msg += ": getgroups() returned ";
             msg += std::to_string(ngroups);
             if (ngroups > 0) {
-                gid_t *groups = (gid_t *)malloc(ngroups * sizeof(gid_t));
+                gid_t *groups = static_cast<gid_t*>(malloc(size_t(ngroups) * sizeof(gid_t)));
                 if (groups != NULL) {
                     ngroups = getgroups(ngroups, groups);
                     if (ngroups > 0) {

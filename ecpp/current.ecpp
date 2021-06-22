@@ -32,8 +32,8 @@
 #include <sys/types.h>
 #include <fty_common_rest_helpers.h>
 #include <fty_common_db_dbpath.h>
+#include <fty_common_mlm_pool.h>
 #include <fty_common_db_asset.h>
-#include <fty_common_mlm_tntmlm.h>
 #include <fty_common_asset_types.h>
 #include <fty_common_macros.h>
 #include <fty_shm.h>
@@ -65,7 +65,7 @@ s_os2string(
             {15, "In_Service"}
     };
 
-    int os = (int) d; // measurements are received as double
+    int os = int(d); // measurements are received as double
     if (OS2STRING.count(os) == 0)
         os = 0;
     return OS2STRING.at(os);
@@ -194,8 +194,8 @@ std::vector<uint32_t> asset_ids;
 
 
     // connect to malamute
-    MlmClientPool::Ptr client = mlm_pool.get ();
-    if (!client.getPointer ()) {
+    auto client = mlm_pool.get();
+    if (!client) {
         log_fatal ("mlm_pool.get () failed.");
         std::string err =  TRANSLATE_ME ("mlm_pool.get () failed.");
         http_die ("internal-error", err.c_str ());
@@ -231,15 +231,15 @@ std::vector<uint32_t> asset_ids;
           if(mresult.size() == 0) {
             continue;
           }
-          for(auto &data : mresult) {
+          for(auto &data1 : mresult) {
               // TODO: non double values are not (yet) supported
               double dvalue = 0.0;
               try {
-                  dvalue = std::stod (fty_proto_value (data));
+                  dvalue = std::stod (fty_proto_value (data1));
               } catch (const std::exception& e) {
-                  log_error ("fty_proto_value () returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", fty_proto_value (data));
+                  log_error ("fty_proto_value () returned a string that does not encode a double value: '%s'. Defaulting to 0.0 value.", fty_proto_value (data1));
               }
-              measurements.emplace (std::make_pair (fty_proto_type (data), dvalue));
+              measurements.emplace (std::make_pair (fty_proto_type (data1), dvalue));
           }
         }
 //        zuuid_t *uuid = zuuid_new ();
@@ -362,7 +362,7 @@ std::vector<uint32_t> asset_ids;
 
             if( one_measurement.first == "status.ups" )
             {
-              siJson.addMember(one_measurement.first) <<= shared::upsstatus_to_string(one_measurement.second);
+              siJson.addMember(one_measurement.first) <<= shared::upsstatus_to_string(uint16_t(one_measurement.second));
             }
             else if (one_measurement.first == "operatingStatus" )
             {
