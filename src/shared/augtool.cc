@@ -81,7 +81,7 @@ std::string augtool::get_cmd_out_raw(std::string command) {
         command += "\n";
     if(!prc->write(command))
         err = true;
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    //std::this_thread::sleep_for(std::chrono::microseconds(500));
     ret = prc->readAllStandardOutput();
     return err ? "" : ret;
 }
@@ -110,11 +110,11 @@ augtool* augtool::get_instance() {
         inst.prc = new fty::Process("sudo", {"augtool", "-S", "-I/usr/share/fty/lenses", "-e"});
 
         //sleep to ensure augeas is launched
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        //std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     if(!inst.prc->exists()) {
         inst.prc->run();
-        nil = inst.get_cmd_out_raw("help\n");
+        nil = inst.get_cmd_out_raw("help");
         if(nil.find("match") == nil.npos) {
             delete inst.prc;
             inst.prc = NULL;
