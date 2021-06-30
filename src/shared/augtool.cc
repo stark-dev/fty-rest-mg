@@ -30,6 +30,7 @@
 #include <mutex>
 #include <thread>
 #include <chrono>
+#include <fty_log.h>
 
 #include "shared/augtool.h"
 
@@ -81,7 +82,7 @@ std::string augtool::get_cmd_out_raw(std::string command) {
         command += "\n";
     if(!prc->write(command))
         err = true;
-    //std::this_thread::sleep_for(std::chrono::microseconds(500));
+    //std::this_thread::sleep_for(std::chrono::microseconds(1000));
     ret = prc->readAllStandardOutput();
     return err ? "" : ret;
 }
@@ -113,12 +114,16 @@ augtool* augtool::get_instance() {
         //std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     if(!inst.prc->exists()) {
-        inst.prc->run();
-        nil = inst.get_cmd_out_raw("help");
-        if(nil.find("match") == nil.npos) {
-            delete inst.prc;
-            inst.prc = NULL;
-            return NULL;
+        if (inst.prc->run()) {
+            //std::this_thread::sleep_for(std::chrono::seconds(1));
+            nil = inst.get_cmd_out_raw("help");
+            //log_debug("augtool: %s", nil.c_str());
+            if(nil.find("match") == nil.npos) {
+                //log_error("Cleanup wrong augtool");
+                delete inst.prc;
+                inst.prc = NULL;
+                return NULL;
+            }
         }
     }
     inst.clear();
