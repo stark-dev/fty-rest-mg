@@ -82,8 +82,7 @@ std::string augtool::get_cmd_out_raw(std::string command) {
         command += "\n";
     if(!prc->write(command))
         err = true;
-    //std::this_thread::sleep_for(std::chrono::microseconds(1000));
-    ret = prc->readAllStandardOutput();
+    ret = prc->readAllStandardOutput(500);
     return err ? "" : ret;
 }
 
@@ -91,8 +90,9 @@ void augtool::run_cmd(std::string cmd) {
     get_cmd_out_raw(cmd);
 }
 
+static std::mutex clear_mux;
+
 void augtool::clear() {
-    static std::mutex clear_mux;
     std::lock_guard<std::mutex> lock(clear_mux);
     run_cmd("");
     run_cmd("load");
@@ -109,17 +109,11 @@ augtool* augtool::get_instance() {
 
     if(inst.prc == NULL) {
         inst.prc = new fty::Process("sudo", {"augtool", "-S", "-I/usr/share/fty/lenses", "-e"});
-
-        //sleep to ensure augeas is launched
-        //std::this_thread::sleep_for(std::chrono::seconds(2));
     }
     if(!inst.prc->exists()) {
         if (inst.prc->run()) {
-            //std::this_thread::sleep_for(std::chrono::seconds(1));
             nil = inst.get_cmd_out_raw("help");
-            //log_debug("augtool: %s", nil.c_str());
             if(nil.find("match") == nil.npos) {
-                //log_error("Cleanup wrong augtool");
                 delete inst.prc;
                 inst.prc = NULL;
                 return NULL;
