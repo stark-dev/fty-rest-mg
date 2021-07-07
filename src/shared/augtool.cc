@@ -102,16 +102,19 @@ static std::mutex in_mux;
 
 augtool* augtool::get_instance() {
     static augtool inst;
-    std::string nil;
+    /*std::string nil;
 
     // Initialization of augtool subprocess if needed
     std::lock_guard<std::mutex> lock(in_mux);
 
     if(inst.prc == NULL) {
+        logDebug("new Process");
         inst.prc = new fty::Process("sudo", {"augtool", "-S", "-I/usr/share/fty/lenses", "-e"});
     }
     if(!inst.prc->exists()) {
+        logDebug("Proc not exits");
         if (inst.prc->run()) {
+            logDebug("run process");
             nil = inst.get_cmd_out_raw("help");
             if(nil.find("match") == nil.npos) {
                 delete inst.prc;
@@ -120,6 +123,25 @@ augtool* augtool::get_instance() {
             }
         }
     }
-    inst.clear();
+    inst.clear();*/
     return &inst;
+}
+
+augtool::augtool()
+{
+    logDebug("new Process");
+    prc = new fty::Process("sudo", {"augtool", "-S", "-I/usr/share/fty/lenses", "-e"});
+
+    if(!prc->exists()) {
+        logDebug("Proc not exits");
+        if (prc->run()) {
+            logDebug("run process");
+            std::string nil = get_cmd_out_raw("help");
+            if(nil.find("match") == nil.npos) {
+                delete prc;
+                prc = NULL;
+            }
+        }
+    }
+    clear();
 }
