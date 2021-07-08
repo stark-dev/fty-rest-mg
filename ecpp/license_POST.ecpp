@@ -134,7 +134,16 @@ bool database_ready;
         // while calling the /bin/systemctl and is eventually killed,
         // even though the actual services of our product have started
         // long before this; so even if it failed - try to use the DB...
-        auto rv_svc = fty::Process::run("/usr/libexec/fty/start-db-services", {}, proc_out, proc_err);
+        fty::Process proc("/usr/libexec/fty/start-db-services", {}, fty::Capture::Out | fty::Capture::Err);
+        if (auto ret = proc.run(); !ret) {
+            logError("Starting of start-db-services have failed. Consult system logs");
+            logError(ret.error());
+            http_die("internal-error", ret.error().c_str());
+        }
+        auto rv_svc = proc.wait(5000);
+        proc_out = proc.readAllStandardOutput();
+        proc_err = proc.readAllStandardError();
+
         uint64_t tme_finish = uint64_t(::time (NULL));
         log_info ("Starting db service completed, timestamp=%" PRIu64 " (duration=%" PRIu64 "), exit-code=%i ..." ,
             tme_finish, (tme_finish - tme_start), *rv_svc);
@@ -142,7 +151,8 @@ bool database_ready;
             log_error ("Starting of start-db-services have failed. Consult system logs");
             log_error ("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                 "/usr/libexec/fty/start-db-services", *rv_svc, proc_out.c_str (), proc_err.c_str ());
-            if (rv_svc > 0) {
+
+            if (rv_svc.error() != "timeout") {
                 std::string err =  TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs");
                 log_error_audit ("Request CREATE license FAILED");
                 http_die ("internal-error", err.c_str ());
