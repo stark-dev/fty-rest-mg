@@ -140,22 +140,32 @@ bool database_ready;
             logError(ret.error());
             http_die("internal-error", ret.error().c_str());
         }
-        auto rv_svc = proc.wait(5000);
+        auto rv_svc = proc.wait(10000);
         proc_out = proc.readAllStandardOutput();
         proc_err = proc.readAllStandardError();
 
         uint64_t tme_finish = uint64_t(::time (NULL));
-        log_info ("Starting db service completed, timestamp=%" PRIu64 " (duration=%" PRIu64 "), exit-code=%i ..." ,
-            tme_finish, (tme_finish - tme_start), *rv_svc);
+        if (rv_svc) {
+            log_info ("Starting db service completed, timestamp=%" PRIu64 " (duration=%" PRIu64 "), exit-code=%i ..." ,
+                tme_finish, (tme_finish - tme_start), *rv_svc);
+        } else {
+            log_info ("Starting db service completed, timestamp=%" PRIu64 " (duration=%" PRIu64 "), exit-code=%s ..." ,
+                tme_finish, (tme_finish - tme_start), rv_svc.error().c_str());
+        }
         if (!rv_svc || *rv_svc != 0) {
             log_error ("Starting of start-db-services have failed. Consult system logs");
             log_error ("%s failed with code %d.\n===== STDOUT: =====\n%s\n===== STDERR: =====\n%s\n=====",
                 "/usr/libexec/fty/start-db-services", *rv_svc, proc_out.c_str (), proc_err.c_str ());
+            if (!rv_svc) {
+                logError("--------------{}----------------", rv_svc.error());
+            }
 
             if (rv_svc.error() != "timeout") {
                 std::string err =  TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs");
                 log_error_audit ("Request CREATE license FAILED");
                 http_die ("internal-error", err.c_str ());
+            } else {
+                proc.interrupt();
             }
             // Negative return means killed by signal, typically by our
             // subprocess timeout handling - fall through to try using DB
