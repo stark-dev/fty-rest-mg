@@ -143,6 +143,7 @@ bool database_ready;
         auto rv_svc = proc.wait(10000);
         proc_out = proc.readAllStandardOutput();
         proc_err = proc.readAllStandardError();
+        proc.kill();
 
         uint64_t tme_finish = uint64_t(::time (NULL));
         if (rv_svc) {
@@ -164,8 +165,6 @@ bool database_ready;
                 std::string err =  TRANSLATE_ME ("Starting of start-db-services have failed. Consult system logs");
                 log_error_audit ("Request CREATE license FAILED");
                 http_die ("internal-error", err.c_str ());
-            } else {
-                proc.interrupt();
             }
             // Negative return means killed by signal, typically by our
             // subprocess timeout handling - fall through to try using DB
